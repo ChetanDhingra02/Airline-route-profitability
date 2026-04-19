@@ -127,7 +127,7 @@ The most important features include:
 - Ticket Revenue  
 - Load Factor  
 - Ancillary Revenue  
-- Flight Hours  
+- Flight Hours
 
 In the absence of revenue variables, cost and operational features such as fuel cost and passenger count become more influential.
 
