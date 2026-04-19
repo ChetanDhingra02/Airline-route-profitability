@@ -1,249 +1,184 @@
+# Airline Route Profitability and Decision Intelligence System
 
+## 1. Introduction
 
-# Airline Route Profitability & Optimization System
+Airline route planning is a complex optimization problem involving demand forecasting, cost control, and profitability management. Airlines must continuously evaluate whether to expand, maintain, optimize, or discontinue routes based on financial and operational performance.
 
-## Project Overview
+This project develops a data-driven system to analyze route-level performance and support strategic decision-making. By combining exploratory data analysis, rule-based classification, and machine learning models, the system provides both descriptive insights and predictive capabilities.
 
-This project presents a data-driven system for analyzing airline route performance and supporting strategic decision-making. It integrates exploratory data analysis, business logic, and machine learning to classify airline routes into actionable categories.
-
-The system is designed to answer a key business question:
-
-**Which airline routes should be expanded, maintained, optimized, or discontinued?**
-
-By combining financial, operational, and demand-based features, the project simulates real-world airline decision-making and demonstrates how data science can be used to optimize network performance.
+The objective is not only to understand current route performance but also to evaluate how early-stage operational features can be used to anticipate outcomes.
 
 ---
 
-## Business Objective
+## 2. Dataset Description
 
-Airlines operate in a highly competitive environment where route-level profitability is critical. Poorly performing routes can lead to significant losses, while high-performing routes present opportunities for expansion.
+The dataset contains 7,974 observations and 33 variables, representing airline route operations. Each row corresponds to a specific flight instance.
 
-The objective of this project is to:
+The dataset includes:
 
-- Evaluate route-level financial performance  
-- Identify inefficiencies in cost and pricing  
-- Classify routes into strategic decision categories  
-- Build predictive models to automate decision-making  
-- Provide insights for improving airline network efficiency  
+- Operational variables such as flight duration, aircraft capacity, and load factor  
+- Demand-related features including passenger count, demand level, and seasonality  
+- Revenue components such as ticket and ancillary revenue  
+- Cost components including fuel, maintenance, crew, and overhead costs  
+- Derived financial metrics such as total cost, profit, and profit margin  
 
----
-
-## Dataset Description
-
-The dataset contains 7,974 route-level observations with 33 variables, including:
-
-### Operational Features
-- Flight Hours  
-- Aircraft Type & Capacity  
-- Load Factor  
-- Route Category  
-
-### Demand Features
-- Passenger Count  
-- Demand Level  
-- Seasonality  
-
-### Revenue Components
-- Ticket Revenue  
-- Ancillary Revenue  
-- Total Revenue  
-
-### Cost Components
-- Fuel Cost  
-- Maintenance Cost  
-- Crew Cost  
-- Sales & Distribution Cost  
-- Overhead Costs  
-
-### Financial Outputs
-- Total Cost  
-- Profit  
-- Profit Margin  
-
-Each row represents a single route instance, enabling detailed analysis at a granular level.
+Before analysis, the dataset was validated to ensure internal consistency. Profit values were verified against revenue and cost components, load factors were confirmed to lie within valid bounds, and no duplicate records were detected.
 
 ---
 
-## Data Validation & Preprocessing
+## 3. Exploratory Data Analysis
 
-Before analysis and modeling:
+Exploratory analysis was conducted to understand the key drivers of profitability and identify patterns in route performance.
 
-- No duplicate records were found  
-- Profit consistency was verified (Profit = Revenue - Cost)  
-- Load factor values were validated (between 0 and 1)  
-- Passenger counts did not exceed aircraft capacity  
-- Missing values were handled using targeted imputation  
-
----
-
-## Exploratory Data Analysis
-
-### Profit vs Load Factor
-
-![Profit vs Load Factor](images/profit_vs_load.png)
-
-Higher load factors generally lead to higher profitability, although cost structure plays a significant role in determining final outcomes.
-
----
-
-### Profit vs Flight Duration
-
-![Profit vs Flight Duration](images/profit_vs_duration.png)
-
-Mid-range flights tend to be more profitable, while long-haul routes often face higher operational costs.
-
----
-
-### Profit Distribution
+### 3.1 Profit Distribution
 
 ![Profit Distribution](images/profit_distribution.png)
 
-The distribution shows a mix of profitable and loss-making routes, with a small subset generating very high profits.
+The distribution reveals a mix of profitable and loss-making routes, with a long right tail indicating that a small number of routes generate disproportionately high profits.
 
 ---
 
-### Cost Structure Analysis
+### 3.2 Profit vs Load Factor
+
+![Profit vs Load Factor](images/profit_vs_load.png)
+
+A strong positive relationship is observed between load factor and profit. However, variability within similar load levels suggests that cost structure also plays a significant role.
+
+---
+
+### 3.3 Profit vs Flight Duration
+
+![Profit vs Flight Duration](images/profit_vs_duration.png)
+
+Mid-range flights tend to achieve higher profitability, while very long routes often experience reduced margins due to increased operational costs.
+
+---
+
+### 3.4 Cost Structure
 
 ![Cost Breakdown](images/cost_breakdown.png)
 
-Fuel cost is the largest expense, followed by sales distribution and overhead costs, indicating the importance of both operational efficiency and pricing strategy.
+Fuel cost is the dominant expense category, followed by sales distribution and overhead costs. This highlights the importance of both operational efficiency and pricing strategy.
 
 ---
 
-## Route Decision Engine
+## 4. Rule-Based Decision Framework
 
-A rule-based classification system was built using:
+A rule-based classification system was developed to categorize each route into one of four strategic decisions:
 
-- Profit  
-- Profit Margin  
-- Load Factor  
-
-Each route is categorized into:
-
-| Category   | Description |
-|------------|------------|
-| Expand     | High-performing routes with strong demand |
-| Maintain   | Stable routes with consistent performance |
-| Optimize   | Profitable but inefficient routes |
-| Drop       | Loss-making routes |
-
----
+- Expand: High profit, high margin, high load factor  
+- Maintain: Stable performance with consistent profitability  
+- Optimize: Profitable but inefficient routes  
+- Drop: Loss-making routes  
 
 ### Route Decision Distribution
 
-![Route Decision Distribution](images/decision_distribution.png)
+![Decision Distribution](images/decision_distribution.png)
 
-A large portion of routes require optimization, while a significant number are loss-making. Only a small subset qualifies for expansion.
-
----
-
-## Machine Learning Models
-
-Three models were developed to predict route decisions:
-
-### Model 1: With Revenue Variables
-- Uses full financial and operational data  
-- Accuracy: ~88%  
+The results show that a significant portion of routes require optimization, while a considerable number are loss-making. Only a small subset qualifies for expansion.
 
 ---
 
-### Model 2: Without Revenue Variables
-- Uses operational and cost features only  
-- Accuracy: ~84%  
+## 5. Machine Learning Models
+
+To automate decision-making, three classification models were developed using different feature sets.
+
+### 5.1 Model Definitions
+
+1. **Model 1: Full Model (With Revenue Variables)**  
+   Uses all financial and operational features  
+
+2. **Model 2: Without Revenue Variables**  
+   Excludes revenue-related features to simulate partial information scenarios  
+
+3. **Model 3: Pre-Operational Model**  
+   Uses only demand and operational features available before route performance is realized  
 
 ---
 
-### Model 3: Pre-Operational Model
-- Uses only demand and route features  
-- Accuracy: ~72%  
-
----
-
-## Model Comparison
+### 5.2 Model Performance Comparison
 
 ![Model Comparison](images/model_comparison.png)
 
-Model performance decreases as financial information is removed, but remains reasonably strong, indicating that decisions can be predicted early.
+| Model | Accuracy | Macro F1 |
+|------|---------|----------|
+| With Revenue Variables | ~0.88 | ~0.88 |
+| Without Revenue Variables | ~0.84 | ~0.84 |
+| Pre-Operational Model | ~0.72 | ~0.73 |
+
+The results show a clear decline in performance as financial information is removed. However, even the pre-operational model achieves reasonable predictive power, indicating that early-stage decisions can be informed using limited data.
 
 ---
 
-## Confusion Matrix
+### 5.3 Confusion Matrix (Best Model)
 
 ![Confusion Matrix](images/confusion_matrix.png)
 
-The model performs well across all categories, with particularly strong results for identifying loss-making and optimization routes.
+The full model demonstrates strong performance across all decision classes. It is particularly effective in identifying loss-making routes and optimization candidates, with relatively low misclassification rates.
 
 ---
 
-## Feature Importance
+### 5.4 Feature Importance
 
 ![Feature Importance](images/feature_importance.png)
 
-Key drivers of route decisions include:
+The most important features include:
 
-- Load Factor  
 - Ticket Revenue  
+- Load Factor  
+- Ancillary Revenue  
 - Flight Hours  
-- Passenger Volume  
 
-Without revenue variables, cost and operational factors become more dominant.
-
----
-
-## Business Insights
-
-### 1. Optimization Opportunity
-A large portion of routes are profitable but inefficient, indicating strong potential for improvement.
-
-### 2. Structural Losses
-Many routes consistently generate losses and may need to be discontinued or redesigned.
-
-### 3. Limited Expansion Opportunities
-Only a small percentage of routes qualify for expansion, suggesting profitability is concentrated.
-
-### 4. Dynamic Route Behavior
-Route performance varies over time, indicating that decisions should be dynamic rather than static.
-
-### 5. Strategic Implication
-Airline decision-making should incorporate both current performance and future projections.
+In the absence of revenue variables, cost and operational features such as fuel cost and passenger count become more influential.
 
 ---
 
-## System Design Perspective
+## 6. Key Insights
 
-The project separates modeling into three levels:
+Several important insights emerge from the analysis:
 
-1. Full financial model (post-performance analysis)  
-2. Operational model (without revenue)  
-3. Pre-operational model (early-stage prediction)  
-
-This reflects real-world decision-making workflows.
-
----
-
-## Limitations
-
-- The dataset is simulated and may not capture full real-world complexity  
-- External factors such as competition and weather are not included  
-- Time-based dynamics are simplified  
+- A large portion of routes are profitable but inefficient, indicating strong optimization opportunities  
+- Many routes consistently generate losses and may need to be discontinued  
+- High profitability is concentrated in a small subset of routes  
+- Route performance is dynamic and varies over time  
+- Operational features alone can provide meaningful predictive signals  
 
 ---
 
-## Conclusion
+## 7. System Deployment
 
-This project demonstrates how data science can support business decision-making by combining:
+The analysis was deployed as an interactive dashboard using Streamlit. The dashboard allows users to:
 
-- Exploratory data analysis  
-- Business rule-based systems  
-- Machine learning models  
+- Explore route performance metrics  
+- Visualize profitability patterns  
+- View top-performing and underperforming routes  
+- Analyze route stability and variability  
+- Generate machine learning-based route decisions  
 
-The results show that route profitability depends on multiple factors, including demand, cost structure, and operational efficiency.
+The system is designed for demonstration purposes and operates on a static dataset. It does not reflect real-time airline operations.
 
-Importantly, the project highlights that meaningful decisions can be predicted even before full financial outcomes are available, making it valuable for strategic planning.
+---
+
+## 8. Limitations
+
+- The dataset is simulated and may not fully capture real-world airline complexity  
+- External factors such as competition, pricing dynamics, and weather are not included  
+- Temporal dependencies are simplified  
+
+---
+
+## 9. Conclusion
+
+This project demonstrates how data science techniques can be applied to solve real-world business problems in airline operations.
+
+By integrating exploratory analysis, rule-based logic, and machine learning, the system provides a comprehensive framework for route-level decision-making.
+
+A key takeaway is that while financial data significantly improves prediction accuracy, meaningful insights can still be derived from operational and demand features alone. This enables earlier and more proactive decision-making in real-world scenarios.
 
 ---
 
 ## Author
 
 Chetan  
-MSc Modeling, Data & Predictions (University of Alberta)
+MSc Modeling, Data & Predictions  
+University of Alberta
