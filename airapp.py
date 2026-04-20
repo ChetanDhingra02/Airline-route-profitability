@@ -16,37 +16,37 @@ st.set_page_config(
 # ─────────────────────────────────────────────────────────────
 #  THEME TOKENS  ← edit only these to restyle the entire app
 # ─────────────────────────────────────────────────────────────
-# Clean neutral glass palette — restrained, professional, readable
-BG_BASE   = "#f6f8fb"
-BG_MESH_A = "rgba(37,99,235,0.10)"
-BG_MESH_B = "rgba(15,23,42,0.06)"
-BG_MESH_C = "rgba(255,255,255,0.55)"
+# Pastel liquid-glass palette — restrained, professional, readable
+BG_BASE   = "#f5f7fb"
+BG_MESH_A = "rgba(167, 139, 250, 0.10)"
+BG_MESH_B = "rgba(125, 211, 252, 0.08)"
+BG_MESH_C = "rgba(255,255,255,0.45)"
 
-GLASS_BG     = "rgba(255,255,255,0.72)"
-GLASS_BORDER = "rgba(255,255,255,0.92)"
-GLASS_BLUR   = "blur(16px)"
+GLASS_BG     = "rgba(255,255,255,0.55)"
+GLASS_BORDER = "rgba(255,255,255,0.85)"
+GLASS_BLUR   = "blur(20px)"
 
 INK       = "#0f172a"
 INK_SOFT  = "#334155"
 INK_MUTED = "#64748b"
 
-ACCENT    = "#2563eb"
-ACCENT_DK = "#1d4ed8"
-ACCENT_LT = "#dbeafe"
+ACCENT    = "#7c8cf8"
+ACCENT_DK = "#6473eb"
+ACCENT_LT = "#e8edff"
 
 COLOR_GREEN  = "#047857"
 COLOR_YELLOW = "#b45309"
 COLOR_ORANGE = "#c2410c"
 COLOR_PINK   = "#be123c"
 
-CHART_EXPAND   = "#2563eb"
-CHART_MAINTAIN = "#0f766e"
-CHART_OPTIMIZE = "#d97706"
-CHART_ORANGE   = "#d97706"
-CHART_DROP     = "#dc2626"
+CHART_EXPAND   = "#93c5fd"
+CHART_MAINTAIN = "#99f6e4"
+CHART_OPTIMIZE = "#fde68a"
+CHART_ORANGE   = "#fde68a"
+CHART_DROP     = "#fca5a5"
 CHART_NEUTRAL  = [
-    "#2563eb", "#0f766e", "#7c3aed", "#d97706",
-    "#0891b2", "#64748b", "#14b8a6", "#94a3b8",
+    "#c4b5fd", "#bfdbfe", "#bae6fd", "#ddd6fe",
+    "#fecdd3", "#fde68a", "#bbf7d0", "#cbd5e1",
 ]
 # ─────────────────────────────────────────────────────────────
 #  GLOBAL CSS — refined monochrome-violet glass + motion
@@ -71,8 +71,20 @@ st.markdown(f"""
     --radius-lg: 22px;
     --radius-xl: 28px;
     --shadow-sm: 0 8px 24px rgba(15,23,42,0.05);
-    --shadow-md: 0 14px 36px rgba(15,23,42,0.08);
-    --shadow-lg: 0 24px 60px rgba(15,23,42,0.10);
+    --shadow-md: 0 18px 38px rgba(15,23,42,0.08);
+    --shadow-lg: 0 26px 60px rgba(15,23,42,0.10);
+    --motion-fast: 180ms cubic-bezier(.2,.8,.2,1);
+    --motion-med: 260ms cubic-bezier(.2,.8,.2,1);
+}}
+
+@keyframes floatIn {{
+    from {{ opacity: 0; transform: translateY(10px); }}
+    to {{ opacity: 1; transform: translateY(0); }}
+}}
+
+@keyframes driftGlow {{
+    0%, 100% {{ transform: translate3d(0,0,0); }}
+    50% {{ transform: translate3d(0,-3px,0); }}
 }}
 
 html, body, [class*="css"] {{
@@ -82,17 +94,17 @@ html, body, [class*="css"] {{
 .stApp {{
     min-height: 100vh;
     background:
-        radial-gradient(circle at 12% 18%, {BG_MESH_A} 0, transparent 34%),
-        radial-gradient(circle at 88% 12%, {BG_MESH_C} 0, transparent 28%),
-        radial-gradient(circle at 82% 82%, {BG_MESH_B} 0, transparent 26%),
-        linear-gradient(180deg, #fbfdff 0%, {BG_BASE} 100%);
+        radial-gradient(circle at 14% 18%, {BG_MESH_A} 0, transparent 30%),
+        radial-gradient(circle at 86% 14%, {BG_MESH_B} 0, transparent 28%),
+        linear-gradient(180deg, #fbfcff 0%, {BG_BASE} 100%);
     background-attachment: fixed;
 }}
 
 .main .block-container {{
     max-width: 1280px;
-    padding-top: 1.45rem;
+    padding-top: 2rem;
     padding-bottom: 3rem;
+    animation: floatIn 420ms ease-out;
 }}
 
 section.main > div {{
@@ -100,7 +112,7 @@ section.main > div {{
 }}
 
 [data-testid="stSidebar"] {{
-    background: rgba(248,250,252,0.76) !important;
+    background: rgba(255,255,255,0.50) !important;
     border-right: 1px solid rgba(148,163,184,0.18) !important;
     backdrop-filter: var(--glass-blur) !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
@@ -148,17 +160,25 @@ h1, h2, h3, h4 {{
     border-radius: var(--radius-xl);
     padding: 1.5rem 1.75rem;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.60));
-    border: 1px solid rgba(255,255,255,0.92);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.88);
+    background: linear-gradient(135deg, rgba(255,255,255,0.58), rgba(255,255,255,0.38));
+    border: 1px solid rgba(255,255,255,0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.70);
 }}
 .hero::before {{
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(110deg, rgba(37,99,235,0.06), transparent 50%, rgba(15,23,42,0.03));
+    background: linear-gradient(115deg, rgba(255,255,255,0.14), transparent 42%, rgba(124,140,248,0.05) 100%);
+    pointer-events: none;
+}}
+.hero::after {{
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: calc(var(--radius-xl) - 1px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.18), transparent 42%);
     pointer-events: none;
 }}
 .hero-left, .hero-badge, .hero-glyph {{ position: relative; z-index: 1; }}
@@ -180,34 +200,45 @@ h1, h2, h3, h4 {{
     color: var(--ink-muted) !important;
     font-size: 0.90rem;
 }}
-.hero-badge {{
+.hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
     padding: 0.58rem 1rem;
     border-radius: 999px;
-    border: 1px solid rgba(37,99,235,0.16);
-    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(124,140,248,0.18);
+    background: rgba(255,255,255,0.56);
     color: var(--accent);
     font-size: 0.78rem;
     font-weight: 700;
-    box-shadow: 0 4px 14px rgba(37,99,235,0.08);
-}}
-.hero-glyph {{
+    box-shadow: 0 4px 14px rgba(124,140,248,0.08);
+    transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+.hero-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(124,140,248,0.14);
+}
+.hero-glyph {
     font-size: 2.8rem;
-    color: rgba(37,99,235,0.16);
+    color: rgba(124,140,248,0.16);
     transform: rotate(-8deg);
-}}
+    animation: driftGlow 4.5s ease-in-out infinite;
+}
 
-[data-testid="metric-container"] {{
-    background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.66)) !important;
-    border: 1px solid rgba(255,255,255,0.95) !important;
+[data-testid="metric-container"] {
+    background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.38)) !important;
+    border: 1px solid rgba(255,255,255,0.84) !important;
     border-radius: var(--radius-md) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
-    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.90) !important;
+    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.72) !important;
     padding: 1rem 1.1rem !important;
+    transition: transform var(--motion-fast), box-shadow var(--motion-fast), background var(--motion-fast) !important;
 }}
+[data-testid="metric-container"]:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.78) !important;
+}
 [data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
     font-size: 0.64rem !important;
     font-weight: 700 !important;
@@ -224,8 +255,8 @@ h1, h2, h3, h4 {{
 
 .stTabs [data-baseweb="tab-list"] {{
     gap: 0.35rem;
-    background: rgba(255,255,255,0.54);
-    border: 1px solid rgba(255,255,255,0.90);
+    background: rgba(255,255,255,0.46);
+    border: 1px solid rgba(255,255,255,0.82);
     border-radius: 18px;
     padding: 0.35rem;
     backdrop-filter: blur(14px);
@@ -247,9 +278,9 @@ h1, h2, h3, h4 {{
     transform: translateY(-1px);
 }}
 .stTabs [aria-selected="true"] {{
-    background: rgba(255,255,255,0.92) !important;
+    background: rgba(255,255,255,0.72) !important;
     color: var(--accent) !important;
-    box-shadow: 0 8px 18px rgba(15,23,42,0.07), inset 0 0 0 1px rgba(37,99,235,0.10) !important;
+    box-shadow: 0 10px 22px rgba(15,23,42,0.07), inset 0 0 0 1px rgba(124,140,248,0.12) !important;
 }}
 .stTabs [data-baseweb="tab-panel"] {{
     padding-top: 1.35rem;
@@ -336,7 +367,7 @@ h1, h2, h3, h4 {{
 .stSelectbox [data-baseweb="select"] > div,
 .stTextInput input,
 .stNumberInput input {{
-    background: rgba(255,255,255,0.78) !important;
+    background: rgba(255,255,255,0.62) !important;
     border: 1px solid rgba(148,163,184,0.26) !important;
     border-radius: 12px !important;
     color: var(--ink) !important;
@@ -351,8 +382,8 @@ h1, h2, h3, h4 {{
 }}
 
 [data-testid="stForm"] {{
-    background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.66)) !important;
-    border: 1px solid rgba(255,255,255,0.95) !important;
+    background: linear-gradient(180deg, rgba(255,255,255,0.60), rgba(255,255,255,0.42)) !important;
+    border: 1px solid rgba(255,255,255,0.86) !important;
     border-radius: 24px !important;
     padding: 1.35rem 1.45rem 1.6rem !important;
     box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.92) !important;
@@ -382,37 +413,42 @@ h1, h2, h3, h4 {{
     border: 1px solid rgba(148,163,184,0.18) !important;
     box-shadow: var(--shadow-sm) !important;
 }}
-.stButton > button:hover {{
-    background: white !important;
-    transform: translateY(-1px);
-}}
+.stButton > button:hover {
+    background: rgba(255,255,255,0.92) !important;
+    transform: translateY(-2px);
+}
 
-[data-testid="stDataFrame"] {{
-    background: rgba(255,255,255,0.76) !important;
-    border: 1px solid rgba(255,255,255,0.94) !important;
+[data-testid="stDataFrame"] {
+    background: rgba(255,255,255,0.55) !important;
+    border: 1px solid rgba(255,255,255,0.82) !important;
     border-radius: 18px !important;
     overflow: hidden !important;
     box-shadow: var(--shadow-sm) !important;
-    backdrop-filter: blur(14px) !important;
-}}
+    backdrop-filter: blur(16px) !important;
+    transition: transform var(--motion-med), box-shadow var(--motion-med) !important;
+}
+[data-testid="stDataFrame"]:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg) !important;
+}
 [data-testid="stDataFrame"] [role="grid"] {{
     background: transparent !important;
 }}
 [data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{
     color: var(--ink) !important;
 }}
-[data-testid="stDataFrame"] [role="columnheader"] {{
-    background: rgba(248,250,252,0.95) !important;
+[data-testid="stDataFrame"] [role="columnheader"] {
+    background: transparent !important;
     color: var(--ink-muted) !important;
-    font-weight: 700 !important;
-    border-bottom: 1px solid rgba(148,163,184,0.18) !important;
-}}
+    font-weight: 600 !important;
+    border-bottom: 1px solid rgba(148,163,184,0.12) !important;
+}
 [data-testid="stDataFrame"] [role="gridcell"] {{
     border-bottom: 1px solid rgba(226,232,240,0.58) !important;
 }}
 
-[data-testid="stExpander"] {{
-    background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.64)) !important;
+[data-testid="stExpander"] {
+    background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.42)) !important;
     border: 1px solid rgba(255,255,255,0.94) !important;
     border-radius: 18px !important;
     box-shadow: var(--shadow-sm) !important;
@@ -427,14 +463,19 @@ h1, h2, h3, h4 {{
     border-radius: 16px !important;
 }}
 
-[data-testid="stPyplot"] {{
-    background: linear-gradient(180deg, rgba(255,255,255,0.80), rgba(255,255,255,0.64));
-    border: 1px solid rgba(255,255,255,0.94);
+[data-testid="stPyplot"] {
+    background: linear-gradient(180deg, rgba(255,255,255,0.56), rgba(255,255,255,0.40));
+    border: 1px solid rgba(255,255,255,0.84);
     border-radius: 20px;
     padding: 0.85rem;
     box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(12px);
-}}
+    backdrop-filter: blur(14px);
+    transition: transform var(--motion-med), box-shadow var(--motion-med);
+}
+[data-testid="stPyplot"]:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
 
 hr {{
     border: none !important;
@@ -474,10 +515,8 @@ def clean_fig(figsize=(8, 4)):
     fig.patch.set_alpha(0)
     ax.set_facecolor("none")
 
-    for spine in ["top", "right"]:
+    for spine in ["top", "right", "left", "bottom"]:
         ax.spines[spine].set_visible(False)
-    ax.spines["left"].set_color("#dbe3ef")
-    ax.spines["bottom"].set_color("#dbe3ef")
 
     ax.tick_params(colors=INK_MUTED, labelsize=8.5, length=0)
     ax.xaxis.label.set_color(INK_MUTED)
@@ -735,10 +774,18 @@ with tab2:
         mn, mx = min(apd.values.min(), 0), apd.values.max()
         pad = (mx - mn) * 0.10 if mx != mn else 1
         for bar, h in zip(bars, apd.values):
-            ty = h + pad if h >= 0 else h - pad
-            ax.text(bar.get_x() + bar.get_width()/2, ty, f"${h:,.0f}",
-                    ha="center", va="bottom" if h >= 0 else "top",
-                    fontsize=8, color=INK_MUTED, fontweight="700")
+            x = bar.get_x() + bar.get_width()/2
+            if h >= 0:
+                ty = h + pad
+                va = "bottom"
+                txt_color = INK_MUTED
+            else:
+                ty = h * 0.5
+                va = "center"
+                txt_color = "white"
+            ax.text(x, ty, f"${h:,.0f}",
+                    ha="center", va=va,
+                    fontsize=8, color=txt_color, fontweight="700")
         ax.set_ylabel("Average Profit ($)")
         ax.set_title("Average Profit by Decision")
         st.pyplot(fig)
@@ -897,8 +944,8 @@ with tab5:
         "How accurate are the models?</p>", unsafe_allow_html=True)
     fig, ax = clean_fig((8, 3.5))
     x = np.arange(len(comparison)); w = 0.33
-    acc_col  = ACCENT
-    f1_col   = "#0f766e"
+    acc_col  = "#c4b5fd"
+    f1_col   = "#bfdbfe"
     bars1 = ax.bar(x - w/2, comparison["Accuracy"], width=w, color=acc_col, label="Accuracy")
     bars2 = ax.bar(x + w/2, comparison["Macro F1"], width=w, color=f1_col, label="Macro F1")
     soften_bars(bars1)
