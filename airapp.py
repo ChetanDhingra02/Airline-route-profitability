@@ -16,517 +16,439 @@ st.set_page_config(
 # ─────────────────────────────────────────────────────────────
 #  THEME TOKENS  ← edit only these to restyle the entire app
 # ─────────────────────────────────────────────────────────────
-# Refined monochrome-violet palette — professional & recruiter-ready
-BG_BASE   = "#f7f5ff"    # barely-there lavender
+# Clean neutral glass palette — restrained, professional, readable
+BG_BASE   = "#f6f8fb"
+BG_MESH_A = "rgba(37,99,235,0.10)"
+BG_MESH_B = "rgba(15,23,42,0.06)"
+BG_MESH_C = "rgba(255,255,255,0.55)"
 
-GLASS_BG     = "rgba(255,255,255,0.60)"
-GLASS_BORDER = "rgba(255,255,255,0.88)"
-GLASS_BLUR   = "blur(20px)"
+GLASS_BG     = "rgba(255,255,255,0.72)"
+GLASS_BORDER = "rgba(255,255,255,0.92)"
+GLASS_BLUR   = "blur(16px)"
 
-INK       = "#18143a"    # near-black navy
-INK_SOFT  = "#3d3464"    # deep slate
-INK_MUTED = "#8b82b0"    # muted lavender
+INK       = "#0f172a"
+INK_SOFT  = "#334155"
+INK_MUTED = "#64748b"
 
-ACCENT    = "#6d28d9"    # single violet accent
-ACCENT_LT = "#ede9fe"    # accent wash
+ACCENT    = "#2563eb"
+ACCENT_DK = "#1d4ed8"
+ACCENT_LT = "#dbeafe"
 
-COLOR_GREEN  = "#14532d"
-COLOR_YELLOW = "#713f12"
-COLOR_ORANGE = "#7c2d12"
-COLOR_PINK   = "#831843"
+COLOR_GREEN  = "#047857"
+COLOR_YELLOW = "#b45309"
+COLOR_ORANGE = "#c2410c"
+COLOR_PINK   = "#be123c"
 
-# Monochrome violet tonal palette — single hue, 4 luminosity steps
-CHART_EXPAND   = "#4c1d95"   # darkest violet  (strong positive)
-CHART_MAINTAIN = "#6d28d9"   # deep violet
-CHART_OPTIMIZE = "#a78bfa"   # mid violet
-CHART_ORANGE   = "#a78bfa"
-CHART_DROP     = "#ddd6fe"   # palest violet   (weak/loss)
+CHART_EXPAND   = "#2563eb"
+CHART_MAINTAIN = "#0f766e"
+CHART_OPTIMIZE = "#d97706"
+CHART_ORANGE   = "#d97706"
+CHART_DROP     = "#dc2626"
 CHART_NEUTRAL  = [
-    "#4c1d95","#6d28d9","#7c3aed","#8b5cf6",
-    "#a78bfa","#c4b5fd","#ddd6fe","#ede9fe",
+    "#2563eb", "#0f766e", "#7c3aed", "#d97706",
+    "#0891b2", "#64748b", "#14b8a6", "#94a3b8",
 ]
-
 # ─────────────────────────────────────────────────────────────
 #  GLOBAL CSS — refined monochrome-violet glass + motion
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap');
-
-/* ── KEYFRAMES ─────────────────────────────────────────────── */
-@keyframes fadeUp {{
-    from {{ opacity:0; transform:translateY(14px); }}
-    to   {{ opacity:1; transform:translateY(0); }}
-}}
-@keyframes fadeIn {{
-    from {{ opacity:0; }} to {{ opacity:1; }}
-}}
-@keyframes orb-drift {{
-    0%,100% {{ transform: translate(0,0) scale(1); }}
-    33%      {{ transform: translate(14px,-10px) scale(1.04); }}
-    66%      {{ transform: translate(-8px, 7px) scale(0.97); }}
-}}
-@keyframes pulse-ring {{
-    0%   {{ box-shadow: 0 0 0 0 rgba(109,40,217,0.18); }}
-    70%  {{ box-shadow: 0 0 0 8px rgba(109,40,217,0); }}
-    100% {{ box-shadow: 0 0 0 0 rgba(109,40,217,0); }}
-}}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap');
 
 :root {{
-    --ink:       {INK};
-    --ink-soft:  {INK_SOFT};
+    --bg-base: {BG_BASE};
+    --glass-bg: {GLASS_BG};
+    --glass-border: {GLASS_BORDER};
+    --glass-blur: {GLASS_BLUR};
+    --ink: {INK};
+    --ink-soft: {INK_SOFT};
     --ink-muted: {INK_MUTED};
-    --accent:    {ACCENT};
+    --accent: {ACCENT};
+    --accent-dk: {ACCENT_DK};
     --accent-lt: {ACCENT_LT};
-    --r-sm: 8px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
-    --shadow-sm: 0 2px 10px rgba(109,40,217,0.07);
-    --shadow-md: 0 6px 24px rgba(109,40,217,0.11);
-    --shadow-lg: 0 16px 48px rgba(109,40,217,0.15);
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 22px;
+    --radius-xl: 28px;
+    --shadow-sm: 0 8px 24px rgba(15,23,42,0.05);
+    --shadow-md: 0 14px 36px rgba(15,23,42,0.08);
+    --shadow-lg: 0 24px 60px rgba(15,23,42,0.10);
 }}
 
 html, body, [class*="css"] {{
-    font-family: 'DM Sans', system-ui, sans-serif !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
 }}
 
-/* ── PAGE BACKGROUND ─────────────────────────────────────── */
 .stApp {{
     min-height: 100vh;
     background:
-        radial-gradient(ellipse 50% 45% at 12% 22%, rgba(109,40,217,0.07) 0%, transparent 60%),
-        radial-gradient(ellipse 42% 38% at 88% 78%, rgba(109,40,217,0.05) 0%, transparent 58%),
-        linear-gradient(160deg, {BG_BASE} 0%, #eef2ff 52%, #f0f7ff 100%);
+        radial-gradient(circle at 12% 18%, {BG_MESH_A} 0, transparent 34%),
+        radial-gradient(circle at 88% 12%, {BG_MESH_C} 0, transparent 28%),
+        radial-gradient(circle at 82% 82%, {BG_MESH_B} 0, transparent 26%),
+        linear-gradient(180deg, #fbfdff 0%, {BG_BASE} 100%);
     background-attachment: fixed;
-    animation: fadeIn 0.45s ease both;
 }}
+
 .main .block-container {{
-    padding-top: 1.4rem; padding-bottom: 3rem;
     max-width: 1280px;
-    animation: fadeUp 0.5s ease both;
+    padding-top: 1.45rem;
+    padding-bottom: 3rem;
 }}
 
-/* ── SIDEBAR ─────────────────────────────────────────────── */
+section.main > div {{
+    background: transparent;
+}}
+
 [data-testid="stSidebar"] {{
-    background: rgba(250,249,255,0.84) !important;
-    border-right: 1px solid rgba(109,40,217,0.11) !important;
-    backdrop-filter: {GLASS_BLUR} !important;
-    -webkit-backdrop-filter: {GLASS_BLUR} !important;
-    box-shadow: 3px 0 18px rgba(109,40,217,0.05) !important;
-}}
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] span,
-[data-testid="stSidebar"] label,
-[data-testid="stSidebar"] div {{ color: {INK_SOFT} !important; }}
-
-/* Fix weird "All" pill/circle in select dropdowns */
-[data-testid="stSidebar"] [data-baseweb="select"] [data-baseweb="tag"],
-[data-testid="stSidebar"] [data-baseweb="select"] [role="option"] > svg {{
-    display: none !important;
-}}
-[data-testid="stSidebar"] [data-baseweb="select"] > div {{
-    background: rgba(255,255,255,0.80) !important;
-    border: 1px solid rgba(109,40,217,0.16) !important;
-    border-radius: var(--r-sm) !important;
-    box-shadow: none !important;
-    min-height: 38px !important;
-    transition: border-color 0.18s, box-shadow 0.18s !important;
-}}
-[data-testid="stSidebar"] [data-baseweb="select"] > div:hover {{
-    border-color: rgba(109,40,217,0.36) !important;
-    box-shadow: var(--shadow-sm) !important;
-}}
-[data-testid="stSidebar"] [data-baseweb="select"] > div:focus-within {{
-    border-color: {ACCENT} !important;
-    box-shadow: 0 0 0 3px rgba(109,40,217,0.11) !important;
+    background: rgba(248,250,252,0.76) !important;
+    border-right: 1px solid rgba(148,163,184,0.18) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    box-shadow: 4px 0 24px rgba(15,23,42,0.04) !important;
 }}
 
-/* ── METRIC CARDS ────────────────────────────────────────── */
+[data-testid="stSidebar"] * {{
+    color: var(--ink-soft) !important;
+}}
+
+.sidebar-brand {{
+    font-family:'DM Serif Display', Georgia, serif;
+    font-size: 1.45rem;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    padding: 0.15rem 0 1rem 0;
+    border-bottom: 1px solid rgba(148,163,184,0.16);
+    margin-bottom: 1rem;
+}}
+.sidebar-brand span {{ color: var(--accent); }}
+
+h1, h2, h3, h4 {{
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    color: var(--ink) !important;
+    letter-spacing: -0.02em !important;
+    font-weight: 400 !important;
+}}
+
+[data-testid="stMarkdownContainer"] p,
+.stMarkdown p,
+[data-testid="stMarkdownContainer"] li,
+.stMarkdown li {{
+    color: var(--ink-soft);
+    line-height: 1.72;
+    font-size: 0.92rem;
+}}
+
+.hero {{
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.2rem;
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.60));
+    border: 1px solid rgba(255,255,255,0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.88);
+}}
+.hero::before {{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, rgba(37,99,235,0.06), transparent 50%, rgba(15,23,42,0.03));
+    pointer-events: none;
+}}
+.hero-left, .hero-badge, .hero-glyph {{ position: relative; z-index: 1; }}
+.hero-left {{ flex: 1; min-width: 0; }}
+.hero-eyebrow {{
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-muted);
+    font-weight: 700;
+    margin-bottom: 0.45rem;
+}}
+.hero h1 {{
+    margin: 0 0 0.35rem 0 !important;
+    font-size: 2.05rem !important;
+}}
+.hero p {{
+    margin: 0;
+    color: var(--ink-muted) !important;
+    font-size: 0.90rem;
+}}
+.hero-badge {{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.58rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(37,99,235,0.16);
+    background: rgba(255,255,255,0.72);
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.08);
+}}
+.hero-glyph {{
+    font-size: 2.8rem;
+    color: rgba(37,99,235,0.16);
+    transform: rotate(-8deg);
+}}
+
 [data-testid="metric-container"] {{
-    background: rgba(255,255,255,0.68) !important;
-    border: 1px solid rgba(255,255,255,0.92) !important;
-    border-radius: var(--r-md) !important;
+    background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.66)) !important;
+    border: 1px solid rgba(255,255,255,0.95) !important;
+    border-radius: var(--radius-md) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
-    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.95) !important;
-    padding: 20px 22px !important;
-    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
-                box-shadow 0.22s ease !important;
-    animation: fadeUp 0.5s ease both !important;
-}}
-[data-testid="metric-container"]:hover {{
-    transform: translateY(-3px) !important;
-    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.90) !important;
+    padding: 1rem 1.1rem !important;
 }}
 [data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
-    font-size: 0.62rem !important; font-weight: 600 !important;
-    letter-spacing: 0.13em !important; text-transform: uppercase !important;
-    color: {INK_MUTED} !important;
+    font-size: 0.64rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    color: var(--ink-muted) !important;
 }}
-[data-testid="stMetricValue"],
-[data-testid="stMetricValue"] > div {{
-    font-family: 'DM Serif Display', Georgia, serif !important;
-    font-size: 2.0rem !important; font-weight: 400 !important;
-    color: {INK} !important; letter-spacing: -0.02em !important;
+[data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
+    color: var(--ink) !important;
+    font-size: 1.95rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
 }}
 
-/* ── TABS ────────────────────────────────────────────────── */
 .stTabs [data-baseweb="tab-list"] {{
-    background: rgba(255,255,255,0.60);
-    border: 1px solid rgba(255,255,255,0.85);
-    border-radius: var(--r-md); padding: 4px; gap: 2px;
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    gap: 0.35rem;
+    background: rgba(255,255,255,0.54);
+    border: 1px solid rgba(255,255,255,0.90);
+    border-radius: 18px;
+    padding: 0.35rem;
+    backdrop-filter: blur(14px);
     box-shadow: var(--shadow-sm);
 }}
 .stTabs [data-baseweb="tab"] {{
-    border-radius: var(--r-sm) !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-weight: 500 !important; font-size: 0.81rem !important;
-    color: {INK_SOFT} !important; padding: 7px 18px !important;
-    background: transparent !important; border: none !important;
-    transition: color 0.18s ease, background 0.22s ease,
-                transform 0.18s cubic-bezier(.34,1.56,.64,1) !important;
-    letter-spacing: 0.005em !important;
+    height: 42px;
+    padding: 0 1rem !important;
+    border-radius: 12px !important;
+    color: var(--ink-soft) !important;
+    font-size: 0.86rem !important;
+    font-weight: 600 !important;
+    background: transparent !important;
+    transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease !important;
 }}
 .stTabs [data-baseweb="tab"]:hover {{
-    background: rgba(109,40,217,0.09) !important;
-    color: {INK} !important;
-    transform: translateY(-1px) !important;
+    background: rgba(255,255,255,0.72) !important;
+    color: var(--ink) !important;
+    transform: translateY(-1px);
 }}
 .stTabs [aria-selected="true"] {{
-    background: {ACCENT} !important;
-    color: #ffffff !important;
-    box-shadow: 0 3px 12px rgba(109,40,217,0.32) !important;
-    font-weight: 600 !important;
+    background: rgba(255,255,255,0.92) !important;
+    color: var(--accent) !important;
+    box-shadow: 0 8px 18px rgba(15,23,42,0.07), inset 0 0 0 1px rgba(37,99,235,0.10) !important;
 }}
-.stTabs [data-baseweb="tab-panel"] {{ background: transparent; padding-top: 1.5rem; }}
-
-/* ── HEADINGS ────────────────────────────────────────────── */
-h1, h2, h3, h4 {{
-    font-family: 'DM Serif Display', Georgia, serif !important;
-    color: {INK} !important; letter-spacing: -0.02em !important;
-    font-weight: 400 !important;
-}}
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] li,
-.stMarkdown p, .stMarkdown li {{
-    color: {INK_SOFT}; line-height: 1.72; font-size: 0.90rem;
+.stTabs [data-baseweb="tab-panel"] {{
+    padding-top: 1.35rem;
 }}
 
-/* ── WIDGET LABELS ───────────────────────────────────────── */
+.section-hd {{
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.10rem;
+    color: var(--ink);
+    margin: 0 0 0.25rem 0;
+}}
+.section-sub {{
+    font-size: 0.84rem;
+    color: var(--ink-muted);
+    margin: 0 0 1.15rem 0;
+}}
+
+.divider-label {{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.4rem 0 1rem 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-muted);
+}}
+.divider-label::before, .divider-label::after {{
+    content:"";
+    flex:1;
+    height:1px;
+    background: linear-gradient(90deg, transparent, rgba(148,163,184,0.35), transparent);
+}}
+
+.info-box {{
+    background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.64));
+    border: 1px solid rgba(255,255,255,0.94);
+    border-radius: 14px;
+    padding: 0.95rem 1rem;
+    color: var(--ink-soft);
+    line-height: 1.75;
+    box-shadow: var(--shadow-sm);
+}}
+
+.pill {{
+    display:inline-block;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+}}
+.pill-expand {{ background: rgba(37,99,235,0.10); color: #1d4ed8; border-color: rgba(37,99,235,0.18); }}
+.pill-maintain {{ background: rgba(13,148,136,0.10); color: #0f766e; border-color: rgba(13,148,136,0.18); }}
+.pill-optimize {{ background: rgba(217,119,6,0.10); color: #b45309; border-color: rgba(217,119,6,0.18); }}
+.pill-drop {{ background: rgba(220,38,38,0.10); color: #b91c1c; border-color: rgba(220,38,38,0.16); }}
+
+.result-card {{
+    border-radius: 20px;
+    padding: 1.4rem 1.5rem;
+    margin: 1.1rem 0;
+    border: 1px solid rgba(255,255,255,0.94);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}}
+.result-expand {{ background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_EXPAND}; }}
+.result-maintain {{ background: linear-gradient(135deg, rgba(13,148,136,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_MAINTAIN}; }}
+.result-optimize {{ background: linear-gradient(135deg, rgba(217,119,6,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_OPTIMIZE}; }}
+.result-drop {{ background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_DROP}; }}
+
 .stSelectbox label, .stNumberInput label,
 .stSlider label, .stRadio label,
 .stCheckbox label, .stTextInput label {{
-    color: {INK} !important; font-weight: 600 !important;
-    font-size: 0.78rem !important; letter-spacing: 0.02em !important;
+    color: var(--ink) !important;
+    font-weight: 600 !important;
+    font-size: 0.78rem !important;
+    letter-spacing: 0.02em !important;
 }}
 
-/* ── MAIN AREA INPUTS ────────────────────────────────────── */
 .stSelectbox [data-baseweb="select"] > div,
-.stTextInput input, .stNumberInput input {{
-    color: {INK} !important;
-    background: rgba(255,255,255,0.72) !important;
-    border: 1px solid rgba(109,40,217,0.18) !important;
-    border-radius: var(--r-sm) !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 0.88rem !important;
-    transition: border-color 0.18s, box-shadow 0.18s !important;
+.stTextInput input,
+.stNumberInput input {{
+    background: rgba(255,255,255,0.78) !important;
+    border: 1px solid rgba(148,163,184,0.26) !important;
+    border-radius: 12px !important;
+    color: var(--ink) !important;
+    min-height: 42px !important;
+    box-shadow: none !important;
 }}
 .stSelectbox [data-baseweb="select"] > div:focus-within,
-.stTextInput input:focus, .stNumberInput input:focus {{
-    border-color: {ACCENT} !important;
-    box-shadow: 0 0 0 3px rgba(109,40,217,0.11) !important;
+.stTextInput input:focus,
+.stNumberInput input:focus {{
+    border-color: rgba(37,99,235,0.45) !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.10) !important;
 }}
 
-/* ── DATAFRAME ───────────────────────────────────────────── */
-[data-testid="stDataFrame"] {{
-    border-radius: var(--r-md) !important; overflow: hidden !important;
-    border: 1px solid rgba(255,255,255,0.85) !important;
-    box-shadow: var(--shadow-sm) !important;
-    background: rgba(255,255,255,0.58) !important;
-    backdrop-filter: blur(12px) !important;
-    transition: box-shadow 0.22s ease !important;
-}}
-[data-testid="stDataFrame"]:hover {{
-    box-shadow: var(--shadow-md) !important;
-}}
-
-/* ── EXPANDER ────────────────────────────────────────────── */
-[data-testid="stExpander"] {{
-    background: rgba(255,255,255,0.55) !important;
-    border: 1px solid rgba(255,255,255,0.85) !important;
-    border-radius: var(--r-md) !important;
-    backdrop-filter: blur(14px) !important;
-    box-shadow: var(--shadow-sm) !important;
-    transition: box-shadow 0.22s ease !important;
-}}
-[data-testid="stExpander"]:hover {{ box-shadow: var(--shadow-md) !important; }}
-[data-testid="stExpander"] summary p {{
-    color: {INK} !important; font-weight: 600 !important; font-size: 0.88rem !important;
-}}
-
-/* ── FORM ────────────────────────────────────────────────── */
 [data-testid="stForm"] {{
-    background: rgba(255,255,255,0.62) !important;
-    border: 1px solid rgba(255,255,255,0.88) !important;
-    border-radius: var(--r-xl) !important;
-    backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
+    background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.66)) !important;
+    border: 1px solid rgba(255,255,255,0.95) !important;
+    border-radius: 24px !important;
+    padding: 1.35rem 1.45rem 1.6rem !important;
     box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.92) !important;
-    padding: 24px 28px 30px !important;
+    backdrop-filter: blur(16px) !important;
 }}
 
-/* ── SUBMIT BUTTON ───────────────────────────────────────── */
+[data-testid="stFormSubmitButton"] > button,
+.stButton > button {{
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    border: none !important;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease !important;
+}}
 [data-testid="stFormSubmitButton"] > button {{
-    background: {ACCENT} !important;
-    border: none !important; border-radius: var(--r-sm) !important;
-    color: #fff !important; font-family: 'DM Sans', sans-serif !important;
-    font-weight: 600 !important; font-size: 0.88rem !important;
-    letter-spacing: 0.03em !important; padding: 12px 32px !important;
     width: 100% !important;
-    transition: background 0.18s, transform 0.22s cubic-bezier(.34,1.56,.64,1),
-                box-shadow 0.18s !important;
-    box-shadow: 0 4px 16px rgba(109,40,217,0.28) !important;
+    background: linear-gradient(135deg, {ACCENT}, {ACCENT_DK}) !important;
+    box-shadow: 0 10px 24px rgba(37,99,235,0.22) !important;
+    color: white !important;
 }}
 [data-testid="stFormSubmitButton"] > button:hover {{
-    background: #5b21b6 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 24px rgba(109,40,217,0.36) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(37,99,235,0.26) !important;
 }}
-[data-testid="stFormSubmitButton"] > button:active {{
-    transform: translateY(1px) !important;
-    box-shadow: 0 2px 8px rgba(109,40,217,0.20) !important;
-}}
-
-/* ── REGULAR BUTTONS ─────────────────────────────────────── */
 .stButton > button {{
-    background: rgba(255,255,255,0.65) !important;
-    border: 1px solid rgba(109,40,217,0.20) !important;
-    border-radius: var(--r-sm) !important; color: {INK} !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-weight: 600 !important; font-size: 0.85rem !important;
-    padding: 9px 22px !important;
-    transition: all 0.20s cubic-bezier(.34,1.56,.64,1) !important;
+    background: rgba(255,255,255,0.78) !important;
+    color: var(--ink) !important;
+    border: 1px solid rgba(148,163,184,0.18) !important;
     box-shadow: var(--shadow-sm) !important;
 }}
 .stButton > button:hover {{
-    background: {ACCENT_LT} !important;
-    border-color: {ACCENT} !important;
-    transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-md) !important;
+    background: white !important;
+    transform: translateY(-1px);
 }}
 
-/* ── HR ──────────────────────────────────────────────────── */
+[data-testid="stDataFrame"] {{
+    background: rgba(255,255,255,0.76) !important;
+    border: 1px solid rgba(255,255,255,0.94) !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    box-shadow: var(--shadow-sm) !important;
+    backdrop-filter: blur(14px) !important;
+}}
+[data-testid="stDataFrame"] [role="grid"] {{
+    background: transparent !important;
+}}
+[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{
+    color: var(--ink) !important;
+}}
+[data-testid="stDataFrame"] [role="columnheader"] {{
+    background: rgba(248,250,252,0.95) !important;
+    color: var(--ink-muted) !important;
+    font-weight: 700 !important;
+    border-bottom: 1px solid rgba(148,163,184,0.18) !important;
+}}
+[data-testid="stDataFrame"] [role="gridcell"] {{
+    border-bottom: 1px solid rgba(226,232,240,0.58) !important;
+}}
+
+[data-testid="stExpander"] {{
+    background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.64)) !important;
+    border: 1px solid rgba(255,255,255,0.94) !important;
+    border-radius: 18px !important;
+    box-shadow: var(--shadow-sm) !important;
+    backdrop-filter: blur(14px) !important;
+}}
+[data-testid="stExpander"] summary p {{
+    color: var(--ink) !important;
+    font-weight: 600 !important;
+}}
+
+[data-testid="stAlert"] {{
+    border-radius: 16px !important;
+}}
+
+[data-testid="stPyplot"] {{
+    background: linear-gradient(180deg, rgba(255,255,255,0.80), rgba(255,255,255,0.64));
+    border: 1px solid rgba(255,255,255,0.94);
+    border-radius: 20px;
+    padding: 0.85rem;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(12px);
+}}
+
 hr {{
     border: none !important;
-    border-top: 1px solid rgba(109,40,217,0.11) !important;
-    margin: 1.5rem 0 !important;
+    border-top: 1px solid rgba(148,163,184,0.18) !important;
+    margin: 1.25rem 0 !important;
 }}
 
-/* ═══ CUSTOM COMPONENTS ══════════════════════════════════════ */
-
-/* ── HERO — compact horizontal strip ────────────────────── */
-.hero {{
-    position: relative; overflow: hidden;
-    border-radius: var(--r-lg); padding: 20px 32px; margin-bottom: 20px;
-    background: rgba(255,255,255,0.62);
-    border: 1px solid rgba(255,255,255,0.90);
-    backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
-    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.96);
-    display: flex; align-items: center; gap: 24px;
-    animation: fadeUp 0.45s ease both;
-}}
-.hero::before {{
-    content:""; position:absolute; inset:0; pointer-events:none;
-    background: linear-gradient(108deg,
-        rgba(109,40,217,0.05) 0%, transparent 52%,
-        rgba(14,165,233,0.03) 100%);
-}}
-.hero-left {{ flex:1; min-width:0; position:relative; z-index:1; }}
-.hero-eyebrow {{
-    font-size:0.58rem; font-weight:700; letter-spacing:0.18em;
-    text-transform:uppercase; color:rgba(109,40,217,0.55);
-    margin-bottom:4px; font-family:'DM Sans',sans-serif;
-}}
-.hero h1 {{
-    font-family:'DM Serif Display',Georgia,serif !important;
-    font-size:1.65rem !important; font-weight:400 !important;
-    color:{INK} !important; margin:0 0 4px 0 !important;
-    letter-spacing:-0.02em !important; line-height:1.18 !important;
-}}
-.hero p {{
-    color:{INK_MUTED} !important; font-size:0.78rem; margin:0;
-    line-height:1.52; font-weight:400;
-}}
-.hero-badge {{
-    display:inline-flex; align-items:center; gap:6px;
-    background:rgba(109,40,217,0.08); border:1px solid rgba(109,40,217,0.16);
-    border-radius:99px; padding:6px 16px; font-size:0.72rem;
-    font-weight:600; color:{ACCENT}; letter-spacing:0.03em;
-    white-space:nowrap; flex-shrink:0; position:relative; z-index:1;
-    transition: background 0.20s, transform 0.20s cubic-bezier(.34,1.56,.64,1);
-    cursor:default;
-}}
-.hero-badge:hover {{
-    background:rgba(109,40,217,0.14); transform:scale(1.04);
-}}
-.hero-glyph {{
-    position:relative; z-index:1; font-size:2.6rem; opacity:0.15;
-    color:{ACCENT}; flex-shrink:0; line-height:1;
-    animation: orb-drift 9s ease-in-out infinite;
-}}
-
-/* ── SIDEBAR BRAND ───────────────────────────────────────── */
-.sidebar-brand {{
-    font-family:'DM Serif Display',Georgia,serif; font-size:1.35rem;
-    font-weight:400; color:{INK}; padding:4px 0 14px 0;
-    border-bottom:1px solid rgba(109,40,217,0.13);
-    margin-bottom:16px; letter-spacing:-0.02em;
-}}
-.sidebar-brand span {{ color:{ACCENT}; }}
-
-/* ── SECTION HELPERS ─────────────────────────────────────── */
-.section-hd {{
-    font-family:'DM Serif Display',Georgia,serif; font-size:1.05rem;
-    font-weight:400; color:{INK}; margin:0 0 4px 0; letter-spacing:-0.01em;
-}}
-.section-sub {{
-    font-size:0.82rem; color:{INK_MUTED}; margin:0 0 20px 0; font-weight:400;
-}}
-
-/* ── GLASS INFO BOX ──────────────────────────────────────── */
-.info-box {{
-    background:rgba(255,255,255,0.58); border:1px solid rgba(255,255,255,0.85);
-    border-radius:var(--r-sm); padding:14px 18px;
-    font-size:0.84rem; color:{INK_SOFT}; margin-bottom:14px; line-height:1.78;
-    transition: box-shadow 0.20s ease;
-}}
-.info-box:hover {{ box-shadow: var(--shadow-sm); }}
-
-/* ── DECISION PILLS ──────────────────────────────────────── */
-.pill {{
-    display:inline-block; padding:3px 11px; border-radius:99px;
-    font-size:0.67rem; font-weight:700; letter-spacing:0.05em;
-    text-transform:uppercase; border:1px solid transparent;
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
-}}
-.pill:hover {{ transform:scale(1.06); box-shadow:var(--shadow-sm); }}
-.pill-expand   {{ background:rgba(109,40,217,0.10); color:{ACCENT};  border-color:rgba(109,40,217,0.24); }}
-.pill-maintain {{ background:rgba(14,165,233,0.10);  color:#0369a1;  border-color:rgba(14,165,233,0.28); }}
-.pill-optimize {{ background:rgba(245,158,11,0.12);  color:#92400e;  border-color:rgba(245,158,11,0.32); }}
-.pill-drop     {{ background:rgba(225,29,72,0.09);   color:#9f1239;  border-color:rgba(225,29,72,0.26); }}
-
-/* ── RESULT CARD ─────────────────────────────────────────── */
-.result-card {{
-    border-radius:var(--r-lg); padding:26px 32px; margin:20px 0;
-    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
-    border:1px solid rgba(255,255,255,0.85);
-    box-shadow:var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.92);
-    animation: fadeUp 0.4s ease both;
-}}
-.result-expand  {{
-    background:linear-gradient(135deg,rgba(109,40,217,0.07) 0%,rgba(255,255,255,0.68) 100%);
-    border-left:3px solid {ACCENT};
-}}
-.result-maintain {{
-    background:linear-gradient(135deg,rgba(14,165,233,0.07) 0%,rgba(255,255,255,0.68) 100%);
-    border-left:3px solid #0ea5e9;
-}}
-.result-optimize {{
-    background:linear-gradient(135deg,rgba(245,158,11,0.07) 0%,rgba(255,255,255,0.68) 100%);
-    border-left:3px solid #f59e0b;
-}}
-.result-drop {{
-    background:linear-gradient(135deg,rgba(225,29,72,0.07) 0%,rgba(255,255,255,0.68) 100%);
-    border-left:3px solid #e11d48;
-}}
-
-/* ── DIVIDER LABEL ───────────────────────────────────────── */
-.divider-label {{
-    display:flex; align-items:center; gap:12px; margin:24px 0 14px;
-    color:{INK_MUTED}; font-size:0.67rem; font-weight:700;
-    letter-spacing:0.12em; text-transform:uppercase;
-}}
-.divider-label::before, .divider-label::after {{
-    content:""; flex:1; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(109,40,217,0.18),transparent);
-}}
-
-/* ── COLUMN LABEL ────────────────────────────────────────── */
 .col-label {{
-    font-size:0.70rem; font-weight:700; color:{INK_MUTED};
-    letter-spacing:0.10em; text-transform:uppercase; margin-bottom:14px;
-}}
-
-/* ── CHART WRAPPER: animated glass card around every pyplot ── */
-[data-testid="stpyplot"] > div,
-.stImage > img {{
-    border-radius: var(--r-md) !important;
-    transition: transform 0.28s cubic-bezier(.34,1.56,.64,1),
-                box-shadow 0.28s ease !important;
-    animation: fadeUp 0.5s ease both !important;
-}}
-[data-testid="stpyplot"] > div:hover {{
-    transform: translateY(-4px) scale(1.005) !important;
-    box-shadow: var(--shadow-lg) !important;
-}}
-
-/* ── TAB PANEL: fade in on switch ───────────────────────── */
-.stTabs [data-baseweb="tab-panel"] > div {{
-    animation: fadeUp 0.38s ease both;
-}}
-
-/* ── STAGGERED METRIC CARD DELAYS ───────────────────────── */
-[data-testid="column"]:nth-child(1) [data-testid="metric-container"] {{
-    animation-delay: 0.05s !important;
-}}
-[data-testid="column"]:nth-child(2) [data-testid="metric-container"] {{
-    animation-delay: 0.12s !important;
-}}
-[data-testid="column"]:nth-child(3) [data-testid="metric-container"] {{
-    animation-delay: 0.19s !important;
-}}
-[data-testid="column"]:nth-child(4) [data-testid="metric-container"] {{
-    animation-delay: 0.26s !important;
-}}
-
-/* ── SIDEBAR FILTER ROWS: slide in ──────────────────────── */
-[data-testid="stSidebar"] .stSelectbox {{
-    animation: fadeUp 0.4s ease both;
-}}
-[data-testid="stSidebar"] .stSelectbox:nth-child(1) {{ animation-delay: 0.06s; }}
-[data-testid="stSidebar"] .stSelectbox:nth-child(2) {{ animation-delay: 0.12s; }}
-[data-testid="stSidebar"] .stSelectbox:nth-child(3) {{ animation-delay: 0.18s; }}
-[data-testid="stSidebar"] .stSelectbox:nth-child(4) {{ animation-delay: 0.24s; }}
-
-/* ── DATAFRAME: hover reveal ────────────────────────────── */
-[data-testid="stDataFrame"] {{
-    transition: transform 0.24s cubic-bezier(.34,1.56,.64,1),
-                box-shadow 0.24s ease !important;
-}}
-[data-testid="stDataFrame"]:hover {{
-    transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-md) !important;
-}}
-
-/* ── EXPANDER: slide-open feel ──────────────────────────── */
-[data-testid="stExpander"] {{
-    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
-                box-shadow 0.22s ease !important;
-}}
-[data-testid="stExpander"]:hover {{
-    transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-md) !important;
-}}
-
-/* ── FORM: lift on focus-within ─────────────────────────── */
-[data-testid="stForm"] {{
-    transition: box-shadow 0.25s ease !important;
-}}
-[data-testid="stForm"]:focus-within {{
-    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.92) !important;
-}}
-
-/* ── RESULT CARD: pop-in ────────────────────────────────── */
-.result-card {{
-    animation: fadeUp 0.42s cubic-bezier(.34,1.56,.64,1) both;
+    font-size: 0.70rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -544,121 +466,38 @@ DECISION_COLORS = {
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
 # ─────────────────────────────────────────────────────────────
-#  CHART HELPERS — polished monochrome glass-violet charts
+#  CHART HELPERS — clean flat charts that match the glass theme
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
-    fig, ax = plt.subplots(figsize=figsize, facecolor="none")
-    fig.patch.set_facecolor("none"); fig.patch.set_alpha(0.0)
-    ax.set_facecolor("#faf9ff")          # very faint lavender panel
+    fig, ax = plt.subplots(figsize=figsize)
+    fig.patch.set_facecolor("none")
+    fig.patch.set_alpha(0)
+    ax.set_facecolor("none")
+
     for spine in ["top", "right"]:
         ax.spines[spine].set_visible(False)
-    ax.spines["left"].set_color("#e5e0f8")
-    ax.spines["bottom"].set_color("#e5e0f8")
+    ax.spines["left"].set_color("#dbe3ef")
+    ax.spines["bottom"].set_color("#dbe3ef")
+
     ax.tick_params(colors=INK_MUTED, labelsize=8.5, length=0)
     ax.xaxis.label.set_color(INK_MUTED)
     ax.yaxis.label.set_color(INK_MUTED)
     ax.title.set_color(INK)
     ax.title.set_fontsize(11.5)
     ax.title.set_fontweight("bold")
-    ax.title.set_fontfamily("serif")
-    ax.grid(axis="y", color="#ede9fe", linewidth=0.7, linestyle="--", alpha=0.8)
+
+    ax.grid(axis="y", color="#e8eef6", linewidth=0.8, linestyle="-", alpha=0.9)
     ax.set_axisbelow(True)
     return fig, ax
 
 def col_seq(labels):
-    return [DECISION_COLORS.get(l, "#c4b5fd") for l in labels]
+    return [DECISION_COLORS.get(l, "#94a3b8") for l in labels]
 
-def _hex_to_rgb(h):
-    h = h.lstrip("#")
-    return tuple(int(h[i:i+2], 16)/255 for i in (0, 2, 4))
-
-def _lighten(hex_color, factor=0.55):
-    r, g, b = _hex_to_rgb(hex_color)
-    return (r + (1-r)*factor, g + (1-g)*factor, b + (1-b)*factor)
-
-def _darken(hex_color, factor=0.25):
-    r, g, b = _hex_to_rgb(hex_color)
-    return (r*(1-factor), g*(1-factor), b*(1-factor))
-
-def bar3d(ax, x, heights, colors, width=0.52, is_horiz=False, **kw):
-    """Draw bars with a vertical gradient (light top → colour body → dark shadow)
-    to create a polished 3D depth effect without mpl3d."""
-    from matplotlib.patches import FancyBboxPatch
-    from matplotlib.colors import to_rgba
-
-    depth = 3   # number of gradient strips
-    for xi, (h, col) in enumerate(zip(heights, colors)):
-        if h == 0:
-            continue
-        light = _lighten(col, 0.62)
-        dark  = _darken(col, 0.22)
-
-        if not is_horiz:
-            left  = xi - width/2
-            bot   = min(h, 0)
-            height_abs = abs(h)
-            strip_h = height_abs / depth
-            # gradient strips: dark bottom → colour → light top
-            grad_cols = [dark, col, light]
-            for i, gc in enumerate(grad_cols):
-                by = bot + i*strip_h
-                rect = FancyBboxPatch(
-                    (left, by), width, strip_h,
-                    boxstyle="square,pad=0", linewidth=0,
-                    facecolor=gc, alpha=0.92 if i == 1 else 0.75,
-                    zorder=2,
-                )
-                ax.add_patch(rect)
-            # thin highlight stripe on left edge
-            ax.add_patch(FancyBboxPatch(
-                (left, bot), width*0.08, height_abs,
-                boxstyle="square,pad=0", linewidth=0,
-                facecolor=light, alpha=0.55, zorder=3,
-            ))
-            # thin shadow on right edge
-            ax.add_patch(FancyBboxPatch(
-                (left + width*0.88, bot), width*0.12, height_abs,
-                boxstyle="square,pad=0", linewidth=0,
-                facecolor=dark, alpha=0.45, zorder=3,
-            ))
-        else:
-            # horizontal bars
-            bot_y = xi - width/2
-            strip_w = abs(h) / depth
-            grad_cols = [dark, col, light]
-            for i, gc in enumerate(grad_cols):
-                bx = i*strip_w
-                rect = FancyBboxPatch(
-                    (bx, bot_y), strip_w, width,
-                    boxstyle="square,pad=0", linewidth=0,
-                    facecolor=gc, alpha=0.92 if i == 1 else 0.75,
-                    zorder=2,
-                )
-                ax.add_patch(rect)
-            ax.add_patch(FancyBboxPatch(
-                (0, bot_y), abs(h), width*0.10,
-                boxstyle="square,pad=0", linewidth=0,
-                facecolor=light, alpha=0.50, zorder=3,
-            ))
-            ax.add_patch(FancyBboxPatch(
-                (0, bot_y + width*0.90), abs(h), width*0.10,
-                boxstyle="square,pad=0", linewidth=0,
-                facecolor=dark, alpha=0.40, zorder=3,
-            ))
-
-    # Re-set axis limits after adding patches
-    if not is_horiz:
-        xpos = list(range(len(heights)))
-        ax.set_xlim(-0.6, len(heights)-0.4)
-        mn, mx = min(min(heights), 0), max(max(heights), 0)
-        pad = (mx - mn) * 0.18 if (mx - mn) > 0 else 1
-        ax.set_ylim(mn - pad*0.1, mx + pad)
-        ax.set_xticks(xpos)
-    else:
-        ax.set_ylim(-0.6, len(heights)-0.4)
-        mn, mx = 0, max(heights)
-        ax.set_xlim(0, mx * 1.22)
-        ax.set_yticks(list(range(len(heights))))
+def soften_bars(bars, alpha=0.92):
+    for bar in bars:
+        bar.set_alpha(alpha)
+        bar.set_linewidth(0)
+    return bars
 
 # ─────────────────────────────────────────────────────────────
 #  PATHS  (unchanged)
@@ -891,15 +730,17 @@ with tab2:
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
         fig, ax = clean_fig((6, 4))
         colors = col_seq(apd.index.tolist())
-        bar3d(ax, range(len(apd)), apd.values.tolist(), colors, width=0.52)
+        bars = ax.bar(apd.index, apd.values, color=colors, width=0.55)
+        soften_bars(bars)
         mn, mx = min(apd.values.min(), 0), apd.values.max()
-        pad = (mx - mn) * 0.18
-        for xi, (label, h) in enumerate(zip(apd.index, apd.values)):
-            ty = h + pad*0.18 if h >= 0 else h - pad*0.18
-            ax.text(xi, ty, f"${h:,.0f}", ha="center", va="bottom",
+        pad = (mx - mn) * 0.10 if mx != mn else 1
+        for bar, h in zip(bars, apd.values):
+            ty = h + pad if h >= 0 else h - pad
+            ax.text(bar.get_x() + bar.get_width()/2, ty, f"${h:,.0f}",
+                    ha="center", va="bottom" if h >= 0 else "top",
                     fontsize=8, color=INK_MUTED, fontweight="700")
-        ax.set_xticklabels(apd.index, fontsize=9)
-        ax.set_ylabel("Average Profit ($)"); ax.set_title("Average Profit by Decision")
+        ax.set_ylabel("Average Profit ($)")
+        ax.set_title("Average Profit by Decision")
         st.pyplot(fig)
 
     with right:
@@ -907,12 +748,14 @@ with tab2:
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
         fig, ax = clean_fig((6, 4))
         colors = col_seq(ald.index.tolist())
-        bar3d(ax, range(len(ald)), ald.values.tolist(), colors, width=0.52)
-        for xi, (label, h) in enumerate(zip(ald.index, ald.values)):
-            ax.text(xi, h + 0.025, f"{h:.0%}", ha="center", va="bottom",
+        bars = ax.bar(ald.index, ald.values, color=colors, width=0.55)
+        soften_bars(bars)
+        for bar, h in zip(bars, ald.values):
+            ax.text(bar.get_x() + bar.get_width()/2, h + 0.02, f"{h:.0%}",
+                    ha="center", va="bottom",
                     fontsize=8, color=INK_MUTED, fontweight="700")
-        ax.set_xticklabels(ald.index, fontsize=9)
-        ax.set_ylabel("Average Seat Occupancy"); ax.set_title("Seat Occupancy by Decision")
+        ax.set_ylabel("Average Seat Occupancy")
+        ax.set_title("Seat Occupancy by Decision")
         st.pyplot(fig)
 
     st.markdown('<div class="divider-label">Cost breakdown</div>', unsafe_allow_html=True)
@@ -939,14 +782,15 @@ with tab2:
     fig, ax = clean_fig((9, 4))
     nc = len(cost_means)
     neutral_cols = CHART_NEUTRAL[:nc]
-    bar3d(ax, range(nc), cost_means.values.tolist(), neutral_cols, width=0.55, is_horiz=True)
+    bars = ax.barh(cost_means.index, cost_means.values, color=neutral_cols, height=0.55)
+    soften_bars(bars)
     mx = cost_means.max()
-    for xi, (label, w) in enumerate(zip(cost_means.index, cost_means.values)):
-        ax.text(w + mx*0.015, xi, f"${w:,.0f}", va="center",
-                fontsize=8, color=INK_MUTED, fontweight="700")
-    ax.set_yticklabels(cost_means.index, fontsize=8.5)
-    ax.set_xlabel("Average Cost per Flight ($)"); ax.set_title("Top Cost Drivers")
-    ax.grid(axis="x", color="#ede9fe", linewidth=0.7, linestyle="--", alpha=0.8)
+    for bar, w in zip(bars, cost_means.values):
+        ax.text(w + mx*0.015, bar.get_y() + bar.get_height()/2, f"${w:,.0f}",
+                va="center", fontsize=8, color=INK_MUTED, fontweight="700")
+    ax.set_xlabel("Average Cost per Flight ($)")
+    ax.set_title("Top Cost Drivers")
+    ax.grid(axis="x", color="#e8eef6", linewidth=0.8, linestyle="-", alpha=0.9)
     ax.grid(axis="y", visible=False)
     st.pyplot(fig)
 
@@ -974,12 +818,11 @@ with tab3:
             "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         fig, ax = clean_fig((7, 5))
-        n = len(top)
-        cols_top = [CHART_EXPAND]*n
-        bar3d(ax, range(n), top.values.tolist(), cols_top, width=0.55, is_horiz=True)
-        ax.set_yticklabels(top.index, fontsize=8)
-        ax.set_xlabel("Total Profit ($)"); ax.set_title("Top 10 Routes")
-        ax.grid(axis="x", color="#ede9fe", linewidth=0.7, linestyle="--", alpha=0.8)
+        bars = ax.barh(top.index, top.values, color=CHART_EXPAND, height=0.55)
+        soften_bars(bars)
+        ax.set_xlabel("Total Profit ($)")
+        ax.set_title("Top 10 Routes")
+        ax.grid(axis="x", color="#e8eef6", linewidth=0.8, linestyle="-", alpha=0.9)
         ax.grid(axis="y", visible=False)
         st.pyplot(fig)
 
@@ -989,17 +832,11 @@ with tab3:
             "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         fig, ax = clean_fig((7, 5))
-        n = len(worst)
-        cols_bot = [CHART_DROP]*n
-        # worst values may be negative; take absolute for bar3d then flip axis
-        abs_vals = [abs(v) for v in worst.values.tolist()]
-        bar3d(ax, range(n), abs_vals, cols_bot, width=0.55, is_horiz=True)
-        ax.set_yticklabels(worst.index, fontsize=8)
-        # re-label x-axis with real (negative) values
-        xticks = ax.get_xticks()
-        ax.set_xticklabels([f"${-v:,.0f}" if v > 0 else "$0" for v in xticks], fontsize=8)
-        ax.set_xlabel("Total Profit ($)"); ax.set_title("Bottom 10 Routes")
-        ax.grid(axis="x", color="#ede9fe", linewidth=0.7, linestyle="--", alpha=0.8)
+        bars = ax.barh(worst.index, worst.values, color=CHART_DROP, height=0.55)
+        soften_bars(bars)
+        ax.set_xlabel("Total Profit ($)")
+        ax.set_title("Bottom 10 Routes")
+        ax.grid(axis="x", color="#e8eef6", linewidth=0.8, linestyle="-", alpha=0.9)
         ax.grid(axis="y", visible=False)
         st.pyplot(fig)
 
@@ -1035,12 +872,13 @@ with tab4:
     bc = [bc_map.get(i,"#c4b5fd") for i in urbd.index]
     fig, ax = clean_fig((8, 4))
     vals4 = urbd["Unique Routes"].values.tolist()
-    bar3d(ax, range(len(vals4)), vals4, bc, width=0.52)
-    for xi, h in enumerate(vals4):
-        ax.text(xi, h + max(vals4)*0.05, f"{int(h)}", ha="center",
-                fontsize=9, color=INK_MUTED, fontweight="700")
-    ax.set_xticklabels(urbd.index, fontsize=9)
-    ax.set_ylabel("Number of Unique Routes"); ax.set_title("Unique Routes per Decision Category")
+    bars = ax.bar(urbd.index, vals4, color=bc, width=0.55)
+    soften_bars(bars)
+    for bar, h in zip(bars, vals4):
+        ax.text(bar.get_x() + bar.get_width()/2, h + max(vals4)*0.05, f"{int(h)}",
+                ha="center", fontsize=9, color=INK_MUTED, fontweight="700")
+    ax.set_ylabel("Number of Unique Routes")
+    ax.set_title("Unique Routes per Decision Category")
     st.pyplot(fig)
 
     patches = [mpatches.Patch(color=bc_map.get(d,"#c4b5fd"), label=d) for d in ORDER]
@@ -1058,20 +896,24 @@ with tab5:
         f"<p style='font-size:0.80rem;font-weight:700;color:{INK};margin-bottom:8px'>"
         "How accurate are the models?</p>", unsafe_allow_html=True)
     fig, ax = clean_fig((8, 3.5))
-    x = np.arange(len(comparison)); w = 0.30
-    acc_col  = "#6d28d9"   # deep violet for accuracy
-    f1_col   = "#a78bfa"   # lighter violet for F1
-    bar3d(ax, x - w/2, comparison["Accuracy"].tolist(), [acc_col]*len(comparison), width=w)
-    bar3d(ax, x + w/2, comparison["Macro F1"].tolist(),  [f1_col]*len(comparison),  width=w)
-    for xi, (acc, f1) in enumerate(zip(comparison["Accuracy"], comparison["Macro F1"])):
-        ax.text(xi-w/2, acc+0.028, f"{acc:.0%}", ha="center", fontsize=7.5, color=INK_MUTED, fontweight="700")
-        ax.text(xi+w/2, f1 +0.028, f"{f1:.0%}",  ha="center", fontsize=7.5, color=INK_MUTED, fontweight="700")
-    from matplotlib.patches import Patch
-    legend_els = [Patch(facecolor=acc_col, label="Accuracy"),
-                  Patch(facecolor=f1_col,  label="Macro F1")]
-    ax.legend(handles=legend_els, frameon=False, fontsize=9)
-    ax.set_xticks(x); ax.set_xticklabels(comparison["Model"], fontsize=8.5, rotation=10)
-    ax.set_ylim(0, 1.18); ax.set_ylabel("Score")
+    x = np.arange(len(comparison)); w = 0.33
+    acc_col  = ACCENT
+    f1_col   = "#0f766e"
+    bars1 = ax.bar(x - w/2, comparison["Accuracy"], width=w, color=acc_col, label="Accuracy")
+    bars2 = ax.bar(x + w/2, comparison["Macro F1"], width=w, color=f1_col, label="Macro F1")
+    soften_bars(bars1)
+    soften_bars(bars2)
+    for bar, acc in zip(bars1, comparison["Accuracy"]):
+        ax.text(bar.get_x()+bar.get_width()/2, acc+0.02, f"{acc:.0%}",
+                ha="center", fontsize=7.5, color=INK_MUTED, fontweight="700")
+    for bar, f1 in zip(bars2, comparison["Macro F1"]):
+        ax.text(bar.get_x()+bar.get_width()/2, f1+0.02, f"{f1:.0%}",
+                ha="center", fontsize=7.5, color=INK_MUTED, fontweight="700")
+    ax.legend(frameon=False, fontsize=9)
+    ax.set_xticks(x)
+    ax.set_xticklabels(comparison["Model"], fontsize=8.5, rotation=10)
+    ax.set_ylim(0, 1.15)
+    ax.set_ylabel("Score")
     ax.set_title("Model Accuracy & F1 Comparison")
     st.pyplot(fig)
 
@@ -1181,8 +1023,8 @@ with tab5:
                       "Optimize":"pill-optimize","Drop":"pill-drop"}
         result_cls = {"Expand":"result-expand","Maintain":"result-maintain",
                       "Optimize":"result-optimize","Drop":"result-drop"}
-        text_col   = {"Expand":"#4c1d95","Maintain":"#6d28d9",
-                      "Optimize":"#7c3aed","Drop":"#8b5cf6"}
+        text_col   = {"Expand":CHART_EXPAND, "Maintain":CHART_MAINTAIN,
+                      "Optimize":CHART_OPTIMIZE, "Drop":CHART_DROP}
         explanations = {
             "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
             "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
@@ -1210,17 +1052,18 @@ with tab5:
 
         prob_df = (pd.DataFrame({"Decision":cls,"Probability":prob})
                    .sort_values("Probability", ascending=False))
-        bar_cp = {"Expand":"#4c1d95","Maintain":"#6d28d9",
-                  "Optimize":"#a78bfa","Drop":"#ddd6fe"}
+        bar_cp = {"Expand":CHART_EXPAND, "Maintain":CHART_MAINTAIN,
+                  "Optimize":CHART_OPTIMIZE, "Drop":CHART_DROP}
         fig, ax = clean_fig((6, 3.5))
-        bar_colors = [bar_cp.get(d,"#c4b5fd") for d in prob_df["Decision"]]
+        bar_colors = [bar_cp.get(d, "#94a3b8") for d in prob_df["Decision"]]
         probs = prob_df["Probability"].tolist()
-        bar3d(ax, range(len(probs)), probs, bar_colors, width=0.45)
-        for xi, h in enumerate(probs):
-            ax.text(xi, h + 0.04, f"{h:.0%}", ha="center",
-                    fontsize=9, color=INK_MUTED, fontweight="700")
-        ax.set_xticklabels(prob_df["Decision"].tolist(), fontsize=9)
-        ax.set_ylim(0, 1.22); ax.set_ylabel("Probability")
+        bars = ax.bar(prob_df["Decision"], probs, color=bar_colors, width=0.5)
+        soften_bars(bars)
+        for bar, h in zip(bars, probs):
+            ax.text(bar.get_x()+bar.get_width()/2, h + 0.03, f"{h:.0%}",
+                    ha="center", fontsize=9, color=INK_MUTED, fontweight="700")
+        ax.set_ylim(0, 1.12)
+        ax.set_ylabel("Probability")
         ax.set_title("Model Confidence per Decision")
         st.pyplot(fig)
 
@@ -1239,7 +1082,7 @@ with st.expander("🗂  Show filtered data"):
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <div style='text-align:center;color:{INK_MUTED};font-size:0.75rem;
-            padding:36px 0 16px;font-family:"Plus Jakarta Sans",sans-serif;
+            padding:36px 0 16px;font-family:"Inter",sans-serif;
             letter-spacing:0.05em'>
   SKYLENS ROUTE INTELLIGENCE &nbsp;✦&nbsp; Built with Streamlit
 </div>
