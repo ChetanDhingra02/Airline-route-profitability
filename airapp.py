@@ -7,7 +7,7 @@ import matplotlib.patches as mpatches
 import numpy as np
 
 st.set_page_config(
-    page_title="Airline Profitability Dashboard",
+    page_title="SkyLens · Route Intelligence",
     page_icon="✈️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -572,7 +572,7 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 st.markdown("""
 <div class="hero">
   <div class="hero-eyebrow">Route Intelligence Platform</div>
-  <h1>Airline Profitability Dashboard</h1>
+  <h1>SkyLens Dashboard</h1>
   <p>
     Built on a sample airline dataset for analysis and demonstration purposes only.
     Does not reflect real-time airline operations or current flight decisions.
@@ -632,7 +632,7 @@ with tab1:
         wedges, texts, autotexts = ax.pie(
             dc.values, labels=dc.index, autopct="%1.1f%%",
             colors=[wc[l] for l in dc.index], startangle=90,
-            wedgeprops={"linewidth":3,"edgecolor":"rgba(255,255,255,0.85)"},
+            wedgeprops={"linewidth":3,"edgecolor":(1,1,1,0.85)},
             textprops={"color":INK,"fontsize":9.5},
             pctdistance=0.78,
         )
@@ -672,7 +672,7 @@ with tab2:
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
         fig, ax = clean_fig((6, 4))
         bars = ax.bar(apd.index, apd.values, color=col_seq(apd.index.tolist()),
-                      width=0.52, edgecolor="rgba(255,255,255,0.80)", linewidth=2)
+                      width=0.52, edgecolor=(1,1,1,0.80), linewidth=2)
         for b in bars:
             h = b.get_height()
             ax.text(b.get_x()+b.get_width()/2, h+abs(apd.values).max()*0.025,
@@ -686,7 +686,7 @@ with tab2:
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
         fig, ax = clean_fig((6, 4))
         bars = ax.bar(ald.index, ald.values, color=col_seq(ald.index.tolist()),
-                      width=0.52, edgecolor="rgba(255,255,255,0.80)", linewidth=2)
+                      width=0.52, edgecolor=(1,1,1,0.80), linewidth=2)
         for b in bars:
             h = b.get_height()
             ax.text(b.get_x()+b.get_width()/2, h+0.006, f"{h:.0%}",
@@ -719,7 +719,7 @@ with tab2:
     fig, ax = clean_fig((9, 4))
     bars = ax.barh(cost_means.index, cost_means.values,
                    color=CHART_NEUTRAL[:len(cost_means)],
-                   edgecolor="rgba(255,255,255,0.80)", linewidth=2, height=0.55)
+                   edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
     mx = cost_means.max()
     for b in bars:
         w = b.get_width()
@@ -753,7 +753,7 @@ with tab3:
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         fig, ax = clean_fig((7, 5))
         ax.barh(top.index, top.values, color=CHART_EXPAND,
-                edgecolor="rgba(255,255,255,0.80)", linewidth=2, height=0.55)
+                edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)"); ax.set_title("Top 10 Routes")
         st.pyplot(fig)
 
@@ -764,7 +764,7 @@ with tab3:
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         fig, ax = clean_fig((7, 5))
         ax.barh(worst.index, worst.values, color=CHART_DROP,
-                edgecolor="rgba(255,255,255,0.80)", linewidth=2, height=0.55)
+                edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)"); ax.set_title("Bottom 10 Routes")
         st.pyplot(fig)
 
@@ -800,7 +800,7 @@ with tab4:
     bc = [bc_map.get(i,"#c4b5fd") for i in urbd.index]
     fig, ax = clean_fig((8, 4))
     bars = ax.bar(urbd.index, urbd["Unique Routes"], color=bc, width=0.52,
-                  edgecolor="rgba(255,255,255,0.80)", linewidth=2)
+                  edgecolor=(1,1,1,0.80), linewidth=2)
     for b in bars:
         h = b.get_height()
         ax.text(b.get_x()+b.get_width()/2, h+0.3, f"{int(h)}",
@@ -825,9 +825,9 @@ with tab5:
     fig, ax = clean_fig((8, 3.5))
     x = np.arange(len(comparison)); w = 0.30
     b1 = ax.bar(x-w/2, comparison["Accuracy"], w, label="Accuracy",
-                color="#a78bfa", edgecolor="rgba(255,255,255,0.80)", linewidth=2)
+                color="#a78bfa", edgecolor=(1,1,1,0.80), linewidth=2)
     b2 = ax.bar(x+w/2, comparison["Macro F1"],  w, label="Macro F1",
-                color="#6ee7b7", edgecolor="rgba(255,255,255,0.80)", linewidth=2)
+                color="#6ee7b7", edgecolor=(1,1,1,0.80), linewidth=2)
     for b in list(b1)+list(b2):
         h = b.get_height()
         ax.text(b.get_x()+b.get_width()/2, h+0.006, f"{h:.0%}",
@@ -979,7 +979,7 @@ with tab5:
         bars = ax.bar(
             prob_df["Decision"], prob_df["Probability"],
             color=[bar_cp.get(d,"#c4b5fd") for d in prob_df["Decision"]],
-            width=0.45, edgecolor="rgba(255,255,255,0.80)", linewidth=2,
+            width=0.45, edgecolor=(1,1,1,0.80), linewidth=2,
         )
         for b in bars:
             h = b.get_height()
@@ -1006,7 +1006,7 @@ st.markdown(f"""
 <div style='text-align:center;color:{INK_MUTED};font-size:0.75rem;
             padding:36px 0 16px;font-family:"Plus Jakarta Sans",sans-serif;
             letter-spacing:0.05em'>
-  Airline Profitability Dashboard &nbsp;✦&nbsp; Built with Streamlit
+  SKYLENS ROUTE INTELLIGENCE &nbsp;✦&nbsp; Built with Streamlit
 </div>
 """, unsafe_allow_html=True)
 
