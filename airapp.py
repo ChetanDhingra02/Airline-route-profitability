@@ -35,15 +35,15 @@ COLOR_YELLOW = "#713f12"
 COLOR_ORANGE = "#7c2d12"
 COLOR_PINK   = "#831843"
 
-# Two-tone chart palette: violet + semantic signal colors
-CHART_EXPAND   = "#6d28d9"   # violet
-CHART_MAINTAIN = "#0ea5e9"   # sky blue
-CHART_OPTIMIZE = "#f59e0b"   # amber
-CHART_ORANGE   = "#f59e0b"
-CHART_DROP     = "#e11d48"   # rose
+# Monochrome violet tonal palette — single hue, 4 luminosity steps
+CHART_EXPAND   = "#4c1d95"   # darkest violet  (strong positive)
+CHART_MAINTAIN = "#6d28d9"   # deep violet
+CHART_OPTIMIZE = "#a78bfa"   # mid violet
+CHART_ORANGE   = "#a78bfa"
+CHART_DROP     = "#ddd6fe"   # palest violet   (weak/loss)
 CHART_NEUTRAL  = [
-    "#6d28d9","#0ea5e9","#10b981","#f59e0b",
-    "#e11d48","#8b5cf6","#38bdf8","#34d399",
+    "#4c1d95","#6d28d9","#7c3aed","#8b5cf6",
+    "#a78bfa","#c4b5fd","#ddd6fe","#ede9fe",
 ]
 
 # ─────────────────────────────────────────────────────────────
@@ -180,18 +180,22 @@ html, body, [class*="css"] {{
     border-radius: var(--r-sm) !important;
     font-family: 'DM Sans', sans-serif !important;
     font-weight: 500 !important; font-size: 0.81rem !important;
-    color: {INK_MUTED} !important; padding: 7px 18px !important;
+    color: {INK_SOFT} !important; padding: 7px 18px !important;
     background: transparent !important; border: none !important;
-    transition: color 0.18s ease, background 0.18s ease !important;
+    transition: color 0.18s ease, background 0.22s ease,
+                transform 0.18s cubic-bezier(.34,1.56,.64,1) !important;
+    letter-spacing: 0.005em !important;
 }}
 .stTabs [data-baseweb="tab"]:hover {{
-    background: rgba(109,40,217,0.07) !important;
-    color: {INK_SOFT} !important;
+    background: rgba(109,40,217,0.09) !important;
+    color: {INK} !important;
+    transform: translateY(-1px) !important;
 }}
 .stTabs [aria-selected="true"] {{
     background: {ACCENT} !important;
-    color: #fff !important;
-    box-shadow: 0 3px 10px rgba(109,40,217,0.28) !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 12px rgba(109,40,217,0.32) !important;
+    font-weight: 600 !important;
 }}
 .stTabs [data-baseweb="tab-panel"] {{ background: transparent; padding-top: 1.5rem; }}
 
@@ -450,6 +454,80 @@ hr {{
     font-size:0.70rem; font-weight:700; color:{INK_MUTED};
     letter-spacing:0.10em; text-transform:uppercase; margin-bottom:14px;
 }}
+
+/* ── CHART WRAPPER: animated glass card around every pyplot ── */
+[data-testid="stpyplot"] > div,
+.stImage > img {{
+    border-radius: var(--r-md) !important;
+    transition: transform 0.28s cubic-bezier(.34,1.56,.64,1),
+                box-shadow 0.28s ease !important;
+    animation: fadeUp 0.5s ease both !important;
+}}
+[data-testid="stpyplot"] > div:hover {{
+    transform: translateY(-4px) scale(1.005) !important;
+    box-shadow: var(--shadow-lg) !important;
+}}
+
+/* ── TAB PANEL: fade in on switch ───────────────────────── */
+.stTabs [data-baseweb="tab-panel"] > div {{
+    animation: fadeUp 0.38s ease both;
+}}
+
+/* ── STAGGERED METRIC CARD DELAYS ───────────────────────── */
+[data-testid="column"]:nth-child(1) [data-testid="metric-container"] {{
+    animation-delay: 0.05s !important;
+}}
+[data-testid="column"]:nth-child(2) [data-testid="metric-container"] {{
+    animation-delay: 0.12s !important;
+}}
+[data-testid="column"]:nth-child(3) [data-testid="metric-container"] {{
+    animation-delay: 0.19s !important;
+}}
+[data-testid="column"]:nth-child(4) [data-testid="metric-container"] {{
+    animation-delay: 0.26s !important;
+}}
+
+/* ── SIDEBAR FILTER ROWS: slide in ──────────────────────── */
+[data-testid="stSidebar"] .stSelectbox {{
+    animation: fadeUp 0.4s ease both;
+}}
+[data-testid="stSidebar"] .stSelectbox:nth-child(1) {{ animation-delay: 0.06s; }}
+[data-testid="stSidebar"] .stSelectbox:nth-child(2) {{ animation-delay: 0.12s; }}
+[data-testid="stSidebar"] .stSelectbox:nth-child(3) {{ animation-delay: 0.18s; }}
+[data-testid="stSidebar"] .stSelectbox:nth-child(4) {{ animation-delay: 0.24s; }}
+
+/* ── DATAFRAME: hover reveal ────────────────────────────── */
+[data-testid="stDataFrame"] {{
+    transition: transform 0.24s cubic-bezier(.34,1.56,.64,1),
+                box-shadow 0.24s ease !important;
+}}
+[data-testid="stDataFrame"]:hover {{
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}}
+
+/* ── EXPANDER: slide-open feel ──────────────────────────── */
+[data-testid="stExpander"] {{
+    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+                box-shadow 0.22s ease !important;
+}}
+[data-testid="stExpander"]:hover {{
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}}
+
+/* ── FORM: lift on focus-within ─────────────────────────── */
+[data-testid="stForm"] {{
+    transition: box-shadow 0.25s ease !important;
+}}
+[data-testid="stForm"]:focus-within {{
+    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.92) !important;
+}}
+
+/* ── RESULT CARD: pop-in ────────────────────────────────── */
+.result-card {{
+    animation: fadeUp 0.42s cubic-bezier(.34,1.56,.64,1) both;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -466,28 +544,121 @@ DECISION_COLORS = {
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
 # ─────────────────────────────────────────────────────────────
-#  CHART HELPER  (axes match pastel theme; data logic unchanged)
+#  CHART HELPERS — polished monochrome glass-violet charts
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
-    fig, ax = plt.subplots(figsize=figsize)
+    fig, ax = plt.subplots(figsize=figsize, facecolor="none")
     fig.patch.set_facecolor("none"); fig.patch.set_alpha(0.0)
-    ax.set_facecolor("none")
+    ax.set_facecolor("#faf9ff")          # very faint lavender panel
     for spine in ["top", "right"]:
         ax.spines[spine].set_visible(False)
-    ax.spines["left"].set_color("#ddd6fe")
-    ax.spines["bottom"].set_color("#ddd6fe")
-    ax.tick_params(colors=INK_MUTED, labelsize=8.5)
+    ax.spines["left"].set_color("#e5e0f8")
+    ax.spines["bottom"].set_color("#e5e0f8")
+    ax.tick_params(colors=INK_MUTED, labelsize=8.5, length=0)
     ax.xaxis.label.set_color(INK_MUTED)
     ax.yaxis.label.set_color(INK_MUTED)
     ax.title.set_color(INK)
-    ax.title.set_fontsize(11)
+    ax.title.set_fontsize(11.5)
     ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color="#ede9fe", linewidth=0.6, linestyle="--")
+    ax.title.set_fontfamily("serif")
+    ax.grid(axis="y", color="#ede9fe", linewidth=0.7, linestyle="--", alpha=0.8)
     ax.set_axisbelow(True)
     return fig, ax
 
 def col_seq(labels):
     return [DECISION_COLORS.get(l, "#c4b5fd") for l in labels]
+
+def _hex_to_rgb(h):
+    h = h.lstrip("#")
+    return tuple(int(h[i:i+2], 16)/255 for i in (0, 2, 4))
+
+def _lighten(hex_color, factor=0.55):
+    r, g, b = _hex_to_rgb(hex_color)
+    return (r + (1-r)*factor, g + (1-g)*factor, b + (1-b)*factor)
+
+def _darken(hex_color, factor=0.25):
+    r, g, b = _hex_to_rgb(hex_color)
+    return (r*(1-factor), g*(1-factor), b*(1-factor))
+
+def bar3d(ax, x, heights, colors, width=0.52, is_horiz=False, **kw):
+    """Draw bars with a vertical gradient (light top → colour body → dark shadow)
+    to create a polished 3D depth effect without mpl3d."""
+    from matplotlib.patches import FancyBboxPatch
+    from matplotlib.colors import to_rgba
+
+    depth = 3   # number of gradient strips
+    for xi, (h, col) in enumerate(zip(heights, colors)):
+        if h == 0:
+            continue
+        light = _lighten(col, 0.62)
+        dark  = _darken(col, 0.22)
+
+        if not is_horiz:
+            left  = xi - width/2
+            bot   = min(h, 0)
+            height_abs = abs(h)
+            strip_h = height_abs / depth
+            # gradient strips: dark bottom → colour → light top
+            grad_cols = [dark, col, light]
+            for i, gc in enumerate(grad_cols):
+                by = bot + i*strip_h
+                rect = FancyBboxPatch(
+                    (left, by), width, strip_h,
+                    boxstyle="square,pad=0", linewidth=0,
+                    facecolor=gc, alpha=0.92 if i == 1 else 0.75,
+                    zorder=2,
+                )
+                ax.add_patch(rect)
+            # thin highlight stripe on left edge
+            ax.add_patch(FancyBboxPatch(
+                (left, bot), width*0.08, height_abs,
+                boxstyle="square,pad=0", linewidth=0,
+                facecolor=light, alpha=0.55, zorder=3,
+            ))
+            # thin shadow on right edge
+            ax.add_patch(FancyBboxPatch(
+                (left + width*0.88, bot), width*0.12, height_abs,
+                boxstyle="square,pad=0", linewidth=0,
+                facecolor=dark, alpha=0.45, zorder=3,
+            ))
+        else:
+            # horizontal bars
+            bot_y = xi - width/2
+            strip_w = abs(h) / depth
+            grad_cols = [dark, col, light]
+            for i, gc in enumerate(grad_cols):
+                bx = i*strip_w
+                rect = FancyBboxPatch(
+                    (bx, bot_y), strip_w, width,
+                    boxstyle="square,pad=0", linewidth=0,
+                    facecolor=gc, alpha=0.92 if i == 1 else 0.75,
+                    zorder=2,
+                )
+                ax.add_patch(rect)
+            ax.add_patch(FancyBboxPatch(
+                (0, bot_y), abs(h), width*0.10,
+                boxstyle="square,pad=0", linewidth=0,
+                facecolor=light, alpha=0.50, zorder=3,
+            ))
+            ax.add_patch(FancyBboxPatch(
+                (0, bot_y + width*0.90), abs(h), width*0.10,
+                boxstyle="square,pad=0", linewidth=0,
+                facecolor=dark, alpha=0.40, zorder=3,
+            ))
+
+    # Re-set axis limits after adding patches
+    if not is_horiz:
+        xpos = list(range(len(heights)))
+        ax.set_xlim(-0.6, len(heights)-0.4)
+        mn, mx = min(min(heights), 0), max(max(heights), 0)
+        pad = (mx - mn) * 0.18 if (mx - mn) > 0 else 1
+        ax.set_ylim(mn - pad*0.1, mx + pad)
+        ax.set_xticks(xpos)
+    else:
+        ax.set_ylim(-0.6, len(heights)-0.4)
+        mn, mx = 0, max(heights)
+        ax.set_xlim(0, mx * 1.22)
+        ax.set_yticks(list(range(len(heights))))
 
 # ─────────────────────────────────────────────────────────────
 #  PATHS  (unchanged)
@@ -719,13 +890,15 @@ with tab2:
         apd = (fdf.groupby("Route_Decision")["Profit"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
         fig, ax = clean_fig((6, 4))
-        bars = ax.bar(apd.index, apd.values, color=col_seq(apd.index.tolist()),
-                      width=0.52, edgecolor=(1,1,1,0.80), linewidth=2)
-        for b in bars:
-            h = b.get_height()
-            ax.text(b.get_x()+b.get_width()/2, h+abs(apd.values).max()*0.025,
-                    f"${h:,.0f}", ha="center", va="bottom",
+        colors = col_seq(apd.index.tolist())
+        bar3d(ax, range(len(apd)), apd.values.tolist(), colors, width=0.52)
+        mn, mx = min(apd.values.min(), 0), apd.values.max()
+        pad = (mx - mn) * 0.18
+        for xi, (label, h) in enumerate(zip(apd.index, apd.values)):
+            ty = h + pad*0.18 if h >= 0 else h - pad*0.18
+            ax.text(xi, ty, f"${h:,.0f}", ha="center", va="bottom",
                     fontsize=8, color=INK_MUTED, fontweight="700")
+        ax.set_xticklabels(apd.index, fontsize=9)
         ax.set_ylabel("Average Profit ($)"); ax.set_title("Average Profit by Decision")
         st.pyplot(fig)
 
@@ -733,13 +906,12 @@ with tab2:
         ald = (fdf.groupby("Route_Decision")["Load_Factor"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
         fig, ax = clean_fig((6, 4))
-        bars = ax.bar(ald.index, ald.values, color=col_seq(ald.index.tolist()),
-                      width=0.52, edgecolor=(1,1,1,0.80), linewidth=2)
-        for b in bars:
-            h = b.get_height()
-            ax.text(b.get_x()+b.get_width()/2, h+0.006, f"{h:.0%}",
-                    ha="center", va="bottom",
+        colors = col_seq(ald.index.tolist())
+        bar3d(ax, range(len(ald)), ald.values.tolist(), colors, width=0.52)
+        for xi, (label, h) in enumerate(zip(ald.index, ald.values)):
+            ax.text(xi, h + 0.025, f"{h:.0%}", ha="center", va="bottom",
                     fontsize=8, color=INK_MUTED, fontweight="700")
+        ax.set_xticklabels(ald.index, fontsize=9)
         ax.set_ylabel("Average Seat Occupancy"); ax.set_title("Seat Occupancy by Decision")
         st.pyplot(fig)
 
@@ -765,15 +937,17 @@ with tab2:
     }
     cost_means.index = [label_map.get(i, i) for i in cost_means.index]
     fig, ax = clean_fig((9, 4))
-    bars = ax.barh(cost_means.index, cost_means.values,
-                   color=CHART_NEUTRAL[:len(cost_means)],
-                   edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
+    nc = len(cost_means)
+    neutral_cols = CHART_NEUTRAL[:nc]
+    bar3d(ax, range(nc), cost_means.values.tolist(), neutral_cols, width=0.55, is_horiz=True)
     mx = cost_means.max()
-    for b in bars:
-        w = b.get_width()
-        ax.text(w+mx*0.012, b.get_y()+b.get_height()/2,
-                f"${w:,.0f}", va="center", fontsize=8, color=INK_MUTED, fontweight="700")
+    for xi, (label, w) in enumerate(zip(cost_means.index, cost_means.values)):
+        ax.text(w + mx*0.015, xi, f"${w:,.0f}", va="center",
+                fontsize=8, color=INK_MUTED, fontweight="700")
+    ax.set_yticklabels(cost_means.index, fontsize=8.5)
     ax.set_xlabel("Average Cost per Flight ($)"); ax.set_title("Top Cost Drivers")
+    ax.grid(axis="x", color="#ede9fe", linewidth=0.7, linestyle="--", alpha=0.8)
+    ax.grid(axis="y", visible=False)
     st.pyplot(fig)
 
 # ── TAB 3 · ROUTE ACTIONS ────────────────────────────────────
@@ -800,9 +974,13 @@ with tab3:
             "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         fig, ax = clean_fig((7, 5))
-        ax.barh(top.index, top.values, color=CHART_EXPAND,
-                edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
+        n = len(top)
+        cols_top = [CHART_EXPAND]*n
+        bar3d(ax, range(n), top.values.tolist(), cols_top, width=0.55, is_horiz=True)
+        ax.set_yticklabels(top.index, fontsize=8)
         ax.set_xlabel("Total Profit ($)"); ax.set_title("Top 10 Routes")
+        ax.grid(axis="x", color="#ede9fe", linewidth=0.7, linestyle="--", alpha=0.8)
+        ax.grid(axis="y", visible=False)
         st.pyplot(fig)
 
     with right:
@@ -811,9 +989,18 @@ with tab3:
             "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         fig, ax = clean_fig((7, 5))
-        ax.barh(worst.index, worst.values, color=CHART_DROP,
-                edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
+        n = len(worst)
+        cols_bot = [CHART_DROP]*n
+        # worst values may be negative; take absolute for bar3d then flip axis
+        abs_vals = [abs(v) for v in worst.values.tolist()]
+        bar3d(ax, range(n), abs_vals, cols_bot, width=0.55, is_horiz=True)
+        ax.set_yticklabels(worst.index, fontsize=8)
+        # re-label x-axis with real (negative) values
+        xticks = ax.get_xticks()
+        ax.set_xticklabels([f"${-v:,.0f}" if v > 0 else "$0" for v in xticks], fontsize=8)
         ax.set_xlabel("Total Profit ($)"); ax.set_title("Bottom 10 Routes")
+        ax.grid(axis="x", color="#ede9fe", linewidth=0.7, linestyle="--", alpha=0.8)
+        ax.grid(axis="y", visible=False)
         st.pyplot(fig)
 
 # ── TAB 4 · ROUTE STABILITY ──────────────────────────────────
@@ -847,12 +1034,12 @@ with tab4:
               "Optimize":CHART_ORANGE,"Drop":CHART_DROP}
     bc = [bc_map.get(i,"#c4b5fd") for i in urbd.index]
     fig, ax = clean_fig((8, 4))
-    bars = ax.bar(urbd.index, urbd["Unique Routes"], color=bc, width=0.52,
-                  edgecolor=(1,1,1,0.80), linewidth=2)
-    for b in bars:
-        h = b.get_height()
-        ax.text(b.get_x()+b.get_width()/2, h+0.3, f"{int(h)}",
-                ha="center", fontsize=9, color=INK_MUTED, fontweight="700")
+    vals4 = urbd["Unique Routes"].values.tolist()
+    bar3d(ax, range(len(vals4)), vals4, bc, width=0.52)
+    for xi, h in enumerate(vals4):
+        ax.text(xi, h + max(vals4)*0.05, f"{int(h)}", ha="center",
+                fontsize=9, color=INK_MUTED, fontweight="700")
+    ax.set_xticklabels(urbd.index, fontsize=9)
     ax.set_ylabel("Number of Unique Routes"); ax.set_title("Unique Routes per Decision Category")
     st.pyplot(fig)
 
@@ -872,18 +1059,20 @@ with tab5:
         "How accurate are the models?</p>", unsafe_allow_html=True)
     fig, ax = clean_fig((8, 3.5))
     x = np.arange(len(comparison)); w = 0.30
-    b1 = ax.bar(x-w/2, comparison["Accuracy"], w, label="Accuracy",
-                color="#a78bfa", edgecolor=(1,1,1,0.80), linewidth=2)
-    b2 = ax.bar(x+w/2, comparison["Macro F1"],  w, label="Macro F1",
-                color="#6ee7b7", edgecolor=(1,1,1,0.80), linewidth=2)
-    for b in list(b1)+list(b2):
-        h = b.get_height()
-        ax.text(b.get_x()+b.get_width()/2, h+0.006, f"{h:.0%}",
-                ha="center", fontsize=7.5, color=INK_MUTED, fontweight="700")
-    ax.set_xticks(x); ax.set_xticklabels(comparison["Model"], fontsize=8.5)
-    ax.set_ylim(0, 1.15); ax.set_ylabel("Score")
+    acc_col  = "#6d28d9"   # deep violet for accuracy
+    f1_col   = "#a78bfa"   # lighter violet for F1
+    bar3d(ax, x - w/2, comparison["Accuracy"].tolist(), [acc_col]*len(comparison), width=w)
+    bar3d(ax, x + w/2, comparison["Macro F1"].tolist(),  [f1_col]*len(comparison),  width=w)
+    for xi, (acc, f1) in enumerate(zip(comparison["Accuracy"], comparison["Macro F1"])):
+        ax.text(xi-w/2, acc+0.028, f"{acc:.0%}", ha="center", fontsize=7.5, color=INK_MUTED, fontweight="700")
+        ax.text(xi+w/2, f1 +0.028, f"{f1:.0%}",  ha="center", fontsize=7.5, color=INK_MUTED, fontweight="700")
+    from matplotlib.patches import Patch
+    legend_els = [Patch(facecolor=acc_col, label="Accuracy"),
+                  Patch(facecolor=f1_col,  label="Macro F1")]
+    ax.legend(handles=legend_els, frameon=False, fontsize=9)
+    ax.set_xticks(x); ax.set_xticklabels(comparison["Model"], fontsize=8.5, rotation=10)
+    ax.set_ylim(0, 1.18); ax.set_ylabel("Score")
     ax.set_title("Model Accuracy & F1 Comparison")
-    ax.legend(frameon=False, fontsize=9); plt.xticks(rotation=10)
     st.pyplot(fig)
 
     st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
@@ -992,8 +1181,8 @@ with tab5:
                       "Optimize":"pill-optimize","Drop":"pill-drop"}
         result_cls = {"Expand":"result-expand","Maintain":"result-maintain",
                       "Optimize":"result-optimize","Drop":"result-drop"}
-        text_col   = {"Expand":COLOR_GREEN,"Maintain":"#0369a1",
-                      "Optimize":COLOR_ORANGE,"Drop":COLOR_PINK}
+        text_col   = {"Expand":"#4c1d95","Maintain":"#6d28d9",
+                      "Optimize":"#7c3aed","Drop":"#8b5cf6"}
         explanations = {
             "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
             "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
@@ -1021,19 +1210,17 @@ with tab5:
 
         prob_df = (pd.DataFrame({"Decision":cls,"Probability":prob})
                    .sort_values("Probability", ascending=False))
-        bar_cp = {"Expand":CHART_EXPAND,"Maintain":CHART_MAINTAIN,
-                  "Optimize":CHART_ORANGE,"Drop":CHART_DROP}
+        bar_cp = {"Expand":"#4c1d95","Maintain":"#6d28d9",
+                  "Optimize":"#a78bfa","Drop":"#ddd6fe"}
         fig, ax = clean_fig((6, 3.5))
-        bars = ax.bar(
-            prob_df["Decision"], prob_df["Probability"],
-            color=[bar_cp.get(d,"#c4b5fd") for d in prob_df["Decision"]],
-            width=0.45, edgecolor=(1,1,1,0.80), linewidth=2,
-        )
-        for b in bars:
-            h = b.get_height()
-            ax.text(b.get_x()+b.get_width()/2, h+0.013, f"{h:.0%}",
-                    ha="center", fontsize=9, color=INK_MUTED, fontweight="700")
-        ax.set_ylim(0,1.18); ax.set_ylabel("Probability")
+        bar_colors = [bar_cp.get(d,"#c4b5fd") for d in prob_df["Decision"]]
+        probs = prob_df["Probability"].tolist()
+        bar3d(ax, range(len(probs)), probs, bar_colors, width=0.45)
+        for xi, h in enumerate(probs):
+            ax.text(xi, h + 0.04, f"{h:.0%}", ha="center",
+                    fontsize=9, color=INK_MUTED, fontweight="700")
+        ax.set_xticklabels(prob_df["Decision"].tolist(), fontsize=9)
+        ax.set_ylim(0, 1.22); ax.set_ylabel("Probability")
         ax.set_title("Model Confidence per Decision")
         st.pyplot(fig)
 
