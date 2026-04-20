@@ -7,7 +7,7 @@ import matplotlib.patches as mpatches
 import numpy as np
 
 st.set_page_config(
-    page_title="SkyLens · Route Intelligence",
+    page_title="Airline Profitability System",
     page_icon="✈️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -860,7 +860,7 @@ st.markdown("""
 <div class="hero">
   <div class="hero-left">
     <div class="hero-eyebrow">✦ Route Intelligence Platform</div>
-    <h1>SkyLens Dashboard</h1>
+    <h1>Airline Profitability System Dashboard</h1>
     <p>Sample airline dataset · for analysis &amp; demonstration only</p>
   </div>
   <div class="hero-badge">⚡ ML-Powered Decisions</div>
@@ -1327,7 +1327,7 @@ st.markdown(f"""
               letter-spacing:0.10em;
               text-transform:uppercase'>
     <span style='color:{ACCENT};font-size:0.85rem'>✦</span>
-    SKYLENS ROUTE INTELLIGENCE
+    Airline Profitability System
     <span style='color:{ACCENT};font-size:0.85rem'>✦</span>
     Built with Streamlit
   </div>
