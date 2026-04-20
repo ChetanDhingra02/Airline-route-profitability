@@ -234,7 +234,7 @@ h1, h2, h3, h4 {{
     box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.72) !important;
     padding: 1rem 1.1rem !important;
     transition: transform var(--motion-fast), box-shadow var(--motion-fast), background var(--motion-fast) !important;
-}}
+}
 [data-testid="metric-container"]:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.78) !important;
