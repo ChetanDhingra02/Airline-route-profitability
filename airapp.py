@@ -55,7 +55,7 @@ st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap');
 
-:root {{
+:root {{{{
     --bg-base: {BG_BASE};
     --glass-bg: {GLASS_BG};
     --glass-border: {GLASS_BORDER};
@@ -75,55 +75,55 @@ st.markdown(f"""
     --shadow-lg: 0 26px 60px rgba(15,23,42,0.10);
     --motion-fast: 180ms cubic-bezier(.2,.8,.2,1);
     --motion-med: 260ms cubic-bezier(.2,.8,.2,1);
-}}
+}}}}
 
-@keyframes floatIn {{
-    from {{ opacity: 0; transform: translateY(10px); }}
-    to {{ opacity: 1; transform: translateY(0); }}
-}}
+@keyframes floatIn {{{{
+    from {{{{ opacity: 0; transform: translateY(10px); }}}}
+    to {{{{ opacity: 1; transform: translateY(0); }}}}
+}}}}
 
-@keyframes driftGlow {{
-    0%, 100% {{ transform: translate3d(0,0,0); }}
-    50% {{ transform: translate3d(0,-3px,0); }}
-}}
+@keyframes driftGlow {{{{
+    0%, 100% {{{{ transform: translate3d(0,0,0); }}}}
+    50% {{{{ transform: translate3d(0,-3px,0); }}}}
+}}}}
 
-html, body, [class*="css"] {{
+html, body, [class*="css"] {{{{
     font-family: 'Inter', system-ui, sans-serif !important;
-}}
+}}}}
 
-.stApp {{
+.stApp {{{{
     min-height: 100vh;
     background:
         radial-gradient(circle at 14% 18%, {BG_MESH_A} 0, transparent 30%),
         radial-gradient(circle at 86% 14%, {BG_MESH_B} 0, transparent 28%),
         linear-gradient(180deg, #fbfcff 0%, {BG_BASE} 100%);
     background-attachment: fixed;
-}}
+}}}}
 
-.main .block-container {{
+.main .block-container {{{{
     max-width: 1280px;
     padding-top: 2rem;
     padding-bottom: 3rem;
     animation: floatIn 420ms ease-out;
-}}
+}}}}
 
-section.main > div {{
+section.main > div {{{{
     background: transparent;
-}}
+}}}}
 
-[data-testid="stSidebar"] {{
+[data-testid="stSidebar"] {{{{
     background: rgba(255,255,255,0.50) !important;
     border-right: 1px solid rgba(148,163,184,0.18) !important;
     backdrop-filter: var(--glass-blur) !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
     box-shadow: 4px 0 24px rgba(15,23,42,0.04) !important;
-}}
+}}}}
 
-[data-testid="stSidebar"] * {{
+[data-testid="stSidebar"] * {{{{
     color: var(--ink-soft) !important;
-}}
+}}}}
 
-.sidebar-brand {{
+.sidebar-brand {{{{
     font-family:'DM Serif Display', Georgia, serif;
     font-size: 1.45rem;
     color: var(--ink);
@@ -131,26 +131,26 @@ section.main > div {{
     padding: 0.15rem 0 1rem 0;
     border-bottom: 1px solid rgba(148,163,184,0.16);
     margin-bottom: 1rem;
-}}
-.sidebar-brand span {{ color: var(--accent); }}
+}}}}
+.sidebar-brand span {{{{ color: var(--accent); }}}}
 
-h1, h2, h3, h4 {{
+h1, h2, h3, h4 {{{{
     font-family: 'DM Serif Display', Georgia, serif !important;
     color: var(--ink) !important;
     letter-spacing: -0.02em !important;
     font-weight: 400 !important;
-}}
+}}}}
 
 [data-testid="stMarkdownContainer"] p,
 .stMarkdown p,
 [data-testid="stMarkdownContainer"] li,
-.stMarkdown li {{
+.stMarkdown li {{{{
     color: var(--ink-soft);
     line-height: 1.72;
     font-size: 0.92rem;
-}}
+}}}}
 
-.hero {{
+.hero {{{{
     position: relative;
     overflow: hidden;
     display: flex;
@@ -165,42 +165,42 @@ h1, h2, h3, h4 {{
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.70);
-}}
-.hero::before {{
+}}}}
+.hero::before {{{{
     content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(115deg, rgba(255,255,255,0.14), transparent 42%, rgba(124,140,248,0.05) 100%);
     pointer-events: none;
-}}
-.hero::after {{
+}}}}
+.hero::after {{{{
     content: "";
     position: absolute;
     inset: 1px;
     border-radius: calc(var(--radius-xl) - 1px);
     background: linear-gradient(180deg, rgba(255,255,255,0.18), transparent 42%);
     pointer-events: none;
-}}
-.hero-left, .hero-badge, .hero-glyph {{ position: relative; z-index: 1; }}
-.hero-left {{ flex: 1; min-width: 0; }}
-.hero-eyebrow {{
+}}}}
+.hero-left, .hero-badge, .hero-glyph {{{{ position: relative; z-index: 1; }}}}
+.hero-left {{{{ flex: 1; min-width: 0; }}}}
+.hero-eyebrow {{{{
     font-size: 0.66rem;
     text-transform: uppercase;
     letter-spacing: 0.16em;
     color: var(--ink-muted);
     font-weight: 700;
     margin-bottom: 0.45rem;
-}}
-.hero h1 {{
+}}}}
+.hero h1 {{{{
     margin: 0 0 0.35rem 0 !important;
     font-size: 2.05rem !important;
-}}
-.hero p {{
+}}}}
+.hero p {{{{
     margin: 0;
     color: var(--ink-muted) !important;
     font-size: 0.90rem;
-}}
-.hero-badge {
+}}}}
+.hero-badge {{
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
@@ -213,19 +213,19 @@ h1, h2, h3, h4 {{
     font-weight: 700;
     box-shadow: 0 4px 14px rgba(124,140,248,0.08);
     transition: transform var(--motion-fast), box-shadow var(--motion-fast);
-}
-.hero-badge:hover {
+}}
+.hero-badge:hover {{
     transform: translateY(-2px);
     box-shadow: 0 10px 22px rgba(124,140,248,0.14);
-}
-.hero-glyph {
+}}
+.hero-glyph {{
     font-size: 2.8rem;
     color: rgba(124,140,248,0.16);
     transform: rotate(-8deg);
     animation: driftGlow 4.5s ease-in-out infinite;
-}
+}}
 
-[data-testid="metric-container"] {
+[data-testid="metric-container"] {{
     background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.38)) !important;
     border: 1px solid rgba(255,255,255,0.84) !important;
     border-radius: var(--radius-md) !important;
@@ -234,26 +234,26 @@ h1, h2, h3, h4 {{
     box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.72) !important;
     padding: 1rem 1.1rem !important;
     transition: transform var(--motion-fast), box-shadow var(--motion-fast), background var(--motion-fast) !important;
-}
-[data-testid="metric-container"]:hover {
+}}}}
+[data-testid="metric-container"]:hover {{
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.78) !important;
-}
-[data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
+}}
+[data-testid="metric-container"] [data-testid="stMetricLabel"] p {{{{
     font-size: 0.64rem !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.12em !important;
     color: var(--ink-muted) !important;
-}}
-[data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
+}}}}
+[data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{{{
     color: var(--ink) !important;
     font-size: 1.95rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.03em !important;
-}}
+}}}}
 
-.stTabs [data-baseweb="tab-list"] {{
+.stTabs [data-baseweb="tab-list"] {{{{
     gap: 0.35rem;
     background: rgba(255,255,255,0.46);
     border: 1px solid rgba(255,255,255,0.82);
@@ -261,8 +261,8 @@ h1, h2, h3, h4 {{
     padding: 0.35rem;
     backdrop-filter: blur(14px);
     box-shadow: var(--shadow-sm);
-}}
-.stTabs [data-baseweb="tab"] {{
+}}}}
+.stTabs [data-baseweb="tab"] {{{{
     height: 42px;
     padding: 0 1rem !important;
     border-radius: 12px !important;
@@ -271,34 +271,34 @@ h1, h2, h3, h4 {{
     font-weight: 600 !important;
     background: transparent !important;
     transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease !important;
-}}
-.stTabs [data-baseweb="tab"]:hover {{
+}}}}
+.stTabs [data-baseweb="tab"]:hover {{{{
     background: rgba(255,255,255,0.72) !important;
     color: var(--ink) !important;
     transform: translateY(-1px);
-}}
-.stTabs [aria-selected="true"] {{
+}}}}
+.stTabs [aria-selected="true"] {{{{
     background: rgba(255,255,255,0.72) !important;
     color: var(--accent) !important;
     box-shadow: 0 10px 22px rgba(15,23,42,0.07), inset 0 0 0 1px rgba(124,140,248,0.12) !important;
-}}
-.stTabs [data-baseweb="tab-panel"] {{
+}}}}
+.stTabs [data-baseweb="tab-panel"] {{{{
     padding-top: 1.35rem;
-}}
+}}}}
 
-.section-hd {{
+.section-hd {{{{
     font-family: 'DM Serif Display', Georgia, serif;
     font-size: 1.10rem;
     color: var(--ink);
     margin: 0 0 0.25rem 0;
-}}
-.section-sub {{
+}}}}
+.section-sub {{{{
     font-size: 0.84rem;
     color: var(--ink-muted);
     margin: 0 0 1.15rem 0;
-}}
+}}}}
 
-.divider-label {{
+.divider-label {{{{
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -308,15 +308,15 @@ h1, h2, h3, h4 {{
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--ink-muted);
-}}
-.divider-label::before, .divider-label::after {{
+}}}}
+.divider-label::before, .divider-label::after {{{{
     content:"";
     flex:1;
     height:1px;
     background: linear-gradient(90deg, transparent, rgba(148,163,184,0.35), transparent);
-}}
+}}}}
 
-.info-box {{
+.info-box {{{{
     background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.64));
     border: 1px solid rgba(255,255,255,0.94);
     border-radius: 14px;
@@ -324,9 +324,9 @@ h1, h2, h3, h4 {{
     color: var(--ink-soft);
     line-height: 1.75;
     box-shadow: var(--shadow-sm);
-}}
+}}}}
 
-.pill {{
+.pill {{{{
     display:inline-block;
     padding: 0.25rem 0.7rem;
     border-radius: 999px;
@@ -335,13 +335,13 @@ h1, h2, h3, h4 {{
     letter-spacing: 0.06em;
     text-transform: uppercase;
     border: 1px solid transparent;
-}}
-.pill-expand {{ background: rgba(37,99,235,0.10); color: #1d4ed8; border-color: rgba(37,99,235,0.18); }}
-.pill-maintain {{ background: rgba(13,148,136,0.10); color: #0f766e; border-color: rgba(13,148,136,0.18); }}
-.pill-optimize {{ background: rgba(217,119,6,0.10); color: #b45309; border-color: rgba(217,119,6,0.18); }}
-.pill-drop {{ background: rgba(220,38,38,0.10); color: #b91c1c; border-color: rgba(220,38,38,0.16); }}
+}}}}
+.pill-expand {{{{ background: rgba(37,99,235,0.10); color: #1d4ed8; border-color: rgba(37,99,235,0.18); }}}}
+.pill-maintain {{{{ background: rgba(13,148,136,0.10); color: #0f766e; border-color: rgba(13,148,136,0.18); }}}}
+.pill-optimize {{{{ background: rgba(217,119,6,0.10); color: #b45309; border-color: rgba(217,119,6,0.18); }}}}
+.pill-drop {{{{ background: rgba(220,38,38,0.10); color: #b91c1c; border-color: rgba(220,38,38,0.16); }}}}
 
-.result-card {{
+.result-card {{{{
     border-radius: 20px;
     padding: 1.4rem 1.5rem;
     margin: 1.1rem 0;
@@ -349,76 +349,76 @@ h1, h2, h3, h4 {{
     box-shadow: var(--shadow-md);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-}}
-.result-expand {{ background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_EXPAND}; }}
-.result-maintain {{ background: linear-gradient(135deg, rgba(13,148,136,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_MAINTAIN}; }}
-.result-optimize {{ background: linear-gradient(135deg, rgba(217,119,6,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_OPTIMIZE}; }}
-.result-drop {{ background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_DROP}; }}
+}}}}
+.result-expand {{{{ background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_EXPAND}; }}}}
+.result-maintain {{{{ background: linear-gradient(135deg, rgba(13,148,136,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_MAINTAIN}; }}}}
+.result-optimize {{{{ background: linear-gradient(135deg, rgba(217,119,6,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_OPTIMIZE}; }}}}
+.result-drop {{{{ background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(255,255,255,0.70)); border-left: 4px solid {CHART_DROP}; }}}}
 
 .stSelectbox label, .stNumberInput label,
 .stSlider label, .stRadio label,
-.stCheckbox label, .stTextInput label {{
+.stCheckbox label, .stTextInput label {{{{
     color: var(--ink) !important;
     font-weight: 600 !important;
     font-size: 0.78rem !important;
     letter-spacing: 0.02em !important;
-}}
+}}}}
 
 .stSelectbox [data-baseweb="select"] > div,
 .stTextInput input,
-.stNumberInput input {{
+.stNumberInput input {{{{
     background: rgba(255,255,255,0.62) !important;
     border: 1px solid rgba(148,163,184,0.26) !important;
     border-radius: 12px !important;
     color: var(--ink) !important;
     min-height: 42px !important;
     box-shadow: none !important;
-}}
+}}}}
 .stSelectbox [data-baseweb="select"] > div:focus-within,
 .stTextInput input:focus,
-.stNumberInput input:focus {{
+.stNumberInput input:focus {{{{
     border-color: rgba(37,99,235,0.45) !important;
     box-shadow: 0 0 0 3px rgba(37,99,235,0.10) !important;
-}}
+}}}}
 
-[data-testid="stForm"] {{
+[data-testid="stForm"] {{{{
     background: linear-gradient(180deg, rgba(255,255,255,0.60), rgba(255,255,255,0.42)) !important;
     border: 1px solid rgba(255,255,255,0.86) !important;
     border-radius: 24px !important;
     padding: 1.35rem 1.45rem 1.6rem !important;
     box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.92) !important;
     backdrop-filter: blur(16px) !important;
-}}
+}}}}
 
 [data-testid="stFormSubmitButton"] > button,
-.stButton > button {{
+.stButton > button {{{{
     border-radius: 12px !important;
     font-weight: 700 !important;
     border: none !important;
     transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease !important;
-}}
-[data-testid="stFormSubmitButton"] > button {{
+}}}}
+[data-testid="stFormSubmitButton"] > button {{{{
     width: 100% !important;
     background: linear-gradient(135deg, {ACCENT}, {ACCENT_DK}) !important;
     box-shadow: 0 10px 24px rgba(37,99,235,0.22) !important;
     color: white !important;
-}}
-[data-testid="stFormSubmitButton"] > button:hover {{
+}}}}
+[data-testid="stFormSubmitButton"] > button:hover {{{{
     transform: translateY(-1px);
     box-shadow: 0 14px 28px rgba(37,99,235,0.26) !important;
-}}
-.stButton > button {{
+}}}}
+.stButton > button {{{{
     background: rgba(255,255,255,0.78) !important;
     color: var(--ink) !important;
     border: 1px solid rgba(148,163,184,0.18) !important;
     box-shadow: var(--shadow-sm) !important;
-}}
-.stButton > button:hover {
+}}}}
+.stButton > button:hover {{
     background: rgba(255,255,255,0.92) !important;
     transform: translateY(-2px);
-}
+}}
 
-[data-testid="stDataFrame"] {
+[data-testid="stDataFrame"] {{
     background: rgba(255,255,255,0.55) !important;
     border: 1px solid rgba(255,255,255,0.82) !important;
     border-radius: 18px !important;
@@ -426,44 +426,44 @@ h1, h2, h3, h4 {{
     box-shadow: var(--shadow-sm) !important;
     backdrop-filter: blur(16px) !important;
     transition: transform var(--motion-med), box-shadow var(--motion-med) !important;
-}
-[data-testid="stDataFrame"]:hover {
+}}
+[data-testid="stDataFrame"]:hover {{
     transform: translateY(-3px);
     box-shadow: var(--shadow-lg) !important;
-}
-[data-testid="stDataFrame"] [role="grid"] {{
+}}
+[data-testid="stDataFrame"] [role="grid"] {{{{
     background: transparent !important;
-}}
-[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{
+}}}}
+[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{{{
     color: var(--ink) !important;
-}}
-[data-testid="stDataFrame"] [role="columnheader"] {
+}}}}
+[data-testid="stDataFrame"] [role="columnheader"] {{
     background: transparent !important;
     color: var(--ink-muted) !important;
     font-weight: 600 !important;
     border-bottom: 1px solid rgba(148,163,184,0.12) !important;
-}
-[data-testid="stDataFrame"] [role="gridcell"] {{
-    border-bottom: 1px solid rgba(226,232,240,0.58) !important;
 }}
+[data-testid="stDataFrame"] [role="gridcell"] {{{{
+    border-bottom: 1px solid rgba(226,232,240,0.58) !important;
+}}}}
 
-[data-testid="stExpander"] {
+[data-testid="stExpander"] {{
     background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.42)) !important;
     border: 1px solid rgba(255,255,255,0.94) !important;
     border-radius: 18px !important;
     box-shadow: var(--shadow-sm) !important;
     backdrop-filter: blur(14px) !important;
-}
-[data-testid="stExpander"] summary p {{
+}}}}
+[data-testid="stExpander"] summary p {{{{
     color: var(--ink) !important;
     font-weight: 600 !important;
-}}
+}}}}
 
-[data-testid="stAlert"] {{
+[data-testid="stAlert"] {{{{
     border-radius: 16px !important;
-}}
+}}}}
 
-[data-testid="stPyplot"] {
+[data-testid="stPyplot"] {{
     background: linear-gradient(180deg, rgba(255,255,255,0.56), rgba(255,255,255,0.40));
     border: 1px solid rgba(255,255,255,0.84);
     border-radius: 20px;
@@ -471,26 +471,26 @@ h1, h2, h3, h4 {{
     box-shadow: var(--shadow-sm);
     backdrop-filter: blur(14px);
     transition: transform var(--motion-med), box-shadow var(--motion-med);
-}
-[data-testid="stPyplot"]:hover {
+}}
+[data-testid="stPyplot"]:hover {{
     transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
-}
+}}
 
-hr {{
+hr {{{{
     border: none !important;
     border-top: 1px solid rgba(148,163,184,0.18) !important;
     margin: 1.25rem 0 !important;
-}}
+}}}}
 
-.col-label {{
+.col-label {{{{
     font-size: 0.70rem;
     font-weight: 700;
     color: var(--ink-muted);
     letter-spacing: 0.10em;
     text-transform: uppercase;
     margin-bottom: 0.85rem;
-}}
+}}}}
 </style>
 """, unsafe_allow_html=True)
 
