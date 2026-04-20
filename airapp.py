@@ -453,7 +453,7 @@ h1, h2, h3, h4 {{
     border-radius: 18px !important;
     box-shadow: var(--shadow-sm) !important;
     backdrop-filter: blur(14px) !important;
-}}
+}
 [data-testid="stExpander"] summary p {{
     color: var(--ink) !important;
     font-weight: 600 !important;
