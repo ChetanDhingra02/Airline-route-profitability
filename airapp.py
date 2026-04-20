@@ -808,7 +808,7 @@ if "pred_result" not in st.session_state:
 #  SIDEBAR
 # ─────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown('<div class="sidebar-brand">Airline<span>Route Intelligence</span> ✦</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-brand">Airline<span> Route Intelligence</span> ✦</div>', unsafe_allow_html=True)
     st.markdown(
         f"<p style='font-size:0.68rem;color:{ACCENT};margin-bottom:16px;"
         "font-weight:700;letter-spacing:0.13em;text-transform:uppercase'>Filter View</p>",
