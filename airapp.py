@@ -16,395 +16,443 @@ st.set_page_config(
 # ─────────────────────────────────────────────────────────────
 #  THEME TOKENS  ← edit only these to restyle the entire app
 # ─────────────────────────────────────────────────────────────
-BG_BLOB_A = "#ddd6fe"    # violet blob
-BG_BLOB_B = "#fbcfe8"    # blush pink blob
-BG_BLOB_C = "#bae6fd"    # sky blue blob
+# Refined monochrome-violet palette — professional & recruiter-ready
+BG_BASE   = "#f7f5ff"    # barely-there lavender
 
-GLASS_BG     = "rgba(255,255,255,0.45)"
-GLASS_BORDER = "rgba(255,255,255,0.72)"
-GLASS_SHADOW = "0 8px 32px rgba(100,80,160,0.13), 0 1.5px 6px rgba(100,80,160,0.07)"
-GLASS_BLUR   = "blur(18px)"
+GLASS_BG     = "rgba(255,255,255,0.60)"
+GLASS_BORDER = "rgba(255,255,255,0.88)"
+GLASS_BLUR   = "blur(20px)"
 
-INK       = "#1e1b4b"
-INK_SOFT  = "#4c1d95"
-INK_MUTED = "#7c6ea0"
+INK       = "#18143a"    # near-black navy
+INK_SOFT  = "#3d3464"    # deep slate
+INK_MUTED = "#8b82b0"    # muted lavender
 
-ACCENT    = "#7c3aed"
-ACCENT_DK = "#5b21b6"
+ACCENT    = "#6d28d9"    # single violet accent
+ACCENT_LT = "#ede9fe"    # accent wash
 
-COLOR_GREEN  = "#065f46"
-COLOR_YELLOW = "#78350f"
+COLOR_GREEN  = "#14532d"
+COLOR_YELLOW = "#713f12"
 COLOR_ORANGE = "#7c2d12"
 COLOR_PINK   = "#831843"
 
-CHART_EXPAND   = "#34d399"
-CHART_MAINTAIN = "#fbbf24"
-CHART_OPTIMIZE = "#fb923c"
-CHART_ORANGE   = "#fb923c"
-CHART_DROP     = "#f472b6"
+# Two-tone chart palette: violet + semantic signal colors
+CHART_EXPAND   = "#6d28d9"   # violet
+CHART_MAINTAIN = "#0ea5e9"   # sky blue
+CHART_OPTIMIZE = "#f59e0b"   # amber
+CHART_ORANGE   = "#f59e0b"
+CHART_DROP     = "#e11d48"   # rose
 CHART_NEUTRAL  = [
-    "#a78bfa","#67e8f9","#86efac","#fde68a",
-    "#fca5a5","#f9a8d4","#c4b5fd","#7dd3fc",
+    "#6d28d9","#0ea5e9","#10b981","#f59e0b",
+    "#e11d48","#8b5cf6","#38bdf8","#34d399",
 ]
 
 # ─────────────────────────────────────────────────────────────
-#  GLOBAL CSS — pastel glassmorphism
+#  GLOBAL CSS — refined monochrome-violet glass + motion
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap');
+
+/* ── KEYFRAMES ─────────────────────────────────────────────── */
+@keyframes fadeUp {{
+    from {{ opacity:0; transform:translateY(14px); }}
+    to   {{ opacity:1; transform:translateY(0); }}
+}}
+@keyframes fadeIn {{
+    from {{ opacity:0; }} to {{ opacity:1; }}
+}}
+@keyframes orb-drift {{
+    0%,100% {{ transform: translate(0,0) scale(1); }}
+    33%      {{ transform: translate(14px,-10px) scale(1.04); }}
+    66%      {{ transform: translate(-8px, 7px) scale(0.97); }}
+}}
+@keyframes pulse-ring {{
+    0%   {{ box-shadow: 0 0 0 0 rgba(109,40,217,0.18); }}
+    70%  {{ box-shadow: 0 0 0 8px rgba(109,40,217,0); }}
+    100% {{ box-shadow: 0 0 0 0 rgba(109,40,217,0); }}
+}}
 
 :root {{
     --ink:       {INK};
     --ink-soft:  {INK_SOFT};
     --ink-muted: {INK_MUTED};
     --accent:    {ACCENT};
-    --glass-bg:  {GLASS_BG};
-    --glass-bd:  {GLASS_BORDER};
-    --blur:      {GLASS_BLUR};
-    --r-sm:  10px; --r-md: 18px; --r-lg: 26px; --r-xl: 34px;
+    --accent-lt: {ACCENT_LT};
+    --r-sm: 8px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+    --shadow-sm: 0 2px 10px rgba(109,40,217,0.07);
+    --shadow-md: 0 6px 24px rgba(109,40,217,0.11);
+    --shadow-lg: 0 16px 48px rgba(109,40,217,0.15);
 }}
 
 html, body, [class*="css"] {{
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    font-family: 'DM Sans', system-ui, sans-serif !important;
 }}
 
-/* PAGE BACKGROUND — soft pastel mesh */
+/* ── PAGE BACKGROUND ─────────────────────────────────────── */
 .stApp {{
     min-height: 100vh;
     background:
-        radial-gradient(ellipse 70% 60% at 10%  20%, {BG_BLOB_A}cc 0%, transparent 65%),
-        radial-gradient(ellipse 55% 50% at 90%  10%, {BG_BLOB_B}bb 0%, transparent 60%),
-        radial-gradient(ellipse 60% 70% at 55%  90%, {BG_BLOB_C}aa 0%, transparent 60%),
-        linear-gradient(135deg, #f5f3ff 0%, #fdf2f8 50%, #f0f9ff 100%);
+        radial-gradient(ellipse 50% 45% at 12% 22%, rgba(109,40,217,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 42% 38% at 88% 78%, rgba(109,40,217,0.05) 0%, transparent 58%),
+        linear-gradient(160deg, {BG_BASE} 0%, #eef2ff 52%, #f0f7ff 100%);
     background-attachment: fixed;
+    animation: fadeIn 0.45s ease both;
 }}
 .main .block-container {{
-    padding-top: 2rem;
-    padding-bottom: 3rem;
+    padding-top: 1.4rem; padding-bottom: 3rem;
     max-width: 1280px;
+    animation: fadeUp 0.5s ease both;
 }}
 
-/* SIDEBAR */
+/* ── SIDEBAR ─────────────────────────────────────────────── */
 [data-testid="stSidebar"] {{
-    background: rgba(245,243,255,0.70) !important;
-    border-right: 1.5px solid rgba(167,139,250,0.28) !important;
+    background: rgba(250,249,255,0.84) !important;
+    border-right: 1px solid rgba(109,40,217,0.11) !important;
     backdrop-filter: {GLASS_BLUR} !important;
     -webkit-backdrop-filter: {GLASS_BLUR} !important;
-    box-shadow: 4px 0 24px rgba(124,58,237,0.07) !important;
+    box-shadow: 3px 0 18px rgba(109,40,217,0.05) !important;
 }}
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,
 [data-testid="stSidebar"] label,
-[data-testid="stSidebar"] div,
-[data-testid="stSidebar"] small {{ color: {INK_SOFT} !important; }}
+[data-testid="stSidebar"] div {{ color: {INK_SOFT} !important; }}
 
-/* METRIC CARDS */
+/* Fix weird "All" pill/circle in select dropdowns */
+[data-testid="stSidebar"] [data-baseweb="select"] [data-baseweb="tag"],
+[data-testid="stSidebar"] [data-baseweb="select"] [role="option"] > svg {{
+    display: none !important;
+}}
+[data-testid="stSidebar"] [data-baseweb="select"] > div {{
+    background: rgba(255,255,255,0.80) !important;
+    border: 1px solid rgba(109,40,217,0.16) !important;
+    border-radius: var(--r-sm) !important;
+    box-shadow: none !important;
+    min-height: 38px !important;
+    transition: border-color 0.18s, box-shadow 0.18s !important;
+}}
+[data-testid="stSidebar"] [data-baseweb="select"] > div:hover {{
+    border-color: rgba(109,40,217,0.36) !important;
+    box-shadow: var(--shadow-sm) !important;
+}}
+[data-testid="stSidebar"] [data-baseweb="select"] > div:focus-within {{
+    border-color: {ACCENT} !important;
+    box-shadow: 0 0 0 3px rgba(109,40,217,0.11) !important;
+}}
+
+/* ── METRIC CARDS ────────────────────────────────────────── */
 [data-testid="metric-container"] {{
-    background: rgba(255,255,255,0.52) !important;
-    border: 1.5px solid rgba(255,255,255,0.75) !important;
+    background: rgba(255,255,255,0.68) !important;
+    border: 1px solid rgba(255,255,255,0.92) !important;
     border-radius: var(--r-md) !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-    box-shadow: 0 4px 20px rgba(124,58,237,0.10),
-                inset 0 1px 0 rgba(255,255,255,0.85) !important;
-    padding: 20px 24px !important;
-    transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+    padding: 20px 22px !important;
+    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+                box-shadow 0.22s ease !important;
+    animation: fadeUp 0.5s ease both !important;
 }}
 [data-testid="metric-container"]:hover {{
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 30px rgba(124,58,237,0.16),
-                inset 0 1px 0 rgba(255,255,255,0.85) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.95) !important;
 }}
 [data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
-    font-size: 0.65rem !important; font-weight: 700 !important;
-    letter-spacing: 0.12em !important; text-transform: uppercase !important;
+    font-size: 0.62rem !important; font-weight: 600 !important;
+    letter-spacing: 0.13em !important; text-transform: uppercase !important;
     color: {INK_MUTED} !important;
 }}
 [data-testid="stMetricValue"],
 [data-testid="stMetricValue"] > div {{
-    font-family: 'Fraunces', Georgia, serif !important;
-    font-size: 2.0rem !important; font-weight: 700 !important;
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    font-size: 2.0rem !important; font-weight: 400 !important;
     color: {INK} !important; letter-spacing: -0.02em !important;
 }}
 
-/* TABS */
+/* ── TABS ────────────────────────────────────────────────── */
 .stTabs [data-baseweb="tab-list"] {{
-    background: rgba(255,255,255,0.40);
-    border: 1.5px solid rgba(255,255,255,0.65);
-    border-radius: var(--r-md); padding: 5px; gap: 3px;
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 16px rgba(124,58,237,0.08);
+    background: rgba(255,255,255,0.60);
+    border: 1px solid rgba(255,255,255,0.85);
+    border-radius: var(--r-md); padding: 4px; gap: 2px;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-sm);
 }}
 .stTabs [data-baseweb="tab"] {{
     border-radius: var(--r-sm) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 600 !important; font-size: 0.80rem !important;
-    color: {INK_MUTED} !important; padding: 7px 16px !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-weight: 500 !important; font-size: 0.81rem !important;
+    color: {INK_MUTED} !important; padding: 7px 18px !important;
     background: transparent !important; border: none !important;
-    transition: all 0.15s ease !important;
+    transition: color 0.18s ease, background 0.18s ease !important;
 }}
 .stTabs [data-baseweb="tab"]:hover {{
-    background: rgba(167,139,250,0.18) !important;
+    background: rgba(109,40,217,0.07) !important;
     color: {INK_SOFT} !important;
 }}
 .stTabs [aria-selected="true"] {{
-    background: linear-gradient(135deg, {ACCENT} 0%, #a855f7 100%) !important;
+    background: {ACCENT} !important;
     color: #fff !important;
-    box-shadow: 0 4px 14px rgba(124,58,237,0.35),
-                inset 0 1px 0 rgba(255,255,255,0.20) !important;
+    box-shadow: 0 3px 10px rgba(109,40,217,0.28) !important;
 }}
 .stTabs [data-baseweb="tab-panel"] {{ background: transparent; padding-top: 1.5rem; }}
 
-/* HEADINGS */
+/* ── HEADINGS ────────────────────────────────────────────── */
 h1, h2, h3, h4 {{
-    font-family: 'Fraunces', Georgia, serif !important;
+    font-family: 'DM Serif Display', Georgia, serif !important;
     color: {INK} !important; letter-spacing: -0.02em !important;
-    font-weight: 700 !important;
+    font-weight: 400 !important;
 }}
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li,
 .stMarkdown p, .stMarkdown li {{
-    color: {INK_SOFT}; line-height: 1.70; font-size: 0.90rem;
+    color: {INK_SOFT}; line-height: 1.72; font-size: 0.90rem;
 }}
 
-/* WIDGET LABELS */
+/* ── WIDGET LABELS ───────────────────────────────────────── */
 .stSelectbox label, .stNumberInput label,
 .stSlider label, .stRadio label,
 .stCheckbox label, .stTextInput label {{
     color: {INK} !important; font-weight: 600 !important;
-    font-size: 0.79rem !important; letter-spacing: 0.03em !important;
+    font-size: 0.78rem !important; letter-spacing: 0.02em !important;
 }}
 
-/* INPUTS */
-.stSelectbox [data-baseweb="select"] div,
+/* ── MAIN AREA INPUTS ────────────────────────────────────── */
+.stSelectbox [data-baseweb="select"] > div,
 .stTextInput input, .stNumberInput input {{
     color: {INK} !important;
-    background: rgba(255,255,255,0.62) !important;
-    border: 1.5px solid rgba(167,139,250,0.35) !important;
+    background: rgba(255,255,255,0.72) !important;
+    border: 1px solid rgba(109,40,217,0.18) !important;
     border-radius: var(--r-sm) !important;
-    backdrop-filter: blur(8px) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: 'DM Sans', sans-serif !important;
     font-size: 0.88rem !important;
-    transition: border-color 0.15s, box-shadow 0.15s !important;
+    transition: border-color 0.18s, box-shadow 0.18s !important;
 }}
-.stSelectbox [data-baseweb="select"] div:focus-within,
+.stSelectbox [data-baseweb="select"] > div:focus-within,
 .stTextInput input:focus, .stNumberInput input:focus {{
     border-color: {ACCENT} !important;
-    box-shadow: 0 0 0 3px rgba(124,58,237,0.15) !important;
+    box-shadow: 0 0 0 3px rgba(109,40,217,0.11) !important;
 }}
 
-/* DATAFRAME */
+/* ── DATAFRAME ───────────────────────────────────────────── */
 [data-testid="stDataFrame"] {{
     border-radius: var(--r-md) !important; overflow: hidden !important;
-    border: 1.5px solid rgba(255,255,255,0.70) !important;
-    box-shadow: 0 4px 20px rgba(124,58,237,0.09) !important;
-    background: rgba(255,255,255,0.45) !important;
-    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255,255,255,0.85) !important;
+    box-shadow: var(--shadow-sm) !important;
+    background: rgba(255,255,255,0.58) !important;
+    backdrop-filter: blur(12px) !important;
+    transition: box-shadow 0.22s ease !important;
+}}
+[data-testid="stDataFrame"]:hover {{
+    box-shadow: var(--shadow-md) !important;
 }}
 
-/* EXPANDER */
+/* ── EXPANDER ────────────────────────────────────────────── */
 [data-testid="stExpander"] {{
-    background: rgba(255,255,255,0.42) !important;
-    border: 1.5px solid rgba(255,255,255,0.68) !important;
+    background: rgba(255,255,255,0.55) !important;
+    border: 1px solid rgba(255,255,255,0.85) !important;
     border-radius: var(--r-md) !important;
-    backdrop-filter: blur(12px) !important;
-    box-shadow: 0 4px 16px rgba(124,58,237,0.08) !important;
+    backdrop-filter: blur(14px) !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: box-shadow 0.22s ease !important;
 }}
+[data-testid="stExpander"]:hover {{ box-shadow: var(--shadow-md) !important; }}
 [data-testid="stExpander"] summary p {{
     color: {INK} !important; font-weight: 600 !important; font-size: 0.88rem !important;
 }}
 
-/* FORM */
+/* ── FORM ────────────────────────────────────────────────── */
 [data-testid="stForm"] {{
-    background: rgba(255,255,255,0.50) !important;
-    border: 1.5px solid rgba(255,255,255,0.72) !important;
+    background: rgba(255,255,255,0.62) !important;
+    border: 1px solid rgba(255,255,255,0.88) !important;
     border-radius: var(--r-xl) !important;
-    backdrop-filter: blur(18px) !important; -webkit-backdrop-filter: blur(18px) !important;
-    box-shadow: 0 8px 32px rgba(124,58,237,0.10),
-                inset 0 1px 0 rgba(255,255,255,0.80) !important;
+    backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.92) !important;
     padding: 24px 28px 30px !important;
 }}
 
-/* SUBMIT BUTTON */
+/* ── SUBMIT BUTTON ───────────────────────────────────────── */
 [data-testid="stFormSubmitButton"] > button {{
-    background: linear-gradient(135deg, {ACCENT} 0%, #a855f7 100%) !important;
-    border: none !important; border-radius: var(--r-md) !important;
-    color: #fff !important; font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 700 !important; font-size: 0.88rem !important;
+    background: {ACCENT} !important;
+    border: none !important; border-radius: var(--r-sm) !important;
+    color: #fff !important; font-family: 'DM Sans', sans-serif !important;
+    font-weight: 600 !important; font-size: 0.88rem !important;
     letter-spacing: 0.03em !important; padding: 12px 32px !important;
-    width: 100% !important; transition: all 0.15s ease !important;
-    box-shadow: 0 4px 18px rgba(124,58,237,0.35),
-                inset 0 1px 0 rgba(255,255,255,0.18) !important;
+    width: 100% !important;
+    transition: background 0.18s, transform 0.22s cubic-bezier(.34,1.56,.64,1),
+                box-shadow 0.18s !important;
+    box-shadow: 0 4px 16px rgba(109,40,217,0.28) !important;
 }}
 [data-testid="stFormSubmitButton"] > button:hover {{
+    background: #5b21b6 !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 28px rgba(124,58,237,0.45),
-                inset 0 1px 0 rgba(255,255,255,0.18) !important;
+    box-shadow: 0 8px 24px rgba(109,40,217,0.36) !important;
 }}
 [data-testid="stFormSubmitButton"] > button:active {{
     transform: translateY(1px) !important;
-    box-shadow: 0 2px 10px rgba(124,58,237,0.25) !important;
+    box-shadow: 0 2px 8px rgba(109,40,217,0.20) !important;
 }}
 
-/* REGULAR BUTTONS */
+/* ── REGULAR BUTTONS ─────────────────────────────────────── */
 .stButton > button {{
-    background: rgba(255,255,255,0.55) !important;
-    border: 1.5px solid rgba(167,139,250,0.40) !important;
+    background: rgba(255,255,255,0.65) !important;
+    border: 1px solid rgba(109,40,217,0.20) !important;
     border-radius: var(--r-sm) !important; color: {INK} !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: 'DM Sans', sans-serif !important;
     font-weight: 600 !important; font-size: 0.85rem !important;
-    padding: 9px 22px !important; backdrop-filter: blur(8px) !important;
-    transition: all 0.15s ease !important;
-    box-shadow: 0 2px 8px rgba(124,58,237,0.08) !important;
+    padding: 9px 22px !important;
+    transition: all 0.20s cubic-bezier(.34,1.56,.64,1) !important;
+    box-shadow: var(--shadow-sm) !important;
 }}
 .stButton > button:hover {{
-    background: rgba(167,139,250,0.20) !important;
-    border-color: rgba(124,58,237,0.50) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 18px rgba(124,58,237,0.16) !important;
+    background: {ACCENT_LT} !important;
+    border-color: {ACCENT} !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
 }}
 
-/* ALERTS / HR */
-[data-testid="stAlert"] {{
-    border-radius: var(--r-md) !important;
-    backdrop-filter: blur(8px) !important;
-    background: rgba(255,255,255,0.50) !important;
-    border: 1.5px solid rgba(255,255,255,0.65) !important;
-}}
-[data-testid="stAlert"] p {{ color: inherit !important; }}
+/* ── HR ──────────────────────────────────────────────────── */
 hr {{
     border: none !important;
-    border-top: 1.5px solid rgba(167,139,250,0.22) !important;
+    border-top: 1px solid rgba(109,40,217,0.11) !important;
     margin: 1.5rem 0 !important;
 }}
 
-/* ═══════════════════════════════════════════
-   CUSTOM COMPONENTS
-═══════════════════════════════════════════ */
+/* ═══ CUSTOM COMPONENTS ══════════════════════════════════════ */
 
-/* Hero */
+/* ── HERO — compact horizontal strip ────────────────────── */
 .hero {{
     position: relative; overflow: hidden;
-    border-radius: var(--r-xl); padding: 44px 52px; margin-bottom: 28px;
-    background: linear-gradient(135deg,
-        rgba(167,139,250,0.55) 0%, rgba(251,207,232,0.50) 50%,
-        rgba(186,230,253,0.50) 100%);
-    border: 1.5px solid rgba(255,255,255,0.75);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 20px 60px rgba(124,58,237,0.14),
-                inset 0 1px 0 rgba(255,255,255,0.80);
+    border-radius: var(--r-lg); padding: 20px 32px; margin-bottom: 20px;
+    background: rgba(255,255,255,0.62);
+    border: 1px solid rgba(255,255,255,0.90);
+    backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.96);
+    display: flex; align-items: center; gap: 24px;
+    animation: fadeUp 0.45s ease both;
 }}
 .hero::before {{
-    content:""; position:absolute; inset:0;
-    background: radial-gradient(ellipse 60% 80% at 85% 50%,
-        rgba(255,255,255,0.30) 0%, transparent 70%);
-    pointer-events:none;
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(108deg,
+        rgba(109,40,217,0.05) 0%, transparent 52%,
+        rgba(14,165,233,0.03) 100%);
 }}
+.hero-left {{ flex:1; min-width:0; position:relative; z-index:1; }}
 .hero-eyebrow {{
-    font-size:0.63rem; font-weight:700; letter-spacing:0.18em;
-    text-transform:uppercase; color:rgba(109,40,217,0.70);
-    margin-bottom:10px; font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:0.58rem; font-weight:700; letter-spacing:0.18em;
+    text-transform:uppercase; color:rgba(109,40,217,0.55);
+    margin-bottom:4px; font-family:'DM Sans',sans-serif;
 }}
 .hero h1 {{
-    font-family:'Fraunces',Georgia,serif !important;
-    font-size:2.7rem !important; font-weight:700 !important;
-    color:{INK} !important; margin:0 0 12px 0 !important;
-    letter-spacing:-0.03em !important; line-height:1.12 !important;
+    font-family:'DM Serif Display',Georgia,serif !important;
+    font-size:1.65rem !important; font-weight:400 !important;
+    color:{INK} !important; margin:0 0 4px 0 !important;
+    letter-spacing:-0.02em !important; line-height:1.18 !important;
 }}
 .hero p {{
-    color:{INK_SOFT} !important; font-size:0.92rem; margin:0;
-    max-width:540px; line-height:1.70; font-weight:400;
+    color:{INK_MUTED} !important; font-size:0.78rem; margin:0;
+    line-height:1.52; font-weight:400;
+}}
+.hero-badge {{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(109,40,217,0.08); border:1px solid rgba(109,40,217,0.16);
+    border-radius:99px; padding:6px 16px; font-size:0.72rem;
+    font-weight:600; color:{ACCENT}; letter-spacing:0.03em;
+    white-space:nowrap; flex-shrink:0; position:relative; z-index:1;
+    transition: background 0.20s, transform 0.20s cubic-bezier(.34,1.56,.64,1);
+    cursor:default;
+}}
+.hero-badge:hover {{
+    background:rgba(109,40,217,0.14); transform:scale(1.04);
 }}
 .hero-glyph {{
-    position:absolute; right:52px; top:50%; transform:translateY(-50%);
-    font-size:9rem; opacity:0.13; color:{ACCENT};
-    pointer-events:none; user-select:none; line-height:1;
+    position:relative; z-index:1; font-size:2.6rem; opacity:0.15;
+    color:{ACCENT}; flex-shrink:0; line-height:1;
+    animation: orb-drift 9s ease-in-out infinite;
 }}
 
-/* Sidebar brand */
+/* ── SIDEBAR BRAND ───────────────────────────────────────── */
 .sidebar-brand {{
-    font-family:'Fraunces',Georgia,serif; font-size:1.50rem;
-    font-weight:700; color:{INK}; padding:4px 0 16px 0;
-    border-bottom:1.5px solid rgba(167,139,250,0.25);
+    font-family:'DM Serif Display',Georgia,serif; font-size:1.35rem;
+    font-weight:400; color:{INK}; padding:4px 0 14px 0;
+    border-bottom:1px solid rgba(109,40,217,0.13);
     margin-bottom:16px; letter-spacing:-0.02em;
 }}
 .sidebar-brand span {{ color:{ACCENT}; }}
 
-/* Section helpers */
+/* ── SECTION HELPERS ─────────────────────────────────────── */
 .section-hd {{
-    font-family:'Fraunces',Georgia,serif; font-size:1.05rem;
-    font-weight:700; color:{INK}; margin:0 0 4px 0; letter-spacing:-0.01em;
+    font-family:'DM Serif Display',Georgia,serif; font-size:1.05rem;
+    font-weight:400; color:{INK}; margin:0 0 4px 0; letter-spacing:-0.01em;
 }}
 .section-sub {{
     font-size:0.82rem; color:{INK_MUTED}; margin:0 0 20px 0; font-weight:400;
 }}
 
-/* Glass info box */
+/* ── GLASS INFO BOX ──────────────────────────────────────── */
 .info-box {{
-    background:rgba(255,255,255,0.48); border:1.5px solid rgba(255,255,255,0.70);
-    border-radius:var(--r-sm); backdrop-filter:blur(10px);
-    padding:14px 18px; font-size:0.84rem; color:{INK_SOFT};
-    margin-bottom:14px; line-height:1.78;
+    background:rgba(255,255,255,0.58); border:1px solid rgba(255,255,255,0.85);
+    border-radius:var(--r-sm); padding:14px 18px;
+    font-size:0.84rem; color:{INK_SOFT}; margin-bottom:14px; line-height:1.78;
+    transition: box-shadow 0.20s ease;
 }}
+.info-box:hover {{ box-shadow: var(--shadow-sm); }}
 
-/* Decision pills */
+/* ── DECISION PILLS ──────────────────────────────────────── */
 .pill {{
-    display:inline-block; padding:3px 13px; border-radius:99px;
-    font-size:0.69rem; font-weight:700; letter-spacing:0.06em;
-    text-transform:uppercase; border:1.5px solid transparent;
-    backdrop-filter:blur(6px);
+    display:inline-block; padding:3px 11px; border-radius:99px;
+    font-size:0.67rem; font-weight:700; letter-spacing:0.05em;
+    text-transform:uppercase; border:1px solid transparent;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
 }}
-.pill-expand   {{ background:rgba(52,211,153,0.18);  color:#065f46; border-color:rgba(52,211,153,0.45); }}
-.pill-maintain {{ background:rgba(251,191,36,0.18);  color:#78350f; border-color:rgba(251,191,36,0.45); }}
-.pill-optimize {{ background:rgba(251,146,60,0.18);  color:#7c2d12; border-color:rgba(251,146,60,0.45); }}
-.pill-drop     {{ background:rgba(244,114,182,0.18); color:#831843; border-color:rgba(244,114,182,0.45); }}
+.pill:hover {{ transform:scale(1.06); box-shadow:var(--shadow-sm); }}
+.pill-expand   {{ background:rgba(109,40,217,0.10); color:{ACCENT};  border-color:rgba(109,40,217,0.24); }}
+.pill-maintain {{ background:rgba(14,165,233,0.10);  color:#0369a1;  border-color:rgba(14,165,233,0.28); }}
+.pill-optimize {{ background:rgba(245,158,11,0.12);  color:#92400e;  border-color:rgba(245,158,11,0.32); }}
+.pill-drop     {{ background:rgba(225,29,72,0.09);   color:#9f1239;  border-color:rgba(225,29,72,0.26); }}
 
-/* Result card */
+/* ── RESULT CARD ─────────────────────────────────────────── */
 .result-card {{
-    border-radius:var(--r-lg); padding:28px 34px; margin:20px 0;
-    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-    border:1.5px solid rgba(255,255,255,0.72);
-    box-shadow:0 8px 32px rgba(124,58,237,0.10),
-               inset 0 1px 0 rgba(255,255,255,0.75);
+    border-radius:var(--r-lg); padding:26px 32px; margin:20px 0;
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,0.85);
+    box-shadow:var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.92);
+    animation: fadeUp 0.4s ease both;
 }}
 .result-expand  {{
-    background:linear-gradient(135deg,rgba(52,211,153,0.18) 0%,rgba(255,255,255,0.50) 100%);
-    border-left:4px solid {CHART_EXPAND};
+    background:linear-gradient(135deg,rgba(109,40,217,0.07) 0%,rgba(255,255,255,0.68) 100%);
+    border-left:3px solid {ACCENT};
 }}
 .result-maintain {{
-    background:linear-gradient(135deg,rgba(251,191,36,0.16) 0%,rgba(255,255,255,0.50) 100%);
-    border-left:4px solid {CHART_MAINTAIN};
+    background:linear-gradient(135deg,rgba(14,165,233,0.07) 0%,rgba(255,255,255,0.68) 100%);
+    border-left:3px solid #0ea5e9;
 }}
 .result-optimize {{
-    background:linear-gradient(135deg,rgba(251,146,60,0.16) 0%,rgba(255,255,255,0.50) 100%);
-    border-left:4px solid {CHART_OPTIMIZE};
+    background:linear-gradient(135deg,rgba(245,158,11,0.07) 0%,rgba(255,255,255,0.68) 100%);
+    border-left:3px solid #f59e0b;
 }}
 .result-drop {{
-    background:linear-gradient(135deg,rgba(244,114,182,0.16) 0%,rgba(255,255,255,0.50) 100%);
-    border-left:4px solid {CHART_DROP};
+    background:linear-gradient(135deg,rgba(225,29,72,0.07) 0%,rgba(255,255,255,0.68) 100%);
+    border-left:3px solid #e11d48;
 }}
 
-/* Divider label */
+/* ── DIVIDER LABEL ───────────────────────────────────────── */
 .divider-label {{
-    display:flex; align-items:center; gap:12px; margin:26px 0 16px;
-    color:{INK_MUTED}; font-size:0.70rem; font-weight:700;
+    display:flex; align-items:center; gap:12px; margin:24px 0 14px;
+    color:{INK_MUTED}; font-size:0.67rem; font-weight:700;
     letter-spacing:0.12em; text-transform:uppercase;
-    font-family:'Plus Jakarta Sans',sans-serif;
 }}
 .divider-label::before, .divider-label::after {{
     content:""; flex:1; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(167,139,250,0.35),transparent);
+    background:linear-gradient(90deg,transparent,rgba(109,40,217,0.18),transparent);
 }}
 
-/* Column section label */
+/* ── COLUMN LABEL ────────────────────────────────────────── */
 .col-label {{
-    font-size:0.72rem; font-weight:700; color:{INK_MUTED};
+    font-size:0.70rem; font-weight:700; color:{INK_MUTED};
     letter-spacing:0.10em; text-transform:uppercase; margin-bottom:14px;
-    font-family:'Plus Jakarta Sans',sans-serif;
 }}
 </style>
 """, unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────────────────────
 #  DECISION CONFIG  (unchanged)
@@ -422,19 +470,19 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
     fig, ax = plt.subplots(figsize=figsize)
-    fig.patch.set_facecolor("none"); fig.patch.set_alpha(0)
+    fig.patch.set_facecolor("none"); fig.patch.set_alpha(0.0)
     ax.set_facecolor("none")
     for spine in ["top", "right"]:
         ax.spines[spine].set_visible(False)
-    ax.spines["left"].set_color("#c4b5fd")
-    ax.spines["bottom"].set_color("#c4b5fd")
+    ax.spines["left"].set_color("#ddd6fe")
+    ax.spines["bottom"].set_color("#ddd6fe")
     ax.tick_params(colors=INK_MUTED, labelsize=8.5)
     ax.xaxis.label.set_color(INK_MUTED)
     ax.yaxis.label.set_color(INK_MUTED)
     ax.title.set_color(INK)
     ax.title.set_fontsize(11)
     ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color="#ede9fe", linewidth=0.8, linestyle="--")
+    ax.grid(axis="y", color="#ede9fe", linewidth=0.6, linestyle="--")
     ax.set_axisbelow(True)
     return fig, ax
 
@@ -571,12 +619,12 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <div class="hero-eyebrow">Route Intelligence Platform</div>
-  <h1>SkyLens Dashboard</h1>
-  <p>
-    Built on a sample airline dataset for analysis and demonstration purposes only.
-    Does not reflect real-time airline operations or current flight decisions.
-  </p>
+  <div class="hero-left">
+    <div class="hero-eyebrow">Route Intelligence Platform</div>
+    <h1>SkyLens Dashboard</h1>
+    <p>Sample airline dataset · for analysis &amp; demonstration only</p>
+  </div>
+  <div class="hero-badge">✦ ML-Powered</div>
   <div class="hero-glyph">✈</div>
 </div>
 """, unsafe_allow_html=True)
@@ -632,7 +680,7 @@ with tab1:
         wedges, texts, autotexts = ax.pie(
             dc.values, labels=dc.index, autopct="%1.1f%%",
             colors=[wc[l] for l in dc.index], startangle=90,
-            wedgeprops={"linewidth":3,"edgecolor":(1,1,1,0.85)},
+            wedgeprops={"linewidth":3,"edgecolor":"rgba(255,255,255,0.85)"},
             textprops={"color":INK,"fontsize":9.5},
             pctdistance=0.78,
         )
@@ -672,7 +720,7 @@ with tab2:
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
         fig, ax = clean_fig((6, 4))
         bars = ax.bar(apd.index, apd.values, color=col_seq(apd.index.tolist()),
-                      width=0.52, edgecolor=(1,1,1,0.80), linewidth=2)
+                      width=0.52, edgecolor="rgba(255,255,255,0.80)", linewidth=2)
         for b in bars:
             h = b.get_height()
             ax.text(b.get_x()+b.get_width()/2, h+abs(apd.values).max()*0.025,
@@ -686,7 +734,7 @@ with tab2:
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
         fig, ax = clean_fig((6, 4))
         bars = ax.bar(ald.index, ald.values, color=col_seq(ald.index.tolist()),
-                      width=0.52, edgecolor=(1,1,1,0.80), linewidth=2)
+                      width=0.52, edgecolor="rgba(255,255,255,0.80)", linewidth=2)
         for b in bars:
             h = b.get_height()
             ax.text(b.get_x()+b.get_width()/2, h+0.006, f"{h:.0%}",
@@ -719,7 +767,7 @@ with tab2:
     fig, ax = clean_fig((9, 4))
     bars = ax.barh(cost_means.index, cost_means.values,
                    color=CHART_NEUTRAL[:len(cost_means)],
-                   edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
+                   edgecolor="rgba(255,255,255,0.80)", linewidth=2, height=0.55)
     mx = cost_means.max()
     for b in bars:
         w = b.get_width()
@@ -753,7 +801,7 @@ with tab3:
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         fig, ax = clean_fig((7, 5))
         ax.barh(top.index, top.values, color=CHART_EXPAND,
-                edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
+                edgecolor="rgba(255,255,255,0.80)", linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)"); ax.set_title("Top 10 Routes")
         st.pyplot(fig)
 
@@ -764,7 +812,7 @@ with tab3:
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         fig, ax = clean_fig((7, 5))
         ax.barh(worst.index, worst.values, color=CHART_DROP,
-                edgecolor=(1,1,1,0.80), linewidth=2, height=0.55)
+                edgecolor="rgba(255,255,255,0.80)", linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)"); ax.set_title("Bottom 10 Routes")
         st.pyplot(fig)
 
@@ -800,7 +848,7 @@ with tab4:
     bc = [bc_map.get(i,"#c4b5fd") for i in urbd.index]
     fig, ax = clean_fig((8, 4))
     bars = ax.bar(urbd.index, urbd["Unique Routes"], color=bc, width=0.52,
-                  edgecolor=(1,1,1,0.80), linewidth=2)
+                  edgecolor="rgba(255,255,255,0.80)", linewidth=2)
     for b in bars:
         h = b.get_height()
         ax.text(b.get_x()+b.get_width()/2, h+0.3, f"{int(h)}",
@@ -825,9 +873,9 @@ with tab5:
     fig, ax = clean_fig((8, 3.5))
     x = np.arange(len(comparison)); w = 0.30
     b1 = ax.bar(x-w/2, comparison["Accuracy"], w, label="Accuracy",
-                color="#a78bfa", edgecolor=(1,1,1,0.80), linewidth=2)
+                color="#a78bfa", edgecolor="rgba(255,255,255,0.80)", linewidth=2)
     b2 = ax.bar(x+w/2, comparison["Macro F1"],  w, label="Macro F1",
-                color="#6ee7b7", edgecolor=(1,1,1,0.80), linewidth=2)
+                color="#6ee7b7", edgecolor="rgba(255,255,255,0.80)", linewidth=2)
     for b in list(b1)+list(b2):
         h = b.get_height()
         ax.text(b.get_x()+b.get_width()/2, h+0.006, f"{h:.0%}",
@@ -944,7 +992,7 @@ with tab5:
                       "Optimize":"pill-optimize","Drop":"pill-drop"}
         result_cls = {"Expand":"result-expand","Maintain":"result-maintain",
                       "Optimize":"result-optimize","Drop":"result-drop"}
-        text_col   = {"Expand":COLOR_GREEN,"Maintain":COLOR_YELLOW,
+        text_col   = {"Expand":COLOR_GREEN,"Maintain":"#0369a1",
                       "Optimize":COLOR_ORANGE,"Drop":COLOR_PINK}
         explanations = {
             "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
@@ -979,7 +1027,7 @@ with tab5:
         bars = ax.bar(
             prob_df["Decision"], prob_df["Probability"],
             color=[bar_cp.get(d,"#c4b5fd") for d in prob_df["Decision"]],
-            width=0.45, edgecolor=(1,1,1,0.80), linewidth=2,
+            width=0.45, edgecolor="rgba(255,255,255,0.80)", linewidth=2,
         )
         for b in bars:
             h = b.get_height()
@@ -1015,12 +1063,7 @@ st.markdown(f"""
 # ─────────────────────────────────────────────────────────────
 # All tokens live under "THEME TOKENS" at the top of this file.
 #
-# Background mood: change BG_BLOB_A/B/C to any hex — e.g. sage+sand+gold
-#   for an earthy feel, or rose+coral+cream for a warmer look.
-#
-# Glass opacity: raise the alpha in GLASS_BG (e.g. 0.65) for more opacity,
-#   lower for a more ethereal look. Pair with GLASS_BLUR for intensity.
-#
-# Accent colour: ACCENT / ACCENT_DK controls buttons, active tabs, focus rings.
-#
+# Background: change BG_BASE to any very-light hex for a different tonal base.
+# Glass opacity: raise alpha in GLASS_BG for more solid panels.
+# Accent: ACCENT / ACCENT_LT control buttons, active tabs, pills, focus rings.
 # Chart colours: CHART_EXPAND / MAINTAIN / OPTIMIZE / DROP / NEUTRAL.
