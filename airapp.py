@@ -110,8 +110,6 @@ html, body, [class*="css"] {{
     color: {INK} !important;
 }}
 
-/* ── CURSOR — hidden (replaced by canvas airplane) ── */
-*, *:hover {{ cursor: none !important; }}
 
 /* ── App background — warm pearl with chromatic orbs ── */
 .stApp {{
