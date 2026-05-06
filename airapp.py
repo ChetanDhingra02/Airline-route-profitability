@@ -125,8 +125,8 @@ st.markdown(f"""
     background-image:
         linear-gradient(45deg, rgba(30,122,74,0.025) 25%, transparent 25%),
         linear-gradient(-45deg, rgba(29,122,74,0.025) 25%, transparent 25%),
-        linear-gradient(45deg, transparent 5%, rgba(29,122,74,0.025) 75%),
-        linear-gradient(-45deg, transparent 5%, rgba(29,122,74,0.025) 75%);
+        linear-gradient(45deg, transparent 75%, rgba(29,122,74,0.025) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(29,122,74,0.025) 75%);
     background-size: 16px 16px;
     background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
     pointer-events:none; z-index:0;
@@ -175,7 +175,7 @@ h1,h2,h3,h4 {{
 
 /* ── Hero ── */
 .hero {{
-    position: relative; overflow: hidden;
+    position: fixed; overflow: hidden;
     display: flex; align-items: center; justify-content: space-between; gap: 1.2rem;
     border-radius: var(--r-md);
     padding: 2rem 2.4rem; margin-bottom: 1.4rem;
