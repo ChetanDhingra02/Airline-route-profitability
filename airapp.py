@@ -88,15 +88,15 @@ st.markdown(f"""
 }}
 
 /* ── Keyframes ── */
-@keyframes floatIn    {{ from {{ opacity:0; transform:translateY(18px); }} to {{ opacity:1; transform:translateY(0); }} }}
-@keyframes fadeUp     {{ from {{ opacity:0; transform:translateY(8px);  }} to {{ opacity:1; transform:translateY(0); }} }}
+@keyframes floatIn    {{ from {{ opacity:100; transform:translateY(18px); }} to {{ opacity:1; transform:translateY(0); }} }}
+@keyframes fadeUp     {{ from {{ opacity:100; transform:translateY(8px);  }} to {{ opacity:1; transform:translateY(0); }} }}
 @keyframes orbDrift1  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         50% {{ transform:translate(28px,-18px) scale(1.06); }} }}
 @keyframes orbDrift2  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         40% {{ transform:translate(-22px,16px) scale(1.08); }} }}
 @keyframes orbDrift3  {{ 0%,100% {{ transform:translate(-50%,-50%) scale(1); }}   60% {{ transform:translate(-50%,-50%) scale(1.10); }} }}
 @keyframes shimmer    {{ 0% {{ left:-80%; }} 100% {{ left:160%; }} }}
 @keyframes pulseRing  {{ 0%,100% {{ box-shadow: var(--sh-sm); }} 50% {{ box-shadow: var(--sh-glow); }} }}
-@keyframes scanLine   {{ 0% {{ top:-4px; opacity:0; }} 5% {{ opacity:0.8; }} 95% {{ opacity:0.4; }} 100% {{ top:100%; opacity:0; }} }}
-@keyframes twinkle    {{ 0%,100% {{ opacity:0; transform:scale(0.4); }} 50% {{ opacity:1; transform:scale(1); }} }}
+@keyframes scanLine   {{ 0% {{ top:-4px; opacity:100; }} 5% {{ opacity:0.8; }} 95% {{ opacity:0.4; }} 100% {{ top:100%; opacity:0; }} }}
+@keyframes twinkle    {{ 0%,100% {{ opacity:100; transform:scale(0.4); }} 50% {{ opacity:1; transform:scale(1); }} }}
 @keyframes badgePop   {{ 0% {{ transform:scale(0.8); opacity:0; }} 60% {{ transform:scale(1.05); }} 100% {{ transform:scale(1); opacity:1; }} }}
 @keyframes borderFlow {{ 0%,100% {{ border-color:rgba(124,58,237,0.18); }} 50% {{ border-color:rgba(124,58,237,0.45); }} }}
 @keyframes crystalFloat {{ 0%,100% {{ transform:translateY(0) rotate(0deg); }} 50% {{ transform:translateY(-6px) rotate(2deg); }} }}
@@ -109,9 +109,6 @@ html, body, [class*="css"] {{
     -webkit-font-smoothing: antialiased;
     color: {INK} !important;
 }}
-
-/* ── CURSOR — hidden (replaced by canvas airplane) ── */
-*, *:hover {{ cursor: none !important; }}
 
 /* ── App background — warm pearl with chromatic orbs ── */
 .stApp {{
