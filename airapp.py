@@ -10,7 +10,7 @@ import streamlit.components.v1 as components
 
 
 st.set_page_config(
-    page_title="Airlines Profitability System",
+    page_title="Airline Profitability System",
     page_icon="✈️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -104,7 +104,15 @@ st.markdown(f"""
 @keyframes tileScroll {{ 0% {{ background-position:0 0; }} 100% {{ background-position:48px 48px; }} }}
 @keyframes shimmer    {{ 0% {{ left:-80%; }} 100% {{ left:180%; }} }}
 
+/* ── Pixel cursor ── */
+*, *::before, *::after {{ cursor: none !important; }}
+#kinich-cursor {{ position:fixed; top:0; left:0; pointer-events:none; z-index:999999; image-rendering:pixelated; }}
 
+html, body, [class*="css"] {{
+    font-family: 'Nunito', system-ui, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    color: {INK} !important;
+}}
 
 /* ── App background — warm parchment with pixel tile texture ── */
 .stApp {{
@@ -123,7 +131,7 @@ st.markdown(f"""
     content:"";
     position:fixed; inset:0;
     background-image:
-        linear-gradient(45deg, rgba(30,122,74,0.025) 25%, transparent 25%),
+        linear-gradient(45deg, rgba(29,122,74,0.025) 25%, transparent 25%),
         linear-gradient(-45deg, rgba(29,122,74,0.025) 25%, transparent 25%),
         linear-gradient(45deg, transparent 75%, rgba(29,122,74,0.025) 75%),
         linear-gradient(-45deg, transparent 75%, rgba(29,122,74,0.025) 75%);
@@ -173,45 +181,20 @@ h1,h2,h3,h4 {{
     text-transform: uppercase !important;
 }}
 
-/* ── Updated Hero ── */
-.hero {
-    position: relative; 
-    overflow: hidden;
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    gap: 1.2rem;
+/* ── Hero ── */
+.hero {{
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between; gap: 1.2rem;
     border-radius: var(--r-md);
-    padding: 3rem 3.4rem; 
-    margin-bottom: 1.9rem;
-    
-    /* 1. Updated Background: Ensure size is larger than the container */
+    padding: 2rem 2.4rem; margin-bottom: 1.4rem;
     background: linear-gradient(140deg,
         rgba(240,247,234,0.95) 0%,
         rgba(232,245,240,0.90) 50%,
         rgba(248,244,232,0.95) 100%);
-    background-size: 300% 300%; /* Required for the movement to be visible */
-    
-    border: 6px solid rgba(212,160,23,0.40);
-    box-shadow: var(--sh-md), inset 0 3px 0 rgba(255,255,255,0.90);
-    
-    /* 2. Change the animation name and duration */
-    animation: gradientFlow 10s ease infinite; 
-}
-
-/* ── Gradient Flow Keyframes ── */
-@keyframes gradientFlow {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
+    border: 2px solid rgba(212,160,23,0.40);
+    box-shadow: var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.90);
+    animation: goldPulse 4s ease-in-out infinite;
+}}
 
 /* Pixel checkerboard border corners */
 .hero::before {{
