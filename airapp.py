@@ -127,7 +127,7 @@ html, body, [class*="css"] {{
 .stApp::before {{
     content:"";
     position:fixed; top:-120px; left:-120px;
-    width:480px; height:480px; border-radius:50%;
+    width:480px; height:480px; border-radius:100%;
     background:radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
     animation:orbDrift1 20s ease-in-out infinite;
     pointer-events:none; z-index:0;
