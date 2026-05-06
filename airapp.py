@@ -14,187 +14,195 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────
-#  THEME TOKENS
+#  JEWEL-TONE ANIME THEME  — deep void navy + electric violet
+#  + cobalt blue + hot magenta pink
 # ─────────────────────────────────────────────────────────────
-BG_BASE   = "#f0f4ff"
-BG_MESH_A = "rgba(167, 139, 250, 0.13)"
-BG_MESH_B = "rgba(125, 211, 252, 0.11)"
 
-GLASS_BG     = "rgba(255,255,255,0.62)"
-GLASS_BORDER = "rgba(255,255,255,0.90)"
-GLASS_BLUR   = "blur(22px)"
+# Background & Surface
+BG_VOID     = "#0d0f1a"   # deep navy-void base
+BG_SURFACE  = "#131629"   # card/panel surface
+BG_RAISED   = "#1a1e36"   # raised element
+BG_BORDER   = "#252a4a"   # subtle border
 
-INK       = "#1e293b"
-INK_SOFT  = "#334155"
-INK_MUTED = "#64748b"
+# Core palette (pulled from the character)
+VIOLET      = "#7c5cfc"   # electric violet (outfit)
+VIOLET_LT   = "#a78bfa"   # lighter violet
+VIOLET_GLO  = "#9d6fff"   # glow violet
+COBALT      = "#3b82f6"   # cobalt blue (collar accent)
+COBALT_LT   = "#60a5fa"
+PINK        = "#e11d78"   # hot magenta pink (ribbon)
+PINK_LT     = "#f472b6"
+LAVENDER    = "#c4b5fd"   # hair lavender
 
-ACCENT    = "#818cf8"
-ACCENT_DK = "#6366f1"
-ACCENT_LT = "#eef2ff"
-ACCENT_2  = "#a78bfa"
+# Ink / text
+INK         = "#eef0ff"   # near-white with violet tint
+INK_SOFT    = "#b8bde8"
+INK_MUTED   = "#6b76b8"
 
-COLOR_GREEN  = "#059669"
-COLOR_YELLOW = "#d97706"
-COLOR_ORANGE = "#ea580c"
-COLOR_PINK   = "#e11d48"
-
-CHART_EXPAND   = "#93c5fd"
-CHART_MAINTAIN = "#6ee7b7"
-CHART_OPTIMIZE = "#fcd34d"
-CHART_ORANGE   = "#fcd34d"
-CHART_DROP     = "#fca5a5"
-CHART_NEUTRAL  = [
-    "#c4b5fd", "#bfdbfe", "#bae6fd", "#ddd6fe",
-    "#fecdd3", "#fde68a", "#bbf7d0", "#cbd5e1",
-]
+# Decision colors — jewel tones
+CHART_EXPAND   = "#38bdf8"   # sky cobalt
+CHART_MAINTAIN = "#34d399"   # emerald
+CHART_OPTIMIZE = "#fbbf24"   # amber
+CHART_DROP     = "#fb7185"   # rose pink
+CHART_NEUTRAL  = ["#7c5cfc","#3b82f6","#06b6d4","#8b5cf6","#e11d78","#f59e0b","#10b981","#64748b"]
 
 # ─────────────────────────────────────────────────────────────
-#  GLOBAL CSS — Liquid Glass Pastel · Professional Edition
+#  GLOBAL CSS — Jewel-Tone Dark · Anime-Inspired
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cinzel:wght@400;500;600&display=swap');
 
 :root {{
-    --bg-base: {BG_BASE};
-    --glass-bg: {GLASS_BG};
-    --glass-border: {GLASS_BORDER};
-    --glass-blur: {GLASS_BLUR};
+    --void: {BG_VOID};
+    --surface: {BG_SURFACE};
+    --raised: {BG_RAISED};
+    --border: {BG_BORDER};
+    --violet: {VIOLET};
+    --violet-lt: {VIOLET_LT};
+    --violet-glo: {VIOLET_GLO};
+    --cobalt: {COBALT};
+    --cobalt-lt: {COBALT_LT};
+    --pink: {PINK};
+    --pink-lt: {PINK_LT};
+    --lavender: {LAVENDER};
     --ink: {INK};
     --ink-soft: {INK_SOFT};
     --ink-muted: {INK_MUTED};
-    --accent: {ACCENT};
-    --accent-dk: {ACCENT_DK};
-    --accent-lt: {ACCENT_LT};
-    --accent-2: {ACCENT_2};
-    --radius-sm: 12px;
-    --radius-md: 18px;
-    --radius-lg: 24px;
-    --radius-xl: 32px;
-    --shadow-sm: 0 4px 16px rgba(99,102,241,0.06), 0 1px 4px rgba(15,23,42,0.04);
-    --shadow-md: 0 12px 36px rgba(99,102,241,0.10), 0 4px 12px rgba(15,23,42,0.06);
-    --shadow-lg: 0 24px 56px rgba(99,102,241,0.14), 0 8px 24px rgba(15,23,42,0.08);
-    --shadow-glow: 0 0 0 1px rgba(129,140,248,0.14), 0 16px 40px rgba(129,140,248,0.18);
-    --motion-fast: 200ms cubic-bezier(.25,.8,.25,1);
-    --motion-med: 320ms cubic-bezier(.25,.8,.25,1);
-    --motion-slow: 480ms cubic-bezier(.25,.8,.25,1);
+    --r-sm: 10px;
+    --r-md: 16px;
+    --r-lg: 22px;
+    --r-xl: 30px;
+    --glow-v: 0 0 24px rgba(124,92,252,0.35), 0 0 6px rgba(124,92,252,0.18);
+    --glow-b: 0 0 24px rgba(59,130,246,0.30), 0 0 6px rgba(59,130,246,0.15);
+    --glow-p: 0 0 24px rgba(225,29,120,0.30), 0 0 6px rgba(225,29,120,0.15);
+    --shadow: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.30);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.55), 0 8px 20px rgba(0,0,0,0.35);
+    --ease: cubic-bezier(.25,.8,.25,1);
 }}
 
 /* ── Keyframes ── */
 @keyframes floatIn {{
-    from {{ opacity: 0; transform: translateY(16px); }}
-    to   {{ opacity: 1; transform: translateY(0);    }}
+    from {{ opacity:0; transform:translateY(20px); }}
+    to   {{ opacity:1; transform:translateY(0);    }}
 }}
 @keyframes fadeUp {{
-    from {{ opacity: 0; transform: translateY(8px); }}
-    to   {{ opacity: 1; transform: translateY(0);   }}
+    from {{ opacity:0; transform:translateY(10px); }}
+    to   {{ opacity:1; transform:translateY(0);    }}
 }}
-@keyframes driftGlow {{
-    0%,100% {{ transform: translate3d(0,0,0) rotate(-8deg); }}
-    50%     {{ transform: translate3d(0,-6px,0) rotate(-6deg); }}
+@keyframes pulseGlow {{
+    0%,100% {{ box-shadow: 0 0 18px rgba(124,92,252,0.25); }}
+    50%     {{ box-shadow: 0 0 36px rgba(124,92,252,0.55), 0 0 12px rgba(196,181,253,0.20); }}
 }}
-@keyframes orbFloat1 {{
+@keyframes orbDrift1 {{
     0%,100% {{ transform: translate(0,0) scale(1); }}
-    33%     {{ transform: translate(18px,-12px) scale(1.04); }}
-    66%     {{ transform: translate(-10px,8px) scale(0.97); }}
+    40%     {{ transform: translate(30px,-20px) scale(1.08); }}
+    70%     {{ transform: translate(-15px,12px) scale(0.94); }}
 }}
-@keyframes orbFloat2 {{
+@keyframes orbDrift2 {{
     0%,100% {{ transform: translate(0,0) scale(1); }}
-    40%     {{ transform: translate(-16px,14px) scale(1.06); }}
-    70%     {{ transform: translate(12px,-8px) scale(0.96); }}
+    35%     {{ transform: translate(-25px,18px) scale(1.06); }}
+    65%     {{ transform: translate(18px,-14px) scale(0.96); }}
 }}
-@keyframes orbFloat3 {{
+@keyframes orbDrift3 {{
     0%,100% {{ transform: translate(0,0) scale(1); }}
-    30%     {{ transform: translate(10px,16px) scale(1.03); }}
-    60%     {{ transform: translate(-14px,-10px) scale(0.98); }}
+    50%     {{ transform: translate(12px,22px) scale(1.04); }}
+}}
+@keyframes scanLine {{
+    0%   {{ top: -4px; opacity:0.7; }}
+    100% {{ top: 100%; opacity:0;   }}
 }}
 @keyframes badgePop {{
-    0%   {{ transform: scale(0.85); opacity:0; }}
-    60%  {{ transform: scale(1.05); }}
-    100% {{ transform: scale(1);   opacity:1; }}
+    0%   {{ transform:scale(0.8); opacity:0; }}
+    65%  {{ transform:scale(1.06); }}
+    100% {{ transform:scale(1);   opacity:1; }}
 }}
-@keyframes shimmerSlide {{
-    0%   {{ left: -100%; }}
-    100% {{ left: 150%;  }}
+@keyframes shimmer {{
+    0%   {{ left:-100%; }}
+    100% {{ left: 160%; }}
+}}
+@keyframes borderPulse {{
+    0%,100% {{ border-color: rgba(124,92,252,0.25); }}
+    50%     {{ border-color: rgba(124,92,252,0.60); }}
+}}
+@keyframes starTwinkle {{
+    0%,100% {{ opacity:0.15; transform:scale(1); }}
+    50%     {{ opacity:0.65; transform:scale(1.4); }}
 }}
 
-/* ── Global fonts ── */
+/* ── Global fonts & body ── */
 html, body, [class*="css"] {{
-    font-family: 'Sora', system-ui, sans-serif !important;
+    font-family: 'Outfit', system-ui, sans-serif !important;
     -webkit-font-smoothing: antialiased;
+    color: {INK};
 }}
 
-/* ── App background ── */
+/* ── App background — dark void with colored orbs ── */
 .stApp {{
-    min-height: 100vh;
+    min-height:100vh;
     background:
-        radial-gradient(circle at 12% 15%, rgba(167,139,250,0.16) 0, transparent 28%),
-        radial-gradient(circle at 88% 12%, rgba(125,211,252,0.13) 0, transparent 26%),
-        radial-gradient(circle at 55% 88%, rgba(253,186,116,0.10) 0, transparent 30%),
-        radial-gradient(circle at 78% 55%, rgba(196,181,253,0.11) 0, transparent 24%),
-        linear-gradient(160deg, #f5f7ff 0%, #eef2ff 40%, #f0fafe 75%, #f5f7ff 100%);
+        radial-gradient(ellipse at 10% 15%, rgba(124,92,252,0.18) 0, transparent 30%),
+        radial-gradient(ellipse at 90% 10%, rgba(59,130,246,0.14) 0, transparent 28%),
+        radial-gradient(ellipse at 50% 90%, rgba(225,29,120,0.12) 0, transparent 32%),
+        radial-gradient(ellipse at 80% 60%, rgba(124,92,252,0.10) 0, transparent 22%),
+        linear-gradient(160deg, #0a0d1a 0%, #0d1124 35%, #0f1220 70%, #0a0d1a 100%);
     background-attachment: fixed;
 }}
 
-/* ── Floating orb 1 ── */
+/* ── Floating orb 1 (violet) ── */
 .stApp::before {{
     content: "";
     position: fixed;
-    top: -100px; left: -100px;
-    width: 450px; height: 450px;
+    top: -120px; left: -80px;
+    width: 500px; height: 500px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(167,139,250,0.12) 0%, transparent 70%);
-    animation: orbFloat1 18s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
+    background: radial-gradient(circle, rgba(124,92,252,0.14) 0%, transparent 65%);
+    animation: orbDrift1 22s ease-in-out infinite;
+    pointer-events: none; z-index: 0;
 }}
-
-/* ── Floating orb 2 ── */
+/* ── Floating orb 2 (cobalt) ── */
 .stApp::after {{
     content: "";
     position: fixed;
-    bottom: -80px; right: -80px;
-    width: 380px; height: 380px;
+    bottom: -100px; right: -80px;
+    width: 420px; height: 420px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(125,211,252,0.12) 0%, transparent 70%);
-    animation: orbFloat2 22s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
+    background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 65%);
+    animation: orbDrift2 26s ease-in-out infinite;
+    pointer-events: none; z-index: 0;
 }}
 
 .main .block-container {{
     max-width: 1300px;
-    padding-top: 2.2rem;
+    padding-top: 2rem;
     padding-bottom: 4rem;
-    animation: floatIn 500ms ease-out;
-    position: relative;
-    z-index: 1;
+    animation: floatIn 550ms ease-out;
+    position: relative; z-index: 1;
 }}
-
 section.main > div {{ background: transparent; }}
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {{
-    background: rgba(255,255,255,0.56) !important;
-    border-right: 1px solid rgba(196,181,253,0.22) !important;
-    backdrop-filter: blur(26px) saturate(1.8) !important;
-    -webkit-backdrop-filter: blur(26px) saturate(1.8) !important;
-    box-shadow: 4px 0 32px rgba(99,102,241,0.07) !important;
+    background: rgba(13,15,26,0.88) !important;
+    border-right: 1px solid rgba(124,92,252,0.22) !important;
+    backdrop-filter: blur(28px) saturate(1.4) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(1.4) !important;
+    box-shadow: 4px 0 40px rgba(0,0,0,0.50) !important;
 }}
-[data-testid="stSidebar"] * {{ color: var(--ink-soft) !important; }}
+[data-testid="stSidebar"] * {{ color: {INK_SOFT} !important; }}
 
 /* ── Sidebar brand ── */
 .sidebar-brand {{
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 1.55rem;
-    color: var(--ink);
-    letter-spacing: -0.03em;
+    font-family: 'Cinzel', serif;
+    font-size: 1.35rem;
+    color: {INK};
+    letter-spacing: 0.04em;
     padding: 0.25rem 0 1.1rem 0;
-    border-bottom: 1px solid rgba(196,181,253,0.25);
+    border-bottom: 1px solid rgba(124,92,252,0.25);
     margin-bottom: 1.1rem;
 }}
 .sidebar-brand span {{
-    background: linear-gradient(135deg, {ACCENT}, {ACCENT_2});
+    background: linear-gradient(135deg, {VIOLET_LT}, {PINK_LT});
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -202,18 +210,17 @@ section.main > div {{ background: transparent; }}
 
 /* ── Headings ── */
 h1, h2, h3, h4 {{
-    font-family: 'Fraunces', Georgia, serif !important;
-    color: var(--ink) !important;
-    letter-spacing: -0.025em !important;
-    font-weight: 400 !important;
+    font-family: 'Cinzel', serif !important;
+    color: {INK} !important;
+    letter-spacing: 0.02em !important;
+    font-weight: 500 !important;
 }}
-
 [data-testid="stMarkdownContainer"] p,
 .stMarkdown p,
 [data-testid="stMarkdownContainer"] li,
 .stMarkdown li {{
-    color: var(--ink-soft);
-    line-height: 1.76;
+    color: {INK_SOFT};
+    line-height: 1.78;
     font-size: 0.91rem;
 }}
 
@@ -225,59 +232,71 @@ h1, h2, h3, h4 {{
     align-items: center;
     justify-content: space-between;
     gap: 1.4rem;
-    border-radius: var(--radius-xl);
-    padding: 1.8rem 2.2rem;
-    margin-bottom: 1.2rem;
+    border-radius: var(--r-xl);
+    padding: 1.8rem 2.4rem;
+    margin-bottom: 1.4rem;
     background: linear-gradient(140deg,
-        rgba(255,255,255,0.72) 0%,
-        rgba(238,242,255,0.60) 50%,
-        rgba(255,255,255,0.52) 100%);
-    border: 1px solid rgba(255,255,255,0.92);
-    backdrop-filter: blur(28px) saturate(1.6);
-    -webkit-backdrop-filter: blur(28px) saturate(1.6);
-    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.80);
-    transition: box-shadow var(--motion-med), transform var(--motion-med);
+        rgba(26,30,54,0.95) 0%,
+        rgba(19,22,41,0.90) 55%,
+        rgba(26,30,54,0.85) 100%);
+    border: 1px solid rgba(124,92,252,0.30);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(196,181,253,0.12);
+    animation: borderPulse 4s ease-in-out infinite;
+    transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
 }}
 .hero:hover {{
-    box-shadow: var(--shadow-glow), inset 0 1px 0 rgba(255,255,255,0.85);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg), var(--glow-v), inset 0 1px 0 rgba(196,181,253,0.18);
 }}
+/* Scan-line effect */
 .hero::before {{
     content: "";
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.90) 50%, transparent 100%);
+    left: 0; right: 0; top: -4px;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%, {VIOLET} 30%, {COBALT_LT} 60%, transparent 100%);
+    animation: scanLine 6s linear infinite;
+    opacity: 0.5;
+    pointer-events: none;
 }}
+/* Pink orb accent */
 .hero::after {{
     content: "";
     position: absolute;
-    top: -60px; right: -60px;
-    width: 220px; height: 220px;
+    top: -80px; right: -60px;
+    width: 260px; height: 260px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(196,181,253,0.22) 0%, transparent 70%);
-    animation: orbFloat3 12s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(225,29,120,0.16) 0%, transparent 70%);
+    animation: orbDrift3 14s ease-in-out infinite;
     pointer-events: none;
 }}
-.hero-left, .hero-badge, .hero-glyph {{ position: relative; z-index: 1; }}
-.hero-left {{ flex: 1; min-width: 0; }}
+.hero-left {{ flex:1; min-width:0; position:relative; z-index:1; }}
+.hero-badge {{ position:relative; z-index:1; }}
+.hero-glyph  {{ position:relative; z-index:1; }}
 .hero-eyebrow {{
-    font-size: 0.63rem;
+    font-size: 0.60rem;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--accent);
+    letter-spacing: 0.22em;
+    color: {VIOLET_LT};
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
 }}
 .hero h1 {{
-    margin: 0 0 0.4rem 0 !important;
-    font-size: 2.2rem !important;
-    line-height: 1.15 !important;
+    margin: 0 0 0.35rem 0 !important;
+    font-size: 2.0rem !important;
+    line-height: 1.18 !important;
+    background: linear-gradient(135deg, {INK} 40%, {LAVENDER} 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }}
 .hero p {{
     margin: 0;
-    color: var(--ink-muted) !important;
-    font-size: 0.88rem;
+    color: {INK_MUTED} !important;
+    font-size: 0.86rem;
 }}
 .hero-badge {{
     display: inline-flex;
@@ -285,119 +304,130 @@ h1, h2, h3, h4 {{
     gap: 0.5rem;
     padding: 0.62rem 1.1rem;
     border-radius: 999px;
-    border: 1px solid rgba(129,140,248,0.22);
-    background: linear-gradient(135deg, rgba(255,255,255,0.72), rgba(238,242,255,0.60));
-    color: var(--accent-dk);
-    font-size: 0.76rem;
+    border: 1px solid rgba(124,92,252,0.40);
+    background: linear-gradient(135deg, rgba(124,92,252,0.20), rgba(59,130,246,0.14));
+    color: {VIOLET_LT};
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.03em;
-    box-shadow: 0 4px 16px rgba(129,140,248,0.12);
-    transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+    letter-spacing: 0.05em;
+    box-shadow: var(--glow-v);
     animation: badgePop 600ms ease-out 200ms both;
     white-space: nowrap;
+    transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
 }}
 .hero-badge:hover {{
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 12px 28px rgba(129,140,248,0.22);
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 0 40px rgba(124,92,252,0.50), 0 0 10px rgba(124,92,252,0.25);
 }}
 .hero-glyph {{
-    font-size: 3.2rem;
-    opacity: 0.22;
-    animation: driftGlow 5s ease-in-out infinite;
-    filter: drop-shadow(0 4px 12px rgba(129,140,248,0.18));
+    font-size: 3.0rem;
+    opacity: 0.18;
+    filter: drop-shadow(0 0 16px rgba(124,92,252,0.60));
+    animation: pulseGlow 4s ease-in-out infinite;
+}}
+
+/* ── Star particles (decorative CSS) ── */
+.star {{
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: {LAVENDER};
+    animation: starTwinkle var(--dur, 3s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
 }}
 
 /* ── Metric cards ── */
 [data-testid="metric-container"] {{
     background: linear-gradient(160deg,
-        rgba(255,255,255,0.78) 0%,
-        rgba(238,242,255,0.55) 100%) !important;
-    border: 1px solid rgba(255,255,255,0.92) !important;
-    border-radius: var(--radius-md) !important;
-    backdrop-filter: blur(20px) saturate(1.5) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(1.5) !important;
-    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.80) !important;
+        rgba(26,30,54,0.92) 0%,
+        rgba(19,22,41,0.85) 100%) !important;
+    border: 1px solid rgba(124,92,252,0.22) !important;
+    border-radius: var(--r-md) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(196,181,253,0.08) !important;
     padding: 1.1rem 1.2rem !important;
-    transition: transform var(--motion-fast), box-shadow var(--motion-fast) !important;
+    transition: transform 220ms var(--ease), box-shadow 220ms var(--ease), border-color 220ms var(--ease) !important;
     position: relative;
     overflow: hidden;
 }}
-[data-testid="metric-container"]::after {{
+[data-testid="metric-container"]::before {{
     content: "";
     position: absolute;
     top: 0; left: -100%;
-    width: 60%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent);
-    transition: left var(--motion-slow);
+    width: 55%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(124,92,252,0.10), transparent);
+    transition: left 500ms ease;
     pointer-events: none;
 }}
 [data-testid="metric-container"]:hover {{
     transform: translateY(-5px) scale(1.02) !important;
-    box-shadow: var(--shadow-md), 0 0 0 1px rgba(129,140,248,0.12), inset 0 1px 0 rgba(255,255,255,0.88) !important;
+    border-color: rgba(124,92,252,0.50) !important;
+    box-shadow: var(--shadow), var(--glow-v), inset 0 1px 0 rgba(196,181,253,0.12) !important;
 }}
-[data-testid="metric-container"]:hover::after {{
-    left: 150%;
+[data-testid="metric-container"]:hover::before {{
+    left: 160%;
 }}
 [data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
-    font-size: 0.62rem !important;
+    font-size: 0.60rem !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.13em !important;
-    color: var(--accent) !important;
+    letter-spacing: 0.16em !important;
+    color: {VIOLET_LT} !important;
 }}
 [data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
-    color: var(--ink) !important;
+    color: {INK} !important;
     font-size: 2.0rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.04em !important;
-    font-family: 'Sora', sans-serif !important;
+    font-family: 'Outfit', sans-serif !important;
 }}
 
 /* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {{
-    gap: 0.3rem;
-    background: rgba(255,255,255,0.52);
-    border: 1px solid rgba(255,255,255,0.88);
+    gap: 0.28rem;
+    background: rgba(19,22,41,0.80);
+    border: 1px solid rgba(124,92,252,0.22);
     border-radius: 20px;
-    padding: 0.38rem;
-    backdrop-filter: blur(18px) saturate(1.4);
-    box-shadow: var(--shadow-sm);
+    padding: 0.35rem;
+    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow);
 }}
 .stTabs [data-baseweb="tab"] {{
-    height: 44px;
-    padding: 0 1.1rem !important;
+    height: 42px;
+    padding: 0 1.05rem !important;
     border-radius: 14px !important;
-    color: var(--ink-soft) !important;
-    font-size: 0.83rem !important;
+    color: {INK_MUTED} !important;
+    font-size: 0.82rem !important;
     font-weight: 600 !important;
     background: transparent !important;
-    transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-fast) !important;
-    letter-spacing: 0.01em;
+    transition: background 200ms var(--ease), color 200ms var(--ease), transform 200ms var(--ease) !important;
+    letter-spacing: 0.02em;
 }}
 .stTabs [data-baseweb="tab"]:hover {{
-    background: rgba(255,255,255,0.78) !important;
-    color: var(--accent-dk) !important;
+    background: rgba(124,92,252,0.14) !important;
+    color: {VIOLET_LT} !important;
     transform: translateY(-1px) !important;
 }}
 .stTabs [aria-selected="true"] {{
-    background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(238,242,255,0.70)) !important;
-    color: var(--accent-dk) !important;
-    box-shadow: 0 6px 18px rgba(99,102,241,0.12), inset 0 0 0 1px rgba(129,140,248,0.18) !important;
+    background: linear-gradient(135deg, rgba(124,92,252,0.28), rgba(59,130,246,0.18)) !important;
+    color: {LAVENDER} !important;
+    box-shadow: 0 4px 18px rgba(124,92,252,0.25), inset 0 0 0 1px rgba(124,92,252,0.35) !important;
 }}
 .stTabs [data-baseweb="tab-panel"] {{ padding-top: 1.5rem; }}
 
 /* ── Section headings ── */
 .section-hd {{
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--ink);
-    margin: 0 0 0.3rem 0;
-    letter-spacing: -0.02em;
+    font-family: 'Cinzel', serif;
+    font-size: 1.08rem;
+    font-weight: 500;
+    color: {INK};
+    margin: 0 0 0.28rem 0;
+    letter-spacing: 0.03em;
 }}
 .section-sub {{
     font-size: 0.83rem;
-    color: var(--ink-muted);
+    color: {INK_MUTED};
     margin: 0 0 1.2rem 0;
     line-height: 1.6;
 }}
@@ -408,36 +438,37 @@ h1, h2, h3, h4 {{
     align-items: center;
     gap: 0.75rem;
     margin: 1.6rem 0 1.1rem 0;
-    font-size: 0.63rem;
+    font-size: 0.60rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--accent);
+    letter-spacing: 0.20em;
+    color: {VIOLET_LT};
 }}
 .divider-label::before, .divider-label::after {{
     content: "";
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(129,140,248,0.22), transparent);
+    background: linear-gradient(90deg, transparent, rgba(124,92,252,0.35), transparent);
 }}
 
 /* ── Info box ── */
 .info-box {{
     background: linear-gradient(160deg,
-        rgba(255,255,255,0.82) 0%,
-        rgba(238,242,255,0.65) 100%);
-    border: 1px solid rgba(196,181,253,0.22);
-    border-radius: var(--radius-md);
+        rgba(26,30,54,0.90) 0%,
+        rgba(19,22,41,0.80) 100%);
+    border: 1px solid rgba(124,92,252,0.22);
+    border-radius: var(--r-md);
     padding: 1rem 1.15rem;
-    color: var(--ink-soft);
+    color: {INK_SOFT};
     line-height: 1.78;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow);
     font-size: 0.88rem;
-    transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+    transition: transform 200ms var(--ease), border-color 200ms var(--ease), box-shadow 200ms var(--ease);
 }}
 .info-box:hover {{
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    border-color: rgba(124,92,252,0.40);
+    box-shadow: var(--shadow), var(--glow-v);
 }}
 
 /* ── Pills ── */
@@ -445,210 +476,221 @@ h1, h2, h3, h4 {{
     display: inline-block;
     padding: 0.26rem 0.75rem;
     border-radius: 999px;
-    font-size: 0.65rem;
+    font-size: 0.64rem;
     font-weight: 700;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
     border: 1px solid transparent;
-    transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+    transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
     cursor: default;
 }}
-.pill:hover {{ transform: scale(1.06); }}
-.pill-expand   {{ background: rgba(59,130,246,0.12); color: #1d4ed8; border-color: rgba(59,130,246,0.22); }}
-.pill-maintain {{ background: rgba(16,185,129,0.12); color: #047857; border-color: rgba(16,185,129,0.22); }}
-.pill-optimize {{ background: rgba(245,158,11,0.12); color: #b45309; border-color: rgba(245,158,11,0.22); }}
-.pill-drop     {{ background: rgba(239,68,68,0.12);  color: #b91c1c; border-color: rgba(239,68,68,0.20);  }}
+.pill:hover {{ transform: scale(1.07); }}
+.pill-expand   {{ background:rgba(56,189,248,0.14); color:#7dd3fc; border-color:rgba(56,189,248,0.28); }}
+.pill-maintain {{ background:rgba(52,211,153,0.14); color:#6ee7b7; border-color:rgba(52,211,153,0.28); }}
+.pill-optimize {{ background:rgba(251,191,36,0.14); color:#fcd34d; border-color:rgba(251,191,36,0.28); }}
+.pill-drop     {{ background:rgba(251,113,133,0.14);color:#fda4af; border-color:rgba(251,113,133,0.25); }}
 
 /* ── Result card ── */
 .result-card {{
-    border-radius: var(--radius-lg);
+    border-radius: var(--r-lg);
     padding: 1.5rem 1.6rem;
     margin: 1.2rem 0;
-    border: 1px solid rgba(255,255,255,0.94);
-    box-shadow: var(--shadow-md);
-    backdrop-filter: blur(18px) saturate(1.4);
-    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     animation: fadeUp 400ms ease-out;
-    transition: transform var(--motion-med), box-shadow var(--motion-med);
+    transition: transform 280ms var(--ease), box-shadow 280ms var(--ease);
+    position: relative; overflow: hidden;
 }}
 .result-card:hover {{
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-lg), 0 0 40px rgba(124,92,252,0.20);
 }}
-.result-expand   {{ background: linear-gradient(140deg, rgba(219,234,254,0.70), rgba(255,255,255,0.72)); border-left: 4px solid {CHART_EXPAND};   }}
-.result-maintain {{ background: linear-gradient(140deg, rgba(209,250,229,0.70), rgba(255,255,255,0.72)); border-left: 4px solid {CHART_MAINTAIN}; }}
-.result-optimize {{ background: linear-gradient(140deg, rgba(254,243,199,0.70), rgba(255,255,255,0.72)); border-left: 4px solid {CHART_OPTIMIZE}; }}
-.result-drop     {{ background: linear-gradient(140deg, rgba(254,226,226,0.70), rgba(255,255,255,0.72)); border-left: 4px solid {CHART_DROP};     }}
+.result-expand   {{ background:linear-gradient(140deg,rgba(56,189,248,0.12),rgba(19,22,41,0.92));  border-left:3px solid {CHART_EXPAND};   }}
+.result-maintain {{ background:linear-gradient(140deg,rgba(52,211,153,0.12),rgba(19,22,41,0.92));  border-left:3px solid {CHART_MAINTAIN}; }}
+.result-optimize {{ background:linear-gradient(140deg,rgba(251,191,36,0.12),rgba(19,22,41,0.92));  border-left:3px solid {CHART_OPTIMIZE}; }}
+.result-drop     {{ background:linear-gradient(140deg,rgba(251,113,133,0.14),rgba(19,22,41,0.92)); border-left:3px solid {CHART_DROP};     }}
 
 /* ── Form inputs ── */
 .stSelectbox label, .stNumberInput label,
 .stSlider label, .stRadio label,
 .stCheckbox label, .stTextInput label {{
-    color: var(--ink) !important;
+    color: {INK} !important;
     font-weight: 600 !important;
-    font-size: 0.76rem !important;
-    letter-spacing: 0.03em !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
 }}
 .stSelectbox [data-baseweb="select"] > div,
 .stTextInput input,
 .stNumberInput input {{
-    background: rgba(255,255,255,0.72) !important;
-    border: 1px solid rgba(196,181,253,0.28) !important;
-    border-radius: var(--radius-sm) !important;
-    color: var(--ink) !important;
+    background: rgba(19,22,41,0.90) !important;
+    border: 1px solid rgba(124,92,252,0.25) !important;
+    border-radius: var(--r-sm) !important;
+    color: {INK} !important;
     min-height: 44px !important;
     box-shadow: none !important;
-    transition: border-color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast) !important;
-    font-family: 'Sora', sans-serif !important;
+    transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease), transform 200ms var(--ease) !important;
+    font-family: 'Outfit', sans-serif !important;
 }}
 .stSelectbox [data-baseweb="select"] > div:hover,
 .stTextInput input:hover,
 .stNumberInput input:hover {{
-    border-color: rgba(129,140,248,0.42) !important;
+    border-color: rgba(124,92,252,0.50) !important;
     transform: translateY(-1px) !important;
 }}
 .stSelectbox [data-baseweb="select"] > div:focus-within,
 .stTextInput input:focus,
 .stNumberInput input:focus {{
-    border-color: rgba(99,102,241,0.55) !important;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.12) !important;
+    border-color: {VIOLET} !important;
+    box-shadow: 0 0 0 3px rgba(124,92,252,0.18), var(--glow-v) !important;
     transform: translateY(-1px) !important;
 }}
 
 /* ── Form card ── */
 [data-testid="stForm"] {{
     background: linear-gradient(160deg,
-        rgba(255,255,255,0.68) 0%,
-        rgba(238,242,255,0.52) 100%) !important;
-    border: 1px solid rgba(255,255,255,0.90) !important;
-    border-radius: var(--radius-lg) !important;
+        rgba(26,30,54,0.92) 0%,
+        rgba(13,15,26,0.88) 100%) !important;
+    border: 1px solid rgba(124,92,252,0.25) !important;
+    border-radius: var(--r-lg) !important;
     padding: 1.5rem 1.6rem 1.8rem !important;
-    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.94) !important;
-    backdrop-filter: blur(20px) saturate(1.5) !important;
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(196,181,253,0.08) !important;
+    backdrop-filter: blur(18px) !important;
+    animation: borderPulse 5s ease-in-out infinite !important;
 }}
 
 /* ── Buttons ── */
 [data-testid="stFormSubmitButton"] > button,
 .stButton > button {{
-    border-radius: var(--radius-sm) !important;
+    border-radius: var(--r-sm) !important;
     font-weight: 700 !important;
     border: none !important;
-    font-family: 'Sora', sans-serif !important;
-    letter-spacing: 0.03em !important;
-    transition: transform var(--motion-fast), box-shadow var(--motion-fast) !important;
-    position: relative;
-    overflow: hidden;
+    font-family: 'Outfit', sans-serif !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    transition: transform 200ms var(--ease), box-shadow 200ms var(--ease) !important;
+    position: relative; overflow: hidden;
 }}
 [data-testid="stFormSubmitButton"] > button {{
     width: 100% !important;
-    background: linear-gradient(135deg, {ACCENT}, {ACCENT_DK}) !important;
-    box-shadow: 0 10px 28px rgba(99,102,241,0.28), 0 4px 10px rgba(99,102,241,0.18) !important;
+    background: linear-gradient(135deg, {VIOLET}, {PINK}) !important;
+    box-shadow: 0 8px 32px rgba(124,92,252,0.40), 0 0 16px rgba(225,29,120,0.22) !important;
     color: white !important;
-    font-size: 0.9rem !important;
-    padding: 0.75rem 0 !important;
+    font-size: 0.88rem !important;
+    padding: 0.78rem 0 !important;
 }}
 [data-testid="stFormSubmitButton"] > button:hover {{
     transform: translateY(-2px) !important;
-    box-shadow: 0 16px 38px rgba(99,102,241,0.34), 0 6px 16px rgba(99,102,241,0.22) !important;
+    box-shadow: 0 14px 40px rgba(124,92,252,0.52), 0 0 24px rgba(225,29,120,0.32) !important;
 }}
 [data-testid="stFormSubmitButton"] > button:active {{
     transform: translateY(0) scale(0.98) !important;
 }}
 .stButton > button {{
-    background: rgba(255,255,255,0.82) !important;
-    color: var(--ink) !important;
-    border: 1px solid rgba(196,181,253,0.22) !important;
-    box-shadow: var(--shadow-sm) !important;
+    background: rgba(26,30,54,0.90) !important;
+    color: {VIOLET_LT} !important;
+    border: 1px solid rgba(124,92,252,0.30) !important;
+    box-shadow: var(--shadow) !important;
 }}
 .stButton > button:hover {{
-    background: rgba(255,255,255,0.96) !important;
+    background: rgba(124,92,252,0.15) !important;
+    border-color: rgba(124,92,252,0.55) !important;
     transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-md) !important;
+    box-shadow: var(--shadow), var(--glow-v) !important;
 }}
 
 /* ── DataFrames ── */
 [data-testid="stDataFrame"] {{
-    background: rgba(255,255,255,0.62) !important;
-    border: 1px solid rgba(255,255,255,0.88) !important;
-    border-radius: var(--radius-md) !important;
+    background: rgba(19,22,41,0.85) !important;
+    border: 1px solid rgba(124,92,252,0.20) !important;
+    border-radius: var(--r-md) !important;
     overflow: hidden !important;
-    box-shadow: var(--shadow-sm) !important;
-    backdrop-filter: blur(18px) !important;
-    transition: transform var(--motion-med), box-shadow var(--motion-med) !important;
+    box-shadow: var(--shadow) !important;
+    backdrop-filter: blur(16px) !important;
+    transition: transform 280ms var(--ease), box-shadow 280ms var(--ease) !important;
 }}
 [data-testid="stDataFrame"]:hover {{
     transform: translateY(-4px) !important;
-    box-shadow: var(--shadow-md) !important;
+    box-shadow: var(--shadow), var(--glow-v) !important;
+    border-color: rgba(124,92,252,0.40) !important;
 }}
 [data-testid="stDataFrame"] [role="grid"] {{ background: transparent !important; }}
 [data-testid="stDataFrame"] div,
-[data-testid="stDataFrame"] span {{ color: var(--ink) !important; }}
+[data-testid="stDataFrame"] span {{ color: {INK} !important; }}
 [data-testid="stDataFrame"] [role="columnheader"] {{
-    background: rgba(238,242,255,0.60) !important;
-    color: var(--accent-dk) !important;
+    background: rgba(124,92,252,0.12) !important;
+    color: {VIOLET_LT} !important;
     font-weight: 700 !important;
-    font-size: 0.74rem !important;
-    letter-spacing: 0.06em !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.10em !important;
     text-transform: uppercase !important;
-    border-bottom: 1px solid rgba(196,181,253,0.18) !important;
+    border-bottom: 1px solid rgba(124,92,252,0.20) !important;
 }}
 [data-testid="stDataFrame"] [role="gridcell"] {{
-    border-bottom: 1px solid rgba(226,232,240,0.45) !important;
+    border-bottom: 1px solid rgba(124,92,252,0.08) !important;
+    color: {INK_SOFT} !important;
 }}
 
 /* ── Expander ── */
 [data-testid="stExpander"] {{
     background: linear-gradient(160deg,
-        rgba(255,255,255,0.65) 0%,
-        rgba(238,242,255,0.50) 100%) !important;
-    border: 1px solid rgba(255,255,255,0.92) !important;
-    border-radius: var(--radius-md) !important;
-    box-shadow: var(--shadow-sm) !important;
-    backdrop-filter: blur(16px) !important;
-    transition: transform var(--motion-fast), box-shadow var(--motion-fast) !important;
+        rgba(26,30,54,0.88) 0%,
+        rgba(19,22,41,0.80) 100%) !important;
+    border: 1px solid rgba(124,92,252,0.20) !important;
+    border-radius: var(--r-md) !important;
+    box-shadow: var(--shadow) !important;
+    backdrop-filter: blur(14px) !important;
+    transition: transform 200ms var(--ease), border-color 200ms var(--ease) !important;
 }}
 [data-testid="stExpander"]:hover {{
     transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-md) !important;
+    border-color: rgba(124,92,252,0.40) !important;
 }}
 [data-testid="stExpander"] summary p {{
-    color: var(--ink) !important;
+    color: {INK} !important;
     font-weight: 600 !important;
 }}
 
 /* ── Charts ── */
 [data-testid="stPyplot"] {{
     background: linear-gradient(160deg,
-        rgba(255,255,255,0.64) 0%,
-        rgba(238,242,255,0.50) 100%);
-    border: 1px solid rgba(255,255,255,0.88);
-    border-radius: var(--radius-lg);
+        rgba(26,30,54,0.85) 0%,
+        rgba(19,22,41,0.78) 100%);
+    border: 1px solid rgba(124,92,252,0.18);
+    border-radius: var(--r-lg);
     padding: 1rem;
-    box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(16px);
-    transition: transform var(--motion-med), box-shadow var(--motion-med);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(14px);
+    transition: transform 280ms var(--ease), box-shadow 280ms var(--ease), border-color 280ms var(--ease);
 }}
 [data-testid="stPyplot"]:hover {{
     transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow), var(--glow-v);
+    border-color: rgba(124,92,252,0.40);
 }}
 
 /* ── Alerts ── */
-[data-testid="stAlert"] {{ border-radius: var(--radius-md) !important; }}
+[data-testid="stAlert"] {{
+    border-radius: var(--r-md) !important;
+    background: rgba(26,30,54,0.90) !important;
+    border-color: rgba(124,92,252,0.28) !important;
+}}
 
 /* ── HR ── */
 hr {{
     border: none !important;
-    border-top: 1px solid rgba(196,181,253,0.22) !important;
+    border-top: 1px solid rgba(124,92,252,0.18) !important;
     margin: 1.4rem 0 !important;
 }}
 
 /* ── Column label ── */
 .col-label {{
-    font-size: 0.67rem;
+    font-size: 0.64rem;
     font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.12em;
+    color: {VIOLET_LT};
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     margin-bottom: 0.9rem;
     display: flex;
@@ -659,40 +701,40 @@ hr {{
     content: "";
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, rgba(129,140,248,0.22), transparent);
+    background: linear-gradient(90deg, rgba(124,92,252,0.35), transparent);
 }}
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar {{ width: 6px; height: 6px; }}
+::-webkit-scrollbar {{ width: 5px; height: 5px; }}
 ::-webkit-scrollbar-track {{ background: transparent; }}
 ::-webkit-scrollbar-thumb {{
-    background: rgba(129,140,248,0.22);
+    background: rgba(124,92,252,0.30);
     border-radius: 999px;
 }}
-::-webkit-scrollbar-thumb:hover {{ background: rgba(129,140,248,0.42); }}
+::-webkit-scrollbar-thumb:hover {{ background: rgba(124,92,252,0.55); }}
 
 /* ── Selection ── */
 ::selection {{
-    background: rgba(129,140,248,0.20);
-    color: var(--ink);
+    background: rgba(124,92,252,0.30);
+    color: {INK};
 }}
 </style>
 """, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────
-#  DECISION CONFIG  (unchanged)
+#  DECISION CONFIG
 # ─────────────────────────────────────────────────────────────
 DECISION_COLORS = {
     "Expand":   CHART_EXPAND,
     "Maintain": CHART_MAINTAIN,
-    "Optimize": CHART_ORANGE,
+    "Optimize": CHART_OPTIMIZE,
     "Drop":     CHART_DROP,
 }
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
 # ─────────────────────────────────────────────────────────────
-#  CHART HELPERS
+#  CHART HELPERS — dark theme aware
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
     fig, ax = plt.subplots(figsize=figsize)
@@ -707,21 +749,21 @@ def clean_fig(figsize=(8, 4)):
     ax.title.set_color(INK)
     ax.title.set_fontsize(11.5)
     ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color="#e2e8f8", linewidth=0.7, linestyle="-", alpha=0.85)
+    ax.grid(axis="y", color=BG_BORDER, linewidth=0.8, linestyle="-", alpha=0.70)
     ax.set_axisbelow(True)
     return fig, ax
 
 def col_seq(labels):
-    return [DECISION_COLORS.get(l, "#94a3b8") for l in labels]
+    return [DECISION_COLORS.get(l, "#64748b") for l in labels]
 
-def soften_bars(bars, alpha=0.88):
+def soften_bars(bars, alpha=0.90):
     for bar in bars:
         bar.set_alpha(alpha)
         bar.set_linewidth(0)
     return bars
 
 # ─────────────────────────────────────────────────────────────
-#  PATHS  (unchanged)
+#  PATHS
 # ─────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(__file__)
 DATA_PATH    = os.path.join(BASE_DIR, "airline_route_profitability.csv")
@@ -733,7 +775,7 @@ X2_COLS_PATH = os.path.join(BASE_DIR, "x2_columns.pkl")
 X3_COLS_PATH = os.path.join(BASE_DIR, "x3_columns.pkl")
 
 # ─────────────────────────────────────────────────────────────
-#  DATA & MODEL LOADING  (logic unchanged)
+#  DATA & MODEL LOADING
 # ─────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
@@ -773,13 +815,13 @@ def prepare_input(input_df, training_columns):
     return enc.reindex(columns=training_columns, fill_value=0)
 
 # ─────────────────────────────────────────────────────────────
-#  LOAD  (unchanged)
+#  LOAD
 # ─────────────────────────────────────────────────────────────
 df = load_data()
 model1, model2, model3, X1_columns, X2_columns, X3_columns = load_artifacts()
 
 # ─────────────────────────────────────────────────────────────
-#  PRE-COMPUTED DATA  (unchanged)
+#  PRE-COMPUTED
 # ─────────────────────────────────────────────────────────────
 comparison = pd.DataFrame({
     "Model":    ["With revenue variables", "Without revenue variables", "Only pre-operational features"],
@@ -810,8 +852,8 @@ if "pred_result" not in st.session_state:
 with st.sidebar:
     st.markdown('<div class="sidebar-brand">Airline<span> Route Intelligence</span> ✦</div>', unsafe_allow_html=True)
     st.markdown(
-        f"<p style='font-size:0.68rem;color:{ACCENT};margin-bottom:16px;"
-        "font-weight:700;letter-spacing:0.13em;text-transform:uppercase'>Filter View</p>",
+        f"<p style='font-size:0.65rem;color:{VIOLET_LT};margin-bottom:16px;"
+        "font-weight:700;letter-spacing:0.16em;text-transform:uppercase'>Filter View</p>",
         unsafe_allow_html=True,
     )
     route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
@@ -826,7 +868,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(f"""
-    <p style='font-size:0.66rem;color:{ACCENT};font-weight:700;letter-spacing:0.13em;
+    <p style='font-size:0.63rem;color:{VIOLET_LT};font-weight:700;letter-spacing:0.16em;
     text-transform:uppercase;margin-bottom:12px'>Decision labels</p>
     <div style='display:flex;flex-direction:column;gap:10px;font-size:0.82rem;color:{INK_SOFT}'>
       <div style='display:flex;align-items:center;gap:10px'>
@@ -845,7 +887,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
-#  FILTER  (logic unchanged)
+#  FILTER
 # ─────────────────────────────────────────────────────────────
 fdf = df.copy()
 if sel_route    != "All": fdf = fdf[fdf["Route"]          == sel_route]
@@ -854,13 +896,18 @@ if sel_season   != "All": fdf = fdf[fdf["Season"]         == sel_season]
 if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 
 # ─────────────────────────────────────────────────────────────
-#  HERO
+#  HERO  — with twinkling star particles
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
+  <!-- Star particles -->
+  <div class="star" style="top:18%;left:68%;--dur:2.8s;--delay:0.2s"></div>
+  <div class="star" style="top:72%;left:75%;--dur:3.5s;--delay:0.8s;width:2px;height:2px"></div>
+  <div class="star" style="top:35%;left:82%;--dur:4.1s;--delay:1.3s;width:2px;height:2px"></div>
+  <div class="star" style="top:55%;left:58%;--dur:2.4s;--delay:0.5s;width:4px;height:4px;opacity:0.10"></div>
   <div class="hero-left">
     <div class="hero-eyebrow">✦ Route Intelligence Platform</div>
-    <h1>Airline Profitability System Dashboard</h1>
+    <h1>Airline Profitability System</h1>
     <p>Sample airline dataset · for analysis &amp; demonstration only</p>
   </div>
   <div class="hero-badge">⚡ ML-Powered Decisions</div>
@@ -914,12 +961,12 @@ with tab1:
         dc = fdf["Route_Decision"].value_counts()
         dc = dc.reindex([x for x in ORDER if x in dc.index]).dropna()
         wc = {"Expand":CHART_EXPAND,"Maintain":CHART_MAINTAIN,
-              "Optimize":CHART_ORANGE,"Drop":CHART_DROP}
+              "Optimize":CHART_OPTIMIZE,"Drop":CHART_DROP}
         fig, ax = clean_fig((5, 4.8))
         wedges, texts, autotexts = ax.pie(
             dc.values, labels=dc.index, autopct="%1.1f%%",
             colors=[wc[l] for l in dc.index], startangle=90,
-            wedgeprops={"linewidth":3,"edgecolor":"white"},
+            wedgeprops={"linewidth":3,"edgecolor":BG_SURFACE},
             textprops={"color":INK,"fontsize":9.5},
             pctdistance=0.78,
         )
@@ -943,9 +990,9 @@ with tab1:
         st.dataframe(summary, use_container_width=True, hide_index=True)
         st.markdown("""
         <div class="info-box">
-          <strong>How to read this</strong><br>
+          <strong style="color:#a78bfa">How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
-          <strong>Expand</strong> routes should have the highest values across all three columns.
+          <strong style="color:#a78bfa">Expand</strong> routes should have the highest values across all three columns.
         </div>""", unsafe_allow_html=True)
 
 # ── TAB 2 · PERFORMANCE DRIVERS ──────────────────────────────
@@ -968,7 +1015,7 @@ with tab2:
             if h >= 0:
                 ty = h + pad; va = "bottom"; txt_color = INK_MUTED
             else:
-                ty = h * 0.5; va = "center"; txt_color = "white"
+                ty = h * 0.5; va = "center"; txt_color = INK_SOFT
             ax.text(x_pos, ty, f"${h:,.0f}",
                     ha="center", va=va, fontsize=8, color=txt_color, fontweight="700")
         ax.set_ylabel("Average Profit ($)")
@@ -1021,7 +1068,7 @@ with tab2:
                 va="center", fontsize=8, color=INK_MUTED, fontweight="700")
     ax.set_xlabel("Average Cost per Flight ($)")
     ax.set_title("Top Cost Drivers")
-    ax.grid(axis="x", color="#e2e8f8", linewidth=0.7, linestyle="-", alpha=0.85)
+    ax.grid(axis="x", color=BG_BORDER, linewidth=0.8, linestyle="-", alpha=0.70)
     ax.grid(axis="y", visible=False)
     st.pyplot(fig)
 
@@ -1053,7 +1100,7 @@ with tab3:
         soften_bars(bars)
         ax.set_xlabel("Total Profit ($)")
         ax.set_title("Top 10 Routes")
-        ax.grid(axis="x", color="#e2e8f8", linewidth=0.7, linestyle="-", alpha=0.85)
+        ax.grid(axis="x", color=BG_BORDER, linewidth=0.8, linestyle="-", alpha=0.70)
         ax.grid(axis="y", visible=False)
         st.pyplot(fig)
 
@@ -1067,7 +1114,7 @@ with tab3:
         soften_bars(bars)
         ax.set_xlabel("Total Profit ($)")
         ax.set_title("Bottom 10 Routes")
-        ax.grid(axis="x", color="#e2e8f8", linewidth=0.7, linestyle="-", alpha=0.85)
+        ax.grid(axis="x", color=BG_BORDER, linewidth=0.8, linestyle="-", alpha=0.70)
         ax.grid(axis="y", visible=False)
         st.pyplot(fig)
 
@@ -1099,8 +1146,8 @@ with tab4:
         .set_index("Route_Decision").reindex(ORDER).dropna()
     )
     bc_map = {"Expand":CHART_EXPAND,"Maintain":CHART_MAINTAIN,
-              "Optimize":CHART_ORANGE,"Drop":CHART_DROP}
-    bc = [bc_map.get(i,"#c4b5fd") for i in urbd.index]
+              "Optimize":CHART_OPTIMIZE,"Drop":CHART_DROP}
+    bc = [bc_map.get(i,"#64748b") for i in urbd.index]
     fig, ax = clean_fig((8, 4))
     vals4 = urbd["Unique Routes"].values.tolist()
     bars = ax.bar(urbd.index, vals4, color=bc, width=0.55)
@@ -1112,10 +1159,11 @@ with tab4:
     ax.set_title("Unique Routes per Decision Category")
     st.pyplot(fig)
 
-    patches = [mpatches.Patch(color=bc_map.get(d,"#c4b5fd"), label=d) for d in ORDER]
-    fig2, ax2 = plt.subplots(figsize=(5,0.5)); fig2.patch.set_alpha(0); ax2.axis("off")
+    patches = [mpatches.Patch(color=bc_map.get(d,"#64748b"), label=d) for d in ORDER]
+    fig2, ax2 = plt.subplots(figsize=(5,0.5))
+    fig2.patch.set_alpha(0); ax2.axis("off")
     ax2.legend(handles=patches, loc="center", frameon=False, ncol=4,
-               prop={"size":9}, labelcolor=INK)
+               prop={"size":9}, labelcolor=INK_SOFT)
     st.pyplot(fig2)
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
@@ -1128,8 +1176,8 @@ with tab5:
         "How accurate are the models?</p>", unsafe_allow_html=True)
     fig, ax = clean_fig((8, 3.5))
     x = np.arange(len(comparison)); w = 0.33
-    acc_col = "#c4b5fd"
-    f1_col  = "#bfdbfe"
+    acc_col = VIOLET_LT
+    f1_col  = COBALT_LT
     bars1 = ax.bar(x - w/2, comparison["Accuracy"], width=w, color=acc_col, label="Accuracy")
     bars2 = ax.bar(x + w/2, comparison["Macro F1"], width=w, color=f1_col,  label="Macro F1")
     soften_bars(bars1); soften_bars(bars2)
@@ -1139,7 +1187,7 @@ with tab5:
     for bar, f1 in zip(bars2, comparison["Macro F1"]):
         ax.text(bar.get_x()+bar.get_width()/2, f1+0.02, f"{f1:.0%}",
                 ha="center", fontsize=7.5, color=INK_MUTED, fontweight="700")
-    ax.legend(frameon=False, fontsize=9)
+    ax.legend(frameon=False, fontsize=9, labelcolor=INK_SOFT)
     ax.set_xticks(x)
     ax.set_xticklabels(comparison["Model"], fontsize=8.5, rotation=10)
     ax.set_ylim(0, 1.15)
@@ -1149,7 +1197,7 @@ with tab5:
 
     st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
-    st.markdown("""<div class="info-box">
+    st.markdown(f"""<div class="info-box">
     <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
     <span class='pill pill-optimize'>Cost-only</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
     <span class='pill pill-expand'>Pre-launch</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
@@ -1204,7 +1252,7 @@ with tab5:
 
         submitted = st.form_submit_button("✈  Get Route Decision")
 
-    # ── PREDICTION LOGIC  (unchanged) ────────────────────────
+    # ── PREDICTION LOGIC ─────────────────────────────────────
     if submitted:
         if model_choice == "With Revenue Variables":
             row = {
@@ -1244,7 +1292,7 @@ with tab5:
 
         st.session_state.pred_result = {"prediction":pred,"probabilities":prob,"classes":cls}
 
-    # ── RESULT DISPLAY ──
+    # ── RESULT DISPLAY ────────────────────────────────────────
     if st.session_state.pred_result is not None:
         res  = st.session_state.pred_result
         pred = res["prediction"]; prob = res["probabilities"]; cls = res["classes"]
@@ -1253,8 +1301,8 @@ with tab5:
                       "Optimize":"pill-optimize","Drop":"pill-drop"}
         result_cls = {"Expand":"result-expand","Maintain":"result-maintain",
                       "Optimize":"result-optimize","Drop":"result-drop"}
-        text_col   = {"Expand":"#1d4ed8","Maintain":"#047857",
-                      "Optimize":"#b45309","Drop":"#b91c1c"}
+        text_col   = {"Expand":CHART_EXPAND,"Maintain":CHART_MAINTAIN,
+                      "Optimize":CHART_OPTIMIZE,"Drop":CHART_DROP}
         explanations = {
             "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
             "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
@@ -1267,12 +1315,12 @@ with tab5:
           <div style='margin-bottom:10px'>
             <span class='pill {pill_cls.get(pred,"")}' style='font-size:0.68rem'>{pred}</span>
           </div>
-          <div style='font-family:"Fraunces",Georgia,serif;font-size:1.75rem;font-weight:600;
-                      color:{text_col.get(pred,INK)};margin-bottom:10px;letter-spacing:-0.025em'>
+          <div style='font-family:"Cinzel",serif;font-size:1.65rem;font-weight:500;
+                      color:{text_col.get(pred,INK)};margin-bottom:10px;letter-spacing:0.02em'>
             Suggested Decision: {pred}
           </div>
           <p style='color:{INK_SOFT};margin:0;font-size:0.90rem;line-height:1.76;
-                    font-family:"Sora",sans-serif'>
+                    font-family:"Outfit",sans-serif'>
             {explanations.get(pred,"")}
           </p>
         </div>""", unsafe_allow_html=True)
@@ -1286,7 +1334,7 @@ with tab5:
         bar_cp = {"Expand":CHART_EXPAND,"Maintain":CHART_MAINTAIN,
                   "Optimize":CHART_OPTIMIZE,"Drop":CHART_DROP}
         fig, ax = clean_fig((6, 3.5))
-        bar_colors = [bar_cp.get(d, "#94a3b8") for d in prob_df["Decision"]]
+        bar_colors = [bar_cp.get(d, "#64748b") for d in prob_df["Decision"]]
         probs = prob_df["Probability"].tolist()
         bars = ax.bar(prob_df["Decision"], probs, color=bar_colors, width=0.5)
         soften_bars(bars)
@@ -1303,7 +1351,7 @@ with tab5:
             use_container_width=True, hide_index=True)
 
 # ─────────────────────────────────────────────────────────────
-#  FILTERED DATA EXPANDER  (unchanged)
+#  FILTERED DATA EXPANDER
 # ─────────────────────────────────────────────────────────────
 with st.expander("🗂  Show filtered data"):
     st.dataframe(fdf, use_container_width=True)
@@ -1314,21 +1362,21 @@ with st.expander("🗂  Show filtered data"):
 st.markdown(f"""
 <div style='text-align:center;padding:44px 0 20px;'>
   <div style='display:inline-flex;align-items:center;gap:12px;
-              background:rgba(255,255,255,0.60);
-              border:1px solid rgba(196,181,253,0.20);
+              background:rgba(19,22,41,0.85);
+              border:1px solid rgba(124,92,252,0.25);
               border-radius:999px;
               padding:0.58rem 1.5rem;
               backdrop-filter:blur(12px);
-              box-shadow:0 4px 16px rgba(99,102,241,0.08);
-              font-family:"Sora",sans-serif;
+              box-shadow:0 4px 20px rgba(124,92,252,0.15),0 0 0 1px rgba(124,92,252,0.12);
+              font-family:"Outfit",sans-serif;
               font-size:0.70rem;
               font-weight:600;
               color:{INK_MUTED};
-              letter-spacing:0.10em;
+              letter-spacing:0.12em;
               text-transform:uppercase'>
-    <span style='color:{ACCENT};font-size:0.85rem'>✦</span>
+    <span style='color:{VIOLET_LT};font-size:0.85rem'>✦</span>
     Airline Profitability System
-    <span style='color:{ACCENT};font-size:0.85rem'>✦</span>
+    <span style='color:{PINK_LT};font-size:0.85rem'>✦</span>
     Built with Streamlit
   </div>
 </div>
