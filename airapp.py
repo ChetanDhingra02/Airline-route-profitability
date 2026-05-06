@@ -18,39 +18,35 @@ st.set_page_config(
 
 
 # ─────────────────────────────────────────────────────────────
-#  KINICH PALETTE — Light background, pixel-art inspired
-#  Colors pulled directly from Kinich's character art:
-#  • Forest/jade green  #1a5c3a / #2d7a4f
-#  • Electric lime      #a8e63d / #c8f03a
-#  • Warm gold          #d4a017 / #f0c040
-#  • Deep teal          #0f6b6b / #1d9a9a
-#  • Pixel chartreuse   #7ecb20
-#  • Parchment ivory    #f8f4e8  (main BG)
+#  JEWEL-TONE LIGHT PALETTE — Crystal / Genshin Impact Style
 # ─────────────────────────────────────────────────────────────
-BG_BASE      = "#f8f4e8"   # warm parchment — like Natlan stone
-BG_SOFT      = "#eef7ec"   # faint jade tint
-BG_COOL      = "#e8f5f0"   # teal whisper
+BG_BASE        = "#fdf9f4"          # warm pearl ivory
+BG_SOFT        = "#f5eeff"          # lavender tint
+BG_COOL        = "#eef5fd"          # sky tint
 
-GLASS_BG     = "rgba(248,244,232,0.78)"
-GLASS_BORDER = "rgba(45,122,79,0.30)"
+GLASS_BG       = "rgba(255, 252, 248, 0.72)"
+GLASS_BORDER   = "rgba(162, 106, 255, 0.28)"
 
-INK          = "#0f2d1a"   # deep forest black
-INK_SOFT     = "#2d5a3d"   # forest green mid
-INK_MUTED    = "#5a8a6a"   # muted jade
+INK            = "#1a0f3c"          # deep indigo-black
+INK_SOFT       = "#4a3278"          # violet ink mid
+INK_MUTED      = "#8b6faa"          # muted amethyst
 
-ACCENT       = "#1d7a4a"   # Kinich jade
-ACCENT_DK    = "#0f4a2a"   # deep forest
-ACCENT_LT    = "#a8e63d"   # electric lime highlight
-ACCENT_2     = "#d4a017"   # Natlan gold
-PIXEL_GREEN  = "#7ecb20"   # pixel art lime
-PIXEL_TEAL   = "#1d9a9a"   # teal
-MAGENTA_ACT  = "#c85a1a"   # warm amber-orange accent (Kinich arm cuffs)
+ACCENT         = "#7c3aed"          # vivid violet
+ACCENT_DK      = "#5b21b6"
+ACCENT_LT      = "#c4b5fd"
+ACCENT_2       = "#0284c7"          # sapphire
+MAGENTA        = "#db2777"          # ruby
 
-# Chart jewel tones — Kinich palette
-CHART_EXPAND   = "#1a7a3a"   # jade
-CHART_MAINTAIN = "#d4a017"   # gold
-CHART_OPTIMIZE = "#1d9a9a"   # teal
-CHART_DROP     = "#c85a1a"   # amber-warning
+# Jewel chart tones — maximum saturation
+CHART_EXPAND   = "#1d4ed8"          # deep sapphire
+CHART_MAINTAIN = "#047857"          # deep emerald
+CHART_OPTIMIZE = "#b45309"          # deep topaz
+CHART_ORANGE   = "#b45309"
+CHART_DROP     = "#be185d"          # deep ruby
+CHART_NEUTRAL  = [
+    "#6d28d9", "#1d4ed8", "#0e7490", "#047857",
+    "#be185d", "#b45309", "#15803d", "#71717a",
+]
 
 DECISION_COLORS = {
     "Expand":   CHART_EXPAND,
@@ -62,83 +58,90 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
 
 # ─────────────────────────────────────────────────────────────
-#  GLOBAL CSS — Kinich / Natlan aesthetic
+#  GLOBAL CSS
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@300;400;500;600;700;800&family=Oxanium:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {{
-    --parchment:   {BG_BASE};
-    --jade-soft:   {BG_SOFT};
-    --teal-soft:   {BG_COOL};
+    --pearl:       {BG_BASE};
+    --pearl-soft:  {BG_SOFT};
+    --pearl-cool:  {BG_COOL};
     --ink:         {INK};
     --ink-soft:    {INK_SOFT};
     --ink-muted:   {INK_MUTED};
     --accent:      {ACCENT};
     --accent-dk:   {ACCENT_DK};
     --accent-lt:   {ACCENT_LT};
-    --gold:        {ACCENT_2};
-    --pixel-green: {PIXEL_GREEN};
-    --teal:        {PIXEL_TEAL};
-    --r-sm: 4px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px;
-    --sh-sm: 0 2px 12px rgba(29,122,74,0.12), 0 1px 4px rgba(0,0,0,0.06);
-    --sh-md: 0 6px 24px rgba(29,122,74,0.18), 0 2px 8px rgba(0,0,0,0.08);
-    --sh-lg: 0 16px 48px rgba(29,122,74,0.22), 0 4px 16px rgba(0,0,0,0.10);
-    --pixel-border: 2px solid rgba(29,122,74,0.35);
-    --gold-border:  2px solid rgba(212,160,23,0.45);
+    --accent-2:    {ACCENT_2};
+    --magenta:     {MAGENTA};
+    --sapphire:    #1d4ed8;
+    --emerald:     #047857;
+    --topaz:       #b45309;
+    --ruby:        #be185d;
+    --amethyst:    #6d28d9;
+    --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+    --sh-sm: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+    --sh-md: 0 8px 32px rgba(120,70,200,0.16), 0 2px 8px rgba(0,0,0,0.08);
+    --sh-lg: 0 20px 56px rgba(120,70,200,0.22), 0 4px 16px rgba(0,0,0,0.10);
+    --sh-glow: 0 0 0 1px rgba(124,58,237,0.30), 0 0 28px rgba(124,58,237,0.18);
     --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
-    --pixel-size: 6px;
 }}
 
 /* ── Keyframes ── */
 @keyframes floatIn    {{ from {{ opacity:0; transform:translateY(18px); }} to {{ opacity:1; transform:translateY(0); }} }}
 @keyframes fadeUp     {{ from {{ opacity:0; transform:translateY(8px);  }} to {{ opacity:1; transform:translateY(0); }} }}
-@keyframes pixelDrift {{ 0%,100% {{ transform:translate(0,0); }} 33% {{ transform:translate(4px,-3px); }} 66% {{ transform:translate(-3px,4px); }} }}
-@keyframes goldPulse  {{ 0%,100% {{ box-shadow:0 0 0 2px rgba(212,160,23,0.20); }} 50% {{ box-shadow:0 0 0 4px rgba(212,160,23,0.45), 0 0 18px rgba(168,230,61,0.20); }} }}
-@keyframes scanPx     {{ 0% {{ left:-120%; }} 100% {{ left:220%; }} }}
-@keyframes checkFlash {{ 0%,100% {{ opacity:0.22; }} 50% {{ opacity:0.45; }} }}
-@keyframes pixelFloat {{ 0%,100% {{ transform:translateY(0) rotate(0deg); }} 50% {{ transform:translateY(-8px) rotate(3deg); }} }}
-@keyframes pixelPop   {{ 0% {{ transform:scale(0.7); opacity:0; }} 60% {{ transform:scale(1.08); }} 100% {{ transform:scale(1); opacity:1; }} }}
-@keyframes limeGlow   {{ 0%,100% {{ border-color:rgba(29,122,74,0.25); box-shadow:var(--sh-sm); }} 50% {{ border-color:rgba(168,230,61,0.50); box-shadow:var(--sh-sm), 0 0 14px rgba(168,230,61,0.22); }} }}
-@keyframes tileScroll {{ 0% {{ background-position:0 0; }} 100% {{ background-position:48px 48px; }} }}
-@keyframes shimmer    {{ 0% {{ left:-80%; }} 100% {{ left:180%; }} }}
-
-/* ── Pixel cursor ── */
-*, *::before, *::after {{ cursor: none !important; }}
-#kinich-cursor {{ position:fixed; top:0; left:0; pointer-events:none; z-index:999999; image-rendering:pixelated; }}
+@keyframes orbDrift1  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         50% {{ transform:translate(28px,-18px) scale(1.06); }} }}
+@keyframes orbDrift2  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         40% {{ transform:translate(-22px,16px) scale(1.08); }} }}
+@keyframes orbDrift3  {{ 0%,100% {{ transform:translate(-50%,-50%) scale(1); }}   60% {{ transform:translate(-50%,-50%) scale(1.10); }} }}
+@keyframes shimmer    {{ 0% {{ left:-80%; }} 100% {{ left:160%; }} }}
+@keyframes pulseRing  {{ 0%,100% {{ box-shadow: var(--sh-sm); }} 50% {{ box-shadow: var(--sh-glow); }} }}
+@keyframes scanLine   {{ 0% {{ top:-4px; opacity:0; }} 5% {{ opacity:0.8; }} 95% {{ opacity:0.4; }} 100% {{ top:100%; opacity:0; }} }}
+@keyframes twinkle    {{ 0%,100% {{ opacity:0; transform:scale(0.4); }} 50% {{ opacity:1; transform:scale(1); }} }}
+@keyframes badgePop   {{ 0% {{ transform:scale(0.8); opacity:0; }} 60% {{ transform:scale(1.05); }} 100% {{ transform:scale(1); opacity:1; }} }}
+@keyframes borderFlow {{ 0%,100% {{ border-color:rgba(124,58,237,0.18); }} 50% {{ border-color:rgba(124,58,237,0.45); }} }}
+@keyframes crystalFloat {{ 0%,100% {{ transform:translateY(0) rotate(0deg); }} 50% {{ transform:translateY(-6px) rotate(2deg); }} }}
+@keyframes particleFly  {{ 0%   {{ opacity:0; transform:scale(0.3) translateY(0); }}
+                           30%  {{ opacity:1; }}
+                           100% {{ opacity:0; transform:scale(1.2) translateY(-20px); }} }}
 
 html, body, [class*="css"] {{
-    font-family: 'Nunito', system-ui, sans-serif !important;
+    font-family: 'DM Sans', system-ui, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     color: {INK} !important;
 }}
 
-/* ── App background — warm parchment with pixel tile texture ── */
+
+/* ── App background — warm pearl with chromatic orbs ── */
 .stApp {{
     min-height: 100vh;
     background:
-        radial-gradient(ellipse at 8% 15%,  rgba(126,203,32,0.12) 0, transparent 32%),
-        radial-gradient(ellipse at 88% 10%,  rgba(29,154,154,0.10) 0, transparent 28%),
-        radial-gradient(ellipse at 55% 90%,  rgba(212,160,23,0.10) 0, transparent 30%),
-        radial-gradient(ellipse at 20% 78%,  rgba(29,122,74,0.08) 0, transparent 26%),
-        linear-gradient(160deg, #f8f4e8 0%, #f0f7ea 35%, #e8f5f0 65%, #f8f4e8 100%);
+        radial-gradient(ellipse at 14% 18%, rgba(162,106,255,0.16) 0, transparent 34%),
+        radial-gradient(ellipse at 84% 12%, rgba(56,189,248,0.13) 0, transparent 30%),
+        radial-gradient(ellipse at 62% 88%, rgba(219,39,119,0.09) 0, transparent 28%),
+        radial-gradient(ellipse at 32% 72%, rgba(5,150,105,0.08) 0, transparent 26%),
+        radial-gradient(ellipse at 76% 54%, rgba(180,83,9,0.06) 0, transparent 22%),
+        linear-gradient(155deg, #fdf9f4 0%, #f7f0ff 28%, #eef5fd 56%, #f0fdf8 80%, #fdf9f4 100%);
     background-attachment: fixed;
 }}
 
-/* Subtle pixel checkerboard overlay (very faint) */
+/* ── Ambient orbs ── */
 .stApp::before {{
     content:"";
-    position:fixed; inset:0;
-    background-image:
-        linear-gradient(45deg, rgba(29,122,74,0.025) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(29,122,74,0.025) 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, rgba(29,122,74,0.025) 75%),
-        linear-gradient(-45deg, transparent 75%, rgba(29,122,74,0.025) 75%);
-    background-size: 16px 16px;
-    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    position:fixed; top:-120px; left:-120px;
+    width:480px; height:480px; border-radius:50%;
+    background:radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
+    animation:orbDrift1 20s ease-in-out infinite;
     pointer-events:none; z-index:0;
-    animation: tileScroll 8s linear infinite;
+}}
+.stApp::after {{
+    content:"";
+    position:fixed; bottom:-100px; right:-100px;
+    width:400px; height:400px; border-radius:50%;
+    background:radial-gradient(circle, rgba(2,132,199,0.12) 0%, transparent 70%);
+    animation:orbDrift2 26s ease-in-out infinite;
+    pointer-events:none; z-index:0;
 }}
 
 .main .block-container {{
@@ -152,32 +155,33 @@ section.main > div {{ background: transparent; }}
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {{
-    background: rgba(240,247,234,0.95) !important;
-    border-right: 3px solid rgba(29,122,74,0.30) !important;
-    backdrop-filter: blur(20px) !important;
-    box-shadow: 4px 0 24px rgba(29,122,74,0.10) !important;
+    background: rgba(253,249,244,0.90) !important;
+    border-right: 1px solid rgba(124,58,237,0.18) !important;
+    backdrop-filter: blur(24px) saturate(1.5) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(1.5) !important;
+    box-shadow: 4px 0 32px rgba(124,58,237,0.08) !important;
 }}
 [data-testid="stSidebar"] * {{ color: {INK_SOFT} !important; }}
 
 .sidebar-brand {{
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.72rem; font-weight: 400;
-    color: {INK}; letter-spacing: 0.04em;
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem; font-weight: 700;
+    color: {INK}; letter-spacing: 0.06em;
     padding: 0.2rem 0 1rem 0;
-    border-bottom: 2px solid rgba(212,160,23,0.40);
-    margin-bottom: 1rem;
-    line-height: 1.8;
+    border-bottom: 1px solid rgba(124,58,237,0.18);
+    margin-bottom: 1rem; text-transform: uppercase;
 }}
 .sidebar-brand span {{
-    color: {ACCENT_2};
+    background: linear-gradient(135deg, {ACCENT}, {ACCENT_2});
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }}
 
 /* ── Headings ── */
 h1,h2,h3,h4 {{
-    font-family: 'Oxanium', sans-serif !important;
+    font-family: 'Cinzel', serif !important;
     color: {INK} !important;
-    letter-spacing: 0.06em !important;
-    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    font-weight: 600 !important;
     text-transform: uppercase !important;
 }}
 
@@ -185,553 +189,533 @@ h1,h2,h3,h4 {{
 .hero {{
     position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: space-between; gap: 1.2rem;
-    border-radius: var(--r-md);
+    border-radius: var(--r-xl);
     padding: 2rem 2.4rem; margin-bottom: 1.4rem;
     background: linear-gradient(140deg,
-        rgba(240,247,234,0.95) 0%,
-        rgba(232,245,240,0.90) 50%,
-        rgba(248,244,232,0.95) 100%);
-    border: 2px solid rgba(212,160,23,0.40);
-    box-shadow: var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.90);
-    animation: goldPulse 4s ease-in-out infinite;
+        rgba(255,252,248,0.88) 0%,
+        rgba(245,238,255,0.80) 50%,
+        rgba(238,245,253,0.75) 100%);
+    border: 1px solid rgba(124,58,237,0.28);
+    backdrop-filter: blur(24px) saturate(1.6);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    box-shadow: var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.9);
+    animation: pulseRing 5s ease-in-out infinite;
+    transition: transform 280ms var(--ease);
 }}
-
-/* Pixel checkerboard border corners */
+.hero:hover {{ transform: translateY(-3px); }}
 .hero::before {{
     content:"";
-    position:absolute; top:0; left:0; right:0; height:4px;
-    background: repeating-linear-gradient(
-        90deg,
-        {ACCENT}   0px,  {ACCENT}   8px,
-        {ACCENT_2} 8px,  {ACCENT_2} 16px,
-        {PIXEL_GREEN} 16px, {PIXEL_GREEN} 24px,
-        {PIXEL_TEAL}  24px, {PIXEL_TEAL}  32px
-    );
-    opacity: 0.85;
+    position:absolute; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,
+        transparent 0%,
+        rgba(124,58,237,0) 10%,
+        rgba(124,58,237,0.6) 45%,
+        rgba(2,132,199,0.5) 55%,
+        rgba(124,58,237,0) 90%, transparent 100%);
+    animation: scanLine 6s linear infinite; pointer-events:none; z-index:5;
 }}
 .hero::after {{
     content:"";
-    position:absolute; bottom:0; left:0; right:0; height:3px;
-    background: repeating-linear-gradient(
-        90deg,
-        {ACCENT_2} 0px,  {ACCENT_2} 8px,
-        {ACCENT}   8px,  {ACCENT}   16px,
-        {PIXEL_TEAL}  16px, {PIXEL_TEAL}  24px,
-        {PIXEL_GREEN} 24px, {PIXEL_GREEN} 32px
-    );
-    opacity: 0.60;
+    position:absolute; top:-60px; right:-60px;
+    width:240px; height:240px; border-radius:50%;
+    background:radial-gradient(circle, rgba(2,132,199,0.16) 0%, transparent 70%);
+    animation: orbDrift3 14s ease-in-out infinite; pointer-events:none;
 }}
-
+.hero-star {{ position:absolute; width:3px; height:3px; border-radius:50%; pointer-events:none; }}
+.hero-star:nth-child(1) {{ top:20%; left:46%; background:rgba(124,58,237,0.7); animation:twinkle 3.0s ease-in-out infinite; }}
+.hero-star:nth-child(2) {{ top:68%; left:63%; background:rgba(2,132,199,0.7); animation:twinkle 4.0s ease-in-out infinite 0.8s; }}
+.hero-star:nth-child(3) {{ top:38%; left:78%; background:rgba(219,39,119,0.6); animation:twinkle 2.8s ease-in-out infinite 1.5s; }}
+.hero-star:nth-child(4) {{ top:80%; left:32%; background:rgba(5,150,105,0.6); animation:twinkle 3.5s ease-in-out infinite 0.4s; width:4px; height:4px; }}
 .hero-left,.hero-badge,.hero-glyph {{ position:relative; z-index:1; }}
 .hero-left {{ flex:1; min-width:0; }}
 .hero-eyebrow {{
-    font-family:'Press Start 2P',monospace;
-    font-size:0.46rem; letter-spacing:0.14em;
-    color:{ACCENT}; font-weight:400; margin-bottom:0.6rem;
+    font-size:0.59rem; text-transform:uppercase; letter-spacing:0.22em;
+    color:{ACCENT}; font-weight:700; margin-bottom:0.5rem; font-family:'DM Sans',sans-serif;
 }}
 .hero h1 {{
     margin:0 0 0.4rem 0 !important;
-    font-size:1.80rem !important; line-height:1.2 !important;
-    background: linear-gradient(135deg, {INK} 0%, {ACCENT} 45%, {ACCENT_2} 100%);
+    font-size:1.90rem !important; line-height:1.2 !important;
+    background: linear-gradient(135deg, {INK} 0%, {ACCENT} 60%, {ACCENT_2} 100%);
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
     text-shadow:none !important;
 }}
-.hero p {{
-    margin:0; color:{INK_SOFT} !important; font-size:0.86rem !important;
-    font-family:'Nunito',sans-serif !important; text-transform:none !important;
-    letter-spacing:0 !important; font-weight:500 !important;
-}}
+.hero p {{ margin:0; color:{INK_SOFT} !important; font-size:0.86rem !important;
+           font-family:'DM Sans',sans-serif !important; text-transform:none !important;
+           letter-spacing:0 !important; font-weight:400 !important; }}
 .hero-badge {{
     display:inline-flex; align-items:center; gap:0.5rem;
-    padding:0.5rem 1rem; border-radius:2px;
-    border:2px solid rgba(212,160,23,0.55);
-    background:linear-gradient(135deg,rgba(212,160,23,0.14),rgba(29,122,74,0.10));
-    color:{ACCENT_2}; font-size:0.50rem; font-weight:400;
-    letter-spacing:0.08em; text-transform:uppercase; font-family:'Press Start 2P',monospace;
-    box-shadow:0 4px 14px rgba(212,160,23,0.18);
-    animation: pixelPop 600ms ease-out 200ms both;
-    white-space:nowrap;
-    image-rendering:pixelated;
+    padding:0.6rem 1.1rem; border-radius:999px;
+    border:1px solid rgba(219,39,119,0.45);
+    background:linear-gradient(135deg,rgba(219,39,119,0.10),rgba(124,58,237,0.10));
+    color:{MAGENTA}; font-size:0.70rem; font-weight:700;
+    letter-spacing:0.08em; text-transform:uppercase; font-family:'DM Sans',sans-serif;
+    box-shadow:0 4px 18px rgba(219,39,119,0.15), 0 0 0 1px rgba(219,39,119,0.15);
+    animation:badgePop 700ms ease-out 250ms both;
+    white-space:nowrap; transition:transform 180ms var(--ease), box-shadow 180ms var(--ease);
 }}
+.hero-badge:hover {{ transform:translateY(-3px) scale(1.04); box-shadow:0 8px 26px rgba(219,39,119,0.28); }}
 .hero-glyph {{
-    font-size:3.5rem; opacity:0.10; color:{ACCENT};
-    animation:pixelFloat 5s ease-in-out infinite;
-    font-family:'Press Start 2P',monospace;
+    font-size:3rem; opacity:0.12; color:{ACCENT};
+    animation:crystalFloat 6s ease-in-out infinite;
 }}
 
 /* ── Metric cards ── */
 [data-testid="metric-container"] {{
     background: linear-gradient(155deg,
-        rgba(240,247,234,0.90) 0%, rgba(232,245,240,0.82) 100%) !important;
-    border: 2px solid rgba(29,122,74,0.22) !important;
-    border-radius: var(--r-sm) !important;
-    box-shadow: var(--sh-sm) !important;
+        rgba(255,252,248,0.85) 0%, rgba(248,244,255,0.75) 100%) !important;
+    border: 1px solid rgba(124,58,237,0.20) !important;
+    border-radius: var(--r-md) !important;
+    backdrop-filter: blur(16px) saturate(1.4) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
+    box-shadow: var(--sh-sm), inset 0 1px 0 rgba(255,255,255,0.95) !important;
     padding: 1.1rem 1.2rem !important;
     transition: transform 200ms var(--ease), box-shadow 200ms var(--ease) !important;
     position:relative; overflow:hidden;
-    animation: limeGlow 5s ease-in-out infinite;
-    image-rendering:pixelated;
-}}
-/* Pixel corner accent */
-[data-testid="metric-container"]::before {{
-    content:""; position:absolute; top:0; left:0;
-    width:8px; height:8px;
-    background:{ACCENT_2}; opacity:0.75;
+    animation: borderFlow 6s ease-in-out infinite;
 }}
 [data-testid="metric-container"]::after {{
-    content:""; position:absolute; bottom:0; right:0;
-    width:8px; height:8px;
-    background:{ACCENT}; opacity:0.50;
+    content:""; position:absolute; top:0; left:-80%; width:50%; height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent);
+    transition:left 0.55s ease; pointer-events:none;
 }}
 [data-testid="metric-container"]:hover {{
-    transform:translateY(-4px) scale(1.02) !important;
-    box-shadow:var(--sh-md), 0 0 0 2px rgba(168,230,61,0.45) !important;
+    transform:translateY(-5px) scale(1.02) !important;
+    box-shadow:var(--sh-md), 0 0 0 1px rgba(124,58,237,0.35), inset 0 1px 0 rgba(255,255,255,0.95) !important;
 }}
+[data-testid="metric-container"]:hover::after {{ left:160%; }}
 [data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
-    font-size:0.56rem !important; font-weight:400 !important;
-    text-transform:uppercase !important; letter-spacing:0.14em !important;
-    color:{ACCENT} !important; font-family:'Press Start 2P',monospace !important;
-    line-height:1.6 !important;
+    font-size:0.60rem !important; font-weight:700 !important;
+    text-transform:uppercase !important; letter-spacing:0.16em !important;
+    color:{ACCENT} !important; font-family:'DM Sans',sans-serif !important;
 }}
 [data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
-    color:{INK} !important; font-size:1.80rem !important; font-weight:700 !important;
-    font-family:'Oxanium',sans-serif !important;
+    color:{INK} !important; font-size:1.90rem !important; font-weight:700 !important;
+    letter-spacing:-0.02em !important; font-family:'Cinzel',serif !important;
 }}
 
 /* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {{
     gap:0.22rem;
-    background:rgba(240,247,234,0.85);
-    border:2px solid rgba(29,122,74,0.22);
-    border-radius:4px; padding:0.28rem;
+    background:rgba(255,252,248,0.80);
+    border:1px solid rgba(124,58,237,0.20);
+    border-radius:20px; padding:0.30rem;
+    backdrop-filter:blur(16px);
     box-shadow:var(--sh-sm);
 }}
 .stTabs [data-baseweb="tab"] {{
     height:40px; padding:0 1rem !important;
-    border-radius:2px !important;
+    border-radius:14px !important;
     color:{INK_MUTED} !important;
-    font-size:0.66rem !important; font-weight:400 !important;
-    font-family:'Press Start 2P',monospace !important;
-    background:transparent !important; letter-spacing:0.02em !important;
-    transition:background 180ms, color 180ms !important;
+    font-size:0.79rem !important; font-weight:600 !important;
+    font-family:'DM Sans',sans-serif !important;
+    background:transparent !important; letter-spacing:0.03em !important;
+    transition:background 180ms, color 180ms, transform 180ms !important;
 }}
 .stTabs [data-baseweb="tab"]:hover {{
-    background:rgba(29,122,74,0.10) !important; color:{ACCENT} !important;
+    background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important;
+    transform:translateY(-1px) !important;
 }}
 .stTabs [aria-selected="true"] {{
-    background:linear-gradient(135deg,rgba(29,122,74,0.16),rgba(212,160,23,0.12)) !important;
+    background:linear-gradient(135deg,rgba(124,58,237,0.14),rgba(2,132,199,0.10)) !important;
     color:{INK} !important;
-    box-shadow:0 4px 12px rgba(29,122,74,0.16), inset 0 0 0 2px rgba(212,160,23,0.35) !important;
+    box-shadow:0 4px 14px rgba(124,58,237,0.14), inset 0 0 0 1px rgba(124,58,237,0.28) !important;
 }}
 .stTabs [data-baseweb="tab-panel"] {{ padding-top:1.5rem; }}
 
 /* ── Section headings ── */
 .section-hd {{
-    font-family:'Oxanium',sans-serif; font-size:0.95rem; font-weight:700;
-    color:{INK}; margin:0 0 0.28rem 0; letter-spacing:0.06em; text-transform:uppercase;
+    font-family:'Cinzel',serif; font-size:1.02rem; font-weight:600;
+    color:{INK}; margin:0 0 0.28rem 0; letter-spacing:0.05em; text-transform:uppercase;
 }}
 .section-sub {{
-    font-size:0.84rem; color:{INK_MUTED}; margin:0 0 1.1rem 0; line-height:1.65;
-    font-family:'Nunito',sans-serif; font-weight:500;
+    font-size:0.83rem; color:{INK_MUTED}; margin:0 0 1.1rem 0; line-height:1.65;
+    font-family:'DM Sans',sans-serif; font-weight:400; text-transform:none; letter-spacing:0;
 }}
 
 /* ── Divider label ── */
 .divider-label {{
     display:flex; align-items:center; gap:0.7rem; margin:1.5rem 0 1rem 0;
-    font-size:0.50rem; font-weight:400; text-transform:uppercase; letter-spacing:0.20em;
-    color:{ACCENT_2}; font-family:'Press Start 2P',monospace;
+    font-size:0.59rem; font-weight:700; text-transform:uppercase; letter-spacing:0.20em;
+    color:{ACCENT}; font-family:'DM Sans',sans-serif;
 }}
 .divider-label::before,.divider-label::after {{
-    content:""; flex:1; height:2px;
-    background: repeating-linear-gradient(
-        90deg, {ACCENT} 0, {ACCENT} 4px, transparent 4px, transparent 8px
-    );
-    opacity: 0.40;
+    content:""; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(124,58,237,0.28),transparent);
 }}
 
 /* ── Info box ── */
 .info-box {{
-    background:linear-gradient(155deg,rgba(240,247,234,0.90),rgba(232,245,240,0.80));
-    border:2px solid rgba(29,122,74,0.22);
-    border-left:4px solid {ACCENT_2};
-    border-radius:var(--r-sm); padding:1rem 1.1rem;
-    color:{INK_SOFT}; line-height:1.80; box-shadow:var(--sh-sm);
-    font-size:0.86rem; font-family:'Nunito',sans-serif;
+    background:linear-gradient(155deg,rgba(255,252,248,0.85),rgba(248,244,255,0.75));
+    border:1px solid rgba(124,58,237,0.18);
+    border-radius:var(--r-md); padding:1rem 1.1rem;
+    color:{INK_SOFT}; line-height:1.75; box-shadow:var(--sh-sm);
+    font-size:0.86rem; font-family:'DM Sans',sans-serif;
+    transition:transform 200ms, box-shadow 200ms;
 }}
+.info-box:hover {{ transform:translateY(-2px); box-shadow:var(--sh-md); }}
 
 /* ── Pills ── */
 .pill {{
-    display:inline-block; padding:0.22rem 0.65rem; border-radius:2px;
-    font-size:0.48rem; font-weight:400; letter-spacing:0.08em; text-transform:uppercase;
-    font-family:'Press Start 2P',monospace; border:2px solid transparent;
-    image-rendering:pixelated;
+    display:inline-block; padding:0.25rem 0.72rem; border-radius:999px;
+    font-size:0.61rem; font-weight:700; letter-spacing:0.10em; text-transform:uppercase;
+    font-family:'DM Sans',sans-serif; border:1px solid transparent;
+    transition:transform 180ms; cursor:default;
 }}
-.pill-expand   {{ background:rgba(26,122,58,0.12);  color:{CHART_EXPAND};   border-color:rgba(26,122,58,0.35); }}
-.pill-maintain {{ background:rgba(212,160,23,0.12); color:{CHART_MAINTAIN}; border-color:rgba(212,160,23,0.38); }}
-.pill-optimize {{ background:rgba(29,154,154,0.12); color:{CHART_OPTIMIZE}; border-color:rgba(29,154,154,0.35); }}
-.pill-drop     {{ background:rgba(200,90,26,0.12);  color:{CHART_DROP};    border-color:rgba(200,90,26,0.35); }}
+.pill:hover {{ transform:scale(1.06); }}
+.pill-expand   {{ background:rgba(29,78,216,0.10); color:#1d4ed8; border-color:rgba(29,78,216,0.30); }}
+.pill-maintain {{ background:rgba(4,120,87,0.10);  color:#047857; border-color:rgba(4,120,87,0.28); }}
+.pill-optimize {{ background:rgba(180,83,9,0.10);  color:#b45309; border-color:rgba(180,83,9,0.26); }}
+.pill-drop     {{ background:rgba(190,24,93,0.10); color:#be185d; border-color:rgba(190,24,93,0.28); }}
 
 /* ── Result card ── */
 .result-card {{
-    border-radius:var(--r-md); padding:1.5rem 1.6rem; margin:1.2rem 0;
-    border:2px solid rgba(29,122,74,0.25);
-    box-shadow:var(--sh-md);
-    animation:fadeUp 380ms ease-out;
-    position:relative; overflow:hidden;
+    border-radius:var(--r-lg); padding:1.5rem 1.6rem; margin:1.2rem 0;
+    border:1px solid rgba(124,58,237,0.22); box-shadow:var(--sh-md);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    animation:fadeUp 380ms ease-out; transition:transform 280ms, box-shadow 280ms;
 }}
-.result-card::before {{
-    content:""; position:absolute; top:0; left:0; right:0; height:4px;
-    background: repeating-linear-gradient(
-        90deg, var(--card-accent) 0, var(--card-accent) 6px,
-        transparent 6px, transparent 12px
-    );
-}}
-.result-expand   {{ background:linear-gradient(140deg,rgba(220,245,225,0.90),rgba(248,244,232,0.92)); border-left:5px solid {CHART_EXPAND};   --card-accent:{CHART_EXPAND}; }}
-.result-maintain {{ background:linear-gradient(140deg,rgba(255,245,200,0.90),rgba(248,244,232,0.92)); border-left:5px solid {CHART_MAINTAIN}; --card-accent:{CHART_MAINTAIN}; }}
-.result-optimize {{ background:linear-gradient(140deg,rgba(200,240,240,0.90),rgba(248,244,232,0.92)); border-left:5px solid {CHART_OPTIMIZE}; --card-accent:{CHART_OPTIMIZE}; }}
-.result-drop     {{ background:linear-gradient(140deg,rgba(255,225,200,0.90),rgba(248,244,232,0.92)); border-left:5px solid {CHART_DROP};     --card-accent:{CHART_DROP}; }}
+.result-card:hover {{ transform:translateY(-4px); box-shadow:var(--sh-lg); }}
+.result-expand   {{ background:linear-gradient(140deg,rgba(219,234,254,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_EXPAND}; }}
+.result-maintain {{ background:linear-gradient(140deg,rgba(209,250,229,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_MAINTAIN}; }}
+.result-optimize {{ background:linear-gradient(140deg,rgba(254,243,199,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_OPTIMIZE}; }}
+.result-drop     {{ background:linear-gradient(140deg,rgba(252,231,243,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_DROP}; }}
 
 /* ── Form inputs ── */
 .stSelectbox label,.stNumberInput label,.stSlider label,
 .stRadio label,.stCheckbox label,.stTextInput label {{
-    color:{INK_SOFT} !important; font-weight:400 !important; font-size:0.55rem !important;
-    letter-spacing:0.08em !important; text-transform:uppercase !important;
-    font-family:'Press Start 2P',monospace !important; line-height:1.8 !important;
+    color:{INK_SOFT} !important; font-weight:600 !important; font-size:0.73rem !important;
+    letter-spacing:0.06em !important; text-transform:uppercase !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 .stSelectbox [data-baseweb="select"] > div,
 .stTextInput input,.stNumberInput input {{
-    background:rgba(248,252,245,0.92) !important;
-    border:2px solid rgba(29,122,74,0.28) !important;
-    border-radius:2px !important; color:{INK} !important;
+    background:rgba(255,252,248,0.85) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-sm) !important; color:{INK} !important;
     min-height:42px !important; box-shadow:none !important;
-    transition:border-color 180ms !important;
-    font-family:'Nunito',sans-serif !important;
+    transition:border-color 180ms, box-shadow 180ms !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
-.stSelectbox [data-baseweb="select"] > div:hover {{ border-color:rgba(212,160,23,0.55) !important; }}
-.stSelectbox [data-baseweb="select"] > div:focus-within {{ border-color:{ACCENT} !important; box-shadow:0 0 0 3px rgba(29,122,74,0.14) !important; }}
+.stSelectbox [data-baseweb="select"] > div:hover,
+.stTextInput input:hover,.stNumberInput input:hover {{
+    border-color:rgba(124,58,237,0.45) !important;
+}}
+.stSelectbox [data-baseweb="select"] > div:focus-within,
+.stTextInput input:focus,.stNumberInput input:focus {{
+    border-color:rgba(124,58,237,0.70) !important;
+    box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important;
+}}
 [data-baseweb="menu"] {{
-    background:rgba(248,252,245,0.98) !important;
-    border:2px solid rgba(29,122,74,0.28) !important;
-    border-radius:2px !important; box-shadow:var(--sh-md) !important;
+    background:rgba(255,252,248,0.96) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-sm) !important;
+    box-shadow:var(--sh-md) !important;
 }}
 [data-baseweb="menu"] li {{ color:{INK_SOFT} !important; }}
-[data-baseweb="menu"] li:hover {{ background:rgba(29,122,74,0.10) !important; color:{ACCENT} !important; }}
+[data-baseweb="menu"] li:hover {{ background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important; }}
 
 /* ── Form card ── */
 [data-testid="stForm"] {{
-    background:linear-gradient(155deg,rgba(240,247,234,0.92),rgba(248,252,245,0.88)) !important;
-    border:2px solid rgba(29,122,74,0.28) !important;
-    border-radius:var(--r-md) !important; padding:1.5rem 1.6rem 1.8rem !important;
-    box-shadow:var(--sh-md) !important;
+    background:linear-gradient(155deg,rgba(255,252,248,0.88),rgba(248,244,255,0.80)) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-lg) !important; padding:1.5rem 1.6rem 1.8rem !important;
+    box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.90) !important;
+    backdrop-filter:blur(20px) !important;
+    animation:borderFlow 7s ease-in-out infinite !important;
 }}
 
 /* ── Buttons ── */
 [data-testid="stFormSubmitButton"] > button, .stButton > button {{
-    border-radius:2px !important; font-weight:400 !important; border:2px solid transparent !important;
-    font-family:'Press Start 2P',monospace !important; letter-spacing:0.06em !important;
-    text-transform:uppercase !important; font-size:0.52rem !important;
+    border-radius:var(--r-sm) !important; font-weight:700 !important; border:none !important;
+    font-family:'DM Sans',sans-serif !important; letter-spacing:0.08em !important;
+    text-transform:uppercase !important; font-size:0.81rem !important;
     transition:transform 180ms, box-shadow 180ms !important;
-    image-rendering:pixelated;
+    position:relative; overflow:hidden;
 }}
 [data-testid="stFormSubmitButton"] > button {{
-    width:100% !important; padding:0.85rem 0 !important;
+    width:100% !important;
     background:linear-gradient(135deg,{ACCENT},{ACCENT_DK}) !important;
-    border-color:{ACCENT_LT} !important;
-    box-shadow:0 6px 20px rgba(29,122,74,0.35), 4px 4px 0 rgba(15,74,42,0.55) !important;
-    color:white !important;
+    box-shadow:0 8px 26px rgba(124,58,237,0.35), 0 0 0 1px rgba(124,58,237,0.30) !important;
+    color:white !important; padding:0.72rem 0 !important;
 }}
 [data-testid="stFormSubmitButton"] > button:hover {{
-    transform:translate(-2px,-2px) !important;
-    box-shadow:0 10px 28px rgba(29,122,74,0.45), 6px 6px 0 rgba(15,74,42,0.55) !important;
+    transform:translateY(-2px) !important;
+    box-shadow:0 14px 36px rgba(124,58,237,0.50) !important;
 }}
-[data-testid="stFormSubmitButton"] > button:active {{
-    transform:translate(2px,2px) !important;
-    box-shadow:2px 2px 0 rgba(15,74,42,0.55) !important;
-}}
+[data-testid="stFormSubmitButton"] > button:active {{ transform:translateY(0) scale(0.98) !important; }}
 .stButton > button {{
-    background:rgba(248,252,245,0.90) !important; color:{INK_SOFT} !important;
-    border-color:rgba(29,122,74,0.30) !important;
-    box-shadow:var(--sh-sm), 3px 3px 0 rgba(29,122,74,0.20) !important;
+    background:rgba(255,252,248,0.85) !important; color:{INK_SOFT} !important;
+    border:1px solid rgba(124,58,237,0.22) !important; box-shadow:var(--sh-sm) !important;
 }}
 .stButton > button:hover {{
-    color:{ACCENT} !important;
-    transform:translate(-2px,-2px) !important;
-    box-shadow:var(--sh-md), 5px 5px 0 rgba(29,122,74,0.28) !important;
+    background:rgba(248,244,255,0.95) !important; color:{ACCENT} !important;
+    transform:translateY(-2px) !important; box-shadow:var(--sh-md) !important;
 }}
 
 /* ── DataFrames ── */
 [data-testid="stDataFrame"] {{
-    background:rgba(240,247,234,0.85) !important;
-    border:2px solid rgba(29,122,74,0.22) !important;
-    border-radius:var(--r-sm) !important; overflow:hidden !important;
-    box-shadow:var(--sh-sm) !important;
+    background:rgba(255,252,248,0.80) !important;
+    border:1px solid rgba(124,58,237,0.18) !important;
+    border-radius:var(--r-md) !important; overflow:hidden !important;
+    box-shadow:var(--sh-sm) !important; backdrop-filter:blur(14px) !important;
+    transition:transform 280ms, box-shadow 280ms !important;
 }}
+[data-testid="stDataFrame"]:hover {{
+    transform:translateY(-3px) !important; box-shadow:var(--sh-md) !important;
+}}
+[data-testid="stDataFrame"] [role="grid"] {{ background:transparent !important; }}
+[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{ color:{INK_SOFT} !important; }}
 [data-testid="stDataFrame"] [role="columnheader"] {{
-    background:rgba(29,122,74,0.10) !important; color:{ACCENT} !important;
-    font-weight:700 !important; font-size:0.72rem !important;
-    letter-spacing:0.08em !important; text-transform:uppercase !important;
-    border-bottom:2px solid rgba(212,160,23,0.35) !important;
-    font-family:'Oxanium',sans-serif !important;
+    background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important;
+    font-weight:700 !important; font-size:0.71rem !important;
+    letter-spacing:0.10em !important; text-transform:uppercase !important;
+    border-bottom:1px solid rgba(124,58,237,0.16) !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 [data-testid="stDataFrame"] [role="gridcell"] {{
-    border-bottom:1px solid rgba(29,122,74,0.08) !important;
+    border-bottom:1px solid rgba(124,58,237,0.08) !important;
 }}
 
 /* ── Expander ── */
 [data-testid="stExpander"] {{
-    background:rgba(240,247,234,0.85) !important;
-    border:2px solid rgba(29,122,74,0.20) !important;
-    border-radius:var(--r-sm) !important; box-shadow:var(--sh-sm) !important;
+    background:rgba(255,252,248,0.80) !important;
+    border:1px solid rgba(124,58,237,0.18) !important;
+    border-radius:var(--r-md) !important; box-shadow:var(--sh-sm) !important;
+    backdrop-filter:blur(14px) !important;
+    transition:transform 180ms, box-shadow 180ms !important;
+}}
+[data-testid="stExpander"]:hover {{ transform:translateY(-2px) !important; box-shadow:var(--sh-md) !important; }}
+[data-testid="stExpander"] summary p {{
+    color:{INK_SOFT} !important; font-weight:600 !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 
 /* ── Charts ── */
 [data-testid="stPyplot"] {{
-    background:rgba(240,247,234,0.80);
-    border:2px solid rgba(29,122,74,0.20);
-    border-radius:var(--r-md); padding:1rem;
-    box-shadow:var(--sh-sm);
+    background:rgba(255,252,248,0.75);
+    border:1px solid rgba(124,58,237,0.18);
+    border-radius:var(--r-lg); padding:1rem;
+    box-shadow:var(--sh-sm); backdrop-filter:blur(14px);
+    transition:transform 280ms, box-shadow 280ms;
+}}
+[data-testid="stPyplot"]:hover {{
+    transform:translateY(-4px);
+    box-shadow:var(--sh-md), 0 0 0 1px rgba(124,58,237,0.28);
 }}
 
 /* ── Alerts ── */
 [data-testid="stAlert"] {{
-    border-radius:var(--r-sm) !important;
-    background:rgba(240,247,234,0.90) !important;
-    border:2px solid rgba(29,122,74,0.22) !important;
+    border-radius:var(--r-md) !important;
+    background:rgba(255,252,248,0.85) !important;
+    border:1px solid rgba(124,58,237,0.20) !important;
     color:{INK_SOFT} !important;
 }}
 
-hr {{ border:none !important; height:2px !important;
-     background: repeating-linear-gradient(90deg, {ACCENT} 0, {ACCENT} 4px, transparent 4px, transparent 10px) !important;
-     opacity:0.25 !important; margin:1.4rem 0 !important; }}
+hr {{ border:none !important; border-top:1px solid rgba(124,58,237,0.14) !important; margin:1.4rem 0 !important; }}
 
 .col-label {{
-    font-size:0.50rem; font-weight:400; color:{ACCENT_2}; letter-spacing:0.12em;
+    font-size:0.63rem; font-weight:700; color:{ACCENT}; letter-spacing:0.16em;
     text-transform:uppercase; margin-bottom:0.9rem;
-    display:flex; align-items:center; gap:0.5rem; font-family:'Press Start 2P',monospace;
-    line-height:1.8;
+    display:flex; align-items:center; gap:0.4rem; font-family:'DM Sans',sans-serif;
 }}
 .col-label::after {{
-    content:""; flex:1; height:2px;
-    background: repeating-linear-gradient(90deg, {ACCENT_2} 0, {ACCENT_2} 4px, transparent 4px, transparent 8px);
-    opacity: 0.40;
+    content:""; flex:1; height:1px;
+    background:linear-gradient(90deg,rgba(124,58,237,0.28),transparent);
 }}
 
 /* Slider */
 [data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
-    background:{ACCENT_2} !important; border-color:{ACCENT_LT} !important;
-    box-shadow:0 0 8px rgba(212,160,23,0.50), 2px 2px 0 rgba(15,74,42,0.35) !important;
-    border-radius:0 !important; width:16px !important; height:16px !important;
+    background:{ACCENT} !important; border-color:{ACCENT_LT} !important;
+    box-shadow:0 0 10px rgba(124,58,237,0.40) !important;
 }}
 [data-testid="stSlider"] [data-baseweb="slider"] [data-testid="stSliderTrackFill"] {{
-    background:linear-gradient(90deg,{ACCENT},{ACCENT_LT}) !important;
+    background:linear-gradient(90deg,{ACCENT},{ACCENT_2}) !important;
 }}
 
 /* Scrollbar */
 ::-webkit-scrollbar {{ width:6px; height:6px; }}
-::-webkit-scrollbar-track {{ background:rgba(232,245,240,0.60); }}
-::-webkit-scrollbar-thumb {{ background:rgba(29,122,74,0.35); border-radius:0; }}
-::-webkit-scrollbar-thumb:hover {{ background:{ACCENT}; }}
-::selection {{ background:rgba(168,230,61,0.30); color:{INK}; }}
+::-webkit-scrollbar-track {{ background:rgba(245,238,255,0.60); }}
+::-webkit-scrollbar-thumb {{ background:rgba(124,58,237,0.30); border-radius:999px; }}
+::-webkit-scrollbar-thumb:hover {{ background:rgba(124,58,237,0.55); }}
+::selection {{ background:rgba(124,58,237,0.20); color:{INK}; }}
+
+/* ── Airplane cursor canvas (always on top) ── */
+#airplane-canvas {{
+    position:fixed; top:0; left:0;
+    width:100vw; height:100vh;
+    pointer-events:none; z-index:999999;
+}}
 </style>
 """, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────
-#  KINICH PIXEL CURSOR + PIXEL AIRPLANE TRAIL
+#  AIRPLANE CURSOR + TRAIL CANVAS
 # ─────────────────────────────────────────────────────────────
-st.markdown(f"""
-<canvas id="kinich-cursor"></canvas>
+st.markdown("""
+<canvas id="airplane-canvas"></canvas>
 <script>
-(function() {{
-    const canvas = document.getElementById('kinich-cursor');
+(function() {
+    const canvas = document.getElementById('airplane-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
 
     let W = window.innerWidth, H = window.innerHeight;
     canvas.width = W; canvas.height = H;
-    window.addEventListener('resize', () => {{
+    window.addEventListener('resize', () => {
         W = window.innerWidth; H = window.innerHeight;
         canvas.width = W; canvas.height = H;
-        ctx.imageSmoothingEnabled = false;
-    }});
+    });
 
-    let mx = W/2, my = H/2;
+    let mx = W/2, my = H/2, pmx = W/2, pmy = H/2;
     let angle = 0, targetAngle = 0;
     const trail = [];
-    const MAX_TRAIL = 28;
+    const MAX_TRAIL = 38;
 
-    document.addEventListener('mousemove', e => {{
+    document.addEventListener('mousemove', e => {
         const dx = e.clientX - mx, dy = e.clientY - my;
-        if (Math.abs(dx) + Math.abs(dy) > 1) {{
+        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
             targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
-        }}
+        }
+        pmx = mx; pmy = my;
         mx = e.clientX; my = e.clientY;
-        trail.push({{ x: mx, y: my, age: 0 }});
+        trail.push({ x: mx, y: my, age: 0 });
         if (trail.length > MAX_TRAIL) trail.shift();
-    }});
+    });
 
-    function lerpAngle(a, b, t) {{
-        let d = b - a;
-        while (d >  Math.PI) d -= 2*Math.PI;
-        while (d < -Math.PI) d += 2*Math.PI;
-        return a + d * t;
-    }}
+    function lerpAngle(a, b, t) {
+        let diff = b - a;
+        while (diff >  Math.PI) diff -= 2 * Math.PI;
+        while (diff < -Math.PI) diff += 2 * Math.PI;
+        return a + diff * t;
+    }
 
-    // Kinich pixel cursor — checkerboard headband style, 16×16 pixel art
-    // Colors: jade, lime, gold, teal
-    const C_JADE  = '#1a7a3a';
-    const C_LIME  = '#a8e63d';
-    const C_GOLD  = '#d4a017';
-    const C_TEAL  = '#1d9a9a';
-    const C_INK   = '#0f2d1a';
-    const C_WHITE = '#f8f4e8';
+    // Jewel trail colors cycling
+    const jewelColors = [
+        'rgba(124,58,237,',   // amethyst
+        'rgba(29,78,216,',    // sapphire
+        'rgba(2,132,199,',    // crystal blue
+        'rgba(4,120,87,',     // emerald
+        'rgba(180,83,9,',     // topaz
+        'rgba(219,39,119,',   // ruby
+    ];
+    let colorIdx = 0;
+    let colorT = 0;
 
-    // Each row: array of [color|null] for a 14×14 pixel cursor
-    // Shaped like a stylized sword/arrow pointing up — Kinich's weapon style
-    const CURSOR_PX = 3; // scale each pixel by 3px
-
-    function drawPixelCursor(x, y, ang) {{
+    function drawAirplane(x, y, ang, scale=1) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(ang);
+        ctx.scale(scale, scale);
 
-        const p = CURSOR_PX;
+        // Shadow / glow beneath plane
+        ctx.shadowColor = 'rgba(124,58,237,0.45)';
+        ctx.shadowBlur  = 14;
 
-        // Pixel art airplane/arrow cursor
-        // Map: each cell is one pixel
-        const grid = [
-            // col:  0  1  2  3  4
-            [0,0,1,0,0],   // row 0   — nose tip
-            [0,0,1,0,0],   // row 1
-            [0,1,1,1,0],   // row 2   — head
-            [0,1,2,1,0],   // row 3   — gold cockpit
-            [1,1,2,1,1],   // row 4   — wings
-            [1,3,1,3,1],   // row 5   — teal wing stripe
-            [0,1,1,1,0],   // row 6
-            [0,0,1,0,0],   // row 7   — body
-            [0,0,1,0,0],   // row 8
-            [0,1,1,1,0],   // row 9   — tail
-            [1,0,1,0,1],   // row 10  — tail fins
-        ];
-        const colorMap = {{ 0:null, 1:C_JADE, 2:C_GOLD, 3:C_TEAL, 4:C_LIME }};
+        // Fuselage
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.quadraticCurveTo(3.5, -4, 3, 6);
+        ctx.quadraticCurveTo(1.5, 10, 0, 11);
+        ctx.quadraticCurveTo(-1.5, 10, -3, 6);
+        ctx.quadraticCurveTo(-3.5, -4, 0, -14);
+        ctx.fillStyle = '#7c3aed';
+        ctx.fill();
 
-        const offsetX = -(grid[0].length * p) / 2;
-        const offsetY = -(grid.length * p) / 2;
+        // Wings
+        ctx.beginPath();
+        ctx.moveTo(-2, 1); ctx.lineTo(-14, 8); ctx.lineTo(-12, 10);
+        ctx.lineTo(-1.5, 5);
+        ctx.closePath();
+        ctx.fillStyle = '#1d4ed8';
+        ctx.fill();
 
-        // Pixel shadow (pixel-offset style)
-        ctx.globalAlpha = 0.22;
-        for (let r = 0; r < grid.length; r++) {{
-            for (let c = 0; c < grid[r].length; c++) {{
-                const v = grid[r][c];
-                if (!v) continue;
-                ctx.fillStyle = C_INK;
-                ctx.fillRect(offsetX + c*p + 2, offsetY + r*p + 2, p, p);
-            }}
-        }}
-        ctx.globalAlpha = 1.0;
+        ctx.beginPath();
+        ctx.moveTo(2, 1); ctx.lineTo(14, 8); ctx.lineTo(12, 10);
+        ctx.lineTo(1.5, 5);
+        ctx.closePath();
+        ctx.fillStyle = '#1d4ed8';
+        ctx.fill();
 
-        for (let r = 0; r < grid.length; r++) {{
-            for (let c = 0; c < grid[r].length; c++) {{
-                const v = grid[r][c];
-                const col = colorMap[v];
-                if (!col) continue;
-                ctx.fillStyle = col;
-                ctx.fillRect(offsetX + c*p, offsetY + r*p, p, p);
-            }}
-        }}
+        // Tail fins
+        ctx.beginPath();
+        ctx.moveTo(-1, 8); ctx.lineTo(-6, 13); ctx.lineTo(-5, 14);
+        ctx.lineTo(-0.5, 10);
+        ctx.closePath();
+        ctx.fillStyle = '#db2777';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(1, 8); ctx.lineTo(6, 13); ctx.lineTo(5, 14);
+        ctx.lineTo(0.5, 10);
+        ctx.closePath();
+        ctx.fillStyle = '#db2777';
+        ctx.fill();
+
+        // Cockpit window
+        ctx.beginPath();
+        ctx.ellipse(0, -9, 1.8, 2.5, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(196,229,255,0.90)';
+        ctx.shadowBlur = 0;
+        ctx.fill();
 
         ctx.restore();
-    }}
+    }
 
-    // Pixel airplane body for trail
-    function drawPixelAirplane(x, y, ang, scale, alpha) {{
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(ang);
-        ctx.globalAlpha = alpha;
-        ctx.imageSmoothingEnabled = false;
-
-        const p = Math.max(1, Math.floor(scale * 2.5));
-
-        // Mini pixel plane: 5×7
-        const plane = [
-            [0,1,0],
-            [0,2,0],
-            [1,1,1],
-            [3,1,3],
-            [0,1,0],
-            [0,1,0],
-            [1,0,1],
-        ];
-        const cmap = {{ 0:null, 1:C_JADE, 2:C_GOLD, 3:C_TEAL }};
-        const ox = -(3*p)/2, oy = -(7*p)/2;
-        for (let r = 0; r < plane.length; r++) {{
-            for (let c = 0; c < plane[r].length; c++) {{
-                const col = cmap[plane[r][c]];
-                if (!col) continue;
-                ctx.fillStyle = col;
-                ctx.fillRect(ox + c*p, oy + r*p, p, p);
-            }}
-        }}
-        ctx.restore();
-    }}
-
-    // Pixel spark colors — Kinich palette
-    const sparkColors = [C_LIME, C_GOLD, C_TEAL, C_JADE, '#7ecb20', '#f0c040'];
-
-    let tick = 0;
-
-    function frame() {{
+    function frame() {
         ctx.clearRect(0, 0, W, H);
-        ctx.imageSmoothingEnabled = false;
-        tick++;
 
-        // Age trail
-        for (let i=0; i<trail.length; i++) trail[i].age++;
+        // Age trail points
+        for (let i = 0; i < trail.length; i++) trail[i].age++;
 
-        // Draw pixel airplane trail
-        for (let i=1; i<trail.length; i++) {{
+        // Draw trail as glowing connected dots / crystals
+        for (let i = 1; i < trail.length; i++) {
             const p = trail[i];
-            const prog = i / trail.length;
-            const fade = prog * Math.max(0, 1 - p.age / 60);
-            if (fade < 0.05) continue;
+            const prog = i / trail.length;          // 0 at tail, 1 at head
+            const fade = prog * (1 - p.age / 120);
+            if (fade <= 0) continue;
 
-            if (i > 1 && i % 3 === 0) {{
-                const prev = trail[i-1];
-                const dx = p.x - prev.x, dy = p.y - prev.y;
-                const a = Math.atan2(dy, dx) + Math.PI/2;
-                drawPixelAirplane(p.x, p.y, a, prog * 0.8 + 0.2, fade * 0.7);
-            }}
+            const ci = Math.floor(prog * jewelColors.length) % jewelColors.length;
+            const c  = jewelColors[ci];
 
-            // Pixel square sparks — checkerboard style
-            if (i % 4 === 0 && prog > 0.3) {{
-                const sz = Math.max(2, Math.floor(prog * 5));
-                const col = sparkColors[Math.floor(prog * sparkColors.length)];
-                ctx.fillStyle = col;
-                ctx.globalAlpha = fade * 0.65;
-                // Pixel-snap position
-                const sx = Math.floor(p.x / 4) * 4;
-                const sy = Math.floor(p.y / 4) * 4;
-                ctx.fillRect(sx, sy, sz, sz);
-                // Checkerboard offset spark
-                if (i % 8 === 0) {{
-                    ctx.fillStyle = C_GOLD;
-                    ctx.fillRect(sx + sz, sy + sz, sz, sz);
-                }}
-                ctx.globalAlpha = 1.0;
-            }}
-        }}
+            // Streak segment
+            const prev = trail[i - 1];
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(prev.x, prev.y);
+            ctx.lineTo(p.x, p.y);
+            ctx.strokeStyle = c + (fade * 0.70).toFixed(2) + ')';
+            ctx.lineWidth   = prog * 3.5 + 0.5;
+            ctx.lineCap     = 'round';
+            ctx.shadowColor = c + '0.6)';
+            ctx.shadowBlur  = 8 * prog;
+            ctx.stroke();
+            ctx.restore();
 
-        angle = lerpAngle(angle, targetAngle, 0.20);
+            // Tiny jewel spark every few points
+            if (i % 5 === 0 && prog > 0.15) {
+                const r = prog * 2.8;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = c + (fade * 0.55).toFixed(2) + ')';
+                ctx.shadowColor = c + '0.8)';
+                ctx.shadowBlur  = 10;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
 
-        // Draw main pixel cursor at mouse
-        drawPixelCursor(mx, my, angle);
+        // Smooth angle
+        angle = lerpAngle(angle, targetAngle, 0.18);
+
+        // Draw airplane
+        drawAirplane(mx, my, angle, 1.15);
 
         requestAnimationFrame(frame);
-    }}
+    }
     frame();
-}})();
+})();
 </script>
 """, unsafe_allow_html=True)
 
@@ -793,11 +777,11 @@ def prepare_input(input_df, training_columns):
 
 
 # ─────────────────────────────────────────────────────────────
-#  CHART HELPERS — Kinich palette
+#  CHART HELPERS — light-theme aware, jewel colors
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
     fig, ax = plt.subplots(figsize=figsize)
-    fig.patch.set_facecolor("#f0f7ea")
+    fig.patch.set_facecolor("#fdf9f4")
     fig.patch.set_alpha(0.0)
     ax.set_facecolor("none")
     for spine in ["top", "right", "left", "bottom"]:
@@ -808,7 +792,8 @@ def clean_fig(figsize=(8, 4)):
     ax.title.set_color(INK)
     ax.title.set_fontsize(11)
     ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color="#c8e8c8", linewidth=0.8, linestyle="-", alpha=0.85)
+    ax.title.set_fontfamily("serif")
+    ax.grid(axis="y", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
     ax.set_axisbelow(True)
     for label in ax.get_xticklabels() + ax.get_yticklabels():
         label.set_color(INK_MUTED)
@@ -819,6 +804,18 @@ def col_seq(labels):
     return [DECISION_COLORS.get(l, ACCENT) for l in labels]
 
 
+def add_bar_shimmer(bars, ax, alpha=0.92):
+    """Legacy fallback: no white static rectangles. Use HTML helpers for real shimmer."""
+    for bar in bars:
+        bar.set_alpha(alpha)
+        bar.set_linewidth(0)
+    return bars
+
+
+
+# ─────────────────────────────────────────────────────────────
+#  ANIMATED HTML CHART HELPERS — keeps the same theme, but lets bars shimmer
+# ─────────────────────────────────────────────────────────────
 def _fmt_chart_value(v, value_format="number"):
     if value_format == "percent":
         return f"{v:.0%}"
@@ -827,83 +824,19 @@ def _fmt_chart_value(v, value_format="number"):
     return f"{v:,.0f}"
 
 
-# ─────────────────────────────────────────────────────────────
-#  ANIMATED HTML CHART HELPERS — Kinich pixel-art style
-# ─────────────────────────────────────────────────────────────
-
-# Shared chart CSS injected once inline
-_KINICH_CHART_CSS = f"""
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Oxanium:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap');
-
-.ki-card {{
-    width:100%; box-sizing:border-box;
-    padding:22px 26px 20px;
-    border-radius:8px;
-    background:
-        linear-gradient(145deg, rgba(240,247,234,0.80), rgba(232,245,240,0.72), rgba(248,244,232,0.78));
-    border:2px solid rgba(29,122,74,0.22);
-    box-shadow:0 2px 14px rgba(29,122,74,0.12);
-    font-family:'Nunito',system-ui,sans-serif;
-    color:{INK};
-    overflow:hidden; position:relative;
-    image-rendering:pixelated;
-}}
-
-/* Pixel checkerboard corner decorations */
-.ki-card::before {{
-    content:"";
-    position:absolute; top:0; left:0; right:0; height:4px;
-    background: repeating-linear-gradient(
-        90deg,
-        {ACCENT}    0px,  {ACCENT}    8px,
-        {ACCENT_2}  8px,  {ACCENT_2}  16px,
-        {PIXEL_GREEN} 16px, {PIXEL_GREEN} 24px,
-        {PIXEL_TEAL}  24px, {PIXEL_TEAL}  32px
-    );
-    opacity:0.70;
-}}
-
-/* Shimmer sweep */
-.ki-card::after {{
-    content:"";
-    position:absolute; top:0; left:-80%; bottom:0; width:50%;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent);
-    animation:kiSweep 5s ease-in-out infinite;
-    pointer-events:none;
-}}
-
-.ki-title {{
-    font-family:'Oxanium',sans-serif;
-    text-align:center; font-size:18px; line-height:1.3;
-    color:{INK}; margin-bottom:18px; font-weight:700;
-    letter-spacing:0.06em; text-transform:uppercase;
-}}
-
-.ki-legend {{
-    display:flex; justify-content:center; gap:18px; margin-bottom:18px; flex-wrap:wrap;
-}}
-.ki-legend-item {{
-    display:flex; align-items:center; gap:7px;
-    color:{INK_SOFT}; font-weight:700; font-size:13px;
-}}
-.ki-legend-swatch {{
-    width:16px; height:8px; border-radius:0;
-    image-rendering:pixelated;
-    box-shadow:2px 2px 0 rgba(15,45,26,0.25);
-}}
-
-@keyframes kiSweep   {{ 0%{{left:-80%}} 50%{{left:180%}} 100%{{left:180%}} }}
-@keyframes kiGrowV   {{ from{{height:0%;opacity:.4}} to{{height:var(--bh);opacity:1}} }}
-@keyframes kiGrowH   {{ from{{width:0%;opacity:.4}}  to{{width:var(--bw);opacity:1}} }}
-@keyframes kiShimmer {{ 0%{{transform:translateX(-150%)}} 48%{{transform:translateX(155%)}} 100%{{transform:translateX(155%)}} }}
-@keyframes kiPopIn   {{ from{{transform:scale(.8) rotate(-8deg);opacity:.4}} to{{transform:scale(1) rotate(0deg);opacity:1}} }}
-"""
-
-
 def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_format="number", height=430):
+    """
+    Animated vertical grouped/single bar chart rendered in HTML/CSS.
+    series example:
+    [
+        {"name": "Accuracy", "values": [0.88, 0.84], "color": ACCENT},
+        {"name": "Macro F1", "values": [0.88, 0.84], "color": ACCENT_2},
+    ]
+    """
     labels = [str(x) for x in labels]
     clean_series = []
     all_values = []
+
     for s in series:
         vals = [float(x) if pd.notna(x) else 0.0 for x in s.get("values", [])]
         all_values.extend(vals)
@@ -913,274 +846,790 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
             "color": s.get("color", ACCENT),
             "colors": s.get("colors", None),
         })
+
     if not all_values:
-        st.info("No chart data available.")
+        st.info("No chart data available for the current filter.")
         return
+
     if max_value is None:
         max_value = max(all_values) if max(all_values) != 0 else 1
-    max_value = float(max_value)
+    max_value = float(max_value) if max_value else 1.0
 
-    chart = {"title": title, "labels": labels, "series": clean_series,
-             "max_value": max_value, "value_format": value_format}
-    cj = json.dumps(chart)
-    plot_h = max(height - 190, 180)
+    chart = {
+        "title": title,
+        "labels": labels,
+        "series": clean_series,
+        "max_value": max_value,
+        "value_format": value_format,
+    }
+    chart_json = json.dumps(chart)
 
     components.html(f"""
-    <div id="ki-vbar-root"></div>
+    <div id="gi-chart-root"></div>
+
     <style>
-    {_KINICH_CHART_CSS}
-    .ki-vplot {{
-        display:grid;
-        grid-template-columns:repeat({max(len(labels),1)}, minmax(0,1fr));
-        gap:24px; align-items:end; height:{plot_h}px;
-        border-bottom:2px solid rgba(29,122,74,0.20);
-        background-image:repeating-linear-gradient(
-            to top,
-            rgba(29,122,74,0.07) 0px, rgba(29,122,74,0.07) 1px,
-            transparent 1px, transparent 25%
-        );
-        padding:0 14px; position:relative; z-index:1;
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    .gi-chart {{
+        width: 100%;
+        min-height: {height}px;
+        box-sizing: border-box;
+        padding: 26px 30px 24px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: {INK};
+        overflow: hidden;
+        position: relative;
     }}
-    .ki-vgroup {{ height:100%; display:flex; align-items:end; justify-content:center; gap:8px; }}
-    .ki-vbar-wrap {{ height:100%; width:min(44px,28%); min-width:24px; display:flex; align-items:end; justify-content:center; position:relative; }}
-    .ki-vbar {{
-        width:100%; height:var(--bh); min-height:3px;
-        border-radius:0; position:relative; overflow:hidden;
-        box-shadow:3px 3px 0 rgba(15,45,26,0.30), inset 0 1px 0 rgba(255,255,255,0.55);
-        animation:kiGrowV 800ms cubic-bezier(.22,.9,.25,1) both;
-        image-rendering:pixelated;
+
+    .gi-chart::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+        transform: translateX(-130%);
+        animation: chartSweep 5.5s ease-in-out infinite;
+        pointer-events: none;
     }}
-    .ki-vbar::before {{
-        content:""; position:absolute; inset:0; width:75%;
-        background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),rgba(255,255,255,0.65),rgba(255,255,255,0.12),transparent);
-        transform:translateX(-150%);
-        animation:kiShimmer 2.2s ease-in-out infinite; animation-delay:var(--delay);
+
+    .gi-chart-title {{
+        font-family: 'Cinzel', Georgia, serif;
+        text-align: center;
+        font-size: 24px;
+        line-height: 1.25;
+        color: {INK};
+        margin-bottom: 20px;
+        letter-spacing: 0.04em;
+        font-weight: 600;
     }}
-    /* Pixel checkerboard stripe on bar */
-    .ki-vbar::after {{
-        content:""; position:absolute; top:0; left:0; right:0; height:6px;
-        background:repeating-linear-gradient(
-            90deg, rgba(255,255,255,0.28) 0, rgba(255,255,255,0.28) 4px,
-            transparent 4px, transparent 8px
-        );
+
+    .gi-legend {{
+        display: flex;
+        justify-content: center;
+        gap: 22px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
     }}
-    .ki-vvalue {{
-        position:absolute; bottom:calc(var(--bh) + 7px);
-        font-size:12px; font-weight:800; color:{INK_SOFT}; white-space:nowrap;
+
+    .gi-legend-item {{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: {INK_SOFT};
+        font-weight: 600;
+        font-size: 14px;
     }}
-    .ki-xlabels {{
-        display:grid; grid-template-columns:repeat({max(len(labels),1)}, minmax(0,1fr));
-        gap:24px; padding:12px 14px 0; text-align:center; position:relative; z-index:1;
+
+    .gi-legend-color {{
+        width: 30px;
+        height: 12px;
+        border-radius: 999px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 4px 12px rgba(74,50,120,0.12);
     }}
-    .ki-xlabel {{ color:{INK_SOFT}; font-weight:700; font-size:12px; line-height:1.25; }}
+
+    .gi-plot {{
+        display: grid;
+        grid-template-columns: repeat({max(len(labels), 1)}, minmax(0, 1fr));
+        gap: 30px;
+        align-items: end;
+        height: {max(height - 180, 190)}px;
+        border-bottom: 1px solid rgba(124,58,237,0.18);
+        background-image: linear-gradient(to top, rgba(124,58,237,0.08) 1px, transparent 1px);
+        background-size: 100% 25%;
+        padding: 0 18px;
+        position: relative;
+        z-index: 1;
+    }}
+
+    .gi-group {{
+        height: 100%;
+        display: flex;
+        align-items: end;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+    }}
+
+    .gi-bar-wrap {{
+        height: 100%;
+        width: min(48px, 30%);
+        min-width: 26px;
+        display: flex;
+        align-items: end;
+        justify-content: center;
+        position: relative;
+    }}
+
+    .gi-bar {{
+        width: 100%;
+        height: var(--bar-height);
+        min-height: 3px;
+        border-radius: 14px 14px 4px 4px;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            inset 8px 0 16px rgba(255,255,255,0.16),
+            0 10px 24px rgba(74,50,120,0.18);
+        animation: growBar 850ms cubic-bezier(.22,.9,.25,1) both;
+    }}
+
+    .gi-bar::before {{
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 80%;
+        background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255,255,255,0.10) 20%,
+            rgba(255,255,255,0.74) 48%,
+            rgba(255,255,255,0.18) 66%,
+            transparent 100%);
+        transform: translateX(-150%);
+        animation: barShimmer 2.25s ease-in-out infinite;
+        animation-delay: var(--delay);
+    }}
+
+
+    .gi-value {{
+        position: absolute;
+        bottom: calc(var(--bar-height) + 8px);
+        font-size: 13px;
+        font-weight: 800;
+        color: {INK_SOFT};
+        white-space: nowrap;
+    }}
+
+    .gi-xlabels {{
+        display: grid;
+        grid-template-columns: repeat({max(len(labels), 1)}, minmax(0, 1fr));
+        gap: 30px;
+        padding: 13px 18px 0;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }}
+
+    .gi-xlabel {{
+        color: {INK_SOFT};
+        font-weight: 700;
+        font-size: 13px;
+        line-height: 1.25;
+        transform: rotate(-6deg);
+        transform-origin: center top;
+    }}
+
+    @keyframes barShimmer {{
+        0%   {{ transform: translateX(-150%); }}
+        48%  {{ transform: translateX(155%); }}
+        100% {{ transform: translateX(155%); }}
+    }}
+
+    @keyframes growBar {{
+        from {{ height: 0%; opacity: 0.50; }}
+        to   {{ height: var(--bar-height); opacity: 1; }}
+    }}
+
+    @keyframes chartSweep {{
+        0%   {{ transform: translateX(-130%); }}
+        45%  {{ transform: translateX(130%); }}
+        100% {{ transform: translateX(130%); }}
+    }}
     </style>
+
     <script>
-    const chart = {cj};
-    function fmtV(v) {{
-        if (chart.value_format==="percent") return Math.round(v*100)+"%";
-        if (chart.value_format==="money") return "$"+Math.round(v).toLocaleString();
+    const chart = {chart_json};
+
+    function formatValue(v) {{
+        if (chart.value_format === "percent") return Math.round(v * 100) + "%";
+        if (chart.value_format === "money") return "$" + Math.round(v).toLocaleString();
         return Math.round(v).toLocaleString();
     }}
-    const root = document.getElementById("ki-vbar-root");
-    const legendHtml = chart.series.map(s=>`
-        <div class="ki-legend-item">
-          <span class="ki-legend-swatch" style="background:${{s.color}}"></span>
-          ${{s.name}}
-        </div>`).join("");
-    const groupsHtml = chart.labels.map((label,i)=>`
-        <div class="ki-vgroup">
-          ${{chart.series.map((s,j)=>{{
-              const val = Number(s.values[i]||0);
-              const pct = Math.max(2,Math.min(100,val/chart.max_value*100));
-              const color = s.colors ? s.colors[i] : s.color;
-              return `<div class="ki-vbar-wrap">
-                <div class="ki-vvalue" style="--bh:${{pct}}%">${{fmtV(val)}}</div>
-                <div class="ki-vbar" style="--bh:${{pct}}%;--delay:${{(i+j)*100}}ms;background:linear-gradient(180deg,${{color}},${{color}}cc);"></div>
-              </div>`;
-          }}).join("")}}
-        </div>`).join("");
-    const xlabels = chart.labels.map(l=>`<div class="ki-xlabel">${{l}}</div>`).join("");
-    root.innerHTML = `<div class="ki-card">
-      <div class="ki-title">${{chart.title}}</div>
-      <div class="ki-legend">${{legendHtml}}</div>
-      <div class="ki-vplot">${{groupsHtml}}</div>
-      <div class="ki-xlabels">${{xlabels}}</div>
-    </div>`;
+
+    const root = document.getElementById("gi-chart-root");
+    const legendHtml = chart.series.map(s => `
+        <div class="gi-legend-item">
+            <span class="gi-legend-color" style="background:${{s.color}}"></span>
+            ${{s.name}}
+        </div>
+    `).join("");
+
+    const groupsHtml = chart.labels.map((label, i) => `
+        <div class="gi-group">
+            ${{chart.series.map((s, j) => {{
+                const value = Number(s.values[i] || 0);
+                const pct = Math.max(2, Math.min(100, value / chart.max_value * 100));
+                const color = s.colors ? s.colors[i] : s.color;
+                return `
+                    <div class="gi-bar-wrap">
+                        <div class="gi-value" style="--bar-height:${{pct}}%">${{formatValue(value)}}</div>
+                        <div class="gi-bar"
+                             style="--bar-height:${{pct}}%; --delay:${{(i + j) * 120}}ms; background: linear-gradient(180deg, ${{color}}, ${{color}}dd);"></div>
+                    </div>
+                `;
+            }}).join("")}}
+        </div>
+    `).join("");
+
+    const xLabelsHtml = chart.labels.map(label => `<div class="gi-xlabel">${{label}}</div>`).join("");
+
+    root.innerHTML = `
+        <div class="gi-chart">
+            <div class="gi-chart-title">${{chart.title}}</div>
+            <div class="gi-legend">${{legendHtml}}</div>
+            <div class="gi-plot">${{groupsHtml}}</div>
+            <div class="gi-xlabels">${{xLabelsHtml}}</div>
+        </div>
+    `;
     </script>
     """, height=height + 40, scrolling=False)
 
 
 def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_format="number", height=430):
+    """Animated horizontal bar chart rendered in HTML/CSS."""
     labels = [str(x) for x in labels]
     values = [float(x) if pd.notna(x) else 0.0 for x in values]
     if not values:
-        st.info("No chart data available.")
+        st.info("No chart data available for the current filter.")
         return
+
     if colors is None:
-        colors = [ACCENT] * len(values)
+        colors = [ACCENT for _ in values]
     elif isinstance(colors, str):
-        colors = [colors] * len(values)
+        colors = [colors for _ in values]
+    else:
+        colors = list(colors)
+
     max_abs = max(abs(v) for v in values) or 1.0
-    rows = [{
-        "label": lab, "value": val,
-        "display": _fmt_chart_value(val, value_format),
-        "width": max(2, min(100, abs(val)/max_abs*100)),
-        "color": col
-    } for lab, val, col in zip(labels, values, colors)]
-    cj = json.dumps({"title": title, "rows": rows})
+    rows = []
+    for label, value, color in zip(labels, values, colors):
+        rows.append({
+            "label": label,
+            "value": value,
+            "display": _fmt_chart_value(value, value_format),
+            "width": max(2, min(100, abs(value) / max_abs * 100)),
+            "color": color,
+        })
+
+    chart = {"title": title, "rows": rows}
+    chart_json = json.dumps(chart)
 
     components.html(f"""
-    <div id="ki-hbar-root"></div>
+    <div id="gi-hbar-root"></div>
+
     <style>
-    {_KINICH_CHART_CSS}
-    .ki-hrows {{ display:flex; flex-direction:column; gap:11px; position:relative; z-index:1; }}
-    .ki-hrow  {{ display:grid; grid-template-columns:minmax(90px,160px) 1fr minmax(70px,96px); align-items:center; gap:10px; }}
-    .ki-hlabel {{ color:{INK_SOFT}; font-size:13px; font-weight:700; text-align:right; }}
-    .ki-htrack {{ height:22px; border-radius:0; background:rgba(29,122,74,0.08); border:1px solid rgba(29,122,74,0.15); overflow:hidden; position:relative; }}
-    .ki-hbar {{
-        height:100%; width:var(--bw); border-radius:0; position:relative; overflow:hidden;
-        box-shadow:2px 2px 0 rgba(15,45,26,0.25), inset 0 1px 0 rgba(255,255,255,0.50);
-        animation:kiGrowH 800ms cubic-bezier(.22,.9,.25,1) both;
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    .gi-hchart {{
+        width: 100%;
+        min-height: {height}px;
+        box-sizing: border-box;
+        padding: 24px 28px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: {INK};
+        overflow: hidden;
+        position: relative;
     }}
-    .ki-hbar::before {{
-        content:""; position:absolute; inset:0; width:75%;
-        background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),rgba(255,255,255,0.60),rgba(255,255,255,0.12),transparent);
-        transform:translateX(-150%); animation:kiShimmer 2.2s ease-in-out infinite; animation-delay:var(--delay);
+
+    .gi-hchart::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+        transform: translateX(-130%);
+        animation: chartSweep 5.5s ease-in-out infinite;
+        pointer-events: none;
     }}
-    .ki-hvalue {{ color:{INK_SOFT}; font-weight:800; font-size:13px; white-space:nowrap; }}
+
+    .gi-hchart-title {{
+        font-family: 'Cinzel', Georgia, serif;
+        text-align: center;
+        font-size: 22px;
+        line-height: 1.25;
+        color: {INK};
+        margin-bottom: 20px;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+    }}
+
+    .gi-hrows {{
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+        position: relative;
+        z-index: 1;
+    }}
+
+    .gi-hrow {{
+        display: grid;
+        grid-template-columns: minmax(92px, 170px) 1fr minmax(72px, 100px);
+        align-items: center;
+        gap: 12px;
+    }}
+
+    .gi-hlabel {{
+        color: {INK_SOFT};
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.15;
+        text-align: right;
+    }}
+
+    .gi-htrack {{
+        height: 24px;
+        border-radius: 999px;
+        background: rgba(124,58,237,0.07);
+        border: 1px solid rgba(124,58,237,0.12);
+        overflow: hidden;
+        position: relative;
+    }}
+
+    .gi-hbar {{
+        height: 100%;
+        width: var(--bar-width);
+        border-radius: 999px;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            inset 8px 0 16px rgba(255,255,255,0.16),
+            0 8px 18px rgba(74,50,120,0.14);
+        animation: growHBar 850ms cubic-bezier(.22,.9,.25,1) both;
+    }}
+
+    .gi-hbar::before {{
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 80%;
+        background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255,255,255,0.10) 20%,
+            rgba(255,255,255,0.74) 48%,
+            rgba(255,255,255,0.18) 66%,
+            transparent 100%);
+        transform: translateX(-150%);
+        animation: barShimmer 2.25s ease-in-out infinite;
+        animation-delay: var(--delay);
+    }}
+
+
+    .gi-hvalue {{
+        color: {INK_SOFT};
+        font-weight: 800;
+        font-size: 13px;
+        white-space: nowrap;
+    }}
+
+    @keyframes barShimmer {{
+        0%   {{ transform: translateX(-150%); }}
+        48%  {{ transform: translateX(155%); }}
+        100% {{ transform: translateX(155%); }}
+    }}
+
+    @keyframes growHBar {{
+        from {{ width: 0%; opacity: 0.50; }}
+        to   {{ width: var(--bar-width); opacity: 1; }}
+    }}
+
+    @keyframes chartSweep {{
+        0%   {{ transform: translateX(-130%); }}
+        45%  {{ transform: translateX(130%); }}
+        100% {{ transform: translateX(130%); }}
+    }}
     </style>
+
     <script>
-    const chart = {cj};
-    const root = document.getElementById("ki-hbar-root");
-    const rows = chart.rows.map((r,i)=>`
-        <div class="ki-hrow">
-          <div class="ki-hlabel">${{r.label}}</div>
-          <div class="ki-htrack"><div class="ki-hbar" style="--bw:${{r.width}}%;--delay:${{i*100}}ms;background:linear-gradient(90deg,${{r.color}},${{r.color}}cc);"></div></div>
-          <div class="ki-hvalue">${{r.display}}</div>
-        </div>`).join("");
-    root.innerHTML = `<div class="ki-card" style="min-height:{height}px">
-      <div class="ki-title">${{chart.title}}</div>
-      <div class="ki-hrows">${{rows}}</div>
-    </div>`;
+    const chart = {chart_json};
+    const root = document.getElementById("gi-hbar-root");
+
+    const rowsHtml = chart.rows.map((r, i) => `
+        <div class="gi-hrow">
+            <div class="gi-hlabel">${{r.label}}</div>
+            <div class="gi-htrack">
+                <div class="gi-hbar"
+                     style="--bar-width:${{r.width}}%; --delay:${{i * 110}}ms; background: linear-gradient(90deg, ${{r.color}}, ${{r.color}}dd);"></div>
+            </div>
+            <div class="gi-hvalue">${{r.display}}</div>
+        </div>
+    `).join("");
+
+    root.innerHTML = `
+        <div class="gi-hchart">
+            <div class="gi-hchart-title">${{chart.title}}</div>
+            <div class="gi-hrows">${{rowsHtml}}</div>
+        </div>
+    `;
     </script>
     """, height=height + 35, scrolling=False)
 
 
 def shimmer_pie_chart(title, labels, values, colors=None, height=430):
+    """Animated donut/pie-style chart rendered in HTML/CSS with shimmer."""
     labels = [str(x) for x in labels]
     values = [float(x) if pd.notna(x) else 0.0 for x in values]
     total = sum(values)
     if not values or total <= 0:
-        st.info("No chart data available.")
+        st.info("No chart data available for the current filter.")
         return
+
     if colors is None:
-        colors = [ACCENT] * len(values)
-    rows, start, stops = [], 0.0, []
+        colors = [ACCENT for _ in values]
+    else:
+        colors = list(colors)
+
+    rows = []
+    start = 0.0
+    stops = []
     for label, value, color in zip(labels, values, colors):
         pct = value / total * 100
         end = start + pct
         stops.append(f"{color} {start:.4f}% {end:.4f}%")
-        rows.append({"label": label, "value": value, "pct": pct, "display": f"{pct:.1f}%", "color": color})
+        rows.append({
+            "label": label,
+            "value": value,
+            "pct": pct,
+            "display": f"{pct:.1f}%",
+            "color": color,
+        })
         start = end
-    cj = json.dumps({"title": title, "gradient": ", ".join(stops), "rows": rows, "total": total})
+
+    chart = {
+        "title": title,
+        "gradient": ", ".join(stops),
+        "rows": rows,
+        "total": total,
+    }
+    chart_json = json.dumps(chart)
 
     components.html(f"""
-    <div id="ki-pie-root"></div>
+    <div id="gi-pie-root"></div>
+
     <style>
-    {_KINICH_CHART_CSS}
-    .ki-pie-layout {{ display:grid; grid-template-columns:minmax(200px,.9fr) minmax(180px,1fr); gap:22px; align-items:center; position:relative; z-index:1; }}
-    .ki-donut-wrap {{ display:flex; align-items:center; justify-content:center; }}
-    .ki-donut {{
-        width:min(220px,78vw); aspect-ratio:1; border-radius:0;
-        background:conic-gradient(var(--pg));
-        position:relative; overflow:hidden;
-        box-shadow:4px 4px 0 rgba(15,45,26,0.28), 0 12px 28px rgba(29,122,74,0.16);
-        animation:kiPopIn 800ms cubic-bezier(.22,.9,.25,1) both;
-        image-rendering:pixelated;
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    .gi-pie-card {{
+        width: 100%;
+        min-height: {height}px;
+        box-sizing: border-box;
+        padding: 24px 28px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: {INK};
+        overflow: hidden;
+        position: relative;
     }}
-    .ki-donut::before {{
-        content:""; position:absolute; inset:-20%;
-        background:linear-gradient(115deg,transparent,rgba(255,255,255,0.60) 48%,transparent);
-        transform:translateX(-120%) rotate(12deg);
-        animation:kiShimmer 2.8s ease-in-out infinite;
+
+    .gi-pie-card::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+        transform: translateX(-130%);
+        animation: pieCardSweep 5.5s ease-in-out infinite;
+        pointer-events: none;
     }}
-    .ki-donut::after {{
-        content:""; position:absolute; inset:28%; border-radius:0;
-        background:linear-gradient(145deg,rgba(240,247,234,0.90),rgba(248,244,232,0.95));
-        box-shadow:inset 0 2px 8px rgba(29,122,74,0.12), inset -1px -1px 0 rgba(212,160,23,0.30);
+
+    .gi-pie-title {{
+        font-family: 'Cinzel', Georgia, serif;
+        text-align: center;
+        font-size: 22px;
+        line-height: 1.25;
+        color: {INK};
+        margin-bottom: 18px;
+        letter-spacing: 0.04em;
+        font-weight: 600;
     }}
-    .ki-pie-legend {{ display:flex; flex-direction:column; gap:10px; }}
-    .ki-pie-row {{ display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:9px; color:{INK_SOFT}; font-size:13px; font-weight:700; }}
-    .ki-pie-dot {{ width:10px; height:10px; border-radius:0; box-shadow:2px 2px 0 rgba(15,45,26,0.22); image-rendering:pixelated; }}
-    .ki-pie-pct {{ font-weight:900; white-space:nowrap; color:{INK_SOFT}; }}
+
+    .gi-pie-layout {{
+        display: grid;
+        grid-template-columns: minmax(210px, 0.9fr) minmax(190px, 1fr);
+        gap: 24px;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }}
+
+    .gi-donut-wrap {{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }}
+
+    .gi-donut {{
+        width: min(230px, 80vw);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: conic-gradient(var(--pie-gradient));
+        position: relative;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            0 14px 32px rgba(74,50,120,0.16);
+        overflow: hidden;
+        animation: donutPop 850ms cubic-bezier(.22,.9,.25,1) both;
+    }}
+
+    .gi-donut::before {{
+        content: "";
+        position: absolute;
+        inset: -20%;
+        background: linear-gradient(115deg,
+            transparent 0%,
+            rgba(255,255,255,0.08) 32%,
+            rgba(255,255,255,0.70) 48%,
+            rgba(255,255,255,0.12) 62%,
+            transparent 100%);
+        transform: translateX(-120%) rotate(12deg);
+        animation: pieShimmer 2.8s ease-in-out infinite;
+    }}
+
+    .gi-donut::after {{
+        content: "";
+        position: absolute;
+        inset: 27%;
+        border-radius: 50%;
+        background:
+            radial-gradient(circle at 35% 25%, rgba(255,255,255,0.82), rgba(255,252,248,0.88) 62%, rgba(245,238,255,0.90));
+        box-shadow: inset 0 2px 10px rgba(124,58,237,0.10);
+    }}
+
+    .gi-pie-legend {{
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+    }}
+
+    .gi-pie-row {{
+        display: grid;
+        grid-template-columns: 14px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        color: {INK_SOFT};
+        font-size: 13px;
+        font-weight: 700;
+    }}
+
+    .gi-pie-dot {{
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.45), 0 4px 12px rgba(74,50,120,0.13);
+    }}
+
+    .gi-pie-pct {{
+        color: {INK_SOFT};
+        font-weight: 900;
+        white-space: nowrap;
+    }}
+
+    @keyframes pieShimmer {{
+        0%   {{ transform: translateX(-120%) rotate(12deg); }}
+        48%  {{ transform: translateX(120%) rotate(12deg); }}
+        100% {{ transform: translateX(120%) rotate(12deg); }}
+    }}
+
+    @keyframes donutPop {{
+        from {{ transform: scale(0.86) rotate(-18deg); opacity: 0.55; }}
+        to   {{ transform: scale(1) rotate(0deg); opacity: 1; }}
+    }}
+
+    @keyframes pieCardSweep {{
+        0%   {{ transform: translateX(-130%); }}
+        45%  {{ transform: translateX(130%); }}
+        100% {{ transform: translateX(130%); }}
+    }}
     </style>
+
     <script>
-    const pc = {cj};
-    const root = document.getElementById("ki-pie-root");
-    const rows = pc.rows.map(r=>`<div class="ki-pie-row">
-        <span class="ki-pie-dot" style="background:${{r.color}}"></span>
-        <span>${{r.label}}</span>
-        <span class="ki-pie-pct">${{r.display}}</span>
-    </div>`).join("");
-    root.innerHTML = `<div class="ki-card" style="min-height:{height}px">
-      <div class="ki-title">${{pc.title}}</div>
-      <div class="ki-pie-layout">
-        <div class="ki-donut-wrap"><div class="ki-donut" style="--pg:${{pc.gradient}}"></div></div>
-        <div class="ki-pie-legend">${{rows}}</div>
-      </div>
-    </div>`;
+    const pieChart = {chart_json};
+    const root = document.getElementById("gi-pie-root");
+    const rowsHtml = pieChart.rows.map(r => `
+        <div class="gi-pie-row">
+            <span class="gi-pie-dot" style="background:${{r.color}}"></span>
+            <span>${{r.label}}</span>
+            <span class="gi-pie-pct">${{r.display}}</span>
+        </div>
+    `).join("");
+
+    root.innerHTML = `
+        <div class="gi-pie-card">
+            <div class="gi-pie-title">${{pieChart.title}}</div>
+            <div class="gi-pie-layout">
+                <div class="gi-donut-wrap">
+                    <div class="gi-donut" style="--pie-gradient:${{pieChart.gradient}}"></div>
+                </div>
+                <div class="gi-pie-legend">${{rowsHtml}}</div>
+            </div>
+        </div>
+    `;
     </script>
     """, height=height + 35, scrolling=False)
 
 
 def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, value_format="money", height=460):
+    """Classic horizontal chart closer to the original Matplotlib look, with animated bar shimmer."""
     labels = [str(x) for x in labels]
     values = [float(x) if pd.notna(x) else 0.0 for x in values]
     if not values:
-        st.info("No chart data available.")
+        st.info("No chart data available for the current filter.")
         return
+
     max_abs = max(abs(v) for v in values) or 1.0
     rows = [{
-        "label": lab, "value": val,
+        "label": lab,
+        "value": val,
         "display": _fmt_chart_value(val, value_format),
-        "width": max(2, min(100, abs(val)/max_abs*100))
+        "width": max(2, min(100, abs(val) / max_abs * 100)),
     } for lab, val in zip(labels, values)]
-    cj = json.dumps({"title": title, "rows": rows, "color": color})
+
+    chart_json = json.dumps({"title": title, "rows": rows, "color": color})
 
     components.html(f"""
-    <div id="ki-cbar-root"></div>
+    <div id="gi-classic-hbar-root"></div>
+
     <style>
-    {_KINICH_CHART_CSS}
-    .ki-crows {{ display:flex; flex-direction:column; gap:11px; }}
-    .ki-crow  {{ display:grid; grid-template-columns:minmax(82px,148px) 1fr minmax(86px,108px); align-items:center; gap:10px; }}
-    .ki-clabel {{ color:{INK_SOFT}; font-size:13px; font-weight:700; text-align:right; }}
-    .ki-caxis {{ height:22px; position:relative; border-bottom:1px solid rgba(29,122,74,0.15);
-                 background-image:repeating-linear-gradient(to right,rgba(29,122,74,0.08) 1px,transparent 1px); background-size:25% 100%; }}
-    .ki-cbar {{
-        height:22px; width:var(--bw); border-radius:0; position:relative; overflow:hidden;
-        background:linear-gradient(90deg,var(--bc),color-mix(in srgb,var(--bc) 80%,#fff));
-        box-shadow:2px 2px 0 rgba(15,45,26,0.22), inset 0 1px 0 rgba(255,255,255,0.45);
-        animation:kiGrowH 800ms cubic-bezier(.22,.9,.25,1) both;
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    .gi-classic-card {{
+        width: 100%;
+        min-height: {height}px;
+        box-sizing: border-box;
+        padding: 24px 26px 22px;
+        border-radius: 22px;
+        background: transparent;
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: {INK};
+        overflow: hidden;
+        position: relative;
     }}
-    .ki-cbar::before {{
-        content:""; position:absolute; inset:0; width:70%;
-        background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),rgba(255,255,255,0.55),rgba(255,255,255,0.12),transparent);
-        transform:translateX(-150%); animation:kiShimmer 2.2s ease-in-out infinite; animation-delay:var(--delay);
+
+    .gi-classic-title {{
+        font-family: 'Cinzel', Georgia, serif;
+        text-align: center;
+        font-size: 22px;
+        line-height: 1.25;
+        color: {INK};
+        margin-bottom: 18px;
+        letter-spacing: 0.04em;
+        font-weight: 600;
     }}
-    .ki-cvalue {{ color:{INK_SOFT}; font-weight:800; font-size:13px; white-space:nowrap; }}
+
+    .gi-classic-rows {{
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }}
+
+    .gi-classic-row {{
+        display: grid;
+        grid-template-columns: minmax(84px, 150px) 1fr minmax(88px, 110px);
+        align-items: center;
+        gap: 12px;
+    }}
+
+    .gi-classic-label {{
+        color: {INK_SOFT};
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.1;
+        text-align: right;
+    }}
+
+    .gi-classic-axis {{
+        height: 23px;
+        position: relative;
+        border-bottom: 1px solid rgba(124,58,237,0.13);
+        background-image: linear-gradient(to right, rgba(124,58,237,0.08) 1px, transparent 1px);
+        background-size: 25% 100%;
+    }}
+
+    .gi-classic-bar {{
+        height: 22px;
+        width: var(--bar-width);
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(90deg, var(--bar-color), color-mix(in srgb, var(--bar-color) 82%, white));
+        box-shadow: 0 6px 16px rgba(74,50,120,0.13), inset 0 1px 0 rgba(255,255,255,0.50);
+        animation: growClassic 850ms cubic-bezier(.22,.9,.25,1) both;
+    }}
+
+    .gi-classic-bar::before {{
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 72%;
+        background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255,255,255,0.08) 24%,
+            rgba(255,255,255,0.62) 50%,
+            rgba(255,255,255,0.13) 68%,
+            transparent 100%);
+        transform: translateX(-150%);
+        animation: classicBarShimmer 2.25s ease-in-out infinite;
+        animation-delay: var(--delay);
+    }}
+
+    .gi-classic-value {{
+        color: {INK_SOFT};
+        font-weight: 800;
+        font-size: 13px;
+        white-space: nowrap;
+    }}
+
+    @keyframes classicBarShimmer {{
+        0%   {{ transform: translateX(-150%); }}
+        48%  {{ transform: translateX(155%); }}
+        100% {{ transform: translateX(155%); }}
+    }}
+
+    @keyframes growClassic {{
+        from {{ width: 0%; opacity: 0.50; }}
+        to   {{ width: var(--bar-width); opacity: 1; }}
+    }}
     </style>
+
     <script>
-    const cc = {cj};
-    const root = document.getElementById("ki-cbar-root");
-    const rows = cc.rows.map((r,i)=>`<div class="ki-crow">
-        <div class="ki-clabel">${{r.label}}</div>
-        <div class="ki-caxis"><div class="ki-cbar" style="--bw:${{r.width}}%;--bc:${{cc.color}};--delay:${{i*100}}ms;"></div></div>
-        <div class="ki-cvalue">${{r.display}}</div>
-    </div>`).join("");
-    root.innerHTML = `<div class="ki-card" style="min-height:{height}px">
-      <div class="ki-title">${{cc.title}}</div>
-      <div class="ki-crows">${{rows}}</div>
-    </div>`;
+    const classicChart = {chart_json};
+    const root = document.getElementById("gi-classic-hbar-root");
+    const rowsHtml = classicChart.rows.map((r, i) => `
+        <div class="gi-classic-row">
+            <div class="gi-classic-label">${{r.label}}</div>
+            <div class="gi-classic-axis">
+                <div class="gi-classic-bar" style="--bar-width:${{r.width}}%; --bar-color:${{classicChart.color}}; --delay:${{i * 110}}ms;"></div>
+            </div>
+            <div class="gi-classic-value">${{r.display}}</div>
+        </div>
+    `).join("");
+
+    root.innerHTML = `
+        <div class="gi-classic-card">
+            <div class="gi-classic-title">${{classicChart.title}}</div>
+            <div class="gi-classic-rows">${{rowsHtml}}</div>
+        </div>
+    `;
     </script>
     """, height=height + 30, scrolling=False)
 
@@ -1190,6 +1639,7 @@ def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, va
 # ─────────────────────────────────────────────────────────────
 df = load_data()
 model1, model2, model3, X1_columns, X2_columns, X3_columns = load_artifacts()
+
 
 # ─────────────────────────────────────────────────────────────
 #  PRE-COMPUTED
@@ -1222,14 +1672,10 @@ if "pred_result" not in st.session_state:
 #  SIDEBAR
 # ─────────────────────────────────────────────────────────────
 with st.sidebar:
+    st.markdown('<div class="sidebar-brand">Airline <span>Route</span> Intelligence ✦</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="sidebar-brand">AIRLINE<br><span>ROUTE</span><br>INTEL ✦</div>',
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<p style='font-size:0.50rem;color:{ACCENT};margin-bottom:14px;"
-        f"font-weight:400;letter-spacing:0.14em;text-transform:uppercase;"
-        f"font-family:Press Start 2P,monospace;line-height:1.8'>◆ Filter View</p>",
+        f"<p style='font-size:0.64rem;color:{ACCENT};margin-bottom:14px;"
+        "font-weight:700;letter-spacing:0.16em;text-transform:uppercase;font-family:DM Sans,sans-serif'>Filter View</p>",
         unsafe_allow_html=True,
     )
     route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
@@ -1239,15 +1685,14 @@ with st.sidebar:
 
     sel_route    = st.selectbox("✈  Route",         route_opts)
     sel_aircraft = st.selectbox("🛩  Aircraft Type", aircraft_opts)
-    sel_season   = st.selectbox("🌿  Season",        season_opts)
+    sel_season   = st.selectbox("🌤  Season",        season_opts)
     sel_decision = st.selectbox("🏷  Decision",      decision_opts)
 
     st.markdown("---")
     st.markdown(f"""
-    <p style='font-size:0.48rem;color:{ACCENT_2};font-weight:400;letter-spacing:0.14em;
-    text-transform:uppercase;margin-bottom:10px;font-family:Press Start 2P,monospace;line-height:1.8'>
-    ◆ Decision Labels</p>
-    <div style='display:flex;flex-direction:column;gap:10px;font-size:0.82rem;color:{INK_SOFT};font-family:Nunito,sans-serif'>
+    <p style='font-size:0.62rem;color:{ACCENT};font-weight:700;letter-spacing:0.16em;
+    text-transform:uppercase;margin-bottom:10px;font-family:DM Sans,sans-serif'>Decision Labels</p>
+    <div style='display:flex;flex-direction:column;gap:9px;font-size:0.80rem;color:{INK_SOFT};font-family:DM Sans,sans-serif'>
       <div style='display:flex;align-items:center;gap:10px'>
         <span class='pill pill-expand'>Expand</span>High profit &amp; demand
       </div>
@@ -1275,35 +1720,18 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 
 
 # ─────────────────────────────────────────────────────────────
-#  HERO — Kinich pixel art style
+#  HERO
 # ─────────────────────────────────────────────────────────────
-st.markdown(f"""
+st.markdown("""
 <div class="hero">
+  <div class="hero-star"></div><div class="hero-star"></div>
+  <div class="hero-star"></div><div class="hero-star"></div>
   <div class="hero-left">
-    <div class="hero-eyebrow">◆ Route Intelligence Platform ◆</div>
+    <div class="hero-eyebrow">✦ Route Intelligence Platform</div>
     <h1>Airline Profitability System</h1>
     <p>Sample airline dataset · for analysis &amp; demonstration only</p>
   </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.7rem;position:relative;z-index:1">
-    <div class="hero-badge">⚡ ML-Powered</div>
-    <!-- Pixel art Kinich-style companion sprite (CSS-drawn) -->
-    <div style="
-      width:48px;height:48px;
-      image-rendering:pixelated;
-      background:
-        /* body */
-        radial-gradient(circle at 50% 45%, {ACCENT} 40%, transparent 41%),
-        /* gold eyes */
-        radial-gradient(circle at 38% 42%, {ACCENT_2} 6%, transparent 7%),
-        radial-gradient(circle at 62% 42%, {ACCENT_2} 6%, transparent 7%),
-        /* lime outline */
-        radial-gradient(circle at 50% 45%, transparent 38%, {PIXEL_GREEN} 39%, {PIXEL_GREEN} 44%, transparent 45%);
-      border:2px solid {ACCENT_2};
-      border-radius:0;
-      box-shadow:3px 3px 0 rgba(15,45,26,0.35);
-      animation:pixelFloat 3s ease-in-out infinite;
-    " title="Kinich's Companion"></div>
-  </div>
+  <div class="hero-badge">⚡ ML-Powered Decisions</div>
   <div class="hero-glyph">✈</div>
 </div>
 """, unsafe_allow_html=True)
@@ -1314,10 +1742,10 @@ st.markdown(f"""
 # ─────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊  Overview",
-    "🔍  Drivers",
-    "🗺  Routes",
-    "📈  Stability",
-    "🤖  Predict",
+    "🔍  Performance Drivers",
+    "🗺  Route Actions",
+    "📈  Route Stability",
+    "🤖  Prediction Tool",
 ])
 
 
@@ -1348,16 +1776,20 @@ with tab1:
     d4.metric("Drop",     f"{drop_pct:.1f}%")
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
-    st.markdown('<div class="divider-label">◆ Composition ◆</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Composition</div>', unsafe_allow_html=True)
 
     left, right = st.columns([1, 1])
 
     with left:
-        st.markdown('<p class="section-hd">Decision Mix</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-hd">Decision mix</p>', unsafe_allow_html=True)
         dc = fdf["Route_Decision"].value_counts()
         dc = dc.reindex([x for x in ORDER if x in dc.index]).dropna()
-        wc = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-              "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
+        wc = {
+            "Expand":   CHART_EXPAND,
+            "Maintain": CHART_MAINTAIN,
+            "Optimize": CHART_OPTIMIZE,
+            "Drop":     CHART_DROP,
+        }
         wedge_colors = [wc[l] for l in dc.index]
         shimmer_pie_chart(
             title="Share of Flights by Decision",
@@ -1368,7 +1800,7 @@ with tab1:
         )
 
     with right:
-        st.markdown('<p class="section-hd">Average Metrics by Decision</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-hd">Average metrics by decision</p>', unsafe_allow_html=True)
         summary = (
             fdf.groupby("Route_Decision")[["Profit", "Profit_Margin", "Load_Factor"]]
             .mean()
@@ -1382,11 +1814,11 @@ with tab1:
             })
         )
         st.dataframe(summary, use_container_width=True, hide_index=True)
-        st.markdown(f"""
+        st.markdown("""
         <div class="info-box">
-          <strong style="color:{ACCENT}">◆ How to read this</strong><br>
+          <strong style="color:#7c3aed">How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
-          <strong style="color:{CHART_EXPAND}">Expand</strong> routes should have the highest values across all three columns.
+          <strong style="color:#1d4ed8">Expand</strong> routes should have the highest values across all three columns.
         </div>""", unsafe_allow_html=True)
 
 
@@ -1426,7 +1858,7 @@ with tab2:
             height=350,
         )
 
-    st.markdown('<div class="divider-label">◆ Cost Breakdown ◆</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Cost breakdown</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Where is the money going?</p>', unsafe_allow_html=True)
     st.markdown('<p class="section-sub">The biggest cost components across all filtered flights.</p>', unsafe_allow_html=True)
 
@@ -1447,10 +1879,14 @@ with tab2:
         "Marketing_Cost": "Marketing", "IT_Systems_Cost": "IT Systems",
     }
     cost_means.index = [label_map.get(i, i) for i in cost_means.index]
+
+    # Build a gradient of jewel tones for cost bars
     nc = len(cost_means)
-    kinich_ramp = [CHART_EXPAND, PIXEL_TEAL, ACCENT, CHART_MAINTAIN,
-                   PIXEL_GREEN, CHART_OPTIMIZE, CHART_DROP, "#5a8a6a"]
-    neutral_cols = kinich_ramp[:nc]
+    jewel_ramp = [
+        CHART_EXPAND, "#0e7490", ACCENT, CHART_MAINTAIN,
+        "#15803d", CHART_OPTIMIZE, CHART_DROP, "#6d28d9",
+    ]
+    neutral_cols = jewel_ramp[:nc]
 
     shimmer_horizontal_bar_chart(
         title="Top Cost Drivers",
@@ -1468,7 +1904,7 @@ with tab3:
     st.markdown('<p class="section-sub">A quick view of your best and worst performing routes.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        f"<p style='font-size:0.76rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:Nunito,sans-serif'>"
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "Top routes currently classified as Expand</p>", unsafe_allow_html=True)
     expand_routes = (
         fdf[fdf["Route_Decision"] == "Expand"]
@@ -1483,7 +1919,7 @@ with tab3:
 
     with left:
         st.markdown(
-            f"<p style='font-size:0.76rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:Nunito,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         shimmer_classic_horizontal_bar_chart(
@@ -1497,7 +1933,7 @@ with tab3:
 
     with right:
         st.markdown(
-            f"<p style='font-size:0.76rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:Nunito,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         shimmer_classic_horizontal_bar_chart(
@@ -1518,18 +1954,18 @@ with tab4:
     left, right = st.columns(2)
     with left:
         st.markdown(
-            f"<p style='font-size:0.76rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:Nunito,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Routes with most decision changes</p>", unsafe_allow_html=True)
         st.dataframe(route_switches.head(10), use_container_width=True, hide_index=True)
     with right:
         st.markdown(
-            f"<p style='font-size:0.76rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:Nunito,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Routes seen in the most decision states</p>", unsafe_allow_html=True)
         st.dataframe(route_variability.head(10), use_container_width=True, hide_index=True)
 
-    st.markdown('<div class="divider-label">◆ Distribution ◆</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Distribution</div>', unsafe_allow_html=True)
     st.markdown(
-        f"<p style='font-size:0.76rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:Nunito,sans-serif'>"
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "How many unique routes appear in each category?</p>", unsafe_allow_html=True)
 
     urbd = (
@@ -1540,8 +1976,8 @@ with tab4:
     bc_map = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
               "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
     bc = [bc_map.get(i, ACCENT) for i in urbd.index]
-    vals4 = urbd["Unique Routes"].values.tolist()
 
+    vals4 = urbd["Unique Routes"].values.tolist()
     shimmer_vertical_bar_chart(
         title="Unique Routes per Decision Category",
         labels=urbd.index.tolist(),
@@ -1559,27 +1995,35 @@ with tab4:
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
 with tab5:
-    st.markdown('<p class="section-hd">Simulate a Route Scenario</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-hd">Simulate a route scenario</p>', unsafe_allow_html=True)
     st.markdown('<p class="section-sub">Enter route characteristics and our model will suggest the best decision.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        f"<p style='font-size:0.76rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:Nunito,sans-serif'>"
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "How accurate are the models?</p>", unsafe_allow_html=True)
 
     shimmer_vertical_bar_chart(
         title="Model Accuracy & F1 Comparison",
         labels=comparison["Model"].tolist(),
         series=[
-            {"name": "Accuracy", "values": comparison["Accuracy"].tolist(), "color": ACCENT},
-            {"name": "Macro F1", "values": comparison["Macro F1"].tolist(),  "color": ACCENT_2},
+            {
+                "name": "Accuracy",
+                "values": comparison["Accuracy"].tolist(),
+                "color": ACCENT,
+            },
+            {
+                "name": "Macro F1",
+                "values": comparison["Macro F1"].tolist(),
+                "color": ACCENT_2,
+            },
         ],
         max_value=1.0,
         value_format="percent",
         height=430,
     )
 
-    st.markdown('<div class="divider-label">◆ Configuration ◆</div>', unsafe_allow_html=True)
-    st.markdown('<p class="section-hd">Choose a Prediction Mode</p>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
+    st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
     st.markdown(f"""<div class="info-box">
     <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
     <span class='pill pill-optimize'>Cost-only</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
@@ -1596,14 +2040,14 @@ with tab5:
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown('<p class="col-label">✈ Flight Basics</p>', unsafe_allow_html=True)
+            st.markdown('<p class="col-label">✈ Flight basics</p>', unsafe_allow_html=True)
             aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
             aircraft_capacity = st.number_input("Aircraft Capacity", min_value=50,  max_value=600, value=250)
             passengers        = st.number_input("Passengers",        min_value=0,   max_value=600, value=200)
             load_factor       = st.slider("Load Factor (seat occupancy)", min_value=0.0, max_value=1.0, value=0.80, step=0.01)
 
         with col2:
-            st.markdown('<p class="col-label">🌍 Route Context</p>', unsafe_allow_html=True)
+            st.markdown('<p class="col-label">🌍 Route context</p>', unsafe_allow_html=True)
             flight_hours   = st.number_input("Flight Hours",   min_value=0.5, max_value=20.0, value=6.0, step=0.1)
             season_val     = st.selectbox("Season",            sorted(df["Season"].dropna().unique()))
             route_category = st.selectbox("Route Category",    sorted(df["Route_Category"].dropna().unique()))
@@ -1617,24 +2061,25 @@ with tab5:
 
         elif model_choice == "Without Revenue Variables":
             with col3:
-                st.markdown('<p class="col-label">💸 Cost Breakdown</p>', unsafe_allow_html=True)
-                fuel_cost               = st.number_input("Fuel Cost ($)",                 min_value=0.0, value=40000.0,  step=1000.0)
-                maintenance_cost        = st.number_input("Maintenance Cost ($)",          min_value=0.0, value=15000.0,  step=500.0)
-                crew_cost               = st.number_input("Crew Cost ($)",                 min_value=0.0, value=8000.0,   step=500.0)
-                depreciation_cost       = st.number_input("Depreciation Cost ($)",         min_value=0.0, value=20000.0,  step=500.0)
-                insurance_cost          = st.number_input("Insurance Cost ($)",            min_value=0.0, value=4000.0,   step=250.0)
-                airport_fees            = st.number_input("Airport Fees ($)",              min_value=0.0, value=5000.0,   step=250.0)
-                catering_cost           = st.number_input("Catering Cost ($)",             min_value=0.0, value=5000.0,   step=250.0)
-                handling_cost           = st.number_input("Handling Cost ($)",             min_value=0.0, value=4000.0,   step=250.0)
-                navigation_fees         = st.number_input("Navigation Fees ($)",           min_value=0.0, value=3500.0,   step=250.0)
-                sales_distribution_cost = st.number_input("Sales & Distribution Cost ($)", min_value=0.0, value=35000.0,  step=500.0)
-                passenger_service_cost  = st.number_input("Passenger Service Cost ($)",    min_value=0.0, value=5000.0,   step=250.0)
-                overhead_cost           = st.number_input("Overhead Cost ($)",             min_value=0.0, value=25000.0,  step=500.0)
-                marketing_cost          = st.number_input("Marketing Cost ($)",            min_value=0.0, value=12000.0,  step=500.0)
-                it_systems_cost         = st.number_input("IT Systems Cost ($)",           min_value=0.0, value=3000.0,   step=250.0)
+                st.markdown('<p class="col-label">💸 Cost breakdown</p>', unsafe_allow_html=True)
+                fuel_cost               = st.number_input("Fuel Cost ($)",                  min_value=0.0, value=40000.0,  step=1000.0)
+                maintenance_cost        = st.number_input("Maintenance Cost ($)",           min_value=0.0, value=15000.0,  step=500.0)
+                crew_cost               = st.number_input("Crew Cost ($)",                  min_value=0.0, value=8000.0,   step=500.0)
+                depreciation_cost       = st.number_input("Depreciation Cost ($)",          min_value=0.0, value=20000.0,  step=500.0)
+                insurance_cost          = st.number_input("Insurance Cost ($)",             min_value=0.0, value=4000.0,   step=250.0)
+                airport_fees            = st.number_input("Airport Fees ($)",               min_value=0.0, value=5000.0,   step=250.0)
+                catering_cost           = st.number_input("Catering Cost ($)",              min_value=0.0, value=5000.0,   step=250.0)
+                handling_cost           = st.number_input("Handling Cost ($)",              min_value=0.0, value=4000.0,   step=250.0)
+                navigation_fees         = st.number_input("Navigation Fees ($)",            min_value=0.0, value=3500.0,   step=250.0)
+                sales_distribution_cost = st.number_input("Sales & Distribution Cost ($)",  min_value=0.0, value=35000.0,  step=500.0)
+                passenger_service_cost  = st.number_input("Passenger Service Cost ($)",     min_value=0.0, value=5000.0,   step=250.0)
+                overhead_cost           = st.number_input("Overhead Cost ($)",              min_value=0.0, value=25000.0,  step=500.0)
+                marketing_cost          = st.number_input("Marketing Cost ($)",             min_value=0.0, value=12000.0,  step=500.0)
+                it_systems_cost         = st.number_input("IT Systems Cost ($)",            min_value=0.0, value=3000.0,   step=250.0)
 
-        submitted = st.form_submit_button("◆ Get Route Decision")
+        submitted = st.form_submit_button("✈  Get Route Decision")
 
+    # ── PREDICTION LOGIC ────────────────────────────────────
     if submitted:
         if model_choice == "With Revenue Variables":
             row = {
@@ -1674,6 +2119,7 @@ with tab5:
 
         st.session_state.pred_result = {"prediction": pred, "probabilities": prob, "classes": cls}
 
+    # ── RESULT ──────────────────────────────────────────────
     if st.session_state.pred_result is not None:
         res  = st.session_state.pred_result
         pred = res["prediction"]; prob = res["probabilities"]; cls = res["classes"]
@@ -1696,33 +2142,34 @@ with tab5:
           <div style='margin-bottom:10px'>
             <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
           </div>
-          <div style='font-family:"Oxanium",sans-serif;font-size:1.45rem;font-weight:700;
-                      color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.06em;
+          <div style='font-family:"Cinzel",serif;font-size:1.55rem;font-weight:600;
+                      color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.04em;
                       text-transform:uppercase'>
-            ◆ Suggested Decision: {pred}
+            Suggested Decision: {pred}
           </div>
-          <p style='color:{INK_SOFT};margin:0;font-size:0.88rem;line-height:1.80;
-                    font-family:"Nunito",sans-serif'>
+          <p style='color:{INK_SOFT};margin:0;font-size:0.88rem;line-height:1.75;
+                    font-family:"DM Sans",sans-serif'>
             {explanations.get(pred, "")}
           </p>
         </div>""", unsafe_allow_html=True)
 
         st.markdown(
-            f"<p style='font-size:0.76rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:Nunito,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Confidence by decision option</p>", unsafe_allow_html=True)
 
         prob_df = (pd.DataFrame({"Decision": cls, "Probability": prob})
                    .sort_values("Probability", ascending=False))
         bar_cp  = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
                    "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-        bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
 
+        bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
+        probs = prob_df["Probability"].tolist()
         shimmer_vertical_bar_chart(
             title="Model Confidence per Decision",
             labels=prob_df["Decision"].tolist(),
             series=[{
                 "name": "Probability",
-                "values": prob_df["Probability"].tolist(),
+                "values": probs,
                 "color": ACCENT,
                 "colors": bar_colors,
             }],
@@ -1748,23 +2195,23 @@ with st.expander("🗂  Show filtered data"):
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <div style='text-align:center;padding:40px 0 18px'>
-  <div style='display:inline-flex;align-items:center;gap:14px;
-              background:rgba(240,247,234,0.90);
-              border:2px solid rgba(212,160,23,0.40);
-              padding:0.55rem 1.6rem;
-              box-shadow:3px 3px 0 rgba(15,45,26,0.20);
-              font-family:"Press Start 2P",monospace;
-              font-size:0.44rem; line-height:1.8;
-              font-weight:400;
+  <div style='display:inline-flex;align-items:center;gap:12px;
+              background:rgba(255,252,248,0.85);
+              border:1px solid rgba(124,58,237,0.22);
+              border-radius:999px;
+              padding:0.55rem 1.4rem;
+              backdrop-filter:blur(14px);
+              box-shadow:0 4px 18px rgba(124,58,237,0.10);
+              font-family:"DM Sans",sans-serif;
+              font-size:0.67rem;
+              font-weight:600;
               color:{INK_MUTED};
-              letter-spacing:0.10em;
-              text-transform:uppercase;
-              image-rendering:pixelated'>
-    <span style='color:{ACCENT};font-size:0.60rem'>◆</span>
+              letter-spacing:0.12em;
+              text-transform:uppercase'>
+    <span style='color:{ACCENT};font-size:0.78rem'>✦</span>
     Airline Profitability System
-    <span style='color:{ACCENT_2};font-size:0.60rem'>◆</span>
+    <span style='color:{ACCENT};font-size:0.78rem'>✦</span>
     Built with Streamlit
-    <span style='color:{ACCENT};font-size:0.60rem'>◆</span>
   </div>
 </div>
 """, unsafe_allow_html=True)
