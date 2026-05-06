@@ -805,21 +805,12 @@ def col_seq(labels):
 
 
 def add_bar_shimmer(bars, ax, alpha=0.92):
-    """Add a subtle highlight stripe on each bar for a crystal effect."""
+    """Legacy fallback: no white static rectangles. Use HTML helpers for real shimmer."""
     for bar in bars:
         bar.set_alpha(alpha)
         bar.set_linewidth(0)
-        # White sheen overlay via a thin lighter rectangle on the left quarter
-        x = bar.get_x()
-        h = bar.get_height()
-        w = bar.get_width()
-        y = bar.get_y()
-        if h > 0:
-            ax.add_patch(plt.Rectangle(
-                (x + w * 0.08, y), w * 0.22, h,
-                color="white", alpha=0.22, zorder=bar.get_zorder() + 1
-            ))
     return bars
+
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1006,15 +997,6 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
         animation-delay: var(--delay);
     }}
 
-    .gi-bar::after {{
-        content: "";
-        position: absolute;
-        left: 12%;
-        top: 0;
-        width: 18%;
-        height: 100%;
-        background: rgba(255,255,255,0.20);
-    }}
 
     .gi-value {{
         position: absolute;
@@ -1246,15 +1228,6 @@ def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_forma
         animation-delay: var(--delay);
     }}
 
-    .gi-hbar::after {{
-        content: "";
-        position: absolute;
-        left: 8%;
-        top: 0;
-        width: 14%;
-        height: 100%;
-        background: rgba(255,255,255,0.20);
-    }}
 
     .gi-hvalue {{
         color: {INK_SOFT};
@@ -1304,6 +1277,361 @@ def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_forma
     `;
     </script>
     """, height=height + 35, scrolling=False)
+
+
+def shimmer_pie_chart(title, labels, values, colors=None, height=430):
+    """Animated donut/pie-style chart rendered in HTML/CSS with shimmer."""
+    labels = [str(x) for x in labels]
+    values = [float(x) if pd.notna(x) else 0.0 for x in values]
+    total = sum(values)
+    if not values or total <= 0:
+        st.info("No chart data available for the current filter.")
+        return
+
+    if colors is None:
+        colors = [ACCENT for _ in values]
+    else:
+        colors = list(colors)
+
+    rows = []
+    start = 0.0
+    stops = []
+    for label, value, color in zip(labels, values, colors):
+        pct = value / total * 100
+        end = start + pct
+        stops.append(f"{color} {start:.4f}% {end:.4f}%")
+        rows.append({
+            "label": label,
+            "value": value,
+            "pct": pct,
+            "display": f"{pct:.1f}%",
+            "color": color,
+        })
+        start = end
+
+    chart = {
+        "title": title,
+        "gradient": ", ".join(stops),
+        "rows": rows,
+        "total": total,
+    }
+    chart_json = json.dumps(chart)
+
+    components.html(f"""
+    <div id="gi-pie-root"></div>
+
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    .gi-pie-card {{
+        width: 100%;
+        min-height: {height}px;
+        box-sizing: border-box;
+        padding: 24px 28px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: {INK};
+        overflow: hidden;
+        position: relative;
+    }}
+
+    .gi-pie-card::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+        transform: translateX(-130%);
+        animation: pieCardSweep 5.5s ease-in-out infinite;
+        pointer-events: none;
+    }}
+
+    .gi-pie-title {{
+        font-family: 'Cinzel', Georgia, serif;
+        text-align: center;
+        font-size: 22px;
+        line-height: 1.25;
+        color: {INK};
+        margin-bottom: 18px;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+    }}
+
+    .gi-pie-layout {{
+        display: grid;
+        grid-template-columns: minmax(210px, 0.9fr) minmax(190px, 1fr);
+        gap: 24px;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }}
+
+    .gi-donut-wrap {{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }}
+
+    .gi-donut {{
+        width: min(230px, 80vw);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: conic-gradient(var(--pie-gradient));
+        position: relative;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            0 14px 32px rgba(74,50,120,0.16);
+        overflow: hidden;
+        animation: donutPop 850ms cubic-bezier(.22,.9,.25,1) both;
+    }}
+
+    .gi-donut::before {{
+        content: "";
+        position: absolute;
+        inset: -20%;
+        background: linear-gradient(115deg,
+            transparent 0%,
+            rgba(255,255,255,0.08) 32%,
+            rgba(255,255,255,0.70) 48%,
+            rgba(255,255,255,0.12) 62%,
+            transparent 100%);
+        transform: translateX(-120%) rotate(12deg);
+        animation: pieShimmer 2.8s ease-in-out infinite;
+    }}
+
+    .gi-donut::after {{
+        content: "";
+        position: absolute;
+        inset: 27%;
+        border-radius: 50%;
+        background:
+            radial-gradient(circle at 35% 25%, rgba(255,255,255,0.82), rgba(255,252,248,0.88) 62%, rgba(245,238,255,0.90));
+        box-shadow: inset 0 2px 10px rgba(124,58,237,0.10);
+    }}
+
+    .gi-pie-legend {{
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+    }}
+
+    .gi-pie-row {{
+        display: grid;
+        grid-template-columns: 14px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        color: {INK_SOFT};
+        font-size: 13px;
+        font-weight: 700;
+    }}
+
+    .gi-pie-dot {{
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.45), 0 4px 12px rgba(74,50,120,0.13);
+    }}
+
+    .gi-pie-pct {{
+        color: {INK_SOFT};
+        font-weight: 900;
+        white-space: nowrap;
+    }}
+
+    @keyframes pieShimmer {{
+        0%   {{ transform: translateX(-120%) rotate(12deg); }}
+        48%  {{ transform: translateX(120%) rotate(12deg); }}
+        100% {{ transform: translateX(120%) rotate(12deg); }}
+    }}
+
+    @keyframes donutPop {{
+        from {{ transform: scale(0.86) rotate(-18deg); opacity: 0.55; }}
+        to   {{ transform: scale(1) rotate(0deg); opacity: 1; }}
+    }}
+
+    @keyframes pieCardSweep {{
+        0%   {{ transform: translateX(-130%); }}
+        45%  {{ transform: translateX(130%); }}
+        100% {{ transform: translateX(130%); }}
+    }}
+    </style>
+
+    <script>
+    const pieChart = {chart_json};
+    const root = document.getElementById("gi-pie-root");
+    const rowsHtml = pieChart.rows.map(r => `
+        <div class="gi-pie-row">
+            <span class="gi-pie-dot" style="background:${{r.color}}"></span>
+            <span>${{r.label}}</span>
+            <span class="gi-pie-pct">${{r.display}}</span>
+        </div>
+    `).join("");
+
+    root.innerHTML = `
+        <div class="gi-pie-card">
+            <div class="gi-pie-title">${{pieChart.title}}</div>
+            <div class="gi-pie-layout">
+                <div class="gi-donut-wrap">
+                    <div class="gi-donut" style="--pie-gradient:${{pieChart.gradient}}"></div>
+                </div>
+                <div class="gi-pie-legend">${{rowsHtml}}</div>
+            </div>
+        </div>
+    `;
+    </script>
+    """, height=height + 35, scrolling=False)
+
+
+def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, value_format="money", height=460):
+    """Classic horizontal chart closer to the original Matplotlib look, with animated bar shimmer."""
+    labels = [str(x) for x in labels]
+    values = [float(x) if pd.notna(x) else 0.0 for x in values]
+    if not values:
+        st.info("No chart data available for the current filter.")
+        return
+
+    max_abs = max(abs(v) for v in values) or 1.0
+    rows = [{
+        "label": lab,
+        "value": val,
+        "display": _fmt_chart_value(val, value_format),
+        "width": max(2, min(100, abs(val) / max_abs * 100)),
+    } for lab, val in zip(labels, values)]
+
+    chart_json = json.dumps({"title": title, "rows": rows, "color": color})
+
+    components.html(f"""
+    <div id="gi-classic-hbar-root"></div>
+
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    .gi-classic-card {{
+        width: 100%;
+        min-height: {height}px;
+        box-sizing: border-box;
+        padding: 24px 26px 22px;
+        border-radius: 22px;
+        background: transparent;
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: {INK};
+        overflow: hidden;
+        position: relative;
+    }}
+
+    .gi-classic-title {{
+        font-family: 'Cinzel', Georgia, serif;
+        text-align: center;
+        font-size: 22px;
+        line-height: 1.25;
+        color: {INK};
+        margin-bottom: 18px;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+    }}
+
+    .gi-classic-rows {{
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }}
+
+    .gi-classic-row {{
+        display: grid;
+        grid-template-columns: minmax(84px, 150px) 1fr minmax(88px, 110px);
+        align-items: center;
+        gap: 12px;
+    }}
+
+    .gi-classic-label {{
+        color: {INK_SOFT};
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.1;
+        text-align: right;
+    }}
+
+    .gi-classic-axis {{
+        height: 23px;
+        position: relative;
+        border-bottom: 1px solid rgba(124,58,237,0.13);
+        background-image: linear-gradient(to right, rgba(124,58,237,0.08) 1px, transparent 1px);
+        background-size: 25% 100%;
+    }}
+
+    .gi-classic-bar {{
+        height: 22px;
+        width: var(--bar-width);
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(90deg, var(--bar-color), color-mix(in srgb, var(--bar-color) 82%, white));
+        box-shadow: 0 6px 16px rgba(74,50,120,0.13), inset 0 1px 0 rgba(255,255,255,0.50);
+        animation: growClassic 850ms cubic-bezier(.22,.9,.25,1) both;
+    }}
+
+    .gi-classic-bar::before {{
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 72%;
+        background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255,255,255,0.08) 24%,
+            rgba(255,255,255,0.62) 50%,
+            rgba(255,255,255,0.13) 68%,
+            transparent 100%);
+        transform: translateX(-150%);
+        animation: classicBarShimmer 2.25s ease-in-out infinite;
+        animation-delay: var(--delay);
+    }}
+
+    .gi-classic-value {{
+        color: {INK_SOFT};
+        font-weight: 800;
+        font-size: 13px;
+        white-space: nowrap;
+    }}
+
+    @keyframes classicBarShimmer {{
+        0%   {{ transform: translateX(-150%); }}
+        48%  {{ transform: translateX(155%); }}
+        100% {{ transform: translateX(155%); }}
+    }}
+
+    @keyframes growClassic {{
+        from {{ width: 0%; opacity: 0.50; }}
+        to   {{ width: var(--bar-width); opacity: 1; }}
+    }}
+    </style>
+
+    <script>
+    const classicChart = {chart_json};
+    const root = document.getElementById("gi-classic-hbar-root");
+    const rowsHtml = classicChart.rows.map((r, i) => `
+        <div class="gi-classic-row">
+            <div class="gi-classic-label">${{r.label}}</div>
+            <div class="gi-classic-axis">
+                <div class="gi-classic-bar" style="--bar-width:${{r.width}}%; --bar-color:${{classicChart.color}}; --delay:${{i * 110}}ms;"></div>
+            </div>
+            <div class="gi-classic-value">${{r.display}}</div>
+        </div>
+    `).join("");
+
+    root.innerHTML = `
+        <div class="gi-classic-card">
+            <div class="gi-classic-title">${{classicChart.title}}</div>
+            <div class="gi-classic-rows">${{rowsHtml}}</div>
+        </div>
+    `;
+    </script>
+    """, height=height + 30, scrolling=False)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1462,21 +1790,14 @@ with tab1:
             "Optimize": CHART_OPTIMIZE,
             "Drop":     CHART_DROP,
         }
-        fig, ax = clean_fig((5, 4.8))
         wedge_colors = [wc[l] for l in dc.index]
-        wedges, texts, autotexts = ax.pie(
-            dc.values, labels=dc.index, autopct="%1.1f%%",
-            colors=wedge_colors, startangle=90,
-            wedgeprops={"linewidth": 3, "edgecolor": "#fdf9f4"},
-            textprops={"color": INK_SOFT, "fontsize": 9.5, "fontfamily": "DM Sans"},
-            pctdistance=0.76,
+        shimmer_pie_chart(
+            title="Share of Flights by Decision",
+            labels=dc.index.tolist(),
+            values=dc.values.tolist(),
+            colors=wedge_colors,
+            height=390,
         )
-        for at in autotexts:
-            at.set_fontsize(8.5); at.set_color(INK); at.set_fontweight("bold")
-        for t in texts:
-            t.set_color(INK_SOFT)
-        ax.set_title("Share of Flights by Decision", pad=14, color=INK)
-        st.pyplot(fig)
 
     with right:
         st.markdown('<p class="section-hd">Average metrics by decision</p>', unsafe_allow_html=True)
@@ -1601,13 +1922,13 @@ with tab3:
             f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
-        shimmer_horizontal_bar_chart(
+        shimmer_classic_horizontal_bar_chart(
             title="Top 10 Routes",
             labels=top.index.tolist(),
             values=top.values.tolist(),
-            colors=CHART_EXPAND,
+            color=CHART_EXPAND,
             value_format="money",
-            height=460,
+            height=430,
         )
 
     with right:
@@ -1615,13 +1936,13 @@ with tab3:
             f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
-        shimmer_horizontal_bar_chart(
+        shimmer_classic_horizontal_bar_chart(
             title="Bottom 10 Routes",
             labels=worst.index.tolist(),
             values=worst.values.tolist(),
-            colors=CHART_DROP,
+            color=CHART_DROP,
             value_format="money",
-            height=460,
+            height=430,
         )
 
 
@@ -1841,20 +2162,21 @@ with tab5:
         bar_cp  = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
                    "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
 
-        fig, ax = clean_fig((6, 3.5))
         bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
         probs = prob_df["Probability"].tolist()
-        bars = ax.bar(prob_df["Decision"], probs, color=bar_colors, width=0.5)
-        add_bar_shimmer(bars, ax)
-        for bar, h in zip(bars, probs):
-            ax.text(bar.get_x() + bar.get_width() / 2, h + 0.025, f"{h:.0%}",
-                    ha="center", fontsize=9, color=INK_SOFT, fontweight="700")
-        ax.set_ylim(0, 1.12)
-        ax.set_ylabel("Probability")
-        ax.set_title("Model Confidence per Decision")
-        for label in ax.get_xticklabels():
-            label.set_color(INK_SOFT)
-        st.pyplot(fig)
+        shimmer_vertical_bar_chart(
+            title="Model Confidence per Decision",
+            labels=prob_df["Decision"].tolist(),
+            series=[{
+                "name": "Probability",
+                "values": probs,
+                "color": ACCENT,
+                "colors": bar_colors,
+            }],
+            max_value=1.0,
+            value_format="percent",
+            height=390,
+        )
 
         st.dataframe(
             prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
