@@ -123,7 +123,7 @@ st.markdown(f"""
     content:"";
     position:fixed; inset:0;
     background-image:
-        linear-gradient(45deg, rgba(29,122,74,0.025) 25%, transparent 25%),
+        linear-gradient(45deg, rgba(30,122,74,0.025) 25%, transparent 25%),
         linear-gradient(-45deg, rgba(29,122,74,0.025) 25%, transparent 25%),
         linear-gradient(45deg, transparent 75%, rgba(29,122,74,0.025) 75%),
         linear-gradient(-45deg, transparent 75%, rgba(29,122,74,0.025) 75%);
