@@ -175,16 +175,16 @@ h1,h2,h3,h4 {{
 
 /* ── Hero ── */
 .hero {{
-    position: fixed; overflow: hidden;
+    position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: space-between; gap: 1.2rem;
     border-radius: var(--r-md);
-    padding: 2rem 2.4rem; margin-bottom: 1.4rem;
+    padding: 3rem 3.4rem; margin-bottom: 1.9rem;
     background: linear-gradient(140deg,
         rgba(240,247,234,0.95) 0%,
         rgba(232,245,240,0.90) 50%,
         rgba(248,244,232,0.95) 100%);
-    border: 2px solid rgba(212,160,23,0.40);
-    box-shadow: var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.90);
+    border: 6px solid rgba(212,160,23,0.40);
+    box-shadow: var(--sh-md), inset 0 3px 0 rgba(255,255,255,0.90);
     animation: goldPulse 4s ease-in-out infinite;
 }}
 
