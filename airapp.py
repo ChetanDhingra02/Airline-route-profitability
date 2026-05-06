@@ -5,6 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
+import json
+import streamlit.components.v1 as components
 
 
 st.set_page_config(
@@ -110,8 +112,6 @@ html, body, [class*="css"] {{
     color: {INK} !important;
 }}
 
-/* ── CURSOR — hidden (replaced by canvas airplane) ── */
-*, *:hover {{ cursor: none !important; }}
 
 /* ── App background — warm pearl with chromatic orbs ── */
 .stApp {{
@@ -823,6 +823,490 @@ def add_bar_shimmer(bars, ax, alpha=0.92):
 
 
 # ─────────────────────────────────────────────────────────────
+#  ANIMATED HTML CHART HELPERS — keeps the same theme, but lets bars shimmer
+# ─────────────────────────────────────────────────────────────
+def _fmt_chart_value(v, value_format="number"):
+    if value_format == "percent":
+        return f"{v:.0%}"
+    if value_format == "money":
+        return f"${v:,.0f}"
+    return f"{v:,.0f}"
+
+
+def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_format="number", height=430):
+    """
+    Animated vertical grouped/single bar chart rendered in HTML/CSS.
+    series example:
+    [
+        {"name": "Accuracy", "values": [0.88, 0.84], "color": ACCENT},
+        {"name": "Macro F1", "values": [0.88, 0.84], "color": ACCENT_2},
+    ]
+    """
+    labels = [str(x) for x in labels]
+    clean_series = []
+    all_values = []
+
+    for s in series:
+        vals = [float(x) if pd.notna(x) else 0.0 for x in s.get("values", [])]
+        all_values.extend(vals)
+        clean_series.append({
+            "name": str(s.get("name", "Value")),
+            "values": vals,
+            "color": s.get("color", ACCENT),
+            "colors": s.get("colors", None),
+        })
+
+    if not all_values:
+        st.info("No chart data available for the current filter.")
+        return
+
+    if max_value is None:
+        max_value = max(all_values) if max(all_values) != 0 else 1
+    max_value = float(max_value) if max_value else 1.0
+
+    chart = {
+        "title": title,
+        "labels": labels,
+        "series": clean_series,
+        "max_value": max_value,
+        "value_format": value_format,
+    }
+    chart_json = json.dumps(chart)
+
+    components.html(f"""
+    <div id="gi-chart-root"></div>
+
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    .gi-chart {{
+        width: 100%;
+        min-height: {height}px;
+        box-sizing: border-box;
+        padding: 26px 30px 24px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: {INK};
+        overflow: hidden;
+        position: relative;
+    }}
+
+    .gi-chart::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+        transform: translateX(-130%);
+        animation: chartSweep 5.5s ease-in-out infinite;
+        pointer-events: none;
+    }}
+
+    .gi-chart-title {{
+        font-family: 'Cinzel', Georgia, serif;
+        text-align: center;
+        font-size: 24px;
+        line-height: 1.25;
+        color: {INK};
+        margin-bottom: 20px;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+    }}
+
+    .gi-legend {{
+        display: flex;
+        justify-content: center;
+        gap: 22px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }}
+
+    .gi-legend-item {{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: {INK_SOFT};
+        font-weight: 600;
+        font-size: 14px;
+    }}
+
+    .gi-legend-color {{
+        width: 30px;
+        height: 12px;
+        border-radius: 999px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 4px 12px rgba(74,50,120,0.12);
+    }}
+
+    .gi-plot {{
+        display: grid;
+        grid-template-columns: repeat({max(len(labels), 1)}, minmax(0, 1fr));
+        gap: 30px;
+        align-items: end;
+        height: {max(height - 180, 190)}px;
+        border-bottom: 1px solid rgba(124,58,237,0.18);
+        background-image: linear-gradient(to top, rgba(124,58,237,0.08) 1px, transparent 1px);
+        background-size: 100% 25%;
+        padding: 0 18px;
+        position: relative;
+        z-index: 1;
+    }}
+
+    .gi-group {{
+        height: 100%;
+        display: flex;
+        align-items: end;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+    }}
+
+    .gi-bar-wrap {{
+        height: 100%;
+        width: min(48px, 30%);
+        min-width: 26px;
+        display: flex;
+        align-items: end;
+        justify-content: center;
+        position: relative;
+    }}
+
+    .gi-bar {{
+        width: 100%;
+        height: var(--bar-height);
+        min-height: 3px;
+        border-radius: 14px 14px 4px 4px;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            inset 8px 0 16px rgba(255,255,255,0.16),
+            0 10px 24px rgba(74,50,120,0.18);
+        animation: growBar 850ms cubic-bezier(.22,.9,.25,1) both;
+    }}
+
+    .gi-bar::before {{
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 80%;
+        background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255,255,255,0.10) 20%,
+            rgba(255,255,255,0.74) 48%,
+            rgba(255,255,255,0.18) 66%,
+            transparent 100%);
+        transform: translateX(-150%);
+        animation: barShimmer 2.25s ease-in-out infinite;
+        animation-delay: var(--delay);
+    }}
+
+    .gi-bar::after {{
+        content: "";
+        position: absolute;
+        left: 12%;
+        top: 0;
+        width: 18%;
+        height: 100%;
+        background: rgba(255,255,255,0.20);
+    }}
+
+    .gi-value {{
+        position: absolute;
+        bottom: calc(var(--bar-height) + 8px);
+        font-size: 13px;
+        font-weight: 800;
+        color: {INK_SOFT};
+        white-space: nowrap;
+    }}
+
+    .gi-xlabels {{
+        display: grid;
+        grid-template-columns: repeat({max(len(labels), 1)}, minmax(0, 1fr));
+        gap: 30px;
+        padding: 13px 18px 0;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }}
+
+    .gi-xlabel {{
+        color: {INK_SOFT};
+        font-weight: 700;
+        font-size: 13px;
+        line-height: 1.25;
+        transform: rotate(-6deg);
+        transform-origin: center top;
+    }}
+
+    @keyframes barShimmer {{
+        0%   {{ transform: translateX(-150%); }}
+        48%  {{ transform: translateX(155%); }}
+        100% {{ transform: translateX(155%); }}
+    }}
+
+    @keyframes growBar {{
+        from {{ height: 0%; opacity: 0.50; }}
+        to   {{ height: var(--bar-height); opacity: 1; }}
+    }}
+
+    @keyframes chartSweep {{
+        0%   {{ transform: translateX(-130%); }}
+        45%  {{ transform: translateX(130%); }}
+        100% {{ transform: translateX(130%); }}
+    }}
+    </style>
+
+    <script>
+    const chart = {chart_json};
+
+    function formatValue(v) {{
+        if (chart.value_format === "percent") return Math.round(v * 100) + "%";
+        if (chart.value_format === "money") return "$" + Math.round(v).toLocaleString();
+        return Math.round(v).toLocaleString();
+    }}
+
+    const root = document.getElementById("gi-chart-root");
+    const legendHtml = chart.series.map(s => `
+        <div class="gi-legend-item">
+            <span class="gi-legend-color" style="background:${{s.color}}"></span>
+            ${{s.name}}
+        </div>
+    `).join("");
+
+    const groupsHtml = chart.labels.map((label, i) => `
+        <div class="gi-group">
+            ${{chart.series.map((s, j) => {{
+                const value = Number(s.values[i] || 0);
+                const pct = Math.max(2, Math.min(100, value / chart.max_value * 100));
+                const color = s.colors ? s.colors[i] : s.color;
+                return `
+                    <div class="gi-bar-wrap">
+                        <div class="gi-value" style="--bar-height:${{pct}}%">${{formatValue(value)}}</div>
+                        <div class="gi-bar"
+                             style="--bar-height:${{pct}}%; --delay:${{(i + j) * 120}}ms; background: linear-gradient(180deg, ${{color}}, ${{color}}dd);"></div>
+                    </div>
+                `;
+            }}).join("")}}
+        </div>
+    `).join("");
+
+    const xLabelsHtml = chart.labels.map(label => `<div class="gi-xlabel">${{label}}</div>`).join("");
+
+    root.innerHTML = `
+        <div class="gi-chart">
+            <div class="gi-chart-title">${{chart.title}}</div>
+            <div class="gi-legend">${{legendHtml}}</div>
+            <div class="gi-plot">${{groupsHtml}}</div>
+            <div class="gi-xlabels">${{xLabelsHtml}}</div>
+        </div>
+    `;
+    </script>
+    """, height=height + 40, scrolling=False)
+
+
+def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_format="number", height=430):
+    """Animated horizontal bar chart rendered in HTML/CSS."""
+    labels = [str(x) for x in labels]
+    values = [float(x) if pd.notna(x) else 0.0 for x in values]
+    if not values:
+        st.info("No chart data available for the current filter.")
+        return
+
+    if colors is None:
+        colors = [ACCENT for _ in values]
+    elif isinstance(colors, str):
+        colors = [colors for _ in values]
+    else:
+        colors = list(colors)
+
+    max_abs = max(abs(v) for v in values) or 1.0
+    rows = []
+    for label, value, color in zip(labels, values, colors):
+        rows.append({
+            "label": label,
+            "value": value,
+            "display": _fmt_chart_value(value, value_format),
+            "width": max(2, min(100, abs(value) / max_abs * 100)),
+            "color": color,
+        })
+
+    chart = {"title": title, "rows": rows}
+    chart_json = json.dumps(chart)
+
+    components.html(f"""
+    <div id="gi-hbar-root"></div>
+
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    .gi-hchart {{
+        width: 100%;
+        min-height: {height}px;
+        box-sizing: border-box;
+        padding: 24px 28px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: {INK};
+        overflow: hidden;
+        position: relative;
+    }}
+
+    .gi-hchart::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+        transform: translateX(-130%);
+        animation: chartSweep 5.5s ease-in-out infinite;
+        pointer-events: none;
+    }}
+
+    .gi-hchart-title {{
+        font-family: 'Cinzel', Georgia, serif;
+        text-align: center;
+        font-size: 22px;
+        line-height: 1.25;
+        color: {INK};
+        margin-bottom: 20px;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+    }}
+
+    .gi-hrows {{
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+        position: relative;
+        z-index: 1;
+    }}
+
+    .gi-hrow {{
+        display: grid;
+        grid-template-columns: minmax(92px, 170px) 1fr minmax(72px, 100px);
+        align-items: center;
+        gap: 12px;
+    }}
+
+    .gi-hlabel {{
+        color: {INK_SOFT};
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.15;
+        text-align: right;
+    }}
+
+    .gi-htrack {{
+        height: 24px;
+        border-radius: 999px;
+        background: rgba(124,58,237,0.07);
+        border: 1px solid rgba(124,58,237,0.12);
+        overflow: hidden;
+        position: relative;
+    }}
+
+    .gi-hbar {{
+        height: 100%;
+        width: var(--bar-width);
+        border-radius: 999px;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            inset 8px 0 16px rgba(255,255,255,0.16),
+            0 8px 18px rgba(74,50,120,0.14);
+        animation: growHBar 850ms cubic-bezier(.22,.9,.25,1) both;
+    }}
+
+    .gi-hbar::before {{
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 80%;
+        background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255,255,255,0.10) 20%,
+            rgba(255,255,255,0.74) 48%,
+            rgba(255,255,255,0.18) 66%,
+            transparent 100%);
+        transform: translateX(-150%);
+        animation: barShimmer 2.25s ease-in-out infinite;
+        animation-delay: var(--delay);
+    }}
+
+    .gi-hbar::after {{
+        content: "";
+        position: absolute;
+        left: 8%;
+        top: 0;
+        width: 14%;
+        height: 100%;
+        background: rgba(255,255,255,0.20);
+    }}
+
+    .gi-hvalue {{
+        color: {INK_SOFT};
+        font-weight: 800;
+        font-size: 13px;
+        white-space: nowrap;
+    }}
+
+    @keyframes barShimmer {{
+        0%   {{ transform: translateX(-150%); }}
+        48%  {{ transform: translateX(155%); }}
+        100% {{ transform: translateX(155%); }}
+    }}
+
+    @keyframes growHBar {{
+        from {{ width: 0%; opacity: 0.50; }}
+        to   {{ width: var(--bar-width); opacity: 1; }}
+    }}
+
+    @keyframes chartSweep {{
+        0%   {{ transform: translateX(-130%); }}
+        45%  {{ transform: translateX(130%); }}
+        100% {{ transform: translateX(130%); }}
+    }}
+    </style>
+
+    <script>
+    const chart = {chart_json};
+    const root = document.getElementById("gi-hbar-root");
+
+    const rowsHtml = chart.rows.map((r, i) => `
+        <div class="gi-hrow">
+            <div class="gi-hlabel">${{r.label}}</div>
+            <div class="gi-htrack">
+                <div class="gi-hbar"
+                     style="--bar-width:${{r.width}}%; --delay:${{i * 110}}ms; background: linear-gradient(90deg, ${{r.color}}, ${{r.color}}dd);"></div>
+            </div>
+            <div class="gi-hvalue">${{r.display}}</div>
+        </div>
+    `).join("");
+
+    root.innerHTML = `
+        <div class="gi-hchart">
+            <div class="gi-hchart-title">${{chart.title}}</div>
+            <div class="gi-hrows">${{rowsHtml}}</div>
+        </div>
+    `;
+    </script>
+    """, height=height + 35, scrolling=False)
+
+
+# ─────────────────────────────────────────────────────────────
 #  LOAD
 # ─────────────────────────────────────────────────────────────
 df = load_data()
@@ -1027,37 +1511,31 @@ with tab2:
     with left:
         apd = (fdf.groupby("Route_Decision")["Profit"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        fig, ax = clean_fig((6, 4))
-        colors = col_seq(apd.index.tolist())
-        bars = ax.bar(apd.index, apd.values, color=colors, width=0.55)
-        add_bar_shimmer(bars, ax)
-        mn, mx_v = min(apd.values.min(), 0), apd.values.max()
-        pad = (mx_v - mn) * 0.10 if mx_v != mn else 1
-        for bar, h in zip(bars, apd.values):
-            xp = bar.get_x() + bar.get_width() / 2
-            if h >= 0:
-                ax.text(xp, h + pad, f"${h:,.0f}", ha="center", va="bottom",
-                        fontsize=8, color=INK_SOFT, fontweight="700")
-            else:
-                ax.text(xp, h * 0.5, f"${h:,.0f}", ha="center", va="center",
-                        fontsize=8, color=INK_SOFT, fontweight="700")
-        ax.set_ylabel("Average Profit ($)")
-        ax.set_title("Average Profit by Decision")
-        st.pyplot(fig)
+        shimmer_horizontal_bar_chart(
+            title="Average Profit by Decision",
+            labels=apd.index.tolist(),
+            values=apd.values.tolist(),
+            colors=col_seq(apd.index.tolist()),
+            value_format="money",
+            height=350,
+        )
 
     with right:
         ald = (fdf.groupby("Route_Decision")["Load_Factor"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        fig, ax = clean_fig((6, 4))
-        colors = col_seq(ald.index.tolist())
-        bars = ax.bar(ald.index, ald.values, color=colors, width=0.55)
-        add_bar_shimmer(bars, ax)
-        for bar, h in zip(bars, ald.values):
-            ax.text(bar.get_x() + bar.get_width() / 2, h + 0.018, f"{h:.0%}",
-                    ha="center", va="bottom", fontsize=8, color=INK_SOFT, fontweight="700")
-        ax.set_ylabel("Average Seat Occupancy")
-        ax.set_title("Seat Occupancy by Decision")
-        st.pyplot(fig)
+        shimmer_vertical_bar_chart(
+            title="Seat Occupancy by Decision",
+            labels=ald.index.tolist(),
+            series=[{
+                "name": "Average Seat Occupancy",
+                "values": ald.values.tolist(),
+                "color": ACCENT,
+                "colors": col_seq(ald.index.tolist()),
+            }],
+            max_value=1.0,
+            value_format="percent",
+            height=350,
+        )
 
     st.markdown('<div class="divider-label">Cost breakdown</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Where is the money going?</p>', unsafe_allow_html=True)
@@ -1089,20 +1567,14 @@ with tab2:
     ]
     neutral_cols = jewel_ramp[:nc]
 
-    fig, ax = clean_fig((9, 4))
-    bars = ax.barh(cost_means.index, cost_means.values, color=neutral_cols, height=0.55)
-    add_bar_shimmer(bars, ax)
-    mx_c = cost_means.max()
-    for bar, w in zip(bars, cost_means.values):
-        ax.text(w + mx_c * 0.015, bar.get_y() + bar.get_height() / 2, f"${w:,.0f}",
-                va="center", fontsize=8, color=INK_SOFT, fontweight="700")
-    ax.set_xlabel("Average Cost per Flight ($)")
-    ax.set_title("Top Cost Drivers")
-    ax.grid(axis="x", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
-    ax.grid(axis="y", visible=False)
-    for label in ax.get_yticklabels():
-        label.set_color(INK_SOFT)
-    st.pyplot(fig)
+    shimmer_horizontal_bar_chart(
+        title="Top Cost Drivers",
+        labels=cost_means.index.tolist(),
+        values=cost_means.values.tolist(),
+        colors=neutral_cols,
+        value_format="money",
+        height=430,
+    )
 
 
 # ── TAB 3 · ROUTE ACTIONS ────────────────────────────────────
@@ -1129,32 +1601,28 @@ with tab3:
             f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
-        fig, ax = clean_fig((7, 5))
-        bars = ax.barh(top.index, top.values, color=CHART_EXPAND, height=0.55)
-        add_bar_shimmer(bars, ax)
-        ax.set_xlabel("Total Profit ($)")
-        ax.set_title("Top 10 Routes")
-        ax.grid(axis="x", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
-        ax.grid(axis="y", visible=False)
-        for label in ax.get_yticklabels():
-            label.set_color(INK_SOFT)
-        st.pyplot(fig)
+        shimmer_horizontal_bar_chart(
+            title="Top 10 Routes",
+            labels=top.index.tolist(),
+            values=top.values.tolist(),
+            colors=CHART_EXPAND,
+            value_format="money",
+            height=460,
+        )
 
     with right:
         st.markdown(
             f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
-        fig, ax = clean_fig((7, 5))
-        bars = ax.barh(worst.index, worst.values, color=CHART_DROP, height=0.55)
-        add_bar_shimmer(bars, ax)
-        ax.set_xlabel("Total Profit ($)")
-        ax.set_title("Bottom 10 Routes")
-        ax.grid(axis="x", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
-        ax.grid(axis="y", visible=False)
-        for label in ax.get_yticklabels():
-            label.set_color(INK_SOFT)
-        st.pyplot(fig)
+        shimmer_horizontal_bar_chart(
+            title="Bottom 10 Routes",
+            labels=worst.index.tolist(),
+            values=worst.values.tolist(),
+            colors=CHART_DROP,
+            value_format="money",
+            height=460,
+        )
 
 
 # ── TAB 4 · ROUTE STABILITY ──────────────────────────────────
@@ -1188,28 +1656,20 @@ with tab4:
               "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
     bc = [bc_map.get(i, ACCENT) for i in urbd.index]
 
-    fig, ax = clean_fig((8, 4))
     vals4 = urbd["Unique Routes"].values.tolist()
-    bars = ax.bar(urbd.index, vals4, color=bc, width=0.55)
-    add_bar_shimmer(bars, ax)
-    for bar, h in zip(bars, vals4):
-        ax.text(bar.get_x() + bar.get_width() / 2, h + max(vals4) * 0.04, f"{int(h)}",
-                ha="center", fontsize=9, color=INK_SOFT, fontweight="700")
-    ax.set_ylabel("Number of Unique Routes")
-    ax.set_title("Unique Routes per Decision Category")
-    for label in ax.get_xticklabels():
-        label.set_color(INK_SOFT)
-    st.pyplot(fig)
-
-    patches = [mpatches.Patch(color=bc_map.get(d, ACCENT), label=d) for d in ORDER]
-    fig2, ax2 = plt.subplots(figsize=(5, 0.5))
-    fig2.patch.set_alpha(0)
-    ax2.axis("off")
-    legend = ax2.legend(handles=patches, loc="center", frameon=False, ncol=4,
-                        prop={"size": 9})
-    for text in legend.get_texts():
-        text.set_color(INK_SOFT)
-    st.pyplot(fig2)
+    shimmer_vertical_bar_chart(
+        title="Unique Routes per Decision Category",
+        labels=urbd.index.tolist(),
+        series=[{
+            "name": "Unique Routes",
+            "values": vals4,
+            "color": ACCENT,
+            "colors": bc,
+        }],
+        max_value=max(vals4) if vals4 else 1,
+        value_format="number",
+        height=390,
+    )
 
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
@@ -1221,26 +1681,25 @@ with tab5:
         f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "How accurate are the models?</p>", unsafe_allow_html=True)
 
-    fig, ax = clean_fig((8, 3.5))
-    x = np.arange(len(comparison)); w = 0.33
-    bars1 = ax.bar(x - w/2, comparison["Accuracy"], width=w, color=ACCENT,  label="Accuracy")
-    bars2 = ax.bar(x + w/2, comparison["Macro F1"], width=w, color=ACCENT_2, label="Macro F1")
-    add_bar_shimmer(bars1, ax); add_bar_shimmer(bars2, ax)
-    for bar, acc in zip(bars1, comparison["Accuracy"]):
-        ax.text(bar.get_x() + bar.get_width() / 2, acc + 0.02, f"{acc:.0%}",
-                ha="center", fontsize=7.5, color=INK_SOFT, fontweight="700")
-    for bar, f1 in zip(bars2, comparison["Macro F1"]):
-        ax.text(bar.get_x() + bar.get_width() / 2, f1 + 0.02, f"{f1:.0%}",
-                ha="center", fontsize=7.5, color=INK_SOFT, fontweight="700")
-    legend = ax.legend(frameon=False, fontsize=9)
-    for text in legend.get_texts():
-        text.set_color(INK_SOFT)
-    ax.set_xticks(x)
-    ax.set_xticklabels(comparison["Model"], fontsize=8.5, rotation=10, color=INK_SOFT)
-    ax.set_ylim(0, 1.15)
-    ax.set_ylabel("Score")
-    ax.set_title("Model Accuracy & F1 Comparison")
-    st.pyplot(fig)
+    shimmer_vertical_bar_chart(
+        title="Model Accuracy & F1 Comparison",
+        labels=comparison["Model"].tolist(),
+        series=[
+            {
+                "name": "Accuracy",
+                "values": comparison["Accuracy"].tolist(),
+                "color": ACCENT,
+            },
+            {
+                "name": "Macro F1",
+                "values": comparison["Macro F1"].tolist(),
+                "color": ACCENT_2,
+            },
+        ],
+        max_value=1.0,
+        value_format="percent",
+        height=430,
+    )
 
     st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
