@@ -18,34 +18,34 @@ st.set_page_config(
 
 
 # ─────────────────────────────────────────────────────────────
-#  KINICH PALETTE — Eight-Bit Artistry / Genshin Impact Style
+#  JEWEL-TONE LIGHT PALETTE — Crystal / Genshin Impact Style
 # ─────────────────────────────────────────────────────────────
-BG_BASE        = "#08150f"          # deep jungle obsidian
-BG_SOFT        = "#10261c"          # moss glass
-BG_COOL        = "#133026"          # jade-teal panel
+BG_BASE        = "#fdf9f4"          # warm pearl ivory
+BG_SOFT        = "#f5eeff"          # lavender tint
+BG_COOL        = "#eef5fd"          # sky tint
 
-GLASS_BG       = "rgba(10, 28, 18, 0.78)"
-GLASS_BORDER   = "rgba(151, 241, 31, 0.24)"
+GLASS_BG       = "rgba(255, 252, 248, 0.72)"
+GLASS_BORDER   = "rgba(162, 106, 255, 0.28)"
 
-INK            = "#eef7c8"          # warm dendro parchment
-INK_SOFT       = "#c9e48a"          # lime parchment
-INK_MUTED      = "#89a86b"          # moss-muted text
+INK            = "#1a0f3c"          # deep indigo-black
+INK_SOFT       = "#4a3278"          # violet ink mid
+INK_MUTED      = "#8b6faa"          # muted amethyst
 
-ACCENT         = "#97f11f"          # Kinich neon dendro
-ACCENT_DK      = "#5f981c"
-ACCENT_LT      = "#dfff8d"
-ACCENT_2       = "#16c7a5"          # turquoise circuitry
-MAGENTA        = "#f39a22"          # sunset-orange trim
+ACCENT         = "#7c3aed"          # vivid violet
+ACCENT_DK      = "#5b21b6"
+ACCENT_LT      = "#c4b5fd"
+ACCENT_2       = "#0284c7"          # sapphire
+MAGENTA        = "#db2777"          # ruby
 
-# Kinich chart tones — neon jungle + Eight-Bit accents
-CHART_EXPAND   = "#2ad5b5"          # turquoise rise
-CHART_MAINTAIN = "#84d12d"          # dendro lime
-CHART_OPTIMIZE = "#d98c1f"          # amber-orange
-CHART_ORANGE   = "#d98c1f"
-CHART_DROP     = "#c95b2d"          # ember clay
+# Jewel chart tones — maximum saturation
+CHART_EXPAND   = "#1d4ed8"          # deep sapphire
+CHART_MAINTAIN = "#047857"          # deep emerald
+CHART_OPTIMIZE = "#b45309"          # deep topaz
+CHART_ORANGE   = "#b45309"
+CHART_DROP     = "#be185d"          # deep ruby
 CHART_NEUTRAL  = [
-    "#97f11f", "#2ad5b5", "#16c7a5", "#84d12d",
-    "#d98c1f", "#c95b2d", "#4fb864", "#7b8f63",
+    "#6d28d9", "#1d4ed8", "#0e7490", "#047857",
+    "#be185d", "#b45309", "#15803d", "#71717a",
 ]
 
 DECISION_COLORS = {
@@ -62,7 +62,7 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {{
     --pearl:       {BG_BASE};
@@ -76,16 +76,16 @@ st.markdown(f"""
     --accent-lt:   {ACCENT_LT};
     --accent-2:    {ACCENT_2};
     --magenta:     {MAGENTA};
-    --sapphire:    #2ad5b5;
-    --emerald:     #84d12d;
-    --topaz:       #d98c1f;
-    --ruby:        #c95b2d;
-    --amethyst:    #62b51f;
+    --sapphire:    #1d4ed8;
+    --emerald:     #047857;
+    --topaz:       #b45309;
+    --ruby:        #be185d;
+    --amethyst:    #6d28d9;
     --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
-    --sh-sm: 0 2px 16px rgba(151,241,31,0.10), 0 1px 4px rgba(0,0,0,0.05);
-    --sh-md: 0 8px 32px rgba(151,241,31,0.14), 0 2px 8px rgba(0,0,0,0.08);
-    --sh-lg: 0 20px 56px rgba(151,241,31,0.18), 0 4px 16px rgba(0,0,0,0.10);
-    --sh-glow: 0 0 0 1px rgba(151,241,31,0.30), 0 0 28px rgba(151,241,31,0.18);
+    --sh-sm: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+    --sh-md: 0 8px 32px rgba(120,70,200,0.16), 0 2px 8px rgba(0,0,0,0.08);
+    --sh-lg: 0 20px 56px rgba(120,70,200,0.22), 0 4px 16px rgba(0,0,0,0.10);
+    --sh-glow: 0 0 0 1px rgba(124,58,237,0.30), 0 0 28px rgba(124,58,237,0.18);
     --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 }}
 
@@ -100,14 +100,14 @@ st.markdown(f"""
 @keyframes scanLine   {{ 0% {{ top:-4px; opacity:0; }} 5% {{ opacity:0.8; }} 95% {{ opacity:0.4; }} 100% {{ top:100%; opacity:0; }} }}
 @keyframes twinkle    {{ 0%,100% {{ opacity:0; transform:scale(0.4); }} 50% {{ opacity:1; transform:scale(1); }} }}
 @keyframes badgePop   {{ 0% {{ transform:scale(0.8); opacity:0; }} 60% {{ transform:scale(1.05); }} 100% {{ transform:scale(1); opacity:1; }} }}
-@keyframes borderFlow {{ 0%,100% {{ border-color:rgba(151,241,31,0.18); }} 50% {{ border-color:rgba(151,241,31,0.45); }} }}
+@keyframes borderFlow {{ 0%,100% {{ border-color:rgba(124,58,237,0.18); }} 50% {{ border-color:rgba(124,58,237,0.45); }} }}
 @keyframes crystalFloat {{ 0%,100% {{ transform:translateY(0) rotate(0deg); }} 50% {{ transform:translateY(-6px) rotate(2deg); }} }}
 @keyframes particleFly  {{ 0%   {{ opacity:0; transform:scale(0.3) translateY(0); }}
                            30%  {{ opacity:1; }}
                            100% {{ opacity:0; transform:scale(1.2) translateY(-20px); }} }}
 
 html, body, [class*="css"] {{
-    font-family: 'Space Grotesk', system-ui, sans-serif !important;
+    font-family: 'DM Sans', system-ui, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     color: {INK} !important;
 }}
@@ -117,12 +117,12 @@ html, body, [class*="css"] {{
 .stApp {{
     min-height: 100vh;
     background:
-        radial-gradient(ellipse at 14% 18%, rgba(151,241,31,0.16) 0, transparent 34%),
-        radial-gradient(ellipse at 84% 12%, rgba(22,199,165,0.13) 0, transparent 30%),
-        radial-gradient(ellipse at 62% 88%, rgba(243,154,34,0.09) 0, transparent 28%),
-        radial-gradient(ellipse at 32% 72%, rgba(108,188,44,0.08) 0, transparent 26%),
-        radial-gradient(ellipse at 76% 54%, rgba(217,140,31,0.06) 0, transparent 22%),
-        linear-gradient(155deg, #08150f 0%, #10261c 28%, #133026 56%, #17392b 80%, #08150f 100%);
+        radial-gradient(ellipse at 14% 18%, rgba(162,106,255,0.16) 0, transparent 34%),
+        radial-gradient(ellipse at 84% 12%, rgba(56,189,248,0.13) 0, transparent 30%),
+        radial-gradient(ellipse at 62% 88%, rgba(219,39,119,0.09) 0, transparent 28%),
+        radial-gradient(ellipse at 32% 72%, rgba(5,150,105,0.08) 0, transparent 26%),
+        radial-gradient(ellipse at 76% 54%, rgba(180,83,9,0.06) 0, transparent 22%),
+        linear-gradient(155deg, #fdf9f4 0%, #f7f0ff 28%, #eef5fd 56%, #f0fdf8 80%, #fdf9f4 100%);
     background-attachment: fixed;
 }}
 
@@ -131,7 +131,7 @@ html, body, [class*="css"] {{
     content:"";
     position:fixed; top:-120px; left:-120px;
     width:480px; height:480px; border-radius:50%;
-    background:radial-gradient(circle, rgba(151,241,31,0.14) 0%, transparent 70%);
+    background:radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
     animation:orbDrift1 20s ease-in-out infinite;
     pointer-events:none; z-index:0;
 }}
@@ -139,7 +139,7 @@ html, body, [class*="css"] {{
     content:"";
     position:fixed; bottom:-100px; right:-100px;
     width:400px; height:400px; border-radius:50%;
-    background:radial-gradient(circle, rgba(22,199,165,0.12) 0%, transparent 70%);
+    background:radial-gradient(circle, rgba(2,132,199,0.12) 0%, transparent 70%);
     animation:orbDrift2 26s ease-in-out infinite;
     pointer-events:none; z-index:0;
 }}
@@ -156,19 +156,19 @@ section.main > div {{ background: transparent; }}
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {{
     background: rgba(253,249,244,0.90) !important;
-    border-right: 1px solid rgba(151,241,31,0.18) !important;
+    border-right: 1px solid rgba(124,58,237,0.18) !important;
     backdrop-filter: blur(24px) saturate(1.5) !important;
     -webkit-backdrop-filter: blur(24px) saturate(1.5) !important;
-    box-shadow: 4px 0 32px rgba(151,241,31,0.08) !important;
+    box-shadow: 4px 0 32px rgba(124,58,237,0.08) !important;
 }}
 [data-testid="stSidebar"] * {{ color: {INK_SOFT} !important; }}
 
 .sidebar-brand {{
-    font-family: 'Oxanium', serif;
+    font-family: 'Cinzel', serif;
     font-size: 1.25rem; font-weight: 700;
     color: {INK}; letter-spacing: 0.06em;
     padding: 0.2rem 0 1rem 0;
-    border-bottom: 1px solid rgba(151,241,31,0.18);
+    border-bottom: 1px solid rgba(124,58,237,0.18);
     margin-bottom: 1rem; text-transform: uppercase;
 }}
 .sidebar-brand span {{
@@ -178,7 +178,7 @@ section.main > div {{ background: transparent; }}
 
 /* ── Headings ── */
 h1,h2,h3,h4 {{
-    font-family: 'Oxanium', serif !important;
+    font-family: 'Cinzel', serif !important;
     color: {INK} !important;
     letter-spacing: 0.04em !important;
     font-weight: 600 !important;
@@ -192,10 +192,10 @@ h1,h2,h3,h4 {{
     border-radius: var(--r-xl);
     padding: 2rem 2.4rem; margin-bottom: 1.4rem;
     background: linear-gradient(140deg,
-        rgba(9,22,15,0.90) 0%,
-        rgba(16,38,26,0.82) 50%,
-        rgba(12,30,22,0.78) 100%);
-    border: 1px solid rgba(151,241,31,0.28);
+        rgba(255,252,248,0.88) 0%,
+        rgba(245,238,255,0.80) 50%,
+        rgba(238,245,253,0.75) 100%);
+    border: 1px solid rgba(124,58,237,0.28);
     backdrop-filter: blur(24px) saturate(1.6);
     -webkit-backdrop-filter: blur(24px) saturate(1.6);
     box-shadow: var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.9);
@@ -208,29 +208,29 @@ h1,h2,h3,h4 {{
     position:absolute; left:0; right:0; height:2px;
     background:linear-gradient(90deg,
         transparent 0%,
-        rgba(151,241,31,0) 10%,
-        rgba(151,241,31,0.6) 45%,
-        rgba(22,199,165,0.5) 55%,
-        rgba(151,241,31,0) 90%, transparent 100%);
+        rgba(124,58,237,0) 10%,
+        rgba(124,58,237,0.6) 45%,
+        rgba(2,132,199,0.5) 55%,
+        rgba(124,58,237,0) 90%, transparent 100%);
     animation: scanLine 6s linear infinite; pointer-events:none; z-index:5;
 }}
 .hero::after {{
     content:"";
     position:absolute; top:-60px; right:-60px;
     width:240px; height:240px; border-radius:50%;
-    background:radial-gradient(circle, rgba(22,199,165,0.16) 0%, transparent 70%);
+    background:radial-gradient(circle, rgba(2,132,199,0.16) 0%, transparent 70%);
     animation: orbDrift3 14s ease-in-out infinite; pointer-events:none;
 }}
 .hero-star {{ position:absolute; width:3px; height:3px; border-radius:50%; pointer-events:none; }}
-.hero-star:nth-child(1) {{ top:20%; left:46%; background:rgba(151,241,31,0.7); animation:twinkle 3.0s ease-in-out infinite; }}
-.hero-star:nth-child(2) {{ top:68%; left:63%; background:rgba(22,199,165,0.7); animation:twinkle 4.0s ease-in-out infinite 0.8s; }}
-.hero-star:nth-child(3) {{ top:38%; left:78%; background:rgba(243,154,34,0.6); animation:twinkle 2.8s ease-in-out infinite 1.5s; }}
-.hero-star:nth-child(4) {{ top:80%; left:32%; background:rgba(108,188,44,0.6); animation:twinkle 3.5s ease-in-out infinite 0.4s; width:4px; height:4px; }}
+.hero-star:nth-child(1) {{ top:20%; left:46%; background:rgba(124,58,237,0.7); animation:twinkle 3.0s ease-in-out infinite; }}
+.hero-star:nth-child(2) {{ top:68%; left:63%; background:rgba(2,132,199,0.7); animation:twinkle 4.0s ease-in-out infinite 0.8s; }}
+.hero-star:nth-child(3) {{ top:38%; left:78%; background:rgba(219,39,119,0.6); animation:twinkle 2.8s ease-in-out infinite 1.5s; }}
+.hero-star:nth-child(4) {{ top:80%; left:32%; background:rgba(5,150,105,0.6); animation:twinkle 3.5s ease-in-out infinite 0.4s; width:4px; height:4px; }}
 .hero-left,.hero-badge,.hero-glyph {{ position:relative; z-index:1; }}
 .hero-left {{ flex:1; min-width:0; }}
 .hero-eyebrow {{
     font-size:0.59rem; text-transform:uppercase; letter-spacing:0.22em;
-    color:{ACCENT}; font-weight:700; margin-bottom:0.5rem; font-family:'Space Grotesk',sans-serif;
+    color:{ACCENT}; font-weight:700; margin-bottom:0.5rem; font-family:'DM Sans',sans-serif;
 }}
 .hero h1 {{
     margin:0 0 0.4rem 0 !important;
@@ -240,20 +240,20 @@ h1,h2,h3,h4 {{
     text-shadow:none !important;
 }}
 .hero p {{ margin:0; color:{INK_SOFT} !important; font-size:0.86rem !important;
-           font-family:'Space Grotesk',sans-serif !important; text-transform:none !important;
+           font-family:'DM Sans',sans-serif !important; text-transform:none !important;
            letter-spacing:0 !important; font-weight:400 !important; }}
 .hero-badge {{
     display:inline-flex; align-items:center; gap:0.5rem;
     padding:0.6rem 1.1rem; border-radius:999px;
-    border:1px solid rgba(243,154,34,0.45);
-    background:linear-gradient(135deg,rgba(243,154,34,0.10),rgba(151,241,31,0.10));
+    border:1px solid rgba(219,39,119,0.45);
+    background:linear-gradient(135deg,rgba(219,39,119,0.10),rgba(124,58,237,0.10));
     color:{MAGENTA}; font-size:0.70rem; font-weight:700;
-    letter-spacing:0.08em; text-transform:uppercase; font-family:'Space Grotesk',sans-serif;
-    box-shadow:0 4px 18px rgba(243,154,34,0.15), 0 0 0 1px rgba(243,154,34,0.15);
+    letter-spacing:0.08em; text-transform:uppercase; font-family:'DM Sans',sans-serif;
+    box-shadow:0 4px 18px rgba(219,39,119,0.15), 0 0 0 1px rgba(219,39,119,0.15);
     animation:badgePop 700ms ease-out 250ms both;
     white-space:nowrap; transition:transform 180ms var(--ease), box-shadow 180ms var(--ease);
 }}
-.hero-badge:hover {{ transform:translateY(-3px) scale(1.04); box-shadow:0 8px 26px rgba(243,154,34,0.28); }}
+.hero-badge:hover {{ transform:translateY(-3px) scale(1.04); box-shadow:0 8px 26px rgba(219,39,119,0.28); }}
 .hero-glyph {{
     font-size:3rem; opacity:0.12; color:{ACCENT};
     animation:crystalFloat 6s ease-in-out infinite;
@@ -262,12 +262,12 @@ h1,h2,h3,h4 {{
 /* ── Metric cards ── */
 [data-testid="metric-container"] {{
     background: linear-gradient(155deg,
-        rgba(9,22,15,0.88) 0%, rgba(15,35,25,0.78) 100%) !important;
-    border: 1px solid rgba(151,241,31,0.20) !important;
+        rgba(255,252,248,0.85) 0%, rgba(248,244,255,0.75) 100%) !important;
+    border: 1px solid rgba(124,58,237,0.20) !important;
     border-radius: var(--r-md) !important;
     backdrop-filter: blur(16px) saturate(1.4) !important;
     -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
-    box-shadow: var(--sh-sm), inset 0 1px 0 rgba(232,255,167,0.10) !important;
+    box-shadow: var(--sh-sm), inset 0 1px 0 rgba(255,255,255,0.95) !important;
     padding: 1.1rem 1.2rem !important;
     transition: transform 200ms var(--ease), box-shadow 200ms var(--ease) !important;
     position:relative; overflow:hidden;
@@ -275,29 +275,29 @@ h1,h2,h3,h4 {{
 }}
 [data-testid="metric-container"]::after {{
     content:""; position:absolute; top:0; left:-80%; width:50%; height:100%;
-    background:linear-gradient(90deg,transparent,rgba(223,255,141,0.14),transparent);
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent);
     transition:left 0.55s ease; pointer-events:none;
 }}
 [data-testid="metric-container"]:hover {{
     transform:translateY(-5px) scale(1.02) !important;
-    box-shadow:var(--sh-md), 0 0 0 1px rgba(151,241,31,0.35), inset 0 1px 0 rgba(232,255,167,0.10) !important;
+    box-shadow:var(--sh-md), 0 0 0 1px rgba(124,58,237,0.35), inset 0 1px 0 rgba(255,255,255,0.95) !important;
 }}
 [data-testid="metric-container"]:hover::after {{ left:160%; }}
 [data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
     font-size:0.60rem !important; font-weight:700 !important;
     text-transform:uppercase !important; letter-spacing:0.16em !important;
-    color:{ACCENT} !important; font-family:'Space Grotesk',sans-serif !important;
+    color:{ACCENT} !important; font-family:'DM Sans',sans-serif !important;
 }}
 [data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
     color:{INK} !important; font-size:1.90rem !important; font-weight:700 !important;
-    letter-spacing:-0.02em !important; font-family:'Oxanium',serif !important;
+    letter-spacing:-0.02em !important; font-family:'Cinzel',serif !important;
 }}
 
 /* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {{
     gap:0.22rem;
-    background:rgba(9,22,15,0.84);
-    border:1px solid rgba(151,241,31,0.20);
+    background:rgba(255,252,248,0.80);
+    border:1px solid rgba(124,58,237,0.20);
     border-radius:20px; padding:0.30rem;
     backdrop-filter:blur(16px);
     box-shadow:var(--sh-sm);
@@ -307,49 +307,49 @@ h1,h2,h3,h4 {{
     border-radius:14px !important;
     color:{INK_MUTED} !important;
     font-size:0.79rem !important; font-weight:600 !important;
-    font-family:'Space Grotesk',sans-serif !important;
+    font-family:'DM Sans',sans-serif !important;
     background:transparent !important; letter-spacing:0.03em !important;
     transition:background 180ms, color 180ms, transform 180ms !important;
 }}
 .stTabs [data-baseweb="tab"]:hover {{
-    background:rgba(151,241,31,0.08) !important; color:{ACCENT} !important;
+    background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important;
     transform:translateY(-1px) !important;
 }}
 .stTabs [aria-selected="true"] {{
-    background:linear-gradient(135deg,rgba(151,241,31,0.14),rgba(22,199,165,0.10)) !important;
+    background:linear-gradient(135deg,rgba(124,58,237,0.14),rgba(2,132,199,0.10)) !important;
     color:{INK} !important;
-    box-shadow:0 4px 14px rgba(151,241,31,0.14), inset 0 0 0 1px rgba(151,241,31,0.28) !important;
+    box-shadow:0 4px 14px rgba(124,58,237,0.14), inset 0 0 0 1px rgba(124,58,237,0.28) !important;
 }}
 .stTabs [data-baseweb="tab-panel"] {{ padding-top:1.5rem; }}
 
 /* ── Section headings ── */
 .section-hd {{
-    font-family:'Oxanium',serif; font-size:1.02rem; font-weight:600;
+    font-family:'Cinzel',serif; font-size:1.02rem; font-weight:600;
     color:{INK}; margin:0 0 0.28rem 0; letter-spacing:0.05em; text-transform:uppercase;
 }}
 .section-sub {{
     font-size:0.83rem; color:{INK_MUTED}; margin:0 0 1.1rem 0; line-height:1.65;
-    font-family:'Space Grotesk',sans-serif; font-weight:400; text-transform:none; letter-spacing:0;
+    font-family:'DM Sans',sans-serif; font-weight:400; text-transform:none; letter-spacing:0;
 }}
 
 /* ── Divider label ── */
 .divider-label {{
     display:flex; align-items:center; gap:0.7rem; margin:1.5rem 0 1rem 0;
     font-size:0.59rem; font-weight:700; text-transform:uppercase; letter-spacing:0.20em;
-    color:{ACCENT}; font-family:'Space Grotesk',sans-serif;
+    color:{ACCENT}; font-family:'DM Sans',sans-serif;
 }}
 .divider-label::before,.divider-label::after {{
     content:""; flex:1; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(151,241,31,0.28),transparent);
+    background:linear-gradient(90deg,transparent,rgba(124,58,237,0.28),transparent);
 }}
 
 /* ── Info box ── */
 .info-box {{
-    background:linear-gradient(155deg,rgba(9,22,15,0.88),rgba(15,35,25,0.78));
-    border:1px solid rgba(151,241,31,0.18);
+    background:linear-gradient(155deg,rgba(255,252,248,0.85),rgba(248,244,255,0.75));
+    border:1px solid rgba(124,58,237,0.18);
     border-radius:var(--r-md); padding:1rem 1.1rem;
     color:{INK_SOFT}; line-height:1.75; box-shadow:var(--sh-sm);
-    font-size:0.86rem; font-family:'Space Grotesk',sans-serif;
+    font-size:0.86rem; font-family:'DM Sans',sans-serif;
     transition:transform 200ms, box-shadow 200ms;
 }}
 .info-box:hover {{ transform:translateY(-2px); box-shadow:var(--sh-md); }}
@@ -358,68 +358,68 @@ h1,h2,h3,h4 {{
 .pill {{
     display:inline-block; padding:0.25rem 0.72rem; border-radius:999px;
     font-size:0.61rem; font-weight:700; letter-spacing:0.10em; text-transform:uppercase;
-    font-family:'Space Grotesk',sans-serif; border:1px solid transparent;
+    font-family:'DM Sans',sans-serif; border:1px solid transparent;
     transition:transform 180ms; cursor:default;
 }}
 .pill:hover {{ transform:scale(1.06); }}
-.pill-expand   {{ background:rgba(42,213,181,0.10); color:#2ad5b5; border-color:rgba(42,213,181,0.30); }}
-.pill-maintain {{ background:rgba(108,188,44,0.10);  color:#84d12d; border-color:rgba(108,188,44,0.28); }}
-.pill-optimize {{ background:rgba(217,140,31,0.10);  color:#d98c1f; border-color:rgba(217,140,31,0.26); }}
-.pill-drop     {{ background:rgba(201,91,45,0.10); color:#c95b2d; border-color:rgba(201,91,45,0.28); }}
+.pill-expand   {{ background:rgba(29,78,216,0.10); color:#1d4ed8; border-color:rgba(29,78,216,0.30); }}
+.pill-maintain {{ background:rgba(4,120,87,0.10);  color:#047857; border-color:rgba(4,120,87,0.28); }}
+.pill-optimize {{ background:rgba(180,83,9,0.10);  color:#b45309; border-color:rgba(180,83,9,0.26); }}
+.pill-drop     {{ background:rgba(190,24,93,0.10); color:#be185d; border-color:rgba(190,24,93,0.28); }}
 
 /* ── Result card ── */
 .result-card {{
     border-radius:var(--r-lg); padding:1.5rem 1.6rem; margin:1.2rem 0;
-    border:1px solid rgba(151,241,31,0.22); box-shadow:var(--sh-md);
+    border:1px solid rgba(124,58,237,0.22); box-shadow:var(--sh-md);
     backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
     animation:fadeUp 380ms ease-out; transition:transform 280ms, box-shadow 280ms;
 }}
 .result-card:hover {{ transform:translateY(-4px); box-shadow:var(--sh-lg); }}
-.result-expand   {{ background:linear-gradient(140deg,rgba(219,234,254,0.80),rgba(9,22,15,0.88)); border-left:4px solid {CHART_EXPAND}; }}
-.result-maintain {{ background:linear-gradient(140deg,rgba(209,250,229,0.80),rgba(9,22,15,0.88)); border-left:4px solid {CHART_MAINTAIN}; }}
-.result-optimize {{ background:linear-gradient(140deg,rgba(254,243,199,0.80),rgba(9,22,15,0.88)); border-left:4px solid {CHART_OPTIMIZE}; }}
-.result-drop     {{ background:linear-gradient(140deg,rgba(252,231,243,0.80),rgba(9,22,15,0.88)); border-left:4px solid {CHART_DROP}; }}
+.result-expand   {{ background:linear-gradient(140deg,rgba(219,234,254,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_EXPAND}; }}
+.result-maintain {{ background:linear-gradient(140deg,rgba(209,250,229,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_MAINTAIN}; }}
+.result-optimize {{ background:linear-gradient(140deg,rgba(254,243,199,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_OPTIMIZE}; }}
+.result-drop     {{ background:linear-gradient(140deg,rgba(252,231,243,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_DROP}; }}
 
 /* ── Form inputs ── */
 .stSelectbox label,.stNumberInput label,.stSlider label,
 .stRadio label,.stCheckbox label,.stTextInput label {{
     color:{INK_SOFT} !important; font-weight:600 !important; font-size:0.73rem !important;
     letter-spacing:0.06em !important; text-transform:uppercase !important;
-    font-family:'Space Grotesk',sans-serif !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 .stSelectbox [data-baseweb="select"] > div,
 .stTextInput input,.stNumberInput input {{
-    background:rgba(9,22,15,0.88) !important;
-    border:1px solid rgba(151,241,31,0.22) !important;
+    background:rgba(255,252,248,0.85) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
     border-radius:var(--r-sm) !important; color:{INK} !important;
     min-height:42px !important; box-shadow:none !important;
     transition:border-color 180ms, box-shadow 180ms !important;
-    font-family:'Space Grotesk',sans-serif !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 .stSelectbox [data-baseweb="select"] > div:hover,
 .stTextInput input:hover,.stNumberInput input:hover {{
-    border-color:rgba(151,241,31,0.45) !important;
+    border-color:rgba(124,58,237,0.45) !important;
 }}
 .stSelectbox [data-baseweb="select"] > div:focus-within,
 .stTextInput input:focus,.stNumberInput input:focus {{
-    border-color:rgba(151,241,31,0.70) !important;
-    box-shadow:0 0 0 3px rgba(151,241,31,0.12) !important;
+    border-color:rgba(124,58,237,0.70) !important;
+    box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important;
 }}
 [data-baseweb="menu"] {{
-    background:rgba(8,20,14,0.96) !important;
-    border:1px solid rgba(151,241,31,0.22) !important;
+    background:rgba(255,252,248,0.96) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
     border-radius:var(--r-sm) !important;
     box-shadow:var(--sh-md) !important;
 }}
 [data-baseweb="menu"] li {{ color:{INK_SOFT} !important; }}
-[data-baseweb="menu"] li:hover {{ background:rgba(151,241,31,0.08) !important; color:{ACCENT} !important; }}
+[data-baseweb="menu"] li:hover {{ background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important; }}
 
 /* ── Form card ── */
 [data-testid="stForm"] {{
-    background:linear-gradient(155deg,rgba(9,22,15,0.90),rgba(15,35,25,0.82)) !important;
-    border:1px solid rgba(151,241,31,0.22) !important;
+    background:linear-gradient(155deg,rgba(255,252,248,0.88),rgba(248,244,255,0.80)) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
     border-radius:var(--r-lg) !important; padding:1.5rem 1.6rem 1.8rem !important;
-    box-shadow:var(--sh-md), inset 0 1px 0 rgba(232,255,167,0.10) !important;
+    box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.90) !important;
     backdrop-filter:blur(20px) !important;
     animation:borderFlow 7s ease-in-out infinite !important;
 }}
@@ -427,7 +427,7 @@ h1,h2,h3,h4 {{
 /* ── Buttons ── */
 [data-testid="stFormSubmitButton"] > button, .stButton > button {{
     border-radius:var(--r-sm) !important; font-weight:700 !important; border:none !important;
-    font-family:'Space Grotesk',sans-serif !important; letter-spacing:0.08em !important;
+    font-family:'DM Sans',sans-serif !important; letter-spacing:0.08em !important;
     text-transform:uppercase !important; font-size:0.81rem !important;
     transition:transform 180ms, box-shadow 180ms !important;
     position:relative; overflow:hidden;
@@ -435,27 +435,27 @@ h1,h2,h3,h4 {{
 [data-testid="stFormSubmitButton"] > button {{
     width:100% !important;
     background:linear-gradient(135deg,{ACCENT},{ACCENT_DK}) !important;
-    box-shadow:0 8px 26px rgba(151,241,31,0.35), 0 0 0 1px rgba(151,241,31,0.30) !important;
+    box-shadow:0 8px 26px rgba(124,58,237,0.35), 0 0 0 1px rgba(124,58,237,0.30) !important;
     color:white !important; padding:0.72rem 0 !important;
 }}
 [data-testid="stFormSubmitButton"] > button:hover {{
     transform:translateY(-2px) !important;
-    box-shadow:0 14px 36px rgba(151,241,31,0.50) !important;
+    box-shadow:0 14px 36px rgba(124,58,237,0.50) !important;
 }}
 [data-testid="stFormSubmitButton"] > button:active {{ transform:translateY(0) scale(0.98) !important; }}
 .stButton > button {{
-    background:rgba(9,22,15,0.88) !important; color:{INK_SOFT} !important;
-    border:1px solid rgba(151,241,31,0.22) !important; box-shadow:var(--sh-sm) !important;
+    background:rgba(255,252,248,0.85) !important; color:{INK_SOFT} !important;
+    border:1px solid rgba(124,58,237,0.22) !important; box-shadow:var(--sh-sm) !important;
 }}
 .stButton > button:hover {{
-    background:rgba(15,35,25,0.96) !important; color:{ACCENT} !important;
+    background:rgba(248,244,255,0.95) !important; color:{ACCENT} !important;
     transform:translateY(-2px) !important; box-shadow:var(--sh-md) !important;
 }}
 
 /* ── DataFrames ── */
 [data-testid="stDataFrame"] {{
-    background:rgba(9,22,15,0.84) !important;
-    border:1px solid rgba(151,241,31,0.18) !important;
+    background:rgba(255,252,248,0.80) !important;
+    border:1px solid rgba(124,58,237,0.18) !important;
     border-radius:var(--r-md) !important; overflow:hidden !important;
     box-shadow:var(--sh-sm) !important; backdrop-filter:blur(14px) !important;
     transition:transform 280ms, box-shadow 280ms !important;
@@ -466,20 +466,20 @@ h1,h2,h3,h4 {{
 [data-testid="stDataFrame"] [role="grid"] {{ background:transparent !important; }}
 [data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{ color:{INK_SOFT} !important; }}
 [data-testid="stDataFrame"] [role="columnheader"] {{
-    background:rgba(151,241,31,0.08) !important; color:{ACCENT} !important;
+    background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important;
     font-weight:700 !important; font-size:0.71rem !important;
     letter-spacing:0.10em !important; text-transform:uppercase !important;
-    border-bottom:1px solid rgba(151,241,31,0.16) !important;
-    font-family:'Space Grotesk',sans-serif !important;
+    border-bottom:1px solid rgba(124,58,237,0.16) !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 [data-testid="stDataFrame"] [role="gridcell"] {{
-    border-bottom:1px solid rgba(151,241,31,0.08) !important;
+    border-bottom:1px solid rgba(124,58,237,0.08) !important;
 }}
 
 /* ── Expander ── */
 [data-testid="stExpander"] {{
-    background:rgba(9,22,15,0.84) !important;
-    border:1px solid rgba(151,241,31,0.18) !important;
+    background:rgba(255,252,248,0.80) !important;
+    border:1px solid rgba(124,58,237,0.18) !important;
     border-radius:var(--r-md) !important; box-shadow:var(--sh-sm) !important;
     backdrop-filter:blur(14px) !important;
     transition:transform 180ms, box-shadow 180ms !important;
@@ -487,46 +487,46 @@ h1,h2,h3,h4 {{
 [data-testid="stExpander"]:hover {{ transform:translateY(-2px) !important; box-shadow:var(--sh-md) !important; }}
 [data-testid="stExpander"] summary p {{
     color:{INK_SOFT} !important; font-weight:600 !important;
-    font-family:'Space Grotesk',sans-serif !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 
 /* ── Charts ── */
 [data-testid="stPyplot"] {{
-    background:rgba(9,22,15,0.80);
-    border:1px solid rgba(151,241,31,0.18);
+    background:rgba(255,252,248,0.75);
+    border:1px solid rgba(124,58,237,0.18);
     border-radius:var(--r-lg); padding:1rem;
     box-shadow:var(--sh-sm); backdrop-filter:blur(14px);
     transition:transform 280ms, box-shadow 280ms;
 }}
 [data-testid="stPyplot"]:hover {{
     transform:translateY(-4px);
-    box-shadow:var(--sh-md), 0 0 0 1px rgba(151,241,31,0.28);
+    box-shadow:var(--sh-md), 0 0 0 1px rgba(124,58,237,0.28);
 }}
 
 /* ── Alerts ── */
 [data-testid="stAlert"] {{
     border-radius:var(--r-md) !important;
-    background:rgba(9,22,15,0.88) !important;
-    border:1px solid rgba(151,241,31,0.20) !important;
+    background:rgba(255,252,248,0.85) !important;
+    border:1px solid rgba(124,58,237,0.20) !important;
     color:{INK_SOFT} !important;
 }}
 
-hr {{ border:none !important; border-top:1px solid rgba(151,241,31,0.14) !important; margin:1.4rem 0 !important; }}
+hr {{ border:none !important; border-top:1px solid rgba(124,58,237,0.14) !important; margin:1.4rem 0 !important; }}
 
 .col-label {{
     font-size:0.63rem; font-weight:700; color:{ACCENT}; letter-spacing:0.16em;
     text-transform:uppercase; margin-bottom:0.9rem;
-    display:flex; align-items:center; gap:0.4rem; font-family:'Space Grotesk',sans-serif;
+    display:flex; align-items:center; gap:0.4rem; font-family:'DM Sans',sans-serif;
 }}
 .col-label::after {{
     content:""; flex:1; height:1px;
-    background:linear-gradient(90deg,rgba(151,241,31,0.28),transparent);
+    background:linear-gradient(90deg,rgba(124,58,237,0.28),transparent);
 }}
 
 /* Slider */
 [data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
     background:{ACCENT} !important; border-color:{ACCENT_LT} !important;
-    box-shadow:0 0 10px rgba(151,241,31,0.40) !important;
+    box-shadow:0 0 10px rgba(124,58,237,0.40) !important;
 }}
 [data-testid="stSlider"] [data-baseweb="slider"] [data-testid="stSliderTrackFill"] {{
     background:linear-gradient(90deg,{ACCENT},{ACCENT_2}) !important;
@@ -535,9 +535,9 @@ hr {{ border:none !important; border-top:1px solid rgba(151,241,31,0.14) !import
 /* Scrollbar */
 ::-webkit-scrollbar {{ width:6px; height:6px; }}
 ::-webkit-scrollbar-track {{ background:rgba(245,238,255,0.60); }}
-::-webkit-scrollbar-thumb {{ background:rgba(151,241,31,0.30); border-radius:999px; }}
-::-webkit-scrollbar-thumb:hover {{ background:rgba(151,241,31,0.55); }}
-::selection {{ background:rgba(151,241,31,0.20); color:{INK}; }}
+::-webkit-scrollbar-thumb {{ background:rgba(124,58,237,0.30); border-radius:999px; }}
+::-webkit-scrollbar-thumb:hover {{ background:rgba(124,58,237,0.55); }}
+::selection {{ background:rgba(124,58,237,0.20); color:{INK}; }}
 
 /* ── Airplane cursor canvas (always on top) ── */
 #airplane-canvas {{
@@ -548,222 +548,6 @@ hr {{ border:none !important; border-top:1px solid rgba(151,241,31,0.14) !import
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown(f"""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap');
-
-:root {{
-    --font-display: 'Oxanium', sans-serif;
-    --font-body: 'Space Grotesk', sans-serif;
-    --font-pixel: 'Press Start 2P', monospace;
-    --panel-dark: rgba(9, 21, 15, 0.90);
-    --panel-mid: rgba(15, 38, 26, 0.88);
-    --pixel-line: rgba(151, 241, 31, 0.10);
-    --pixel-glow: rgba(22, 199, 165, 0.12);
-    --ember-glow: rgba(243, 154, 34, 0.12);
-}}
-
-html, body, [class*="css"] {{
-    font-family: var(--font-body) !important;
-    color: {INK} !important;
-}}
-
-.stApp {{
-    background:
-        radial-gradient(circle at 14% 18%, rgba(151,241,31,0.18) 0, transparent 24%),
-        radial-gradient(circle at 86% 14%, rgba(22,199,165,0.15) 0, transparent 22%),
-        radial-gradient(circle at 78% 78%, rgba(243,154,34,0.12) 0, transparent 18%),
-        linear-gradient(180deg, rgba(6,16,11,0.97), rgba(7,18,12,0.99)),
-        repeating-linear-gradient(0deg, rgba(151,241,31,0.045) 0 1px, transparent 1px 18px),
-        repeating-linear-gradient(90deg, rgba(151,241,31,0.045) 0 1px, transparent 1px 18px) !important;
-    background-blend-mode: screen, screen, screen, normal, normal, normal !important;
-}}
-.stApp::before {{
-    background: radial-gradient(circle, rgba(151,241,31,0.22) 0%, rgba(151,241,31,0.05) 35%, transparent 70%) !important;
-    filter: blur(8px) !important;
-}}
-.stApp::after {{
-    background: radial-gradient(circle, rgba(22,199,165,0.20) 0%, rgba(22,199,165,0.04) 40%, transparent 72%) !important;
-    filter: blur(8px) !important;
-}}
-
-[data-testid="stSidebar"] {{
-    background: linear-gradient(180deg, rgba(7,17,11,0.96), rgba(12,31,21,0.97)) !important;
-    border-right: 1px solid rgba(151,241,31,0.28) !important;
-    box-shadow: 8px 0 32px rgba(0,0,0,0.34), inset -1px 0 0 rgba(22,199,165,0.14) !important;
-}}
-[data-testid="stSidebar"] * {{ color: {INK_SOFT} !important; }}
-
-.sidebar-brand, h1, h2, h3, h4, .section-hd {{
-    font-family: var(--font-display) !important;
-    letter-spacing: 0.08em !important;
-    color: {INK} !important;
-}}
-.sidebar-brand span, .hero h1 {{
-    background: linear-gradient(135deg, {ACCENT_LT} 0%, {ACCENT} 45%, {ACCENT_2} 75%, {MAGENTA} 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
-}}
-
-.hero, [data-testid="metric-container"], [data-testid="stForm"], .result-card, [data-testid="stPyplot"], [data-testid="stDataFrame"], [data-testid="stExpander"], .info-box {{
-    background:
-        linear-gradient(160deg, rgba(9,22,15,0.92), rgba(16,39,27,0.88)) !important;
-    border: 1px solid rgba(151,241,31,0.24) !important;
-    box-shadow: 0 0 0 1px rgba(22,199,165,0.08), 0 16px 36px rgba(0,0,0,0.30), inset 0 0 0 1px rgba(151,241,31,0.05) !important;
-    position: relative !important;
-    overflow: hidden !important;
-}}
-
-.hero::before, [data-testid="metric-container"]::before, [data-testid="stForm"]::before, .result-card::before, [data-testid="stPyplot"]::before, [data-testid="stDataFrame"]::before, [data-testid="stExpander"]::before, .info-box::before {{
-    content: "" !important;
-    position: absolute !important;
-    inset: 0 !important;
-    background:
-        linear-gradient(90deg, transparent 0 17px, rgba(151,241,31,0.08) 17px 18px, transparent 18px 100%),
-        linear-gradient(0deg, transparent 0 17px, rgba(151,241,31,0.08) 17px 18px, transparent 18px 100%) !important;
-    background-size: 18px 18px !important;
-    opacity: 0.28 !important;
-    pointer-events: none !important;
-}}
-
-.hero::after, [data-testid="metric-container"]::after, [data-testid="stForm"]::after, .result-card::after {{
-    content: "" !important;
-    position: absolute !important;
-    right: -16px !important;
-    bottom: -16px !important;
-    width: 132px !important;
-    height: 132px !important;
-    background:
-        linear-gradient(135deg, transparent 0 42%, rgba(243,154,34,0.14) 42% 54%, transparent 54%),
-        linear-gradient(135deg, transparent 0 56%, rgba(22,199,165,0.16) 56% 68%, transparent 68%) !important;
-    pointer-events: none !important;
-}}
-
-.hero {{
-    border-radius: 8px !important;
-    animation: pulseRing 6s ease-in-out infinite !important;
-}}
-.hero-badge, .divider-label, .col-label, .pill, .hero-eyebrow,
-[data-testid="metric-container"] [data-testid="stMetricLabel"] p,
-.stTabs [data-baseweb="tab"], .stSelectbox label, .stNumberInput label,
-.stSlider label, .stRadio label, .stCheckbox label, .stTextInput label,
-[data-testid="stDataFrame"] [role="columnheader"],
-[data-testid="stFormSubmitButton"] > button, .stButton > button {{
-    font-family: var(--font-pixel) !important;
-}}
-
-.hero p, .section-sub, .info-box, [data-testid="stAlert"],
-[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span,
-[data-baseweb="menu"] li, [data-testid="stExpander"] summary p,
-.stTabs [data-baseweb="tab"], .gi-chart-title, .gi-hchart-title, .gi-pie-title, .gi-classic-title {{
-    color: {INK_SOFT} !important;
-}}
-
-.hero-badge {{
-    border-color: rgba(243,154,34,0.58) !important;
-    background: linear-gradient(135deg, rgba(243,154,34,0.18), rgba(151,241,31,0.12)) !important;
-    color: {MAGENTA} !important;
-    box-shadow: 0 0 0 1px rgba(243,154,34,0.18), 0 6px 18px rgba(243,154,34,0.14) !important;
-}}
-.hero-glyph {{ color: rgba(151,241,31,0.30) !important; text-shadow: 0 0 20px rgba(151,241,31,0.25) !important; }}
-.hero-star:nth-child(1) {{ background: rgba(151,241,31,0.9) !important; }}
-.hero-star:nth-child(2) {{ background: rgba(22,199,165,0.9) !important; }}
-.hero-star:nth-child(3) {{ background: rgba(243,154,34,0.82) !important; }}
-.hero-star:nth-child(4) {{ background: rgba(132,209,45,0.84) !important; }}
-
-[data-testid="metric-container"] [data-testid="stMetricValue"],
-[data-testid="metric-container"] [data-testid="stMetricValue"] > div,
-[data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
-    color: {INK} !important;
-    font-family: var(--font-display) !important;
-}}
-
-.stTabs [data-baseweb="tab-list"] {{
-    background: rgba(8,22,15,0.88) !important;
-    border-color: rgba(151,241,31,0.22) !important;
-}}
-.stTabs [data-baseweb="tab"] {{
-    color: {INK_MUTED} !important;
-    font-size: 0.66rem !important;
-}}
-.stTabs [data-baseweb="tab"]:hover {{
-    background: rgba(151,241,31,0.10) !important;
-    color: {ACCENT} !important;
-}}
-.stTabs [aria-selected="true"] {{
-    background: linear-gradient(135deg, rgba(151,241,31,0.16), rgba(22,199,165,0.12)) !important;
-    color: {INK} !important;
-    box-shadow: 0 0 0 1px rgba(151,241,31,0.24), 0 4px 14px rgba(0,0,0,0.25) !important;
-}}
-
-.stSelectbox [data-baseweb="select"] > div,
-.stTextInput input, .stNumberInput input, [data-baseweb="menu"], [data-testid="stAlert"] {{
-    background: rgba(8,20,14,0.92) !important;
-    border-color: rgba(151,241,31,0.24) !important;
-    color: {INK} !important;
-}}
-.stSelectbox [data-baseweb="select"] > div:hover,
-.stTextInput input:hover, .stNumberInput input:hover {{
-    border-color: rgba(22,199,165,0.48) !important;
-}}
-.stSelectbox [data-baseweb="select"] > div:focus-within,
-.stTextInput input:focus, .stNumberInput input:focus {{
-    border-color: rgba(151,241,31,0.74) !important;
-    box-shadow: 0 0 0 3px rgba(151,241,31,0.14) !important;
-}}
-[data-baseweb="menu"] li:hover {{
-    background: rgba(151,241,31,0.10) !important;
-    color: {ACCENT_LT} !important;
-}}
-
-[data-testid="stFormSubmitButton"] > button {{
-    background: linear-gradient(135deg, {ACCENT}, {ACCENT_2}) !important;
-    color: #071109 !important;
-    box-shadow: 0 10px 24px rgba(151,241,31,0.20), 0 0 0 1px rgba(151,241,31,0.30) !important;
-}}
-[data-testid="stFormSubmitButton"] > button:hover {{
-    box-shadow: 0 14px 32px rgba(151,241,31,0.26) !important;
-}}
-.stButton > button {{
-    background: rgba(8,22,15,0.88) !important;
-    color: {INK_SOFT} !important;
-    border: 1px solid rgba(151,241,31,0.22) !important;
-}}
-.stButton > button:hover {{
-    background: rgba(14,34,24,0.96) !important;
-    color: {ACCENT_LT} !important;
-}}
-
-[data-testid="stDataFrame"] [role="columnheader"] {{
-    background: rgba(151,241,31,0.12) !important;
-    color: {ACCENT_LT} !important;
-    border-bottom-color: rgba(151,241,31,0.18) !important;
-}}
-[data-testid="stDataFrame"] [role="gridcell"] {{
-    border-bottom-color: rgba(151,241,31,0.08) !important;
-}}
-
-hr {{ border-top: 1px solid rgba(151,241,31,0.18) !important; }}
-.col-label::after, .divider-label::before, .divider-label::after {{
-    background: linear-gradient(90deg, rgba(151,241,31,0.36), transparent) !important;
-}}
-
-[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
-    background: {ACCENT} !important;
-    border-color: {ACCENT_LT} !important;
-    box-shadow: 0 0 12px rgba(151,241,31,0.36) !important;
-}}
-[data-testid="stSlider"] [data-baseweb="slider"] [data-testid="stSliderTrackFill"] {{
-    background: linear-gradient(90deg, {ACCENT}, {ACCENT_2}) !important;
-}}
-
-::-webkit-scrollbar-track {{ background: rgba(10,24,17,0.84) !important; }}
-::-webkit-scrollbar-thumb {{ background: rgba(151,241,31,0.30) !important; }}
-::-webkit-scrollbar-thumb:hover {{ background: rgba(151,241,31,0.52) !important; }}
-::selection {{ background: rgba(151,241,31,0.22) !important; color: {INK} !important; }}
-</style>
-""", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
 #  AIRPLANE CURSOR + TRAIL CANVAS
@@ -808,12 +592,12 @@ st.markdown("""
 
     // Jewel trail colors cycling
     const jewelColors = [
-        'rgba(151,241,31,',   // amethyst
-        'rgba(42,213,181,',    // sapphire
-        'rgba(22,199,165,',    // crystal blue
-        'rgba(108,188,44,',     // emerald
-        'rgba(217,140,31,',     // topaz
-        'rgba(243,154,34,',   // ruby
+        'rgba(124,58,237,',   // amethyst
+        'rgba(29,78,216,',    // sapphire
+        'rgba(2,132,199,',    // crystal blue
+        'rgba(4,120,87,',     // emerald
+        'rgba(180,83,9,',     // topaz
+        'rgba(219,39,119,',   // ruby
     ];
     let colorIdx = 0;
     let colorT = 0;
@@ -825,7 +609,7 @@ st.markdown("""
         ctx.scale(scale, scale);
 
         // Shadow / glow beneath plane
-        ctx.shadowColor = 'rgba(151,241,31,0.45)';
+        ctx.shadowColor = 'rgba(124,58,237,0.45)';
         ctx.shadowBlur  = 14;
 
         // Fuselage
@@ -835,7 +619,7 @@ st.markdown("""
         ctx.quadraticCurveTo(1.5, 10, 0, 11);
         ctx.quadraticCurveTo(-1.5, 10, -3, 6);
         ctx.quadraticCurveTo(-3.5, -4, 0, -14);
-        ctx.fillStyle = '#97f11f';
+        ctx.fillStyle = '#7c3aed';
         ctx.fill();
 
         // Wings
@@ -843,14 +627,14 @@ st.markdown("""
         ctx.moveTo(-2, 1); ctx.lineTo(-14, 8); ctx.lineTo(-12, 10);
         ctx.lineTo(-1.5, 5);
         ctx.closePath();
-        ctx.fillStyle = '#2ad5b5';
+        ctx.fillStyle = '#1d4ed8';
         ctx.fill();
 
         ctx.beginPath();
         ctx.moveTo(2, 1); ctx.lineTo(14, 8); ctx.lineTo(12, 10);
         ctx.lineTo(1.5, 5);
         ctx.closePath();
-        ctx.fillStyle = '#2ad5b5';
+        ctx.fillStyle = '#1d4ed8';
         ctx.fill();
 
         // Tail fins
@@ -858,20 +642,20 @@ st.markdown("""
         ctx.moveTo(-1, 8); ctx.lineTo(-6, 13); ctx.lineTo(-5, 14);
         ctx.lineTo(-0.5, 10);
         ctx.closePath();
-        ctx.fillStyle = '#f39a22';
+        ctx.fillStyle = '#db2777';
         ctx.fill();
 
         ctx.beginPath();
         ctx.moveTo(1, 8); ctx.lineTo(6, 13); ctx.lineTo(5, 14);
         ctx.lineTo(0.5, 10);
         ctx.closePath();
-        ctx.fillStyle = '#f39a22';
+        ctx.fillStyle = '#db2777';
         ctx.fill();
 
         // Cockpit window
         ctx.beginPath();
         ctx.ellipse(0, -9, 1.8, 2.5, 0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(223,255,141,0.88)';
+        ctx.fillStyle = 'rgba(196,229,255,0.90)';
         ctx.shadowBlur = 0;
         ctx.fill();
 
@@ -902,7 +686,7 @@ st.markdown("""
             ctx.lineTo(p.x, p.y);
             ctx.strokeStyle = c + (fade * 0.70).toFixed(2) + ')';
             ctx.lineWidth   = prog * 3.5 + 0.5;
-            ctx.lineCap     = 'square';
+            ctx.lineCap     = 'round';
             ctx.shadowColor = c + '0.6)';
             ctx.shadowBlur  = 8 * prog;
             ctx.stroke();
@@ -912,13 +696,12 @@ st.markdown("""
             if (i % 5 === 0 && prog > 0.15) {
                 const r = prog * 2.8;
                 ctx.save();
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
                 ctx.fillStyle = c + (fade * 0.55).toFixed(2) + ')';
                 ctx.shadowColor = c + '0.8)';
                 ctx.shadowBlur  = 10;
-                ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
-                ctx.strokeStyle = c + (fade * 0.85).toFixed(2) + ')';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(p.x - r, p.y - r, r * 2, r * 2);
+                ctx.fill();
                 ctx.restore();
             }
         }
@@ -998,7 +781,7 @@ def prepare_input(input_df, training_columns):
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
     fig, ax = plt.subplots(figsize=figsize)
-    fig.patch.set_facecolor("#08150f")
+    fig.patch.set_facecolor("#fdf9f4")
     fig.patch.set_alpha(0.0)
     ax.set_facecolor("none")
     for spine in ["top", "right", "left", "bottom"]:
@@ -1010,7 +793,7 @@ def clean_fig(figsize=(8, 4)):
     ax.title.set_fontsize(11)
     ax.title.set_fontweight("bold")
     ax.title.set_fontfamily("serif")
-    ax.grid(axis="y", color="#2b4735", linewidth=0.8, linestyle="-", alpha=0.85)
+    ax.grid(axis="y", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
     ax.set_axisbelow(True)
     for label in ax.get_xticklabels() + ax.get_yticklabels():
         label.set_color(INK_MUTED)
@@ -1085,7 +868,7 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
     <div id="gi-chart-root"></div>
 
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
     .gi-chart {{
         width: 100%;
@@ -1094,12 +877,12 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
         padding: 26px 30px 24px;
         border-radius: 22px;
         background:
-            radial-gradient(circle at 16% 12%, rgba(151,241,31,0.13), transparent 32%),
-            radial-gradient(circle at 88% 20%, rgba(22,199,165,0.11), transparent 34%),
-            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(16,38,26,0.70), rgba(12,30,22,0.72));
-        border: 1px solid rgba(151,241,31,0.18);
-        box-shadow: 0 2px 16px rgba(151,241,31,0.10), 0 1px 4px rgba(0,0,0,0.05);
-        font-family: 'Space Grotesk', system-ui, sans-serif;
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
         color: {INK};
         overflow: hidden;
         position: relative;
@@ -1109,14 +892,14 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(120deg, transparent, rgba(223,255,141,0.10), transparent);
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
         transform: translateX(-130%);
         animation: chartSweep 5.5s ease-in-out infinite;
         pointer-events: none;
     }}
 
     .gi-chart-title {{
-        font-family: 'Oxanium', Georgia, serif;
+        font-family: 'Cinzel', Georgia, serif;
         text-align: center;
         font-size: 24px;
         line-height: 1.25;
@@ -1147,7 +930,7 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
         width: 30px;
         height: 12px;
         border-radius: 999px;
-        box-shadow: inset 0 1px 0 rgba(223,255,141,0.12), 0 4px 12px rgba(0,0,0,0.18);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 4px 12px rgba(74,50,120,0.12);
     }}
 
     .gi-plot {{
@@ -1156,8 +939,8 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
         gap: 30px;
         align-items: end;
         height: {max(height - 180, 190)}px;
-        border-bottom: 1px solid rgba(151,241,31,0.18);
-        background-image: linear-gradient(to top, rgba(151,241,31,0.08) 1px, transparent 1px);
+        border-bottom: 1px solid rgba(124,58,237,0.18);
+        background-image: linear-gradient(to top, rgba(124,58,237,0.08) 1px, transparent 1px);
         background-size: 100% 25%;
         padding: 0 18px;
         position: relative;
@@ -1191,9 +974,9 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
         position: relative;
         overflow: hidden;
         box-shadow:
-            inset 0 1px 0 rgba(223,255,141,0.18),
-            inset 8px 0 16px rgba(223,255,141,0.06),
-            0 10px 24px rgba(0,0,0,0.28);
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            inset 8px 0 16px rgba(255,255,255,0.16),
+            0 10px 24px rgba(74,50,120,0.18);
         animation: growBar 850ms cubic-bezier(.22,.9,.25,1) both;
     }}
 
@@ -1205,9 +988,9 @@ def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_form
         width: 80%;
         background: linear-gradient(90deg,
             transparent 0%,
-            rgba(223,255,141,0.05) 20%,
-            rgba(223,255,141,0.26) 48%,
-            rgba(223,255,141,0.08) 66%,
+            rgba(255,255,255,0.10) 20%,
+            rgba(255,255,255,0.74) 48%,
+            rgba(255,255,255,0.18) 66%,
             transparent 100%);
         transform: translateX(-150%);
         animation: barShimmer 2.25s ease-in-out infinite;
@@ -1342,7 +1125,7 @@ def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_forma
     <div id="gi-hbar-root"></div>
 
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
     .gi-hchart {{
         width: 100%;
@@ -1351,12 +1134,12 @@ def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_forma
         padding: 24px 28px;
         border-radius: 22px;
         background:
-            radial-gradient(circle at 16% 12%, rgba(151,241,31,0.13), transparent 32%),
-            radial-gradient(circle at 88% 20%, rgba(22,199,165,0.11), transparent 34%),
-            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(16,38,26,0.70), rgba(12,30,22,0.72));
-        border: 1px solid rgba(151,241,31,0.18);
-        box-shadow: 0 2px 16px rgba(151,241,31,0.10), 0 1px 4px rgba(0,0,0,0.05);
-        font-family: 'Space Grotesk', system-ui, sans-serif;
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
         color: {INK};
         overflow: hidden;
         position: relative;
@@ -1366,14 +1149,14 @@ def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_forma
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(120deg, transparent, rgba(223,255,141,0.10), transparent);
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
         transform: translateX(-130%);
         animation: chartSweep 5.5s ease-in-out infinite;
         pointer-events: none;
     }}
 
     .gi-hchart-title {{
-        font-family: 'Oxanium', Georgia, serif;
+        font-family: 'Cinzel', Georgia, serif;
         text-align: center;
         font-size: 22px;
         line-height: 1.25;
@@ -1409,8 +1192,8 @@ def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_forma
     .gi-htrack {{
         height: 24px;
         border-radius: 999px;
-        background: rgba(151,241,31,0.07);
-        border: 1px solid rgba(151,241,31,0.12);
+        background: rgba(124,58,237,0.07);
+        border: 1px solid rgba(124,58,237,0.12);
         overflow: hidden;
         position: relative;
     }}
@@ -1422,9 +1205,9 @@ def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_forma
         position: relative;
         overflow: hidden;
         box-shadow:
-            inset 0 1px 0 rgba(223,255,141,0.18),
-            inset 8px 0 16px rgba(223,255,141,0.06),
-            0 8px 18px rgba(0,0,0,0.22);
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            inset 8px 0 16px rgba(255,255,255,0.16),
+            0 8px 18px rgba(74,50,120,0.14);
         animation: growHBar 850ms cubic-bezier(.22,.9,.25,1) both;
     }}
 
@@ -1436,9 +1219,9 @@ def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_forma
         width: 80%;
         background: linear-gradient(90deg,
             transparent 0%,
-            rgba(223,255,141,0.05) 20%,
-            rgba(223,255,141,0.26) 48%,
-            rgba(223,255,141,0.08) 66%,
+            rgba(255,255,255,0.10) 20%,
+            rgba(255,255,255,0.74) 48%,
+            rgba(255,255,255,0.18) 66%,
             transparent 100%);
         transform: translateX(-150%);
         animation: barShimmer 2.25s ease-in-out infinite;
@@ -1538,7 +1321,7 @@ def shimmer_pie_chart(title, labels, values, colors=None, height=430):
     <div id="gi-pie-root"></div>
 
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
     .gi-pie-card {{
         width: 100%;
@@ -1547,12 +1330,12 @@ def shimmer_pie_chart(title, labels, values, colors=None, height=430):
         padding: 24px 28px;
         border-radius: 22px;
         background:
-            radial-gradient(circle at 16% 12%, rgba(151,241,31,0.13), transparent 32%),
-            radial-gradient(circle at 88% 20%, rgba(22,199,165,0.11), transparent 34%),
-            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(16,38,26,0.70), rgba(12,30,22,0.72));
-        border: 1px solid rgba(151,241,31,0.18);
-        box-shadow: 0 2px 16px rgba(151,241,31,0.10), 0 1px 4px rgba(0,0,0,0.05);
-        font-family: 'Space Grotesk', system-ui, sans-serif;
+            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
+            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
+            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
+        border: 1px solid rgba(124,58,237,0.18);
+        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+        font-family: 'DM Sans', system-ui, sans-serif;
         color: {INK};
         overflow: hidden;
         position: relative;
@@ -1562,14 +1345,14 @@ def shimmer_pie_chart(title, labels, values, colors=None, height=430):
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(120deg, transparent, rgba(223,255,141,0.10), transparent);
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
         transform: translateX(-130%);
         animation: pieCardSweep 5.5s ease-in-out infinite;
         pointer-events: none;
     }}
 
     .gi-pie-title {{
-        font-family: 'Oxanium', Georgia, serif;
+        font-family: 'Cinzel', Georgia, serif;
         text-align: center;
         font-size: 22px;
         line-height: 1.25;
@@ -1601,8 +1384,8 @@ def shimmer_pie_chart(title, labels, values, colors=None, height=430):
         background: conic-gradient(var(--pie-gradient));
         position: relative;
         box-shadow:
-            inset 0 1px 0 rgba(223,255,141,0.18),
-            0 14px 32px rgba(0,0,0,0.24);
+            inset 0 1px 0 rgba(255,255,255,0.65),
+            0 14px 32px rgba(74,50,120,0.16);
         overflow: hidden;
         animation: donutPop 850ms cubic-bezier(.22,.9,.25,1) both;
     }}
@@ -1613,9 +1396,9 @@ def shimmer_pie_chart(title, labels, values, colors=None, height=430):
         inset: -20%;
         background: linear-gradient(115deg,
             transparent 0%,
-            rgba(223,255,141,0.04) 32%,
-            rgba(223,255,141,0.22) 48%,
-            rgba(223,255,141,0.06) 62%,
+            rgba(255,255,255,0.08) 32%,
+            rgba(255,255,255,0.70) 48%,
+            rgba(255,255,255,0.12) 62%,
             transparent 100%);
         transform: translateX(-120%) rotate(12deg);
         animation: pieShimmer 2.8s ease-in-out infinite;
@@ -1627,8 +1410,8 @@ def shimmer_pie_chart(title, labels, values, colors=None, height=430):
         inset: 27%;
         border-radius: 50%;
         background:
-            radial-gradient(circle at 35% 25%, rgba(232,255,167,0.16), rgba(9,22,15,0.90) 62%, rgba(245,238,255,0.90));
-        box-shadow: inset 0 2px 10px rgba(151,241,31,0.10);
+            radial-gradient(circle at 35% 25%, rgba(255,255,255,0.82), rgba(255,252,248,0.88) 62%, rgba(245,238,255,0.90));
+        box-shadow: inset 0 2px 10px rgba(124,58,237,0.10);
     }}
 
     .gi-pie-legend {{
@@ -1651,7 +1434,7 @@ def shimmer_pie_chart(title, labels, values, colors=None, height=430):
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        box-shadow: 0 0 0 3px rgba(223,255,141,0.12), 0 4px 12px rgba(0,0,0,0.20);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.45), 0 4px 12px rgba(74,50,120,0.13);
     }}
 
     .gi-pie-pct {{
@@ -1726,7 +1509,7 @@ def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, va
     <div id="gi-classic-hbar-root"></div>
 
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
     .gi-classic-card {{
         width: 100%;
@@ -1735,14 +1518,14 @@ def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, va
         padding: 24px 26px 22px;
         border-radius: 22px;
         background: transparent;
-        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-family: 'DM Sans', system-ui, sans-serif;
         color: {INK};
         overflow: hidden;
         position: relative;
     }}
 
     .gi-classic-title {{
-        font-family: 'Oxanium', Georgia, serif;
+        font-family: 'Cinzel', Georgia, serif;
         text-align: center;
         font-size: 22px;
         line-height: 1.25;
@@ -1776,8 +1559,8 @@ def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, va
     .gi-classic-axis {{
         height: 23px;
         position: relative;
-        border-bottom: 1px solid rgba(151,241,31,0.13);
-        background-image: linear-gradient(to right, rgba(151,241,31,0.08) 1px, transparent 1px);
+        border-bottom: 1px solid rgba(124,58,237,0.13);
+        background-image: linear-gradient(to right, rgba(124,58,237,0.08) 1px, transparent 1px);
         background-size: 25% 100%;
     }}
 
@@ -1788,7 +1571,7 @@ def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, va
         position: relative;
         overflow: hidden;
         background: linear-gradient(90deg, var(--bar-color), color-mix(in srgb, var(--bar-color) 82%, white));
-        box-shadow: 0 6px 16px rgba(0,0,0,0.20), inset 0 1px 0 rgba(223,255,141,0.12);
+        box-shadow: 0 6px 16px rgba(74,50,120,0.13), inset 0 1px 0 rgba(255,255,255,0.50);
         animation: growClassic 850ms cubic-bezier(.22,.9,.25,1) both;
     }}
 
@@ -1800,9 +1583,9 @@ def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, va
         width: 72%;
         background: linear-gradient(90deg,
             transparent 0%,
-            rgba(223,255,141,0.04) 24%,
-            rgba(223,255,141,0.16) 50%,
-            rgba(223,255,141,0.06) 68%,
+            rgba(255,255,255,0.08) 24%,
+            rgba(255,255,255,0.62) 50%,
+            rgba(255,255,255,0.13) 68%,
             transparent 100%);
         transform: translateX(-150%);
         animation: classicBarShimmer 2.25s ease-in-out infinite;
@@ -1892,7 +1675,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-brand">Airline <span>Route</span> Intelligence ✦</div>', unsafe_allow_html=True)
     st.markdown(
         f"<p style='font-size:0.64rem;color:{ACCENT};margin-bottom:14px;"
-        "font-weight:700;letter-spacing:0.16em;text-transform:uppercase;font-family:&quot;Space Grotesk&quot;,sans-serif'>Filter View</p>",
+        "font-weight:700;letter-spacing:0.16em;text-transform:uppercase;font-family:DM Sans,sans-serif'>Filter View</p>",
         unsafe_allow_html=True,
     )
     route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
@@ -1908,8 +1691,8 @@ with st.sidebar:
     st.markdown("---")
     st.markdown(f"""
     <p style='font-size:0.62rem;color:{ACCENT};font-weight:700;letter-spacing:0.16em;
-    text-transform:uppercase;margin-bottom:10px;font-family:&quot;Space Grotesk&quot;,sans-serif'>Decision Labels</p>
-    <div style='display:flex;flex-direction:column;gap:9px;font-size:0.80rem;color:{INK_SOFT};font-family:&quot;Space Grotesk&quot;,sans-serif'>
+    text-transform:uppercase;margin-bottom:10px;font-family:DM Sans,sans-serif'>Decision Labels</p>
+    <div style='display:flex;flex-direction:column;gap:9px;font-size:0.80rem;color:{INK_SOFT};font-family:DM Sans,sans-serif'>
       <div style='display:flex;align-items:center;gap:10px'>
         <span class='pill pill-expand'>Expand</span>High profit &amp; demand
       </div>
@@ -2033,9 +1816,9 @@ with tab1:
         st.dataframe(summary, use_container_width=True, hide_index=True)
         st.markdown("""
         <div class="info-box">
-          <strong style="color:#97f11f">How to read this</strong><br>
+          <strong style="color:#7c3aed">How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
-          <strong style="color:#2ad5b5">Expand</strong> routes should have the highest values across all three columns.
+          <strong style="color:#1d4ed8">Expand</strong> routes should have the highest values across all three columns.
         </div>""", unsafe_allow_html=True)
 
 
@@ -2100,8 +1883,8 @@ with tab2:
     # Build a gradient of jewel tones for cost bars
     nc = len(cost_means)
     jewel_ramp = [
-        CHART_EXPAND, "#1a9075", ACCENT, CHART_MAINTAIN,
-        "#4fb864", CHART_OPTIMIZE, CHART_DROP, "#62b51f",
+        CHART_EXPAND, "#0e7490", ACCENT, CHART_MAINTAIN,
+        "#15803d", CHART_OPTIMIZE, CHART_DROP, "#6d28d9",
     ]
     neutral_cols = jewel_ramp[:nc]
 
@@ -2121,7 +1904,7 @@ with tab3:
     st.markdown('<p class="section-sub">A quick view of your best and worst performing routes.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:&quot;Space Grotesk&quot;,sans-serif'>"
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "Top routes currently classified as Expand</p>", unsafe_allow_html=True)
     expand_routes = (
         fdf[fdf["Route_Decision"] == "Expand"]
@@ -2136,7 +1919,7 @@ with tab3:
 
     with left:
         st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:&quot;Space Grotesk&quot;,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         shimmer_classic_horizontal_bar_chart(
@@ -2150,7 +1933,7 @@ with tab3:
 
     with right:
         st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:&quot;Space Grotesk&quot;,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         shimmer_classic_horizontal_bar_chart(
@@ -2171,18 +1954,18 @@ with tab4:
     left, right = st.columns(2)
     with left:
         st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:&quot;Space Grotesk&quot;,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Routes with most decision changes</p>", unsafe_allow_html=True)
         st.dataframe(route_switches.head(10), use_container_width=True, hide_index=True)
     with right:
         st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:&quot;Space Grotesk&quot;,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Routes seen in the most decision states</p>", unsafe_allow_html=True)
         st.dataframe(route_variability.head(10), use_container_width=True, hide_index=True)
 
     st.markdown('<div class="divider-label">Distribution</div>', unsafe_allow_html=True)
     st.markdown(
-        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:&quot;Space Grotesk&quot;,sans-serif'>"
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "How many unique routes appear in each category?</p>", unsafe_allow_html=True)
 
     urbd = (
@@ -2216,7 +1999,7 @@ with tab5:
     st.markdown('<p class="section-sub">Enter route characteristics and our model will suggest the best decision.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:&quot;Space Grotesk&quot;,sans-serif'>"
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "How accurate are the models?</p>", unsafe_allow_html=True)
 
     shimmer_vertical_bar_chart(
@@ -2359,19 +2142,19 @@ with tab5:
           <div style='margin-bottom:10px'>
             <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
           </div>
-          <div style='font-family:&quot;Oxanium&quot;,serif;font-size:1.55rem;font-weight:600;
+          <div style='font-family:"Cinzel",serif;font-size:1.55rem;font-weight:600;
                       color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.04em;
                       text-transform:uppercase'>
             Suggested Decision: {pred}
           </div>
           <p style='color:{INK_SOFT};margin:0;font-size:0.88rem;line-height:1.75;
-                    font-family:&quot;Space Grotesk&quot;,sans-serif'>
+                    font-family:"DM Sans",sans-serif'>
             {explanations.get(pred, "")}
           </p>
         </div>""", unsafe_allow_html=True)
 
         st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:&quot;Space Grotesk&quot;,sans-serif'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Confidence by decision option</p>", unsafe_allow_html=True)
 
         prob_df = (pd.DataFrame({"Decision": cls, "Probability": prob})
@@ -2413,13 +2196,13 @@ with st.expander("🗂  Show filtered data"):
 st.markdown(f"""
 <div style='text-align:center;padding:40px 0 18px'>
   <div style='display:inline-flex;align-items:center;gap:12px;
-              background:rgba(9,22,15,0.88);
-              border:1px solid rgba(151,241,31,0.22);
+              background:rgba(255,252,248,0.85);
+              border:1px solid rgba(124,58,237,0.22);
               border-radius:999px;
               padding:0.55rem 1.4rem;
               backdrop-filter:blur(14px);
-              box-shadow:0 4px 18px rgba(151,241,31,0.10);
-              font-family:&quot;Space Grotesk&quot;,sans-serif;
+              box-shadow:0 4px 18px rgba(124,58,237,0.10);
+              font-family:"DM Sans",sans-serif;
               font-size:0.67rem;
               font-weight:600;
               color:{INK_MUTED};
