@@ -104,15 +104,7 @@ st.markdown(f"""
 @keyframes tileScroll {{ 0% {{ background-position:0 0; }} 100% {{ background-position:48px 48px; }} }}
 @keyframes shimmer    {{ 0% {{ left:-80%; }} 100% {{ left:180%; }} }}
 
-/* ── Pixel cursor ── */
-*, *::before, *::after {{ cursor: none !important; }}
-#kinich-cursor {{ position:fixed; top:0; left:0; pointer-events:none; z-index:999999; image-rendering:pixelated; }}
 
-html, body, [class*="css"] {{
-    font-family: 'Nunito', system-ui, sans-serif !important;
-    -webkit-font-smoothing: antialiased;
-    color: {INK} !important;
-}}
 
 /* ── App background — warm parchment with pixel tile texture ── */
 .stApp {{
