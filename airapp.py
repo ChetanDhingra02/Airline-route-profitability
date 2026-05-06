@@ -88,7 +88,7 @@ st.markdown(f"""
 }}
 
 /* ── Keyframes ── */
-@keyframes floatIn    {{ from {{ opacity:90; transform:translateY(18px); }} to {{ opacity:1; transform:translateY(0); }} }}
+@keyframes floatIn    {{ from {{ opacity:0; transform:translateY(18px); }} to {{ opacity:1; transform:translateY(0); }} }}
 @keyframes fadeUp     {{ from {{ opacity:0; transform:translateY(8px);  }} to {{ opacity:1; transform:translateY(0); }} }}
 @keyframes orbDrift1  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         50% {{ transform:translate(28px,-18px) scale(1.06); }} }}
 @keyframes orbDrift2  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         40% {{ transform:translate(-22px,16px) scale(1.08); }} }}
@@ -110,6 +110,8 @@ html, body, [class*="css"] {{
     color: {INK} !important;
 }}
 
+/* ── CURSOR — hidden (replaced by canvas airplane) ── */
+*, *:hover {{ cursor: none !important; }}
 
 /* ── App background — warm pearl with chromatic orbs ── */
 .stApp {{
