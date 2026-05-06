@@ -46,7 +46,7 @@ CHART_ORANGE   = "#f4a261"
 CHART_DROP     = "#e63946"          # Mario red (stop)
 CHART_NEUTRAL  = [
     "#e63946", "#1d6a96", "#2d6a4f", "#e9c46a",
-    "#f4a261", "#6a4c93", "#2ec4b6", "#264653",
+    "#f4a261", "#7f768b", "#2ec4b6", "#264653",
 ]
 
 DECISION_COLORS = {
@@ -172,7 +172,7 @@ section.main > div {{ background: transparent; }}
     border-right: 4px solid #8B0000 !important;
     box-shadow: 4px 0 0 #8B0000 !important;
 }}
-[data-testid="stSidebar"] * {{ color: #fff8e7 !important; }}
+[data-testid="stSidebar"] * {{ color: #"#7f768b" !important; }}
 [data-testid="stSidebar"] label {{ color: #ffe066 !important; }}
 
 .sidebar-brand {{
@@ -1220,7 +1220,7 @@ def shimmer_pie_chart(title, labels, values, colors=None, height=430):
         animation:pixDonut 800ms steps(16,end) both;
     }}
     .gi-donut::after {{
-        content:""; position:absolute; inset:25%;
+        content:""; position:relative; inset:25%;
         background:#fff9e6;
         border:3px solid #1a1a2e;
     }}
