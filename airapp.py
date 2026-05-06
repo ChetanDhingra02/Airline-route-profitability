@@ -173,20 +173,45 @@ h1,h2,h3,h4 {{
     text-transform: uppercase !important;
 }}
 
-/* ── Hero ── */
-.hero {{
-    position: relative; overflow: hidden;
-    display: flex; align-items: center; justify-content: space-between; gap: 1.2rem;
+/* ── Updated Hero ── */
+.hero {
+    position: relative; 
+    overflow: hidden;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 1.2rem;
     border-radius: var(--r-md);
-    padding: 3rem 3.4rem; margin-bottom: 1.9rem;
+    padding: 3rem 3.4rem; 
+    margin-bottom: 1.9rem;
+    
+    /* 1. Updated Background: Ensure size is larger than the container */
     background: linear-gradient(140deg,
         rgba(240,247,234,0.95) 0%,
         rgba(232,245,240,0.90) 50%,
         rgba(248,244,232,0.95) 100%);
+    background-size: 300% 300%; /* Required for the movement to be visible */
+    
     border: 6px solid rgba(212,160,23,0.40);
     box-shadow: var(--sh-md), inset 0 3px 0 rgba(255,255,255,0.90);
-    animation: goldPulse 4s ease-in-out infinite;
-}}
+    
+    /* 2. Change the animation name and duration */
+    animation: gradientFlow 10s ease infinite; 
+}
+
+/* ── Gradient Flow Keyframes ── */
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 
 /* Pixel checkerboard border corners */
 .hero::before {{
