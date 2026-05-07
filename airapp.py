@@ -1,4 +1,3 @@
-
 import os
 import joblib
 import streamlit as st
@@ -6,8 +5,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
-import json
-import streamlit.components.v1 as components
 
 
 st.set_page_config(
@@ -19,34 +16,34 @@ st.set_page_config(
 
 
 # ─────────────────────────────────────────────────────────────
-#  PIXEL / SUPER MARIO PALETTE
+#  JEWEL-TONE LIGHT PALETTE — Crystal / Genshin Impact Style
 # ─────────────────────────────────────────────────────────────
-BG_BASE        = "#e8f4f8"          # sky blue (Mario sky)
-BG_SOFT        = "#d4ecd4"          # grass green tint
-BG_COOL        = "#fff9e6"          # coin yellow tint
+BG_BASE        = "#fdf9f4"          # warm pearl ivory
+BG_SOFT        = "#f5eeff"          # lavender tint
+BG_COOL        = "#eef5fd"          # sky tint
 
-GLASS_BG       = "rgba(255, 255, 255, 0.82)"
-GLASS_BORDER   = "rgba(44, 117, 44, 0.40)"
+GLASS_BG       = "rgba(255, 252, 248, 0.72)"
+GLASS_BORDER   = "rgba(162, 106, 255, 0.28)"
 
-INK            = "#1a1a2e"          # dark navy pixel ink
-INK_SOFT       = "#2c3e50"          # medium dark
-INK_MUTED      = "#5a6c7d"          # muted slate
+INK            = "#1a0f3c"          # deep indigo-black
+INK_SOFT       = "#4a3278"          # violet ink mid
+INK_MUTED      = "#8b6faa"          # muted amethyst
 
-ACCENT         = "#e63946"          # Mario red
-ACCENT_DK      = "#c1121f"          # dark red
-ACCENT_LT      = "#ff8fa3"          # light red
-ACCENT_2       = "#1d6a96"          # Mario blue (overalls)
-MAGENTA        = "#f4a261"          # coin orange
+ACCENT         = "#7c3aed"          # vivid violet
+ACCENT_DK      = "#5b21b6"
+ACCENT_LT      = "#c4b5fd"
+ACCENT_2       = "#0284c7"          # sapphire
+MAGENTA        = "#db2777"          # ruby
 
-# Pixel chart tones
-CHART_EXPAND   = "#2d6a4f"          # forest green (go!)
-CHART_MAINTAIN = "#1d6a96"          # Mario blue
-CHART_OPTIMIZE = "#e9c46a"          # coin yellow
-CHART_ORANGE   = "#f4a261"
-CHART_DROP     = "#e63946"          # Mario red (stop)
+# Jewel chart tones — maximum saturation
+CHART_EXPAND   = "#1d4ed8"          # deep sapphire
+CHART_MAINTAIN = "#047857"          # deep emerald
+CHART_OPTIMIZE = "#b45309"          # deep topaz
+CHART_ORANGE   = "#b45309"
+CHART_DROP     = "#be185d"          # deep ruby
 CHART_NEUTRAL  = [
-    "#e63946", "#1d6a96", "#2d6a4f", "#e9c46a",
-    "#f4a261", "#7f768b", "#2ec4b6", "#264653",
+    "#6d28d9", "#1d4ed8", "#0e7490", "#047857",
+    "#be185d", "#b45309", "#15803d", "#71717a",
 ]
 
 DECISION_COLORS = {
@@ -59,634 +56,501 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
 
 # ─────────────────────────────────────────────────────────────
-#  GLOBAL CSS — PIXEL / 8-BIT GAME THEME
+#  GLOBAL CSS
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {{
-    --sky:         {BG_BASE};
-    --grass:       {BG_SOFT};
-    --coin:        {BG_COOL};
+    --pearl:       {BG_BASE};
+    --pearl-soft:  {BG_SOFT};
+    --pearl-cool:  {BG_COOL};
     --ink:         {INK};
     --ink-soft:    {INK_SOFT};
     --ink-muted:   {INK_MUTED};
-    --red:         {ACCENT};
-    --red-dk:      {ACCENT_DK};
-    --red-lt:      {ACCENT_LT};
-    --blue:        {ACCENT_2};
-    --orange:      {MAGENTA};
-    --green:       {CHART_EXPAND};
-    --coin-y:      {CHART_OPTIMIZE};
-    --px-border:   4px;
-    --px-shadow:   4px 4px 0px rgba(0,0,0,0.35);
-    --px-shadow-lg: 6px 6px 0px rgba(0,0,0,0.35);
-    --px-inset:    inset -3px -3px 0px rgba(0,0,0,0.25), inset 2px 2px 0px rgba(255,255,255,0.35);
+    --accent:      {ACCENT};
+    --accent-dk:   {ACCENT_DK};
+    --accent-lt:   {ACCENT_LT};
+    --accent-2:    {ACCENT_2};
+    --magenta:     {MAGENTA};
+    --sapphire:    #1d4ed8;
+    --emerald:     #047857;
+    --topaz:       #b45309;
+    --ruby:        #be185d;
+    --amethyst:    #6d28d9;
+    --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+    --sh-sm: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+    --sh-md: 0 8px 32px rgba(120,70,200,0.16), 0 2px 8px rgba(0,0,0,0.08);
+    --sh-lg: 0 20px 56px rgba(120,70,200,0.22), 0 4px 16px rgba(0,0,0,0.10);
+    --sh-glow: 0 0 0 1px rgba(124,58,237,0.30), 0 0 28px rgba(124,58,237,0.18);
+    --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 }}
 
-/* Pixel checkerboard keyframes */
-@keyframes floatIn    {{ from {{ opacity:0; transform:translateY(16px); }} to {{ opacity:1; transform:translateY(0); }} }}
-@keyframes coinSpin   {{ 0%,100% {{ transform:scaleX(1); }} 40% {{ transform:scaleX(0.1); }} 60% {{ transform:scaleX(1); }} }}
-@keyframes bobUp      {{ 0%,100% {{ transform:translateY(0); }} 50% {{ transform:translateY(-6px); }} }}
-@keyframes blinkCursor {{ 0%,49% {{ opacity:1; }} 50%,100% {{ opacity:0; }} }}
-@keyframes pixelSlide {{ from {{ transform:translateX(-100%); }} to {{ transform:translateX(120vw); }} }}
-@keyframes starPop    {{ 0% {{ transform:scale(0) rotate(0deg); opacity:0; }}
-                         60% {{ transform:scale(1.3) rotate(20deg); opacity:1; }}
-                         100% {{ transform:scale(1) rotate(15deg); opacity:0.85; }} }}
-@keyframes groundScroll {{ from {{ background-position:0 0; }} to {{ background-position:-64px 0; }} }}
-@keyframes coinFloat  {{ 0%,100% {{ transform:translateY(0) rotate(0deg); }}
-                         50% {{ transform:translateY(-8px) rotate(10deg); }} }}
-@keyframes pixelPulse {{ 0%,100% {{ box-shadow: 4px 4px 0px rgba(0,0,0,0.35); }}
-                         50% {{ box-shadow: 4px 4px 0px rgba(0,0,0,0.35), 0 0 0 3px {ACCENT}55; }} }}
+/* ── Keyframes ── */
+@keyframes floatIn    {{ from {{ opacity:0; transform:translateY(18px); }} to {{ opacity:1; transform:translateY(0); }} }}
+@keyframes fadeUp     {{ from {{ opacity:0; transform:translateY(8px);  }} to {{ opacity:1; transform:translateY(0); }} }}
+@keyframes orbDrift1  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         50% {{ transform:translate(28px,-18px) scale(1.06); }} }}
+@keyframes orbDrift2  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         40% {{ transform:translate(-22px,16px) scale(1.08); }} }}
+@keyframes orbDrift3  {{ 0%,100% {{ transform:translate(-50%,-50%) scale(1); }}   60% {{ transform:translate(-50%,-50%) scale(1.10); }} }}
+@keyframes shimmer    {{ 0% {{ left:-80%; }} 100% {{ left:160%; }} }}
+@keyframes pulseRing  {{ 0%,100% {{ box-shadow: var(--sh-sm); }} 50% {{ box-shadow: var(--sh-glow); }} }}
+@keyframes scanLine   {{ 0% {{ top:-4px; opacity:0; }} 5% {{ opacity:0.8; }} 95% {{ opacity:0.4; }} 100% {{ top:100%; opacity:0; }} }}
+@keyframes twinkle    {{ 0%,100% {{ opacity:0; transform:scale(0.4); }} 50% {{ opacity:1; transform:scale(1); }} }}
+@keyframes badgePop   {{ 0% {{ transform:scale(0.8); opacity:0; }} 60% {{ transform:scale(1.05); }} 100% {{ transform:scale(1); opacity:1; }} }}
+@keyframes borderFlow {{ 0%,100% {{ border-color:rgba(124,58,237,0.18); }} 50% {{ border-color:rgba(124,58,237,0.45); }} }}
+@keyframes crystalFloat {{ 0%,100% {{ transform:translateY(0) rotate(0deg); }} 50% {{ transform:translateY(-6px) rotate(2deg); }} }}
+@keyframes particleFly  {{ 0%   {{ opacity:0; transform:scale(0.3) translateY(0); }}
+                           30%  {{ opacity:1; }}
+                           100% {{ opacity:0; transform:scale(1.2) translateY(-20px); }} }}
 
 html, body, [class*="css"] {{
-    font-family: 'Nunito', system-ui, sans-serif !important;
-    -webkit-font-smoothing: auto !important;
+    font-family: 'DM Sans', system-ui, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
     color: {INK} !important;
-    image-rendering: pixelated;
 }}
 
-/* ── App background: checkered sky pattern ── */
+/* ── CURSOR — hidden (replaced by canvas airplane) ── */
+*, *:hover {{ cursor: none !important; }}
+
+/* ── App background — warm pearl with chromatic orbs ── */
 .stApp {{
     min-height: 100vh;
-    background-color: #87CEEB;
-    background-image:
-        /* Pixel cloud shapes using box gradients */
-        radial-gradient(ellipse at 15% 22%, rgba(255,255,255,0.75) 0, rgba(255,255,255,0.75) 6%, transparent 7%),
-        radial-gradient(ellipse at 18% 20%, rgba(255,255,255,0.75) 0, rgba(255,255,255,0.75) 5%, transparent 6%),
-        radial-gradient(ellipse at 21% 22%, rgba(255,255,255,0.75) 0, rgba(255,255,255,0.75) 5%, transparent 6%),
-        radial-gradient(ellipse at 60% 12%, rgba(255,255,255,0.72) 0, rgba(255,255,255,0.72) 5%, transparent 6%),
-        radial-gradient(ellipse at 63% 10%, rgba(255,255,255,0.72) 0, rgba(255,255,255,0.72) 4%, transparent 5%),
-        radial-gradient(ellipse at 80% 30%, rgba(255,255,255,0.60) 0, rgba(255,255,255,0.60) 4%, transparent 5%),
-        radial-gradient(ellipse at 83% 28%, rgba(255,255,255,0.60) 0, rgba(255,255,255,0.60) 3%, transparent 4%),
-        /* Checkerboard tile overlay */
-        repeating-conic-gradient(rgba(255,255,255,0.06) 0% 25%, transparent 0% 50%) 0 0 / 32px 32px,
-        /* Main sky gradient */
-        linear-gradient(180deg, #5bb8e8 0%, #87CEEB 40%, #a8dff5 70%, #c8f0d0 85%, #5a9e50 100%);
+    background:
+        radial-gradient(ellipse at 14% 18%, rgba(162,106,255,0.16) 0, transparent 34%),
+        radial-gradient(ellipse at 84% 12%, rgba(56,189,248,0.13) 0, transparent 30%),
+        radial-gradient(ellipse at 62% 88%, rgba(219,39,119,0.09) 0, transparent 28%),
+        radial-gradient(ellipse at 32% 72%, rgba(5,150,105,0.08) 0, transparent 26%),
+        radial-gradient(ellipse at 76% 54%, rgba(180,83,9,0.06) 0, transparent 22%),
+        linear-gradient(155deg, #fdf9f4 0%, #f7f0ff 28%, #eef5fd 56%, #f0fdf8 80%, #fdf9f4 100%);
     background-attachment: fixed;
 }}
 
-/* Ground strip at the very bottom */
+/* ── Ambient orbs ── */
+.stApp::before {{
+    content:"";
+    position:fixed; top:-120px; left:-120px;
+    width:480px; height:480px; border-radius:50%;
+    background:radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
+    animation:orbDrift1 20s ease-in-out infinite;
+    pointer-events:none; z-index:0;
+}}
 .stApp::after {{
-    content: "";
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 24px;
-    background: repeating-linear-gradient(
-        90deg,
-        #5a9e50 0px, #5a9e50 16px,
-        #4a8a40 16px, #4a8a40 32px
-    );
-    z-index: 0;
-    pointer-events: none;
+    content:"";
+    position:fixed; bottom:-100px; right:-100px;
+    width:400px; height:400px; border-radius:50%;
+    background:radial-gradient(circle, rgba(2,132,199,0.12) 0%, transparent 70%);
+    animation:orbDrift2 26s ease-in-out infinite;
+    pointer-events:none; z-index:0;
 }}
 
 .main .block-container {{
     max-width: 1320px;
-    padding-top: 1.8rem;
-    padding-bottom: 5rem;
-    animation: floatIn 400ms ease-out;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    animation: floatIn 500ms ease-out;
     position: relative; z-index: 1;
 }}
 section.main > div {{ background: transparent; }}
 
-/* ── Sidebar: brick wall style ── */
+/* ── Sidebar ── */
 [data-testid="stSidebar"] {{
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 15px,
-            rgba(0,0,0,0.12) 15px,
-            rgba(0,0,0,0.12) 16px
-        ),
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 31px,
-            rgba(0,0,0,0.10) 31px,
-            rgba(0,0,0,0.10) 32px
-        ),
-        linear-gradient(180deg, #d9534f 0%, #c0392b 100%) !important;
-    border-right: 4px solid #8B0000 !important;
-    box-shadow: 4px 0 0 #8B0000 !important;
+    background: rgba(253,249,244,0.90) !important;
+    border-right: 1px solid rgba(124,58,237,0.18) !important;
+    backdrop-filter: blur(24px) saturate(1.5) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(1.5) !important;
+    box-shadow: 4px 0 32px rgba(124,58,237,0.08) !important;
 }}
-[data-testid="stSidebar"] * {{ color: #"#7f768b" !important; }}
-[data-testid="stSidebar"] label {{ color: #ffe066 !important; }}
+[data-testid="stSidebar"] * {{ color: {INK_SOFT} !important; }}
 
 .sidebar-brand {{
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.60rem; font-weight: 400;
-    color: #ffe066;
-    padding: 0.5rem 0 1rem 0;
-    border-bottom: 3px solid rgba(255,255,255,0.25);
-    margin-bottom: 1rem;
-    line-height: 1.8;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
-    letter-spacing: 0.05em;
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem; font-weight: 700;
+    color: {INK}; letter-spacing: 0.06em;
+    padding: 0.2rem 0 1rem 0;
+    border-bottom: 1px solid rgba(124,58,237,0.18);
+    margin-bottom: 1rem; text-transform: uppercase;
 }}
-.sidebar-brand span {{ color: #fff8e7; }}
+.sidebar-brand span {{
+    background: linear-gradient(135deg, {ACCENT}, {ACCENT_2});
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}}
 
-/* ── Headings: pixel font ── */
+/* ── Headings ── */
 h1,h2,h3,h4 {{
-    font-family: 'Press Start 2P', monospace !important;
+    font-family: 'Cinzel', serif !important;
     color: {INK} !important;
-    font-weight: 400 !important;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.15) !important;
-    text-transform: none !important;
-    letter-spacing: 0.03em !important;
+    letter-spacing: 0.04em !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
 }}
 
-/* ── Hero: pixel game card ── */
+/* ── Hero ── */
 .hero {{
     position: relative; overflow: hidden;
-    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    border-radius: 0 !important;
-    padding: 1.6rem 2rem; margin-bottom: 1.4rem;
-    background: #fff9e6;
-    border: 4px solid {INK};
-    box-shadow: var(--px-shadow-lg);
-    image-rendering: pixelated;
+    display: flex; align-items: center; justify-content: space-between; gap: 1.2rem;
+    border-radius: var(--r-xl);
+    padding: 2rem 2.4rem; margin-bottom: 1.4rem;
+    background: linear-gradient(140deg,
+        rgba(255,252,248,0.88) 0%,
+        rgba(245,238,255,0.80) 50%,
+        rgba(238,245,253,0.75) 100%);
+    border: 1px solid rgba(124,58,237,0.28);
+    backdrop-filter: blur(24px) saturate(1.6);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    box-shadow: var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.9);
+    animation: pulseRing 5s ease-in-out infinite;
+    transition: transform 280ms var(--ease);
 }}
-
-/* Pixel border decoration top */
+.hero:hover {{ transform: translateY(-3px); }}
 .hero::before {{
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 8px;
-    background: repeating-linear-gradient(
-        90deg,
-        {ACCENT} 0px, {ACCENT} 16px,
-        {CHART_EXPAND} 16px, {CHART_EXPAND} 32px,
-        {ACCENT_2} 32px, {ACCENT_2} 48px,
-        {CHART_OPTIMIZE} 48px, {CHART_OPTIMIZE} 64px
-    );
+    content:"";
+    position:absolute; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,
+        transparent 0%,
+        rgba(124,58,237,0) 10%,
+        rgba(124,58,237,0.6) 45%,
+        rgba(2,132,199,0.5) 55%,
+        rgba(124,58,237,0) 90%, transparent 100%);
+    animation: scanLine 6s linear infinite; pointer-events:none; z-index:5;
 }}
-/* Pixel border bottom */
 .hero::after {{
-    content: "";
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 8px;
-    background: repeating-linear-gradient(
-        90deg,
-        {CHART_OPTIMIZE} 0px, {CHART_OPTIMIZE} 16px,
-        {ACCENT_2} 16px, {ACCENT_2} 32px,
-        {CHART_EXPAND} 32px, {CHART_EXPAND} 48px,
-        {ACCENT} 48px, {ACCENT} 64px
-    );
+    content:"";
+    position:absolute; top:-60px; right:-60px;
+    width:240px; height:240px; border-radius:50%;
+    background:radial-gradient(circle, rgba(2,132,199,0.16) 0%, transparent 70%);
+    animation: orbDrift3 14s ease-in-out infinite; pointer-events:none;
 }}
-
-.hero-star {{ display: none; }}
+.hero-star {{ position:absolute; width:3px; height:3px; border-radius:50%; pointer-events:none; }}
+.hero-star:nth-child(1) {{ top:20%; left:46%; background:rgba(124,58,237,0.7); animation:twinkle 3.0s ease-in-out infinite; }}
+.hero-star:nth-child(2) {{ top:68%; left:63%; background:rgba(2,132,199,0.7); animation:twinkle 4.0s ease-in-out infinite 0.8s; }}
+.hero-star:nth-child(3) {{ top:38%; left:78%; background:rgba(219,39,119,0.6); animation:twinkle 2.8s ease-in-out infinite 1.5s; }}
+.hero-star:nth-child(4) {{ top:80%; left:32%; background:rgba(5,150,105,0.6); animation:twinkle 3.5s ease-in-out infinite 0.4s; width:4px; height:4px; }}
 .hero-left,.hero-badge,.hero-glyph {{ position:relative; z-index:1; }}
-.hero-left {{ flex:1; min-width:0; padding-top: 8px; }}
+.hero-left {{ flex:1; min-width:0; }}
 .hero-eyebrow {{
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.48rem; letter-spacing: 0.18em;
-    color: {ACCENT};
-    margin-bottom: 0.7rem;
-    text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+    font-size:0.59rem; text-transform:uppercase; letter-spacing:0.22em;
+    color:{ACCENT}; font-weight:700; margin-bottom:0.5rem; font-family:'DM Sans',sans-serif;
 }}
 .hero h1 {{
-    margin: 0 0 0.5rem 0 !important;
-    font-size: 1.1rem !important;
-    line-height: 1.5 !important;
-    color: {INK} !important;
-    text-shadow: 3px 3px 0px rgba(0,0,0,0.18) !important;
-    -webkit-text-fill-color: {INK} !important;
+    margin:0 0 0.4rem 0 !important;
+    font-size:1.90rem !important; line-height:1.2 !important;
+    background: linear-gradient(135deg, {INK} 0%, {ACCENT} 60%, {ACCENT_2} 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    text-shadow:none !important;
 }}
-.hero p {{
-    margin: 0; color: {INK_SOFT} !important;
-    font-size: 0.82rem !important;
-    font-family: 'VT323', monospace !important;
-    font-size: 1.1rem !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-    font-weight: 400 !important;
-}}
-
+.hero p {{ margin:0; color:{INK_SOFT} !important; font-size:0.86rem !important;
+           font-family:'DM Sans',sans-serif !important; text-transform:none !important;
+           letter-spacing:0 !important; font-weight:400 !important; }}
 .hero-badge {{
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    padding: 0.55rem 1rem;
-    border: 3px solid {INK};
-    background: {CHART_OPTIMIZE};
-    color: {INK};
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.45rem;
-    letter-spacing: 0.06em;
-    box-shadow: 3px 3px 0px rgba(0,0,0,0.35);
-    white-space: nowrap;
-    animation: bobUp 2s ease-in-out infinite;
-    border-radius: 0 !important;
-    text-transform: none;
+    display:inline-flex; align-items:center; gap:0.5rem;
+    padding:0.6rem 1.1rem; border-radius:999px;
+    border:1px solid rgba(219,39,119,0.45);
+    background:linear-gradient(135deg,rgba(219,39,119,0.10),rgba(124,58,237,0.10));
+    color:{MAGENTA}; font-size:0.70rem; font-weight:700;
+    letter-spacing:0.08em; text-transform:uppercase; font-family:'DM Sans',sans-serif;
+    box-shadow:0 4px 18px rgba(219,39,119,0.15), 0 0 0 1px rgba(219,39,119,0.15);
+    animation:badgePop 700ms ease-out 250ms both;
+    white-space:nowrap; transition:transform 180ms var(--ease), box-shadow 180ms var(--ease);
 }}
-
+.hero-badge:hover {{ transform:translateY(-3px) scale(1.04); box-shadow:0 8px 26px rgba(219,39,119,0.28); }}
 .hero-glyph {{
-    font-size: 2.8rem; opacity: 0.13; color: {INK};
-    animation: coinFloat 4s ease-in-out infinite;
+    font-size:3rem; opacity:0.12; color:{ACCENT};
+    animation:crystalFloat 6s ease-in-out infinite;
 }}
 
-/* ── Pixel airplane in hero (canvas) ── */
-#pixel-plane-canvas {{
-    position: absolute;
-    top: 50%; left: 0;
-    transform: translateY(-50%);
-    width: 100%; height: 100%;
-    pointer-events: none; z-index: 0;
-    image-rendering: pixelated;
-}}
-
-/* ── Metric cards: pixel block style ── */
+/* ── Metric cards ── */
 [data-testid="metric-container"] {{
-    background: #ffffff !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-    padding: 1rem 1.1rem !important;
-    transition: transform 150ms ease, box-shadow 150ms ease !important;
-    position: relative; overflow: hidden;
+    background: linear-gradient(155deg,
+        rgba(255,252,248,0.85) 0%, rgba(248,244,255,0.75) 100%) !important;
+    border: 1px solid rgba(124,58,237,0.20) !important;
+    border-radius: var(--r-md) !important;
+    backdrop-filter: blur(16px) saturate(1.4) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
+    box-shadow: var(--sh-sm), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+    padding: 1.1rem 1.2rem !important;
+    transition: transform 200ms var(--ease), box-shadow 200ms var(--ease) !important;
+    position:relative; overflow:hidden;
+    animation: borderFlow 6s ease-in-out infinite;
 }}
-[data-testid="metric-container"]::before {{
-    content: "";
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 5px;
-    background: repeating-linear-gradient(
-        90deg,
-        {ACCENT} 0px, {ACCENT} 8px,
-        {ACCENT_2} 8px, {ACCENT_2} 16px
-    );
+[data-testid="metric-container"]::after {{
+    content:""; position:absolute; top:0; left:-80%; width:50%; height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent);
+    transition:left 0.55s ease; pointer-events:none;
 }}
 [data-testid="metric-container"]:hover {{
-    transform: translate(-2px, -2px) !important;
-    box-shadow: 6px 6px 0px {INK} !important;
+    transform:translateY(-5px) scale(1.02) !important;
+    box-shadow:var(--sh-md), 0 0 0 1px rgba(124,58,237,0.35), inset 0 1px 0 rgba(255,255,255,0.95) !important;
 }}
+[data-testid="metric-container"]:hover::after {{ left:160%; }}
 [data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
-    font-family: 'Press Start 2P', monospace !important;
-    font-size: 0.45rem !important;
-    font-weight: 400 !important;
-    text-transform: none !important;
-    letter-spacing: 0.08em !important;
-    color: {INK_SOFT} !important;
+    font-size:0.60rem !important; font-weight:700 !important;
+    text-transform:uppercase !important; letter-spacing:0.16em !important;
+    color:{ACCENT} !important; font-family:'DM Sans',sans-serif !important;
 }}
 [data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
-    color: {INK} !important;
-    font-family: 'Press Start 2P', monospace !important;
-    font-size: 1.3rem !important;
-    font-weight: 400 !important;
-    letter-spacing: -0.01em !important;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.12) !important;
+    color:{INK} !important; font-size:1.90rem !important; font-weight:700 !important;
+    letter-spacing:-0.02em !important; font-family:'Cinzel',serif !important;
 }}
 
-/* ── Tabs: pixel style ── */
+/* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {{
-    gap: 0.18rem;
-    background: rgba(255,255,255,0.85);
-    border: 3px solid {INK};
-    border-radius: 0 !important;
-    padding: 0.25rem;
-    box-shadow: 3px 3px 0px {INK};
+    gap:0.22rem;
+    background:rgba(255,252,248,0.80);
+    border:1px solid rgba(124,58,237,0.20);
+    border-radius:20px; padding:0.30rem;
+    backdrop-filter:blur(16px);
+    box-shadow:var(--sh-sm);
 }}
 .stTabs [data-baseweb="tab"] {{
-    height: 38px; padding: 0 0.9rem !important;
-    border-radius: 0 !important;
-    color: {INK_MUTED} !important;
-    font-family: 'Press Start 2P', monospace !important;
-    font-size: 0.42rem !important;
-    font-weight: 400 !important;
-    background: transparent !important;
-    letter-spacing: 0.03em !important;
-    transition: background 120ms, color 120ms !important;
-    border: 2px solid transparent !important;
+    height:40px; padding:0 1rem !important;
+    border-radius:14px !important;
+    color:{INK_MUTED} !important;
+    font-size:0.79rem !important; font-weight:600 !important;
+    font-family:'DM Sans',sans-serif !important;
+    background:transparent !important; letter-spacing:0.03em !important;
+    transition:background 180ms, color 180ms, transform 180ms !important;
 }}
 .stTabs [data-baseweb="tab"]:hover {{
-    background: {CHART_OPTIMIZE}44 !important;
-    color: {INK} !important;
-    border: 2px solid {INK} !important;
+    background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important;
+    transform:translateY(-1px) !important;
 }}
 .stTabs [aria-selected="true"] {{
-    background: {ACCENT} !important;
-    color: #fff8e7 !important;
-    border: 2px solid {INK} !important;
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.3) !important;
+    background:linear-gradient(135deg,rgba(124,58,237,0.14),rgba(2,132,199,0.10)) !important;
+    color:{INK} !important;
+    box-shadow:0 4px 14px rgba(124,58,237,0.14), inset 0 0 0 1px rgba(124,58,237,0.28) !important;
 }}
-.stTabs [data-baseweb="tab-panel"] {{ padding-top: 1.4rem; }}
+.stTabs [data-baseweb="tab-panel"] {{ padding-top:1.5rem; }}
 
 /* ── Section headings ── */
 .section-hd {{
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.60rem;
-    font-weight: 400;
-    color: {INK};
-    margin: 0 0 0.3rem 0;
-    letter-spacing: 0.04em;
-    text-shadow: 1px 1px 0px rgba(0,0,0,0.12);
+    font-family:'Cinzel',serif; font-size:1.02rem; font-weight:600;
+    color:{INK}; margin:0 0 0.28rem 0; letter-spacing:0.05em; text-transform:uppercase;
 }}
 .section-sub {{
-    font-family: 'VT323', monospace;
-    font-size: 1.05rem;
-    color: {INK_MUTED};
-    margin: 0 0 1rem 0;
-    line-height: 1.55;
-    font-weight: 400;
-    text-transform: none;
-    letter-spacing: 0;
+    font-size:0.83rem; color:{INK_MUTED}; margin:0 0 1.1rem 0; line-height:1.65;
+    font-family:'DM Sans',sans-serif; font-weight:400; text-transform:none; letter-spacing:0;
 }}
 
-/* ── Divider label: coin style ── */
+/* ── Divider label ── */
 .divider-label {{
-    display: flex; align-items: center; gap: 0.7rem;
-    margin: 1.5rem 0 1rem 0;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.42rem;
-    font-weight: 400;
-    letter-spacing: 0.16em;
-    color: {INK};
+    display:flex; align-items:center; gap:0.7rem; margin:1.5rem 0 1rem 0;
+    font-size:0.59rem; font-weight:700; text-transform:uppercase; letter-spacing:0.20em;
+    color:{ACCENT}; font-family:'DM Sans',sans-serif;
 }}
-.divider-label::before, .divider-label::after {{
-    content: ""; flex: 1; height: 3px;
-    background: repeating-linear-gradient(
-        90deg,
-        {INK} 0px, {INK} 8px,
-        transparent 8px, transparent 12px
-    );
+.divider-label::before,.divider-label::after {{
+    content:""; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(124,58,237,0.28),transparent);
 }}
 
-/* ── Info box: speech bubble pixel style ── */
+/* ── Info box ── */
 .info-box {{
-    background: #fff9e6;
-    border: 3px solid {INK};
-    border-radius: 0 !important;
-    padding: 1rem 1.1rem;
-    color: {INK_SOFT};
-    line-height: 1.75;
-    box-shadow: 4px 4px 0px {INK};
-    font-family: 'VT323', monospace;
-    font-size: 1.1rem;
-    transition: transform 150ms, box-shadow 150ms;
-    position: relative;
+    background:linear-gradient(155deg,rgba(255,252,248,0.85),rgba(248,244,255,0.75));
+    border:1px solid rgba(124,58,237,0.18);
+    border-radius:var(--r-md); padding:1rem 1.1rem;
+    color:{INK_SOFT}; line-height:1.75; box-shadow:var(--sh-sm);
+    font-size:0.86rem; font-family:'DM Sans',sans-serif;
+    transition:transform 200ms, box-shadow 200ms;
 }}
-.info-box:hover {{
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px {INK};
-}}
+.info-box:hover {{ transform:translateY(-2px); box-shadow:var(--sh-md); }}
 
-/* ── Pills: pixel badge style ── */
+/* ── Pills ── */
 .pill {{
-    display: inline-block;
-    padding: 0.22rem 0.60rem;
-    border-radius: 0 !important;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.40rem;
-    font-weight: 400;
-    letter-spacing: 0.06em;
-    text-transform: none;
-    border: 2px solid {INK};
-    transition: transform 120ms;
-    cursor: default;
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    display:inline-block; padding:0.25rem 0.72rem; border-radius:999px;
+    font-size:0.61rem; font-weight:700; letter-spacing:0.10em; text-transform:uppercase;
+    font-family:'DM Sans',sans-serif; border:1px solid transparent;
+    transition:transform 180ms; cursor:default;
 }}
-.pill:hover {{ transform: translate(-1px, -1px); box-shadow: 3px 3px 0px rgba(0,0,0,0.3); }}
-.pill-expand   {{ background: #b7e4c7; color: #1b4332; border-color: #1b4332; }}
-.pill-maintain {{ background: #bde0fe; color: #023e8a; border-color: #023e8a; }}
-.pill-optimize {{ background: #ffe066; color: #7c4b00; border-color: #7c4b00; }}
-.pill-drop     {{ background: #ffb3ba; color: #7d0000; border-color: #7d0000; }}
+.pill:hover {{ transform:scale(1.06); }}
+.pill-expand   {{ background:rgba(29,78,216,0.10); color:#1d4ed8; border-color:rgba(29,78,216,0.30); }}
+.pill-maintain {{ background:rgba(4,120,87,0.10);  color:#047857; border-color:rgba(4,120,87,0.28); }}
+.pill-optimize {{ background:rgba(180,83,9,0.10);  color:#b45309; border-color:rgba(180,83,9,0.26); }}
+.pill-drop     {{ background:rgba(190,24,93,0.10); color:#be185d; border-color:rgba(190,24,93,0.28); }}
 
 /* ── Result card ── */
 .result-card {{
-    border-radius: 0 !important;
-    padding: 1.4rem 1.5rem; margin: 1.1rem 0;
-    border: 4px solid {INK};
-    box-shadow: 6px 6px 0px {INK};
-    animation: floatIn 300ms ease-out;
-    transition: transform 200ms, box-shadow 200ms;
+    border-radius:var(--r-lg); padding:1.5rem 1.6rem; margin:1.2rem 0;
+    border:1px solid rgba(124,58,237,0.22); box-shadow:var(--sh-md);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    animation:fadeUp 380ms ease-out; transition:transform 280ms, box-shadow 280ms;
 }}
-.result-card:hover {{
-    transform: translate(-3px, -3px);
-    box-shadow: 9px 9px 0px {INK};
-}}
-.result-expand   {{ background: #b7e4c7; border-left: 8px solid {CHART_EXPAND}; }}
-.result-maintain {{ background: #bde0fe; border-left: 8px solid {CHART_MAINTAIN}; }}
-.result-optimize {{ background: #ffe066; border-left: 8px solid {CHART_OPTIMIZE}; }}
-.result-drop     {{ background: #ffb3ba; border-left: 8px solid {CHART_DROP}; }}
+.result-card:hover {{ transform:translateY(-4px); box-shadow:var(--sh-lg); }}
+.result-expand   {{ background:linear-gradient(140deg,rgba(219,234,254,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_EXPAND}; }}
+.result-maintain {{ background:linear-gradient(140deg,rgba(209,250,229,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_MAINTAIN}; }}
+.result-optimize {{ background:linear-gradient(140deg,rgba(254,243,199,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_OPTIMIZE}; }}
+.result-drop     {{ background:linear-gradient(140deg,rgba(252,231,243,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_DROP}; }}
 
-/* ── Form inputs: pixel style ── */
+/* ── Form inputs ── */
 .stSelectbox label,.stNumberInput label,.stSlider label,
 .stRadio label,.stCheckbox label,.stTextInput label {{
-    font-family: 'Press Start 2P', monospace !important;
-    color: {INK_SOFT} !important;
-    font-weight: 400 !important;
-    font-size: 0.44rem !important;
-    letter-spacing: 0.05em !important;
-    text-transform: none !important;
+    color:{INK_SOFT} !important; font-weight:600 !important; font-size:0.73rem !important;
+    letter-spacing:0.06em !important; text-transform:uppercase !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 .stSelectbox [data-baseweb="select"] > div,
-.stTextInput input, .stNumberInput input {{
-    background: #ffffff !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    color: {INK} !important;
-    min-height: 42px !important;
-    box-shadow: 3px 3px 0px {INK} !important;
-    font-family: 'VT323', monospace !important;
-    font-size: 1.1rem !important;
-    transition: box-shadow 120ms !important;
+.stTextInput input,.stNumberInput input {{
+    background:rgba(255,252,248,0.85) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-sm) !important; color:{INK} !important;
+    min-height:42px !important; box-shadow:none !important;
+    transition:border-color 180ms, box-shadow 180ms !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 .stSelectbox [data-baseweb="select"] > div:hover,
-.stTextInput input:hover, .stNumberInput input:hover {{
-    box-shadow: 4px 4px 0px {INK} !important;
+.stTextInput input:hover,.stNumberInput input:hover {{
+    border-color:rgba(124,58,237,0.45) !important;
+}}
+.stSelectbox [data-baseweb="select"] > div:focus-within,
+.stTextInput input:focus,.stNumberInput input:focus {{
+    border-color:rgba(124,58,237,0.70) !important;
+    box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important;
 }}
 [data-baseweb="menu"] {{
-    background: #fff9e6 !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    box-shadow: 4px 4px 0px {INK} !important;
+    background:rgba(255,252,248,0.96) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-sm) !important;
+    box-shadow:var(--sh-md) !important;
 }}
-[data-baseweb="menu"] li {{ color: {INK} !important; font-family: 'VT323', monospace !important; font-size: 1.1rem !important; }}
-[data-baseweb="menu"] li:hover {{ background: {CHART_OPTIMIZE}88 !important; }}
+[data-baseweb="menu"] li {{ color:{INK_SOFT} !important; }}
+[data-baseweb="menu"] li:hover {{ background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important; }}
 
 /* ── Form card ── */
 [data-testid="stForm"] {{
-    background: rgba(255, 255, 255, 0.92) !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    padding: 1.4rem 1.5rem 1.7rem !important;
-    box-shadow: 6px 6px 0px {INK} !important;
+    background:linear-gradient(155deg,rgba(255,252,248,0.88),rgba(248,244,255,0.80)) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-lg) !important; padding:1.5rem 1.6rem 1.8rem !important;
+    box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.90) !important;
+    backdrop-filter:blur(20px) !important;
+    animation:borderFlow 7s ease-in-out infinite !important;
 }}
 
-/* ── Buttons: pixel press style ── */
+/* ── Buttons ── */
 [data-testid="stFormSubmitButton"] > button, .stButton > button {{
-    border-radius: 0 !important;
-    font-family: 'Press Start 2P', monospace !important;
-    font-weight: 400 !important;
-    font-size: 0.50rem !important;
-    letter-spacing: 0.06em !important;
-    text-transform: none !important;
-    transition: transform 80ms, box-shadow 80ms !important;
-    position: relative; overflow: hidden;
-    border: 3px solid {INK} !important;
+    border-radius:var(--r-sm) !important; font-weight:700 !important; border:none !important;
+    font-family:'DM Sans',sans-serif !important; letter-spacing:0.08em !important;
+    text-transform:uppercase !important; font-size:0.81rem !important;
+    transition:transform 180ms, box-shadow 180ms !important;
+    position:relative; overflow:hidden;
 }}
 [data-testid="stFormSubmitButton"] > button {{
-    width: 100% !important;
-    background: {ACCENT} !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-    color: white !important;
-    padding: 0.7rem 0 !important;
+    width:100% !important;
+    background:linear-gradient(135deg,{ACCENT},{ACCENT_DK}) !important;
+    box-shadow:0 8px 26px rgba(124,58,237,0.35), 0 0 0 1px rgba(124,58,237,0.30) !important;
+    color:white !important; padding:0.72rem 0 !important;
 }}
 [data-testid="stFormSubmitButton"] > button:hover {{
-    transform: translate(-2px, -2px) !important;
-    box-shadow: 6px 6px 0px {INK} !important;
+    transform:translateY(-2px) !important;
+    box-shadow:0 14px 36px rgba(124,58,237,0.50) !important;
 }}
-[data-testid="stFormSubmitButton"] > button:active {{
-    transform: translate(2px, 2px) !important;
-    box-shadow: 1px 1px 0px {INK} !important;
-}}
+[data-testid="stFormSubmitButton"] > button:active {{ transform:translateY(0) scale(0.98) !important; }}
 .stButton > button {{
-    background: #ffffff !important;
-    color: {INK} !important;
-    box-shadow: 3px 3px 0px {INK} !important;
+    background:rgba(255,252,248,0.85) !important; color:{INK_SOFT} !important;
+    border:1px solid rgba(124,58,237,0.22) !important; box-shadow:var(--sh-sm) !important;
 }}
 .stButton > button:hover {{
-    background: {CHART_OPTIMIZE} !important;
-    transform: translate(-1px, -1px) !important;
-    box-shadow: 4px 4px 0px {INK} !important;
+    background:rgba(248,244,255,0.95) !important; color:{ACCENT} !important;
+    transform:translateY(-2px) !important; box-shadow:var(--sh-md) !important;
 }}
 
 /* ── DataFrames ── */
 [data-testid="stDataFrame"] {{
-    background: rgba(255, 255, 255, 0.90) !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    overflow: hidden !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-    transition: transform 200ms, box-shadow 200ms !important;
+    background:rgba(255,252,248,0.80) !important;
+    border:1px solid rgba(124,58,237,0.18) !important;
+    border-radius:var(--r-md) !important; overflow:hidden !important;
+    box-shadow:var(--sh-sm) !important; backdrop-filter:blur(14px) !important;
+    transition:transform 280ms, box-shadow 280ms !important;
 }}
 [data-testid="stDataFrame"]:hover {{
-    transform: translate(-2px, -2px) !important;
-    box-shadow: 6px 6px 0px {INK} !important;
+    transform:translateY(-3px) !important; box-shadow:var(--sh-md) !important;
 }}
-[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{ color: {INK_SOFT} !important; }}
+[data-testid="stDataFrame"] [role="grid"] {{ background:transparent !important; }}
+[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{ color:{INK_SOFT} !important; }}
 [data-testid="stDataFrame"] [role="columnheader"] {{
-    background: {INK} !important;
-    color: #ffe066 !important;
-    font-family: 'Press Start 2P', monospace !important;
-    font-weight: 400 !important;
-    font-size: 0.44rem !important;
-    letter-spacing: 0.08em !important;
-    text-transform: none !important;
-    border-bottom: 2px solid {INK} !important;
+    background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important;
+    font-weight:700 !important; font-size:0.71rem !important;
+    letter-spacing:0.10em !important; text-transform:uppercase !important;
+    border-bottom:1px solid rgba(124,58,237,0.16) !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 [data-testid="stDataFrame"] [role="gridcell"] {{
-    border-bottom: 1px solid rgba(26, 26, 46, 0.12) !important;
-    font-family: 'VT323', monospace !important;
-    font-size: 1rem !important;
+    border-bottom:1px solid rgba(124,58,237,0.08) !important;
 }}
 
 /* ── Expander ── */
 [data-testid="stExpander"] {{
-    background: rgba(255, 255, 255, 0.88) !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    box-shadow: 3px 3px 0px {INK} !important;
-    transition: transform 150ms, box-shadow 150ms !important;
+    background:rgba(255,252,248,0.80) !important;
+    border:1px solid rgba(124,58,237,0.18) !important;
+    border-radius:var(--r-md) !important; box-shadow:var(--sh-sm) !important;
+    backdrop-filter:blur(14px) !important;
+    transition:transform 180ms, box-shadow 180ms !important;
 }}
-[data-testid="stExpander"]:hover {{
-    transform: translate(-1px, -1px) !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-}}
+[data-testid="stExpander"]:hover {{ transform:translateY(-2px) !important; box-shadow:var(--sh-md) !important; }}
 [data-testid="stExpander"] summary p {{
-    color: {INK} !important;
-    font-family: 'Press Start 2P', monospace !important;
-    font-size: 0.50rem !important;
-    font-weight: 400 !important;
+    color:{INK_SOFT} !important; font-weight:600 !important;
+    font-family:'DM Sans',sans-serif !important;
 }}
 
 /* ── Charts ── */
 [data-testid="stPyplot"] {{
-    background: rgba(255, 255, 255, 0.88);
-    border: 3px solid {INK};
-    border-radius: 0;
-    padding: 0.8rem;
-    box-shadow: 4px 4px 0px {INK};
-    transition: transform 200ms, box-shadow 200ms;
+    background:rgba(255,252,248,0.75);
+    border:1px solid rgba(124,58,237,0.18);
+    border-radius:var(--r-lg); padding:1rem;
+    box-shadow:var(--sh-sm); backdrop-filter:blur(14px);
+    transition:transform 280ms, box-shadow 280ms;
 }}
 [data-testid="stPyplot"]:hover {{
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px {INK};
+    transform:translateY(-4px);
+    box-shadow:var(--sh-md), 0 0 0 1px rgba(124,58,237,0.28);
 }}
 
 /* ── Alerts ── */
 [data-testid="stAlert"] {{
-    border-radius: 0 !important;
-    background: rgba(255, 255, 255, 0.90) !important;
-    border: 3px solid {INK} !important;
-    box-shadow: 3px 3px 0px {INK} !important;
-    color: {INK} !important;
-    font-family: 'VT323', monospace !important;
-    font-size: 1.1rem !important;
+    border-radius:var(--r-md) !important;
+    background:rgba(255,252,248,0.85) !important;
+    border:1px solid rgba(124,58,237,0.20) !important;
+    color:{INK_SOFT} !important;
 }}
 
-hr {{ border: none !important; height: 3px !important;
-      background: repeating-linear-gradient(
-        90deg, {INK} 0px, {INK} 8px, transparent 8px, transparent 12px
-      ) !important; margin: 1.2rem 0 !important; }}
+hr {{ border:none !important; border-top:1px solid rgba(124,58,237,0.14) !important; margin:1.4rem 0 !important; }}
 
 .col-label {{
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.44rem;
-    font-weight: 400;
-    color: {ACCENT};
-    letter-spacing: 0.10em;
-    text-transform: none;
-    margin-bottom: 0.8rem;
-    display: flex; align-items: center; gap: 0.5rem;
+    font-size:0.63rem; font-weight:700; color:{ACCENT}; letter-spacing:0.16em;
+    text-transform:uppercase; margin-bottom:0.9rem;
+    display:flex; align-items:center; gap:0.4rem; font-family:'DM Sans',sans-serif;
 }}
 .col-label::after {{
-    content: ""; flex: 1; height: 3px;
-    background: repeating-linear-gradient(
-        90deg, {ACCENT} 0px, {ACCENT} 6px, transparent 6px, transparent 9px
-    );
+    content:""; flex:1; height:1px;
+    background:linear-gradient(90deg,rgba(124,58,237,0.28),transparent);
 }}
 
-/* Slider: pixel thumb */
+/* Slider */
 [data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
-    background: {ACCENT} !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    box-shadow: 2px 2px 0px {INK} !important;
-    width: 20px !important; height: 20px !important;
+    background:{ACCENT} !important; border-color:{ACCENT_LT} !important;
+    box-shadow:0 0 10px rgba(124,58,237,0.40) !important;
 }}
 [data-testid="stSlider"] [data-baseweb="slider"] [data-testid="stSliderTrackFill"] {{
-    background: {ACCENT} !important;
-    height: 6px !important;
-}}
-[data-testid="stSlider"] [data-baseweb="slider"] > div:first-child {{
-    height: 6px !important;
-    background: rgba(26,26,46,0.2) !important;
-    border-radius: 0 !important;
+    background:linear-gradient(90deg,{ACCENT},{ACCENT_2}) !important;
 }}
 
-/* Scrollbar: chunky pixel */
-::-webkit-scrollbar {{ width: 10px; height: 10px; }}
-::-webkit-scrollbar-track {{ background: #c8f0d0; border: 2px solid {INK}; }}
-::-webkit-scrollbar-thumb {{ background: {ACCENT}; border: 2px solid {INK}; border-radius: 0; }}
-::-webkit-scrollbar-thumb:hover {{ background: {ACCENT_DK}; }}
-::selection {{ background: {CHART_OPTIMIZE}; color: {INK}; }}
+/* Scrollbar */
+::-webkit-scrollbar {{ width:6px; height:6px; }}
+::-webkit-scrollbar-track {{ background:rgba(245,238,255,0.60); }}
+::-webkit-scrollbar-thumb {{ background:rgba(124,58,237,0.30); border-radius:999px; }}
+::-webkit-scrollbar-thumb:hover {{ background:rgba(124,58,237,0.55); }}
+::selection {{ background:rgba(124,58,237,0.20); color:{INK}; }}
 
-/* ── Airplane cursor canvas ── */
+/* ── Airplane cursor canvas (always on top) ── */
 #airplane-canvas {{
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    pointer-events: none; z-index: 999999;
-    image-rendering: pixelated;
+    position:fixed; top:0; left:0;
+    width:100vw; height:100vh;
+    pointer-events:none; z-index:999999;
 }}
 </style>
 """, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────
-#  PIXEL AIRPLANE CURSOR — 8-bit style trail
+#  AIRPLANE CURSOR + TRAIL CANVAS
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <canvas id="airplane-canvas"></canvas>
@@ -695,7 +559,6 @@ st.markdown("""
     const canvas = document.getElementById('airplane-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
 
     let W = window.innerWidth, H = window.innerHeight;
     canvas.width = W; canvas.height = H;
@@ -704,125 +567,150 @@ st.markdown("""
         canvas.width = W; canvas.height = H;
     });
 
-    let mx = W/2, my = H/2;
+    let mx = W/2, my = H/2, pmx = W/2, pmy = H/2;
     let angle = 0, targetAngle = 0;
     const trail = [];
-    const MAX_TRAIL = 28;
-
-    // Pixel star/sparkle colors (non-neon, vibrant)
-    const sparkColors = ['#e63946','#e9c46a','#2d6a4f','#1d6a96','#f4a261','#6a4c93'];
+    const MAX_TRAIL = 38;
 
     document.addEventListener('mousemove', e => {
         const dx = e.clientX - mx, dy = e.clientY - my;
         if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
             targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
         }
+        pmx = mx; pmy = my;
         mx = e.clientX; my = e.clientY;
-        trail.push({ x: mx, y: my, age: 0, color: sparkColors[Math.floor(Math.random() * sparkColors.length)] });
+        trail.push({ x: mx, y: my, age: 0 });
         if (trail.length > MAX_TRAIL) trail.shift();
     });
 
     function lerpAngle(a, b, t) {
         let diff = b - a;
-        while (diff > Math.PI) diff -= 2 * Math.PI;
+        while (diff >  Math.PI) diff -= 2 * Math.PI;
         while (diff < -Math.PI) diff += 2 * Math.PI;
         return a + diff * t;
     }
 
-    // Draw a PIXEL airplane using filled rectangles (8-bit look)
-    function drawPixelPlane(x, y, ang) {
+    // Jewel trail colors cycling
+    const jewelColors = [
+        'rgba(124,58,237,',   // amethyst
+        'rgba(29,78,216,',    // sapphire
+        'rgba(2,132,199,',    // crystal blue
+        'rgba(4,120,87,',     // emerald
+        'rgba(180,83,9,',     // topaz
+        'rgba(219,39,119,',   // ruby
+    ];
+    let colorIdx = 0;
+    let colorT = 0;
+
+    function drawAirplane(x, y, ang, scale=1) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(ang);
-        ctx.imageSmoothingEnabled = false;
+        ctx.scale(scale, scale);
 
-        const S = 3; // pixel block size
+        // Shadow / glow beneath plane
+        ctx.shadowColor = 'rgba(124,58,237,0.45)';
+        ctx.shadowBlur  = 14;
 
-        // Define pixel art plane (white body, blue wings)
-        // Each entry: [col, row, color]
-        const pixels = [
-            // Body (white)
-            [0,-5,'#ffffff'],[0,-4,'#ffffff'],[0,-3,'#ffffff'],
-            [0,-2,'#ffffff'],[0,-1,'#ffffff'],[0,0,'#ffffff'],
-            [0,1,'#ffffff'],[0,2,'#ffffff'],
-            // Body outline
-            [-1,-4,'#1a1a2e'],[-1,-3,'#1a1a2e'],[-1,-2,'#1a1a2e'],[-1,-1,'#1a1a2e'],[-1,0,'#1a1a2e'],
-            [1,-4,'#1a1a2e'],[1,-3,'#1a1a2e'],[1,-2,'#1a1a2e'],[1,-1,'#1a1a2e'],[1,0,'#1a1a2e'],
-            // Nose tip
-            [0,-6,'#e0e0e0'],
-            // Wings (blue)
-            [-4,0,'#1d6a96'],[-3,0,'#1d6a96'],[-2,0,'#1d6a96'],[-1,0,'#1d6a96'],
-            [2,0,'#1d6a96'],[3,0,'#1d6a96'],[4,0,'#1d6a96'],
-            [-5,-1,'#1d6a96'],[-4,-1,'#1d6a96'],[-3,-1,'#1d6a96'],
-            [3,-1,'#1d6a96'],[4,-1,'#1d6a96'],[5,-1,'#1d6a96'],
-            // Wing outline
-            [-5,-2,'#1a1a2e'],[-4,-2,'#1a1a2e'],[-3,-2,'#1a1a2e'],
-            [3,-2,'#1a1a2e'],[4,-2,'#1a1a2e'],[5,-2,'#1a1a2e'],
-            [-6,0,'#1a1a2e'],[6,0,'#1a1a2e'],
-            [-5,1,'#1a1a2e'],[-4,1,'#1a1a2e'],[-3,1,'#1a1a2e'],
-            [3,1,'#1a1a2e'],[4,1,'#1a1a2e'],[5,1,'#1a1a2e'],
-            // Tail fins (red)
-            [-2,2,'#e63946'],[-1,2,'#e63946'],
-            [1,2,'#e63946'],[2,2,'#e63946'],
-            [-2,3,'#e63946'],[2,3,'#e63946'],
-            [-2,4,'#1a1a2e'],[-1,4,'#1a1a2e'],[1,4,'#1a1a2e'],[2,4,'#1a1a2e'],
-            // Cockpit window (light blue)
-            [0,-3,'#a8d8f0'],[-1,-3,'#a8d8f0'],[1,-3,'#a8d8f0'],
-        ];
+        // Fuselage
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.quadraticCurveTo(3.5, -4, 3, 6);
+        ctx.quadraticCurveTo(1.5, 10, 0, 11);
+        ctx.quadraticCurveTo(-1.5, 10, -3, 6);
+        ctx.quadraticCurveTo(-3.5, -4, 0, -14);
+        ctx.fillStyle = '#7c3aed';
+        ctx.fill();
 
-        pixels.forEach(([col, row, color]) => {
-            ctx.fillStyle = color;
-            ctx.fillRect(col * S - S/2, row * S - S/2, S, S);
-        });
+        // Wings
+        ctx.beginPath();
+        ctx.moveTo(-2, 1); ctx.lineTo(-14, 8); ctx.lineTo(-12, 10);
+        ctx.lineTo(-1.5, 5);
+        ctx.closePath();
+        ctx.fillStyle = '#1d4ed8';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(2, 1); ctx.lineTo(14, 8); ctx.lineTo(12, 10);
+        ctx.lineTo(1.5, 5);
+        ctx.closePath();
+        ctx.fillStyle = '#1d4ed8';
+        ctx.fill();
+
+        // Tail fins
+        ctx.beginPath();
+        ctx.moveTo(-1, 8); ctx.lineTo(-6, 13); ctx.lineTo(-5, 14);
+        ctx.lineTo(-0.5, 10);
+        ctx.closePath();
+        ctx.fillStyle = '#db2777';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(1, 8); ctx.lineTo(6, 13); ctx.lineTo(5, 14);
+        ctx.lineTo(0.5, 10);
+        ctx.closePath();
+        ctx.fillStyle = '#db2777';
+        ctx.fill();
+
+        // Cockpit window
+        ctx.beginPath();
+        ctx.ellipse(0, -9, 1.8, 2.5, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(196,229,255,0.90)';
+        ctx.shadowBlur = 0;
+        ctx.fill();
 
         ctx.restore();
-    }
-
-    // Draw pixel star sparkle
-    function drawPixelStar(x, y, size, color) {
-        ctx.fillStyle = color;
-        const s = Math.max(2, Math.round(size));
-        // Cross shape for pixel star
-        ctx.fillRect(x - s/2, y - s*1.5, s, s);
-        ctx.fillRect(x - s/2, y + s/2, s, s);
-        ctx.fillRect(x - s*1.5, y - s/2, s, s);
-        ctx.fillRect(x + s/2, y - s/2, s, s);
-        ctx.fillRect(x - s/2, y - s/2, s, s);
     }
 
     function frame() {
         ctx.clearRect(0, 0, W, H);
 
-        // Age and draw trail as pixel blocks
-        for (let i = 0; i < trail.length; i++) {
-            trail[i].age++;
+        // Age trail points
+        for (let i = 0; i < trail.length; i++) trail[i].age++;
+
+        // Draw trail as glowing connected dots / crystals
+        for (let i = 1; i < trail.length; i++) {
             const p = trail[i];
-            const prog = i / trail.length;
-            const alpha = prog * (1 - p.age / 80);
-            if (alpha <= 0.05) continue;
+            const prog = i / trail.length;          // 0 at tail, 1 at head
+            const fade = prog * (1 - p.age / 120);
+            if (fade <= 0) continue;
 
-            ctx.globalAlpha = alpha;
+            const ci = Math.floor(prog * jewelColors.length) % jewelColors.length;
+            const c  = jewelColors[ci];
 
-            // Every few points, draw a pixel block
-            if (i % 3 === 0) {
-                const sz = Math.max(2, Math.round(prog * 5));
-                ctx.fillStyle = p.color;
-                ctx.fillRect(
-                    Math.round(p.x) - sz/2,
-                    Math.round(p.y) - sz/2,
-                    sz, sz
-                );
-            }
+            // Streak segment
+            const prev = trail[i - 1];
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(prev.x, prev.y);
+            ctx.lineTo(p.x, p.y);
+            ctx.strokeStyle = c + (fade * 0.70).toFixed(2) + ')';
+            ctx.lineWidth   = prog * 3.5 + 0.5;
+            ctx.lineCap     = 'round';
+            ctx.shadowColor = c + '0.6)';
+            ctx.shadowBlur  = 8 * prog;
+            ctx.stroke();
+            ctx.restore();
 
-            // Occasional pixel star sparkle
-            if (i % 7 === 0 && prog > 0.3) {
-                drawPixelStar(Math.round(p.x), Math.round(p.y), Math.round(prog * 3), p.color);
+            // Tiny jewel spark every few points
+            if (i % 5 === 0 && prog > 0.15) {
+                const r = prog * 2.8;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = c + (fade * 0.55).toFixed(2) + ')';
+                ctx.shadowColor = c + '0.8)';
+                ctx.shadowBlur  = 10;
+                ctx.fill();
+                ctx.restore();
             }
         }
 
-        ctx.globalAlpha = 1.0;
-        angle = lerpAngle(angle, targetAngle, 0.16);
-        drawPixelPlane(Math.round(mx), Math.round(my), angle);
+        // Smooth angle
+        angle = lerpAngle(angle, targetAngle, 0.18);
+
+        // Draw airplane
+        drawAirplane(mx, my, angle, 1.15);
 
         requestAnimationFrame(frame);
     }
@@ -889,11 +777,11 @@ def prepare_input(input_df, training_columns):
 
 
 # ─────────────────────────────────────────────────────────────
-#  CHART HELPERS
+#  CHART HELPERS — light-theme aware, jewel colors
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
     fig, ax = plt.subplots(figsize=figsize)
-    fig.patch.set_facecolor("#ffffff")
+    fig.patch.set_facecolor("#fdf9f4")
     fig.patch.set_alpha(0.0)
     ax.set_facecolor("none")
     for spine in ["top", "right", "left", "bottom"]:
@@ -904,7 +792,8 @@ def clean_fig(figsize=(8, 4)):
     ax.title.set_color(INK)
     ax.title.set_fontsize(11)
     ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color="#cccccc", linewidth=1.0, linestyle="--", alpha=0.70)
+    ax.title.set_fontfamily("serif")
+    ax.grid(axis="y", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
     ax.set_axisbelow(True)
     for label in ax.get_xticklabels() + ax.get_yticklabels():
         label.set_color(INK_MUTED)
@@ -916,416 +805,21 @@ def col_seq(labels):
 
 
 def add_bar_shimmer(bars, ax, alpha=0.92):
+    """Add a subtle highlight stripe on each bar for a crystal effect."""
     for bar in bars:
         bar.set_alpha(alpha)
         bar.set_linewidth(0)
+        # White sheen overlay via a thin lighter rectangle on the left quarter
+        x = bar.get_x()
+        h = bar.get_height()
+        w = bar.get_width()
+        y = bar.get_y()
+        if h > 0:
+            ax.add_patch(plt.Rectangle(
+                (x + w * 0.08, y), w * 0.22, h,
+                color="white", alpha=0.22, zorder=bar.get_zorder() + 1
+            ))
     return bars
-
-
-# ─────────────────────────────────────────────────────────────
-#  PIXEL HTML CHART HELPERS
-# ─────────────────────────────────────────────────────────────
-def _fmt_chart_value(v, value_format="number"):
-    if value_format == "percent":
-        return f"{v:.0%}"
-    if value_format == "money":
-        return f"${v:,.0f}"
-    return f"{v:,.0f}"
-
-
-def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_format="number", height=430):
-    labels = [str(x) for x in labels]
-    clean_series = []
-    all_values = []
-
-    for s in series:
-        vals = [float(x) if pd.notna(x) else 0.0 for x in s.get("values", [])]
-        all_values.extend(vals)
-        clean_series.append({
-            "name": str(s.get("name", "Value")),
-            "values": vals,
-            "color": s.get("color", ACCENT),
-            "colors": s.get("colors", None),
-        })
-
-    if not all_values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if max_value is None:
-        max_value = max(all_values) if max(all_values) != 0 else 1
-    max_value = float(max_value) if max_value else 1.0
-
-    chart = {
-        "title": title,
-        "labels": labels,
-        "series": clean_series,
-        "max_value": max_value,
-        "value_format": value_format,
-    }
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-chart-root"></div>
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-    .gi-chart {{
-        width:100%; min-height:{height}px; box-sizing:border-box;
-        padding:22px 24px 20px;
-        background:#fff9e6;
-        border:3px solid #1a1a2e;
-        box-shadow:5px 5px 0px #1a1a2e;
-        font-family:'VT323',monospace; color:#1a1a2e; overflow:hidden; position:relative;
-    }}
-    .gi-chart::before {{
-        content:""; position:absolute; top:0; left:0; right:0; height:7px;
-        background:repeating-linear-gradient(90deg,{ACCENT} 0px,{ACCENT} 14px,{CHART_EXPAND} 14px,{CHART_EXPAND} 28px,{ACCENT_2} 28px,{ACCENT_2} 42px,{CHART_OPTIMIZE} 42px,{CHART_OPTIMIZE} 56px);
-    }}
-    .gi-chart-title {{
-        font-family:'Press Start 2P',monospace;
-        text-align:center; font-size:12px; line-height:1.4; color:#1a1a2e;
-        margin-bottom:16px; margin-top:10px; letter-spacing:0.03em;
-    }}
-    .gi-legend {{ display:flex; justify-content:center; gap:18px; margin-bottom:18px; flex-wrap:wrap; }}
-    .gi-legend-item {{ display:flex; align-items:center; gap:7px; color:#2c3e50; font-size:16px; }}
-    .gi-legend-color {{ width:18px; height:12px; border:2px solid #1a1a2e; image-rendering:pixelated; }}
-    .gi-plot {{
-        display:grid;
-        grid-template-columns:repeat({max(len(labels),1)}, minmax(0,1fr));
-        gap:24px; align-items:end;
-        height:{max(height-175,190)}px;
-        border-bottom:3px solid #1a1a2e;
-        background-image:repeating-linear-gradient(to top, rgba(26,26,46,0.10) 1px, transparent 1px);
-        background-size:100% 25%;
-        padding:0 14px; position:relative; z-index:1;
-    }}
-    .gi-group {{ height:100%; display:flex; align-items:end; justify-content:center; gap:8px; position:relative; }}
-    .gi-bar-wrap {{ height:100%; width:min(44px,28%); min-width:22px; display:flex; align-items:end; justify-content:center; position:relative; }}
-    .gi-bar {{
-        width:100%; height:var(--bar-height); min-height:3px;
-        border:2px solid #1a1a2e;
-        position:relative; overflow:hidden;
-        box-shadow:3px 3px 0px #1a1a2e;
-        animation:pixGrow 700ms steps(14,end) both;
-        image-rendering:pixelated;
-    }}
-    .gi-bar::after {{
-        content:""; position:absolute; top:0; left:0; right:0;
-        height:6px; background:rgba(255,255,255,0.45);
-    }}
-    .gi-value {{
-        position:absolute; bottom:calc(var(--bar-height) + 8px);
-        font-size:15px; font-weight:bold; color:#1a1a2e; white-space:nowrap;
-    }}
-    .gi-xlabels {{
-        display:grid;
-        grid-template-columns:repeat({max(len(labels),1)}, minmax(0,1fr));
-        gap:24px; padding:10px 14px 0; text-align:center; position:relative; z-index:1;
-    }}
-    .gi-xlabel {{ color:#2c3e50; font-family:'Press Start 2P',monospace; font-size:8px; line-height:1.4; }}
-    @keyframes pixGrow {{
-        from {{ height:0%; }} to {{ height:var(--bar-height); }}
-    }}
-    </style>
-    <script>
-    const chart = {chart_json};
-    function formatValue(v) {{
-        if (chart.value_format==="percent") return Math.round(v*100)+"%";
-        if (chart.value_format==="money") return "$"+Math.round(v).toLocaleString();
-        return Math.round(v).toLocaleString();
-    }}
-    const root = document.getElementById("gi-chart-root");
-    const legendHtml = chart.series.map(s=>`
-        <div class="gi-legend-item">
-            <span class="gi-legend-color" style="background:${{s.color}}"></span>
-            ${{s.name}}
-        </div>`).join("");
-    const groupsHtml = chart.labels.map((label,i)=>`
-        <div class="gi-group">
-            ${{chart.series.map((s,j)=>{{
-                const value=Number(s.values[i]||0);
-                const pct=Math.max(2,Math.min(100,value/chart.max_value*100));
-                const color=s.colors?s.colors[i]:s.color;
-                return `<div class="gi-bar-wrap">
-                    <div class="gi-value" style="--bar-height:${{pct}}%">${{formatValue(value)}}</div>
-                    <div class="gi-bar" style="--bar-height:${{pct}}%;background:${{color}};animation-delay:${{(i+j)*80}}ms;"></div>
-                </div>`;
-            }}).join("")}}
-        </div>`).join("");
-    const xLabelsHtml = chart.labels.map(label=>`<div class="gi-xlabel">${{label}}</div>`).join("");
-    root.innerHTML=`<div class="gi-chart">
-        <div class="gi-chart-title">${{chart.title}}</div>
-        <div class="gi-legend">${{legendHtml}}</div>
-        <div class="gi-plot">${{groupsHtml}}</div>
-        <div class="gi-xlabels">${{xLabelsHtml}}</div>
-    </div>`;
-    </script>
-    """, height=height + 40, scrolling=False)
-
-
-def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_format="number", height=430):
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    if not values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if colors is None:
-        colors = [ACCENT for _ in values]
-    elif isinstance(colors, str):
-        colors = [colors for _ in values]
-    else:
-        colors = list(colors)
-
-    max_abs = max(abs(v) for v in values) or 1.0
-    rows = []
-    for label, value, color in zip(labels, values, colors):
-        rows.append({
-            "label": label,
-            "value": value,
-            "display": _fmt_chart_value(value, value_format),
-            "width": max(2, min(100, abs(value) / max_abs * 100)),
-            "color": color,
-        })
-
-    chart = {"title": title, "rows": rows}
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-hbar-root"></div>
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-    .gi-hchart {{
-        width:100%; min-height:{height}px; box-sizing:border-box;
-        padding:22px 24px;
-        background:#fff9e6;
-        border:3px solid #1a1a2e;
-        box-shadow:5px 5px 0px #1a1a2e;
-        font-family:'VT323',monospace; color:#1a1a2e; overflow:hidden; position:relative;
-    }}
-    .gi-hchart::before {{
-        content:""; position:absolute; top:0; left:0; right:0; height:7px;
-        background:repeating-linear-gradient(90deg,{CHART_OPTIMIZE} 0px,{CHART_OPTIMIZE} 14px,{ACCENT_2} 14px,{ACCENT_2} 28px,{CHART_EXPAND} 28px,{CHART_EXPAND} 42px,{ACCENT} 42px,{ACCENT} 56px);
-    }}
-    .gi-hchart-title {{
-        font-family:'Press Start 2P',monospace;
-        text-align:center; font-size:12px; line-height:1.4; color:#1a1a2e;
-        margin-bottom:18px; margin-top:10px;
-    }}
-    .gi-hrows {{ display:flex; flex-direction:column; gap:11px; position:relative; z-index:1; }}
-    .gi-hrow {{ display:grid; grid-template-columns:minmax(80px,155px) 1fr minmax(65px,95px); align-items:center; gap:10px; }}
-    .gi-hlabel {{ color:#2c3e50; font-size:15px; font-weight:bold; line-height:1.1; text-align:right; }}
-    .gi-htrack {{ height:20px; background:rgba(26,26,46,0.09); border:2px solid #1a1a2e; overflow:hidden; position:relative; }}
-    .gi-hbar {{
-        height:100%; width:var(--bar-width);
-        position:relative; overflow:hidden;
-        border-right:2px solid #1a1a2e;
-        box-shadow:inset 0 4px 0 rgba(255,255,255,0.40);
-        animation:pixHGrow 700ms steps(14,end) both;
-        animation-delay:var(--delay);
-        image-rendering:pixelated;
-    }}
-    .gi-hvalue {{ color:#1a1a2e; font-weight:bold; font-size:15px; white-space:nowrap; }}
-    @keyframes pixHGrow {{ from {{ width:0%; }} to {{ width:var(--bar-width); }} }}
-    </style>
-    <script>
-    const chart = {chart_json};
-    const root = document.getElementById("gi-hbar-root");
-    const rowsHtml = chart.rows.map((r,i)=>`
-        <div class="gi-hrow">
-            <div class="gi-hlabel">${{r.label}}</div>
-            <div class="gi-htrack">
-                <div class="gi-hbar" style="--bar-width:${{r.width}}%;--delay:${{i*90}}ms;background:${{r.color}};"></div>
-            </div>
-            <div class="gi-hvalue">${{r.display}}</div>
-        </div>`).join("");
-    root.innerHTML=`<div class="gi-hchart">
-        <div class="gi-hchart-title">${{chart.title}}</div>
-        <div class="gi-hrows">${{rowsHtml}}</div>
-    </div>`;
-    </script>
-    """, height=height + 35, scrolling=False)
-
-
-def shimmer_pie_chart(title, labels, values, colors=None, height=430):
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    total = sum(values)
-    if not values or total <= 0:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if colors is None:
-        colors = [ACCENT for _ in values]
-    else:
-        colors = list(colors)
-
-    rows = []
-    start = 0.0
-    stops = []
-    for label, value, color in zip(labels, values, colors):
-        pct = value / total * 100
-        end = start + pct
-        stops.append(f"{color} {start:.4f}% {end:.4f}%")
-        rows.append({
-            "label": label,
-            "value": value,
-            "pct": pct,
-            "display": f"{pct:.1f}%",
-            "color": color,
-        })
-        start = end
-
-    chart = {
-        "title": title,
-        "gradient": ", ".join(stops),
-        "rows": rows,
-        "total": total,
-    }
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-pie-root"></div>
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-    .gi-pie-card {{
-        width:100%; min-height:{height}px; box-sizing:border-box;
-        padding:22px 24px;
-        background:#fff9e6;
-        border:3px solid #1a1a2e;
-        box-shadow:5px 5px 0px #1a1a2e;
-        font-family:'VT323',monospace; color:#1a1a2e; overflow:hidden; position:relative;
-    }}
-    .gi-pie-card::before {{
-        content:""; position:absolute; top:0; left:0; right:0; height:7px;
-        background:repeating-linear-gradient(90deg,{ACCENT} 0px,{ACCENT} 14px,{CHART_EXPAND} 14px,{CHART_EXPAND} 28px,{ACCENT_2} 28px,{ACCENT_2} 42px,{CHART_OPTIMIZE} 42px,{CHART_OPTIMIZE} 56px);
-    }}
-    .gi-pie-title {{
-        font-family:'Press Start 2P',monospace;
-        text-align:center; font-size:12px; line-height:1.4; color:#1a1a2e;
-        margin-bottom:16px; margin-top:10px;
-    }}
-    .gi-pie-layout {{
-        display:grid; grid-template-columns:minmax(200px,0.9fr) minmax(180px,1fr);
-        gap:22px; align-items:center; position:relative; z-index:1;
-    }}
-    .gi-donut-wrap {{ display:flex; align-items:center; justify-content:center; }}
-    .gi-donut {{
-        width:min(210px,75vw); aspect-ratio:1; border-radius:0 !important;
-        background:conic-gradient(var(--pie-gradient));
-        position:relative;
-        border:4px solid #1a1a2e;
-        box-shadow:5px 5px 0px #1a1a2e;
-        image-rendering:pixelated;
-        animation:pixDonut 800ms steps(16,end) both;
-    }}
-    .gi-donut::after {{
-        content:""; position:relative; inset:25%;
-        background:#fff9e6;
-        border:3px solid #1a1a2e;
-    }}
-    .gi-pie-legend {{ display:flex; flex-direction:column; gap:10px; }}
-    .gi-pie-row {{
-        display:grid; grid-template-columns:16px 1fr auto;
-        align-items:center; gap:9px; color:#2c3e50; font-size:16px;
-    }}
-    .gi-pie-dot {{ width:14px; height:14px; border:2px solid #1a1a2e; image-rendering:pixelated; }}
-    .gi-pie-pct {{ color:#1a1a2e; font-weight:bold; white-space:nowrap; }}
-    @keyframes pixDonut {{ from {{ transform:scale(0.5); opacity:0; }} to {{ transform:scale(1); opacity:1; }} }}
-    </style>
-    <script>
-    const pieChart = {chart_json};
-    const root = document.getElementById("gi-pie-root");
-    const rowsHtml = pieChart.rows.map(r=>`
-        <div class="gi-pie-row">
-            <span class="gi-pie-dot" style="background:${{r.color}}"></span>
-            <span>${{r.label}}</span>
-            <span class="gi-pie-pct">${{r.display}}</span>
-        </div>`).join("");
-    root.innerHTML=`<div class="gi-pie-card">
-        <div class="gi-pie-title">${{pieChart.title}}</div>
-        <div class="gi-pie-layout">
-            <div class="gi-donut-wrap">
-                <div class="gi-donut" style="--pie-gradient:${{pieChart.gradient}}"></div>
-            </div>
-            <div class="gi-pie-legend">${{rowsHtml}}</div>
-        </div>
-    </div>`;
-    </script>
-    """, height=height + 35, scrolling=False)
-
-
-def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, value_format="money", height=460):
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    if not values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    max_abs = max(abs(v) for v in values) or 1.0
-    rows = [{
-        "label": lab,
-        "value": val,
-        "display": _fmt_chart_value(val, value_format),
-        "width": max(2, min(100, abs(val) / max_abs * 100)),
-    } for lab, val in zip(labels, values)]
-
-    chart_json = json.dumps({"title": title, "rows": rows, "color": color})
-
-    components.html(f"""
-    <div id="gi-classic-hbar-root"></div>
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-    .gi-classic-card {{
-        width:100%; min-height:{height}px; box-sizing:border-box;
-        padding:22px 24px 20px;
-        background:transparent;
-        font-family:'VT323',monospace; color:#1a1a2e; overflow:hidden; position:relative;
-    }}
-    .gi-classic-title {{
-        font-family:'Press Start 2P',monospace;
-        text-align:center; font-size:12px; line-height:1.4; color:#1a1a2e;
-        margin-bottom:16px;
-    }}
-    .gi-classic-rows {{ display:flex; flex-direction:column; gap:10px; }}
-    .gi-classic-row {{ display:grid; grid-template-columns:minmax(80px,145px) 1fr minmax(80px,105px); align-items:center; gap:10px; }}
-    .gi-classic-label {{ color:#2c3e50; font-size:15px; font-weight:bold; line-height:1.1; text-align:right; }}
-    .gi-classic-axis {{
-        height:20px; position:relative;
-        border-bottom:2px solid #1a1a2e;
-        background-image:repeating-linear-gradient(to right,rgba(26,26,46,0.10) 1px,transparent 1px);
-        background-size:25% 100%;
-    }}
-    .gi-classic-bar {{
-        height:20px; width:var(--bar-width);
-        border:2px solid #1a1a2e;
-        position:relative; overflow:hidden;
-        background:var(--bar-color);
-        box-shadow:2px 2px 0px #1a1a2e, inset 0 3px 0 rgba(255,255,255,0.40);
-        animation:pixClassicGrow 700ms steps(14,end) both;
-        animation-delay:var(--delay);
-        image-rendering:pixelated;
-    }}
-    .gi-classic-value {{ color:#1a1a2e; font-weight:bold; font-size:15px; white-space:nowrap; }}
-    @keyframes pixClassicGrow {{ from {{ width:0%; }} to {{ width:var(--bar-width); }} }}
-    </style>
-    <script>
-    const classicChart = {chart_json};
-    const root = document.getElementById("gi-classic-hbar-root");
-    const rowsHtml = classicChart.rows.map((r,i)=>`
-        <div class="gi-classic-row">
-            <div class="gi-classic-label">${{r.label}}</div>
-            <div class="gi-classic-axis">
-                <div class="gi-classic-bar" style="--bar-width:${{r.width}}%;--bar-color:${{classicChart.color}};--delay:${{i*90}}ms;"></div>
-            </div>
-            <div class="gi-classic-value">${{r.display}}</div>
-        </div>`).join("");
-    root.innerHTML=`<div class="gi-classic-card">
-        <div class="gi-classic-title">${{classicChart.title}}</div>
-        <div class="gi-classic-rows">${{rowsHtml}}</div>
-    </div>`;
-    </script>
-    """, height=height + 30, scrolling=False)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1366,10 +860,10 @@ if "pred_result" not in st.session_state:
 #  SIDEBAR
 # ─────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown('<div class="sidebar-brand">✈ AIRLINE<br>ROUTE<br>INTEL</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-brand">Airline <span>Route</span> Intelligence ✦</div>', unsafe_allow_html=True)
     st.markdown(
-        f"<p style='font-family:Press Start 2P,monospace;font-size:0.44rem;color:#ffe066;"
-        "margin-bottom:14px;letter-spacing:0.12em;'>FILTER</p>",
+        f"<p style='font-size:0.64rem;color:{ACCENT};margin-bottom:14px;"
+        "font-weight:700;letter-spacing:0.16em;text-transform:uppercase;font-family:DM Sans,sans-serif'>Filter View</p>",
         unsafe_allow_html=True,
     )
     route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
@@ -1384,20 +878,20 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(f"""
-    <p style='font-family:Press Start 2P,monospace;font-size:0.42rem;color:#ffe066;
-    margin-bottom:10px;letter-spacing:0.12em;'>LEGEND</p>
-    <div style='display:flex;flex-direction:column;gap:8px;font-family:VT323,monospace;font-size:1rem;color:#fff8e7;'>
+    <p style='font-size:0.62rem;color:{ACCENT};font-weight:700;letter-spacing:0.16em;
+    text-transform:uppercase;margin-bottom:10px;font-family:DM Sans,sans-serif'>Decision Labels</p>
+    <div style='display:flex;flex-direction:column;gap:9px;font-size:0.80rem;color:{INK_SOFT};font-family:DM Sans,sans-serif'>
       <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-expand'>EXPAND</span>High profit &amp; demand
+        <span class='pill pill-expand'>Expand</span>High profit &amp; demand
       </div>
       <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-maintain'>MAINTAIN</span>Stable performer
+        <span class='pill pill-maintain'>Maintain</span>Stable performer
       </div>
       <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-optimize'>OPTIMIZE</span>Room to improve
+        <span class='pill pill-optimize'>Optimize</span>Room to improve
       </div>
       <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-drop'>DROP</span>Losing money
+        <span class='pill pill-drop'>Drop</span>Losing money
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1414,85 +908,20 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 
 
 # ─────────────────────────────────────────────────────────────
-#  HERO — pixel airplane animates across
+#  HERO
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <canvas id="pixel-plane-canvas" width="900" height="90" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;image-rendering:pixelated;"></canvas>
-  <div class="hero-left" style="position:relative;z-index:2;">
-    <div class="hero-eyebrow">★ ROUTE INTELLIGENCE PLATFORM ★</div>
-    <h1>AIRLINE<br>PROFITABILITY<br>SYSTEM</h1>
+  <div class="hero-star"></div><div class="hero-star"></div>
+  <div class="hero-star"></div><div class="hero-star"></div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">✦ Route Intelligence Platform</div>
+    <h1>Airline Profitability System</h1>
     <p>Sample airline dataset · for analysis &amp; demonstration only</p>
   </div>
-  <div class="hero-badge" style="position:relative;z-index:2;">⚡ ML-POWERED</div>
-  <div class="hero-glyph" style="position:relative;z-index:2;">✈</div>
+  <div class="hero-badge">⚡ ML-Powered Decisions</div>
+  <div class="hero-glyph">✈</div>
 </div>
-
-<script>
-(function() {
-    const canvas = document.getElementById('pixel-plane-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-
-    let planeX = -60;
-    const planeY = canvas.height / 2;
-
-    // Coin-yellow color trail blocks
-    const trailColors = ['#e9c46a','#f4a261','#e63946','#2d6a4f','#1d6a96'];
-    const trail = [];
-
-    function drawPixelPlane(x, y) {
-        const S = 4;
-        const pixels = [
-            [0,-5,'#ffffff'],[0,-4,'#ffffff'],[0,-3,'#a8d8f0'],[0,-2,'#ffffff'],
-            [0,-1,'#ffffff'],[0,0,'#ffffff'],[0,1,'#ffffff'],
-            [-1,-4,'#1a1a2e'],[-1,-3,'#1a1a2e'],[-1,-2,'#1a1a2e'],[-1,-1,'#1a1a2e'],[-1,0,'#1a1a2e'],
-            [1,-4,'#1a1a2e'],[1,-3,'#1a1a2e'],[1,-2,'#1a1a2e'],[1,-1,'#1a1a2e'],[1,0,'#1a1a2e'],
-            [0,-6,'#e0e0e0'],
-            [-4,0,'#1d6a96'],[-3,0,'#1d6a96'],[-2,0,'#1d6a96'],
-            [2,0,'#1d6a96'],[3,0,'#1d6a96'],[4,0,'#1d6a96'],
-            [-4,-1,'#1d6a96'],[-3,-1,'#1d6a96'],
-            [3,-1,'#1d6a96'],[4,-1,'#1d6a96'],
-            [-5,0,'#1a1a2e'],[5,0,'#1a1a2e'],
-            [-4,1,'#1a1a2e'],[-3,1,'#1a1a2e'],[3,1,'#1a1a2e'],[4,1,'#1a1a2e'],
-            [-1,2,'#e63946'],[1,2,'#e63946'],
-            [-1,3,'#1a1a2e'],[1,3,'#1a1a2e'],
-        ];
-        pixels.forEach(([col, row, color]) => {
-            ctx.fillStyle = color;
-            ctx.fillRect(Math.round(x + col*S - S/2), Math.round(y + row*S - S/2), S, S);
-        });
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Trail blocks
-        trail.push({x: planeX, y: planeY + (Math.sin(planeX * 0.04) * 8), color: trailColors[Math.floor(planeX/12) % trailColors.length]});
-        if (trail.length > 18) trail.shift();
-
-        trail.forEach((t, i) => {
-            const alpha = i / trail.length;
-            ctx.globalAlpha = alpha * 0.7;
-            ctx.fillStyle = t.color;
-            const sz = Math.round(3 + alpha * 5);
-            ctx.fillRect(Math.round(t.x) - sz/2, Math.round(t.y) - sz/2, sz, sz);
-        });
-        ctx.globalAlpha = 1;
-
-        // Subtle sine wave path for the plane
-        const bobY = planeY + Math.sin(planeX * 0.04) * 8;
-        drawPixelPlane(Math.round(planeX), Math.round(bobY));
-
-        planeX += 1.8;
-        if (planeX > canvas.width + 80) planeX = -80;
-
-        requestAnimationFrame(animate);
-    }
-    animate();
-})();
-</script>
 """, unsafe_allow_html=True)
 
 
@@ -1535,7 +964,7 @@ with tab1:
     d4.metric("Drop",     f"{drop_pct:.1f}%")
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
-    st.markdown('<div class="divider-label">★ COMPOSITION ★</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Composition</div>', unsafe_allow_html=True)
 
     left, right = st.columns([1, 1])
 
@@ -1549,14 +978,21 @@ with tab1:
             "Optimize": CHART_OPTIMIZE,
             "Drop":     CHART_DROP,
         }
+        fig, ax = clean_fig((5, 4.8))
         wedge_colors = [wc[l] for l in dc.index]
-        shimmer_pie_chart(
-            title="Share of Flights by Decision",
-            labels=dc.index.tolist(),
-            values=dc.values.tolist(),
-            colors=wedge_colors,
-            height=390,
+        wedges, texts, autotexts = ax.pie(
+            dc.values, labels=dc.index, autopct="%1.1f%%",
+            colors=wedge_colors, startangle=90,
+            wedgeprops={"linewidth": 3, "edgecolor": "#fdf9f4"},
+            textprops={"color": INK_SOFT, "fontsize": 9.5, "fontfamily": "DM Sans"},
+            pctdistance=0.76,
         )
+        for at in autotexts:
+            at.set_fontsize(8.5); at.set_color(INK); at.set_fontweight("bold")
+        for t in texts:
+            t.set_color(INK_SOFT)
+        ax.set_title("Share of Flights by Decision", pad=14, color=INK)
+        st.pyplot(fig)
 
     with right:
         st.markdown('<p class="section-hd">Average metrics by decision</p>', unsafe_allow_html=True)
@@ -1573,11 +1009,11 @@ with tab1:
             })
         )
         st.dataframe(summary, use_container_width=True, hide_index=True)
-        st.markdown(f"""
+        st.markdown("""
         <div class="info-box">
-          <strong style="color:{ACCENT}">HOW TO READ THIS</strong><br>
+          <strong style="color:#7c3aed">How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
-          <strong style="color:{CHART_EXPAND}">EXPAND</strong> routes should have the highest values across all three columns.
+          <strong style="color:#1d4ed8">Expand</strong> routes should have the highest values across all three columns.
         </div>""", unsafe_allow_html=True)
 
 
@@ -1591,33 +1027,39 @@ with tab2:
     with left:
         apd = (fdf.groupby("Route_Decision")["Profit"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        shimmer_horizontal_bar_chart(
-            title="Average Profit by Decision",
-            labels=apd.index.tolist(),
-            values=apd.values.tolist(),
-            colors=col_seq(apd.index.tolist()),
-            value_format="money",
-            height=350,
-        )
+        fig, ax = clean_fig((6, 4))
+        colors = col_seq(apd.index.tolist())
+        bars = ax.bar(apd.index, apd.values, color=colors, width=0.55)
+        add_bar_shimmer(bars, ax)
+        mn, mx_v = min(apd.values.min(), 0), apd.values.max()
+        pad = (mx_v - mn) * 0.10 if mx_v != mn else 1
+        for bar, h in zip(bars, apd.values):
+            xp = bar.get_x() + bar.get_width() / 2
+            if h >= 0:
+                ax.text(xp, h + pad, f"${h:,.0f}", ha="center", va="bottom",
+                        fontsize=8, color=INK_SOFT, fontweight="700")
+            else:
+                ax.text(xp, h * 0.5, f"${h:,.0f}", ha="center", va="center",
+                        fontsize=8, color=INK_SOFT, fontweight="700")
+        ax.set_ylabel("Average Profit ($)")
+        ax.set_title("Average Profit by Decision")
+        st.pyplot(fig)
 
     with right:
         ald = (fdf.groupby("Route_Decision")["Load_Factor"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        shimmer_vertical_bar_chart(
-            title="Seat Occupancy by Decision",
-            labels=ald.index.tolist(),
-            series=[{
-                "name": "Average Seat Occupancy",
-                "values": ald.values.tolist(),
-                "color": ACCENT,
-                "colors": col_seq(ald.index.tolist()),
-            }],
-            max_value=1.0,
-            value_format="percent",
-            height=350,
-        )
+        fig, ax = clean_fig((6, 4))
+        colors = col_seq(ald.index.tolist())
+        bars = ax.bar(ald.index, ald.values, color=colors, width=0.55)
+        add_bar_shimmer(bars, ax)
+        for bar, h in zip(bars, ald.values):
+            ax.text(bar.get_x() + bar.get_width() / 2, h + 0.018, f"{h:.0%}",
+                    ha="center", va="bottom", fontsize=8, color=INK_SOFT, fontweight="700")
+        ax.set_ylabel("Average Seat Occupancy")
+        ax.set_title("Seat Occupancy by Decision")
+        st.pyplot(fig)
 
-    st.markdown('<div class="divider-label">★ COST BREAKDOWN ★</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Cost breakdown</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Where is the money going?</p>', unsafe_allow_html=True)
     st.markdown('<p class="section-sub">The biggest cost components across all filtered flights.</p>', unsafe_allow_html=True)
 
@@ -1639,21 +1081,28 @@ with tab2:
     }
     cost_means.index = [label_map.get(i, i) for i in cost_means.index]
 
+    # Build a gradient of jewel tones for cost bars
     nc = len(cost_means)
     jewel_ramp = [
-        CHART_EXPAND, ACCENT_2, ACCENT, CHART_MAINTAIN,
-        "#15803d", CHART_OPTIMIZE, CHART_DROP, "#6a4c93",
+        CHART_EXPAND, "#0e7490", ACCENT, CHART_MAINTAIN,
+        "#15803d", CHART_OPTIMIZE, CHART_DROP, "#6d28d9",
     ]
     neutral_cols = jewel_ramp[:nc]
 
-    shimmer_horizontal_bar_chart(
-        title="Top Cost Drivers",
-        labels=cost_means.index.tolist(),
-        values=cost_means.values.tolist(),
-        colors=neutral_cols,
-        value_format="money",
-        height=430,
-    )
+    fig, ax = clean_fig((9, 4))
+    bars = ax.barh(cost_means.index, cost_means.values, color=neutral_cols, height=0.55)
+    add_bar_shimmer(bars, ax)
+    mx_c = cost_means.max()
+    for bar, w in zip(bars, cost_means.values):
+        ax.text(w + mx_c * 0.015, bar.get_y() + bar.get_height() / 2, f"${w:,.0f}",
+                va="center", fontsize=8, color=INK_SOFT, fontweight="700")
+    ax.set_xlabel("Average Cost per Flight ($)")
+    ax.set_title("Top Cost Drivers")
+    ax.grid(axis="x", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
+    ax.grid(axis="y", visible=False)
+    for label in ax.get_yticklabels():
+        label.set_color(INK_SOFT)
+    st.pyplot(fig)
 
 
 # ── TAB 3 · ROUTE ACTIONS ────────────────────────────────────
@@ -1662,8 +1111,8 @@ with tab3:
     st.markdown('<p class="section-sub">A quick view of your best and worst performing routes.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        f"<p style='font-family:Press Start 2P,monospace;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-        "Top routes: EXPAND</p>", unsafe_allow_html=True)
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
+        "Top routes currently classified as Expand</p>", unsafe_allow_html=True)
     expand_routes = (
         fdf[fdf["Route_Decision"] == "Expand"]
         .sort_values("Profit", ascending=False)
@@ -1677,31 +1126,35 @@ with tab3:
 
     with left:
         st.markdown(
-            f"<p style='font-family:Press Start 2P,monospace;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Top 10 routes · total profit</p>", unsafe_allow_html=True)
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
+            "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
-        shimmer_classic_horizontal_bar_chart(
-            title="Top 10 Routes",
-            labels=top.index.tolist(),
-            values=top.values.tolist(),
-            color=CHART_EXPAND,
-            value_format="money",
-            height=430,
-        )
+        fig, ax = clean_fig((7, 5))
+        bars = ax.barh(top.index, top.values, color=CHART_EXPAND, height=0.55)
+        add_bar_shimmer(bars, ax)
+        ax.set_xlabel("Total Profit ($)")
+        ax.set_title("Top 10 Routes")
+        ax.grid(axis="x", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
+        ax.grid(axis="y", visible=False)
+        for label in ax.get_yticklabels():
+            label.set_color(INK_SOFT)
+        st.pyplot(fig)
 
     with right:
         st.markdown(
-            f"<p style='font-family:Press Start 2P,monospace;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Bottom 10 routes · total profit</p>", unsafe_allow_html=True)
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
+            "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
-        shimmer_classic_horizontal_bar_chart(
-            title="Bottom 10 Routes",
-            labels=worst.index.tolist(),
-            values=worst.values.tolist(),
-            color=CHART_DROP,
-            value_format="money",
-            height=430,
-        )
+        fig, ax = clean_fig((7, 5))
+        bars = ax.barh(worst.index, worst.values, color=CHART_DROP, height=0.55)
+        add_bar_shimmer(bars, ax)
+        ax.set_xlabel("Total Profit ($)")
+        ax.set_title("Bottom 10 Routes")
+        ax.grid(axis="x", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
+        ax.grid(axis="y", visible=False)
+        for label in ax.get_yticklabels():
+            label.set_color(INK_SOFT)
+        st.pyplot(fig)
 
 
 # ── TAB 4 · ROUTE STABILITY ──────────────────────────────────
@@ -1712,19 +1165,19 @@ with tab4:
     left, right = st.columns(2)
     with left:
         st.markdown(
-            f"<p style='font-family:Press Start 2P,monospace;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Most decision changes</p>", unsafe_allow_html=True)
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
+            "Routes with most decision changes</p>", unsafe_allow_html=True)
         st.dataframe(route_switches.head(10), use_container_width=True, hide_index=True)
     with right:
         st.markdown(
-            f"<p style='font-family:Press Start 2P,monospace;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Most decision states</p>", unsafe_allow_html=True)
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
+            "Routes seen in the most decision states</p>", unsafe_allow_html=True)
         st.dataframe(route_variability.head(10), use_container_width=True, hide_index=True)
 
-    st.markdown('<div class="divider-label">★ DISTRIBUTION ★</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Distribution</div>', unsafe_allow_html=True)
     st.markdown(
-        f"<p style='font-family:Press Start 2P,monospace;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-        "Unique routes per category</p>", unsafe_allow_html=True)
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
+        "How many unique routes appear in each category?</p>", unsafe_allow_html=True)
 
     urbd = (
         df.groupby("Route_Decision")["Route"].nunique().reset_index()
@@ -1735,20 +1188,28 @@ with tab4:
               "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
     bc = [bc_map.get(i, ACCENT) for i in urbd.index]
 
+    fig, ax = clean_fig((8, 4))
     vals4 = urbd["Unique Routes"].values.tolist()
-    shimmer_vertical_bar_chart(
-        title="Unique Routes per Decision Category",
-        labels=urbd.index.tolist(),
-        series=[{
-            "name": "Unique Routes",
-            "values": vals4,
-            "color": ACCENT,
-            "colors": bc,
-        }],
-        max_value=max(vals4) if vals4 else 1,
-        value_format="number",
-        height=390,
-    )
+    bars = ax.bar(urbd.index, vals4, color=bc, width=0.55)
+    add_bar_shimmer(bars, ax)
+    for bar, h in zip(bars, vals4):
+        ax.text(bar.get_x() + bar.get_width() / 2, h + max(vals4) * 0.04, f"{int(h)}",
+                ha="center", fontsize=9, color=INK_SOFT, fontweight="700")
+    ax.set_ylabel("Number of Unique Routes")
+    ax.set_title("Unique Routes per Decision Category")
+    for label in ax.get_xticklabels():
+        label.set_color(INK_SOFT)
+    st.pyplot(fig)
+
+    patches = [mpatches.Patch(color=bc_map.get(d, ACCENT), label=d) for d in ORDER]
+    fig2, ax2 = plt.subplots(figsize=(5, 0.5))
+    fig2.patch.set_alpha(0)
+    ax2.axis("off")
+    legend = ax2.legend(handles=patches, loc="center", frameon=False, ncol=4,
+                        prop={"size": 9})
+    for text in legend.get_texts():
+        text.set_color(INK_SOFT)
+    st.pyplot(fig2)
 
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
@@ -1757,35 +1218,36 @@ with tab5:
     st.markdown('<p class="section-sub">Enter route characteristics and our model will suggest the best decision.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        f"<p style='font-family:Press Start 2P,monospace;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
+        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "How accurate are the models?</p>", unsafe_allow_html=True)
 
-    shimmer_vertical_bar_chart(
-        title="Model Accuracy & F1 Comparison",
-        labels=comparison["Model"].tolist(),
-        series=[
-            {
-                "name": "Accuracy",
-                "values": comparison["Accuracy"].tolist(),
-                "color": ACCENT,
-            },
-            {
-                "name": "Macro F1",
-                "values": comparison["Macro F1"].tolist(),
-                "color": ACCENT_2,
-            },
-        ],
-        max_value=1.0,
-        value_format="percent",
-        height=430,
-    )
+    fig, ax = clean_fig((8, 3.5))
+    x = np.arange(len(comparison)); w = 0.33
+    bars1 = ax.bar(x - w/2, comparison["Accuracy"], width=w, color=ACCENT,  label="Accuracy")
+    bars2 = ax.bar(x + w/2, comparison["Macro F1"], width=w, color=ACCENT_2, label="Macro F1")
+    add_bar_shimmer(bars1, ax); add_bar_shimmer(bars2, ax)
+    for bar, acc in zip(bars1, comparison["Accuracy"]):
+        ax.text(bar.get_x() + bar.get_width() / 2, acc + 0.02, f"{acc:.0%}",
+                ha="center", fontsize=7.5, color=INK_SOFT, fontweight="700")
+    for bar, f1 in zip(bars2, comparison["Macro F1"]):
+        ax.text(bar.get_x() + bar.get_width() / 2, f1 + 0.02, f"{f1:.0%}",
+                ha="center", fontsize=7.5, color=INK_SOFT, fontweight="700")
+    legend = ax.legend(frameon=False, fontsize=9)
+    for text in legend.get_texts():
+        text.set_color(INK_SOFT)
+    ax.set_xticks(x)
+    ax.set_xticklabels(comparison["Model"], fontsize=8.5, rotation=10, color=INK_SOFT)
+    ax.set_ylim(0, 1.15)
+    ax.set_ylabel("Score")
+    ax.set_title("Model Accuracy & F1 Comparison")
+    st.pyplot(fig)
 
-    st.markdown('<div class="divider-label">★ CONFIGURATION ★</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
     st.markdown(f"""<div class="info-box">
-    <span class='pill pill-maintain'>WITH REVENUE</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
-    <span class='pill pill-optimize'>COST-ONLY</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
-    <span class='pill pill-expand'>PRE-LAUNCH</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
+    <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
+    <span class='pill pill-optimize'>Cost-only</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
+    <span class='pill pill-expand'>Pre-launch</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
     </div>""", unsafe_allow_html=True)
 
     model_choice = st.selectbox(
@@ -1798,14 +1260,14 @@ with tab5:
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown('<p class="col-label">✈ FLIGHT BASICS</p>', unsafe_allow_html=True)
+            st.markdown('<p class="col-label">✈ Flight basics</p>', unsafe_allow_html=True)
             aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
             aircraft_capacity = st.number_input("Aircraft Capacity", min_value=50,  max_value=600, value=250)
             passengers        = st.number_input("Passengers",        min_value=0,   max_value=600, value=200)
             load_factor       = st.slider("Load Factor (seat occupancy)", min_value=0.0, max_value=1.0, value=0.80, step=0.01)
 
         with col2:
-            st.markdown('<p class="col-label">🌍 ROUTE CONTEXT</p>', unsafe_allow_html=True)
+            st.markdown('<p class="col-label">🌍 Route context</p>', unsafe_allow_html=True)
             flight_hours   = st.number_input("Flight Hours",   min_value=0.5, max_value=20.0, value=6.0, step=0.1)
             season_val     = st.selectbox("Season",            sorted(df["Season"].dropna().unique()))
             route_category = st.selectbox("Route Category",    sorted(df["Route_Category"].dropna().unique()))
@@ -1813,13 +1275,13 @@ with tab5:
 
         if model_choice == "With Revenue Variables":
             with col3:
-                st.markdown('<p class="col-label">💰 REVENUE</p>', unsafe_allow_html=True)
+                st.markdown('<p class="col-label">💰 Revenue</p>', unsafe_allow_html=True)
                 ticket_revenue    = st.number_input("Ticket Revenue ($)",    min_value=0.0, value=120000.0, step=1000.0)
                 ancillary_revenue = st.number_input("Ancillary Revenue ($)", min_value=0.0, value=10000.0,  step=500.0)
 
         elif model_choice == "Without Revenue Variables":
             with col3:
-                st.markdown('<p class="col-label">💸 COST BREAKDOWN</p>', unsafe_allow_html=True)
+                st.markdown('<p class="col-label">💸 Cost breakdown</p>', unsafe_allow_html=True)
                 fuel_cost               = st.number_input("Fuel Cost ($)",                  min_value=0.0, value=40000.0,  step=1000.0)
                 maintenance_cost        = st.number_input("Maintenance Cost ($)",           min_value=0.0, value=15000.0,  step=500.0)
                 crew_cost               = st.number_input("Crew Cost ($)",                  min_value=0.0, value=8000.0,   step=500.0)
@@ -1835,7 +1297,7 @@ with tab5:
                 marketing_cost          = st.number_input("Marketing Cost ($)",             min_value=0.0, value=12000.0,  step=500.0)
                 it_systems_cost         = st.number_input("IT Systems Cost ($)",            min_value=0.0, value=3000.0,   step=250.0)
 
-        submitted = st.form_submit_button("✈  GET ROUTE DECISION")
+        submitted = st.form_submit_button("✈  Get Route Decision")
 
     # ── PREDICTION LOGIC ────────────────────────────────────
     if submitted:
@@ -1898,20 +1360,21 @@ with tab5:
         st.markdown(f"""
         <div class='result-card {result_cls.get(pred, "result-expand")}'>
           <div style='margin-bottom:10px'>
-            <span class='pill {pill_cls.get(pred, "")}'>{pred.upper()}</span>
+            <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
           </div>
-          <div style='font-family:Press Start 2P,monospace;font-size:0.85rem;font-weight:400;
-                      color:{text_col.get(pred, INK)};margin-bottom:12px;letter-spacing:0.03em;
-                      text-shadow:2px 2px 0px rgba(0,0,0,0.15);line-height:1.5'>
-            DECISION: {pred.upper()}
+          <div style='font-family:"Cinzel",serif;font-size:1.55rem;font-weight:600;
+                      color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.04em;
+                      text-transform:uppercase'>
+            Suggested Decision: {pred}
           </div>
-          <p style='color:{INK_SOFT};margin:0;font-family:VT323,monospace;font-size:1.15rem;line-height:1.75;'>
+          <p style='color:{INK_SOFT};margin:0;font-size:0.88rem;line-height:1.75;
+                    font-family:"DM Sans",sans-serif'>
             {explanations.get(pred, "")}
           </p>
         </div>""", unsafe_allow_html=True)
 
         st.markdown(
-            f"<p style='font-family:Press Start 2P,monospace;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Confidence by decision option</p>", unsafe_allow_html=True)
 
         prob_df = (pd.DataFrame({"Decision": cls, "Probability": prob})
@@ -1919,21 +1382,20 @@ with tab5:
         bar_cp  = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
                    "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
 
+        fig, ax = clean_fig((6, 3.5))
         bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
         probs = prob_df["Probability"].tolist()
-        shimmer_vertical_bar_chart(
-            title="Model Confidence per Decision",
-            labels=prob_df["Decision"].tolist(),
-            series=[{
-                "name": "Probability",
-                "values": probs,
-                "color": ACCENT,
-                "colors": bar_colors,
-            }],
-            max_value=1.0,
-            value_format="percent",
-            height=390,
-        )
+        bars = ax.bar(prob_df["Decision"], probs, color=bar_colors, width=0.5)
+        add_bar_shimmer(bars, ax)
+        for bar, h in zip(bars, probs):
+            ax.text(bar.get_x() + bar.get_width() / 2, h + 0.025, f"{h:.0%}",
+                    ha="center", fontsize=9, color=INK_SOFT, fontweight="700")
+        ax.set_ylim(0, 1.12)
+        ax.set_ylabel("Probability")
+        ax.set_title("Model Confidence per Decision")
+        for label in ax.get_xticklabels():
+            label.set_color(INK_SOFT)
+        st.pyplot(fig)
 
         st.dataframe(
             prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
@@ -1951,17 +1413,24 @@ with st.expander("🗂  Show filtered data"):
 #  FOOTER
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
-<div style='text-align:center;padding:40px 0 28px'>
-  <div style='display:inline-block;
-              background:#fff9e6;
-              border:3px solid {INK};
-              box-shadow:4px 4px 0px {INK};
-              padding:0.6rem 1.6rem;
-              font-family:Press Start 2P,monospace;
-              font-size:0.42rem;
+<div style='text-align:center;padding:40px 0 18px'>
+  <div style='display:inline-flex;align-items:center;gap:12px;
+              background:rgba(255,252,248,0.85);
+              border:1px solid rgba(124,58,237,0.22);
+              border-radius:999px;
+              padding:0.55rem 1.4rem;
+              backdrop-filter:blur(14px);
+              box-shadow:0 4px 18px rgba(124,58,237,0.10);
+              font-family:"DM Sans",sans-serif;
+              font-size:0.67rem;
+              font-weight:600;
               color:{INK_MUTED};
-              letter-spacing:0.10em;'>
-    ★ AIRLINE PROFITABILITY SYSTEM ★ BUILT WITH STREAMLIT ★
+              letter-spacing:0.12em;
+              text-transform:uppercase'>
+    <span style='color:{ACCENT};font-size:0.78rem'>✦</span>
+    Airline Profitability System
+    <span style='color:{ACCENT};font-size:0.78rem'>✦</span>
+    Built with Streamlit
   </div>
 </div>
 """, unsafe_allow_html=True)
