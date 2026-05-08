@@ -457,7 +457,7 @@ hr {{
 DECISION_COLORS = {
     "Expand":   CHART_EXPAND,
     "Maintain": CHART_MAINTAIN,
-    "Optimize": CHART_ORANGE,
+    "Optimize": CHART_OPTIMIZE,
     "Drop":     CHART_DROP,
 }
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
@@ -724,7 +724,7 @@ with tab1:
         wc = {
             "Expand":   CHART_EXPAND,
             "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_ORANGE,
+            "Optimize": CHART_OPTIMIZE,
             "Drop":     CHART_DROP,
         }
         fig, ax = clean_fig((5, 4.6))
@@ -970,7 +970,7 @@ with tab4:
     bc_map = {
         "Expand":   CHART_EXPAND,
         "Maintain": CHART_MAINTAIN,
-        "Optimize": CHART_ORANGE,
+        "Optimize": CHART_OPTIMIZE,
         "Drop":     CHART_DROP,
     }
     bc = [bc_map.get(i, "#CCCCCC") for i in urbd.index]
@@ -1235,7 +1235,7 @@ with tab5:
         bar_cp = {
             "Expand":   CHART_EXPAND,
             "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_ORANGE,
+            "Optimize": CHART_OPTIMIZE,
             "Drop":     CHART_DROP,
         }
         fig, ax = clean_fig((6, 3.5))
@@ -1292,4 +1292,4 @@ st.markdown("""
 # and --accent in :root.
 #
 # Chart colors are controlled by CHART_EXPAND / CHART_MAINTAIN /
-# CHART_ORANGE / CHART_DROP and CHART_NEUTRAL at the top of the file.
+# CHART_OPTIMIZE / CHART_DROP and CHART_NEUTRAL at the top of the file.
