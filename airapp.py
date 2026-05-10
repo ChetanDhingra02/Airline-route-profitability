@@ -1241,7 +1241,7 @@ with tab1:
             at.set_color("#ffffff")
             at.set_fontweight("bold")
         for txt in texts:
-            txt.set_color("rgba(255,255,255,0.75)")
+            txt.set_color((1, 1, 1, 0.75))
 
         theta = np.linspace(0, 2 * np.pi, 300)
         ax.plot(0.95 * np.cos(theta), 0.95 * np.sin(theta),
@@ -1565,7 +1565,7 @@ with tab5:
     ax.set_title("Model Accuracy & F1 Comparison", pad=14)
     leg = ax.legend(frameon=False, fontsize=9)
     for text in leg.get_texts():
-        text.set_color("rgba(255,255,255,0.65)")
+        text.set_color((1, 1, 1, 0.65))
     plt.xticks(rotation=10)
     fig.tight_layout()
     st.pyplot(fig)
