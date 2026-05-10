@@ -649,7 +649,7 @@ header[data-testid="stHeader"] {{
 DECISION_COLORS = {
     "Expand":   CHART_EXPAND,
     "Maintain": CHART_MAINTAIN,
-    "Optimize": CHART_ORANGE,
+    "Optimize": CHART_OPTIMIZE,
     "Drop":     CHART_DROP,
 }
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
