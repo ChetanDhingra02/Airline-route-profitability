@@ -871,7 +871,7 @@ with tab1:
         wc = {
             "Expand":   CHART_EXPAND,
             "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_ORANGE,
+            "Optimize": CHART_OPTIMIZE,
             "Drop":     CHART_DROP,
         }
         fig, ax = clean_fig((5, 4.6))
@@ -1117,7 +1117,7 @@ with tab4:
     bc_map = {
         "Expand":   CHART_EXPAND,
         "Maintain": CHART_MAINTAIN,
-        "Optimize": CHART_ORANGE,
+        "Optimize": CHART_OPTIMIZE,
         "Drop":     CHART_DROP,
     }
     bc = [bc_map.get(i, "#CCCCCC") for i in urbd.index]
@@ -1358,7 +1358,7 @@ with tab5:
         bar_cp = {
             "Expand":   CHART_EXPAND,
             "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_ORANGE,
+            "Optimize": CHART_OPTIMIZE,
             "Drop":     CHART_DROP,
         }
         fig, ax = clean_fig((6, 3.5))
