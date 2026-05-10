@@ -14,34 +14,37 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────
-#  THEME TOKENS
+#  THEME TOKENS — jewel-tone palette
 # ─────────────────────────────────────────────────────────────
-COLOR_BG           = "#05010a"
-COLOR_GREEN        = "#0bda87"
-COLOR_YELLOW       = "#E4D00A"
-COLOR_ORANGE       = "#ec5b13"
-COLOR_PINK         = "#E0115F"
-COLOR_ACCENT       = "#0074D9"
-COLOR_ACCENT_DARK  = "#005bb5"
-COLOR_AMETHYST     = "#9966CC"
+COLOR_BG           = "#04010d"
+COLOR_GREEN        = "#00ffb3"
+COLOR_YELLOW       = "#f5e642"
+COLOR_ORANGE       = "#ff6b35"
+COLOR_PINK         = "#ff2d78"
+COLOR_ACCENT       = "#4d9fff"
+COLOR_ACCENT_DARK  = "#1a6fd4"
+COLOR_AMETHYST     = "#b366ff"
+COLOR_MAGENTA      = "#e040fb"
+COLOR_TEAL         = "#00e5cc"
 
-CHART_EXPAND   = "#0bda87"
-CHART_MAINTAIN = "#E4D00A"
-CHART_OPTIMIZE = "#ec5b13"
-CHART_DROP     = "#E0115F"
-CHART_NEUTRAL  = ["#0074D9","#9966CC","#0bda87","#E4D00A","#ec5b13","#E0115F","#7ecfff","#b388ff"]
+CHART_EXPAND   = "#00ffb3"
+CHART_MAINTAIN = "#f5e642"
+CHART_OPTIMIZE = "#ff6b35"
+CHART_DROP     = "#ff2d78"
+CHART_NEUTRAL  = ["#4d9fff","#b366ff","#00ffb3","#f5e642","#ff6b35","#ff2d78","#7ecfff","#e040fb"]
 
 # ─────────────────────────────────────────────────────────────
-#  AURORA CANVAS + ANIMATED STARS
+#  AURORA CANVAS — multi-layer animated aurora + stars
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
 #aurora-canvas {
     position: fixed;
     top: 0; left: 0;
-    width: 100%; height: 100%;
+    width: 100vw; height: 100vh;
     z-index: -10;
     pointer-events: none;
+    display: block;
 }
 </style>
 <canvas id="aurora-canvas"></canvas>
@@ -52,23 +55,41 @@ st.markdown("""
   let W, H, t = 0;
 
   /* ── stars ── */
-  const stars = Array.from({length: 280}, () => ({
+  const STAR_COUNT = 340;
+  const stars = Array.from({length: STAR_COUNT}, () => ({
     x: Math.random(),
     y: Math.random(),
-    r: Math.random() * 1.5 + 0.2,
-    speed: Math.random() * 0.003 + 0.0005,
+    r: Math.random() * 1.8 + 0.15,
+    speed: Math.random() * 0.002 + 0.0004,
     phase: Math.random() * Math.PI * 2,
-    twinkleSpeed: Math.random() * 0.04 + 0.01
+    twinkleSpeed: Math.random() * 0.05 + 0.008,
+    colorIndex: Math.floor(Math.random() * 4),
   }));
+  const STAR_TINTS = [
+    [255,255,255],
+    [180,220,255],
+    [200,180,255],
+    [180,255,230],
+  ];
 
-  /* ── aurora blobs ── */
+  /* ── aurora wave bands ── */
+  const bands = [
+    { y: 0.18, amp: 0.08,  freq: 1.3, speed: 0.18, rgb: '0,255,179',   alpha: 0.22, thickness: 0.14 },
+    { y: 0.28, amp: 0.07,  freq: 1.7, speed: 0.14, rgb: '179,102,255', alpha: 0.18, thickness: 0.12 },
+    { y: 0.12, amp: 0.06,  freq: 2.1, speed: 0.22, rgb: '224,64,251',  alpha: 0.13, thickness: 0.10 },
+    { y: 0.35, amp: 0.05,  freq: 1.1, speed: 0.10, rgb: '77,159,255',  alpha: 0.14, thickness: 0.11 },
+    { y: 0.08, amp: 0.04,  freq: 2.8, speed: 0.26, rgb: '0,229,204',   alpha: 0.10, thickness: 0.08 },
+  ];
+
+  /* ── aurora blobs (radial) ── */
   const blobs = [
-    { cx:0.18, cy:0.28, rx:0.42, rgb:'11,218,135',  a:0.13, ox:0.08, oy:0.06, os:0.18, ot:0.22 },
-    { cx:0.78, cy:0.20, rx:0.40, rgb:'153,102,204', a:0.14, ox:0.06, oy:0.08, os:0.14, ot:0.25 },
-    { cx:0.50, cy:0.55, rx:0.50, rgb:'224,17,95',   a:0.08, ox:0.10, oy:0.06, os:0.11, ot:0.30 },
-    { cx:0.10, cy:0.78, rx:0.38, rgb:'0,116,217',   a:0.11, ox:0.05, oy:0.07, os:0.12, ot:0.18 },
-    { cx:0.88, cy:0.68, rx:0.28, rgb:'228,208,10',  a:0.07, ox:0.04, oy:0.05, os:0.22, ot:0.26 },
-    { cx:0.35, cy:0.10, rx:0.32, rgb:'0,116,217',   a:0.09, ox:0.07, oy:0.04, os:0.16, ot:0.20 },
+    { cx:0.15, cy:0.22, rx:0.55, rgb:'0,255,179',   a:0.18, ox:0.09, oy:0.07, os:0.15, ot:0.22 },
+    { cx:0.82, cy:0.18, rx:0.50, rgb:'179,102,255', a:0.20, ox:0.07, oy:0.09, os:0.13, ot:0.25 },
+    { cx:0.50, cy:0.45, rx:0.60, rgb:'224,64,251',  a:0.10, ox:0.11, oy:0.06, os:0.10, ot:0.30 },
+    { cx:0.08, cy:0.72, rx:0.45, rgb:'77,159,255',  a:0.14, ox:0.06, oy:0.08, os:0.12, ot:0.18 },
+    { cx:0.90, cy:0.65, rx:0.35, rgb:'0,229,204',   a:0.12, ox:0.05, oy:0.06, os:0.20, ot:0.26 },
+    { cx:0.40, cy:0.08, rx:0.42, rgb:'255,45,120',  a:0.09, ox:0.08, oy:0.04, os:0.16, ot:0.20 },
+    { cx:0.70, cy:0.38, rx:0.38, rgb:'245,230,66',  a:0.07, ox:0.06, oy:0.07, os:0.18, ot:0.24 },
   ];
 
   function resize() {
@@ -78,59 +99,115 @@ st.markdown("""
   window.addEventListener('resize', resize);
   resize();
 
+  /* draw a single aurora wave band as a smooth horizontal ribbon */
+  function drawBand(b) {
+    const baseY = b.y * H;
+    const thick = b.thickness * H;
+    const pts   = 120;
+    ctx.beginPath();
+    for (let i = 0; i <= pts; i++) {
+      const x = (i / pts) * W;
+      const phase2 = t * b.speed + i * 0.08;
+      const y = baseY
+        + Math.sin(phase2 * b.freq)              * b.amp * H
+        + Math.sin(phase2 * b.freq * 1.618 + 1.2) * b.amp * H * 0.4
+        + Math.sin(phase2 * b.freq * 0.618 + 2.5) * b.amp * H * 0.2;
+      if (i === 0) ctx.moveTo(x, y);
+      else         ctx.lineTo(x, y);
+    }
+    for (let i = pts; i >= 0; i--) {
+      const x = (i / pts) * W;
+      const phase2 = t * b.speed + i * 0.08;
+      const y = baseY + thick
+        + Math.sin(phase2 * b.freq + 0.5)          * b.amp * H * 0.6
+        + Math.sin(phase2 * b.freq * 1.618 + 2.0)  * b.amp * H * 0.25;
+      ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+
+    /* vertical gradient through the ribbon */
+    const grad = ctx.createLinearGradient(0, baseY - thick * 0.5, 0, baseY + thick * 1.5);
+    grad.addColorStop(0,    `rgba(${b.rgb},0)`);
+    grad.addColorStop(0.3,  `rgba(${b.rgb},${(b.alpha * 0.6).toFixed(3)})`);
+    grad.addColorStop(0.55, `rgba(${b.rgb},${b.alpha.toFixed(3)})`);
+    grad.addColorStop(0.75, `rgba(${b.rgb},${(b.alpha * 0.5).toFixed(3)})`);
+    grad.addColorStop(1,    `rgba(${b.rgb},0)`);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
   function frame() {
-    t += 0.012;
+    t += 0.008;
     ctx.clearRect(0, 0, W, H);
 
     /* deep space background */
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#05010a');
-    bg.addColorStop(1, '#0d041a');
+    bg.addColorStop(0,   '#04010d');
+    bg.addColorStop(0.5, '#080118');
+    bg.addColorStop(1,   '#0a0220');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
 
-    /* aurora blobs */
+    /* aurora blob layer (soft radial pools of colour) */
     blobs.forEach(b => {
-      const cx = (b.cx + Math.sin(t * b.os) * b.ox) * W;
-      const cy = (b.cy + Math.cos(t * b.os * 0.7) * b.oy) * H;
-      const a  = b.a + Math.sin(t * b.ot) * (b.a * 0.5);
+      const cx = (b.cx + Math.sin(t * b.os + 0.3)  * b.ox) * W;
+      const cy = (b.cy + Math.cos(t * b.os * 0.65) * b.oy) * H;
+      const a  = b.a + Math.sin(t * b.ot) * (b.a * 0.45);
       const r  = b.rx * W;
       const g  = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      g.addColorStop(0,    `rgba(${b.rgb},${Math.min(a, 0.22).toFixed(3)})`);
-      g.addColorStop(0.45, `rgba(${b.rgb},${(a * 0.4).toFixed(3)})`);
+      g.addColorStop(0,    `rgba(${b.rgb},${Math.min(a, 0.26).toFixed(3)})`);
+      g.addColorStop(0.40, `rgba(${b.rgb},${(a * 0.38).toFixed(3)})`);
       g.addColorStop(1,    `rgba(${b.rgb},0)`);
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, W, H);
     });
 
-    /* subtle shimmer scan-line */
-    const scan = ctx.createLinearGradient(0, 0, W, H);
+    /* aurora wave bands — the signature curtain effect */
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    bands.forEach(drawBand);
+    ctx.restore();
+
+    /* subtle shimmer overlay */
+    const scan = ctx.createLinearGradient(0, 0, W * 0.5, H);
     scan.addColorStop(0,   'rgba(255,255,255,0)');
-    scan.addColorStop(0.5, `rgba(255,255,255,${(0.012 + 0.006 * Math.sin(t * 0.4)).toFixed(4)})`);
+    scan.addColorStop(0.5, `rgba(255,255,255,${(0.018 + 0.008 * Math.sin(t * 0.35)).toFixed(4)})`);
     scan.addColorStop(1,   'rgba(255,255,255,0)');
     ctx.fillStyle = scan;
     ctx.fillRect(0, 0, W, H);
 
     /* twinkling stars */
     stars.forEach(s => {
-      const twinkle = 0.25 + 0.75 * Math.abs(Math.sin(t * s.twinkleSpeed / s.speed + s.phase));
-      const size    = s.r * (0.7 + 0.3 * twinkle);
+      const twinkle = 0.20 + 0.80 * Math.abs(Math.sin(t * s.twinkleSpeed / s.speed + s.phase));
+      const size    = s.r * (0.65 + 0.35 * twinkle);
+      const tint    = STAR_TINTS[s.colorIndex];
       ctx.beginPath();
       ctx.arc(s.x * W, s.y * H, size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${(twinkle * 0.9).toFixed(3)})`;
+      ctx.fillStyle = `rgba(${tint[0]},${tint[1]},${tint[2]},${(twinkle * 0.92).toFixed(3)})`;
       ctx.fill();
 
-      /* occasional star cross-glow */
-      if (s.r > 1.2 && twinkle > 0.85) {
-        ctx.strokeStyle = `rgba(255,255,255,${(twinkle * 0.25).toFixed(3)})`;
-        ctx.lineWidth   = 0.5;
-        const g = 5 * s.r;
+      /* cross-glow on brighter stars */
+      if (s.r > 1.1 && twinkle > 0.82) {
+        ctx.save();
+        ctx.strokeStyle = `rgba(${tint[0]},${tint[1]},${tint[2]},${(twinkle * 0.28).toFixed(3)})`;
+        ctx.lineWidth   = 0.6;
+        const g = 6 * s.r * twinkle;
         ctx.beginPath();
         ctx.moveTo(s.x * W - g, s.y * H);
         ctx.lineTo(s.x * W + g, s.y * H);
         ctx.moveTo(s.x * W, s.y * H - g);
         ctx.lineTo(s.x * W, s.y * H + g);
         ctx.stroke();
+        /* diagonal softcross */
+        ctx.globalAlpha = 0.12 * twinkle;
+        const dg = g * 0.55;
+        ctx.beginPath();
+        ctx.moveTo(s.x * W - dg, s.y * H - dg);
+        ctx.lineTo(s.x * W + dg, s.y * H + dg);
+        ctx.moveTo(s.x * W + dg, s.y * H - dg);
+        ctx.lineTo(s.x * W - dg, s.y * H + dg);
+        ctx.stroke();
+        ctx.restore();
       }
     });
 
@@ -142,13 +219,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
-#  GLOBAL CSS
+#  GLOBAL CSS — jewel glassmorphism system
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
-/* ── VARIABLES ─────────────────────────────────────────────── */
+/* ── CSS VARIABLES ─────────────────────────────────────────── */
 :root {{
   --bg:           {COLOR_BG};
   --green:        {COLOR_GREEN};
@@ -157,52 +234,55 @@ st.markdown(f"""
   --pink:         {COLOR_PINK};
   --accent:       {COLOR_ACCENT};
   --amethyst:     {COLOR_AMETHYST};
+  --magenta:      {COLOR_MAGENTA};
+  --teal:         {COLOR_TEAL};
 
-  --glass-bg:     rgba(255,255,255,0.05);
-  --glass-bg-hov: rgba(255,255,255,0.08);
+  --glass-1:      rgba(255,255,255,0.042);
+  --glass-2:      rgba(255,255,255,0.075);
+  --glass-3:      rgba(255,255,255,0.11);
   --glass-border: rgba(255,255,255,0.10);
-  --glass-border-bright: rgba(255,255,255,0.18);
-  --glass-shine:  rgba(255,255,255,0.06);
+  --glass-bright: rgba(255,255,255,0.20);
+  --glass-shine:  linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 50%, transparent 100%);
 
   --ink:          #ffffff;
-  --ink-soft:     rgba(255,255,255,0.75);
-  --ink-muted:    rgba(255,255,255,0.45);
+  --ink-soft:     rgba(255,255,255,0.78);
+  --ink-muted:    rgba(255,255,255,0.48);
   --ink-faint:    rgba(255,255,255,0.22);
 
-  --radius-sm:    10px;
-  --radius-md:    16px;
-  --radius-lg:    22px;
+  --r-sm:   10px;
+  --r-md:   16px;
+  --r-lg:   22px;
+  --r-xl:   30px;
 
-  --shadow-sm:    0 2px 12px rgba(0,0,0,0.45);
-  --shadow-md:    0 8px 32px rgba(0,0,0,0.55);
-  --shadow-lg:    0 20px 60px rgba(0,0,0,0.65);
+  --sh-sm:  0 2px 16px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+  --sh-md:  0 8px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.06);
+  --sh-lg:  0 24px 72px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.08);
 
-  --glow-green:   0 0 24px rgba(11,218,135,0.30), 0 0 60px rgba(11,218,135,0.12);
-  --glow-blue:    0 0 24px rgba(0,116,217,0.35),  0 0 60px rgba(0,116,217,0.14);
-  --glow-purple:  0 0 24px rgba(153,102,204,0.30),0 0 60px rgba(153,102,204,0.12);
-  --glow-ruby:    0 0 24px rgba(224,17,95,0.30),  0 0 60px rgba(224,17,95,0.12);
-  --glow-citrine: 0 0 24px rgba(228,208,10,0.30), 0 0 60px rgba(228,208,10,0.12);
+  --glow-green:   0 0 32px rgba(0,255,179,0.40),   0 0 80px rgba(0,255,179,0.15);
+  --glow-blue:    0 0 32px rgba(77,159,255,0.40),   0 0 80px rgba(77,159,255,0.15);
+  --glow-purple:  0 0 32px rgba(179,102,255,0.40),  0 0 80px rgba(179,102,255,0.15);
+  --glow-magenta: 0 0 32px rgba(224,64,251,0.40),   0 0 80px rgba(224,64,251,0.15);
+  --glow-pink:    0 0 32px rgba(255,45,120,0.40),   0 0 80px rgba(255,45,120,0.15);
+  --glow-citrine: 0 0 32px rgba(245,230,66,0.40),   0 0 80px rgba(245,230,66,0.15);
+  --glow-teal:    0 0 32px rgba(0,229,204,0.40),    0 0 80px rgba(0,229,204,0.15);
 }}
 
 /* ── BASE ───────────────────────────────────────────────────── */
 html, body, [class*="css"] {{
-  font-family: 'Public Sans', system-ui, sans-serif !important;
+  font-family: 'Outfit', system-ui, sans-serif !important;
   color: var(--ink) !important;
+  -webkit-font-smoothing: antialiased;
 }}
-
 .stApp {{
   background: transparent !important;
   min-height: 100vh;
 }}
-
 .main .block-container {{
-  padding-top: 2rem;
-  padding-bottom: 4rem;
-  max-width: 1300px;
+  padding-top: 2.2rem;
+  padding-bottom: 5rem;
+  max-width: 1340px;
   background: transparent !important;
 }}
-
-/* Force every Streamlit inner wrapper to be see-through */
 section[data-testid="stMain"] > div,
 .stMainBlockContainer,
 [data-testid="stVerticalBlock"],
@@ -214,21 +294,26 @@ section[data-testid="stMain"] > div,
 
 /* ── SIDEBAR ─────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {{
-  background: rgba(5,1,10,0.82) !important;
-  backdrop-filter: blur(28px) !important;
-  -webkit-backdrop-filter: blur(28px) !important;
-  border-right: 1px solid var(--glass-border) !important;
-  box-shadow: 4px 0 40px rgba(0,0,0,0.65) !important;
+  background: rgba(4,1,13,0.88) !important;
+  backdrop-filter: blur(36px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(1.4) !important;
+  border-right: 1px solid rgba(179,102,255,0.18) !important;
+  box-shadow: 4px 0 60px rgba(0,0,0,0.75), inset -1px 0 0 rgba(255,255,255,0.06) !important;
 }}
 [data-testid="stSidebar"]::before {{
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg,
-    rgba(11,218,135,0.04) 0%,
-    rgba(153,102,204,0.04) 50%,
-    rgba(0,116,217,0.04) 100%);
+  background:
+    radial-gradient(ellipse at 50% 0%,   rgba(0,255,179,0.07)   0%, transparent 60%),
+    radial-gradient(ellipse at 0%  60%,  rgba(179,102,255,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 90%, rgba(77,159,255,0.05)  0%, transparent 55%);
   pointer-events: none;
+  animation: sidebarPulse 10s ease-in-out infinite alternate;
+}}
+@keyframes sidebarPulse {{
+  0%   {{ opacity: 0.6; }}
+  100% {{ opacity: 1.0; }}
 }}
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,
@@ -236,117 +321,144 @@ section[data-testid="stMain"] > div,
 [data-testid="stSidebar"] div,
 [data-testid="stSidebar"] small {{
   color: var(--ink-soft) !important;
-  font-family: 'Public Sans', sans-serif !important;
+  font-family: 'Outfit', sans-serif !important;
 }}
 [data-testid="stSidebar"] [data-baseweb="select"] {{
-  background: rgba(255,255,255,0.07) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-sm) !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(179,102,255,0.25) !important;
+  border-radius: var(--r-sm) !important;
+  transition: border-color 0.22s, box-shadow 0.22s !important;
+}}
+[data-testid="stSidebar"] [data-baseweb="select"]:hover {{
+  border-color: rgba(0,255,179,0.40) !important;
+  box-shadow: var(--glow-green) !important;
 }}
 [data-testid="stSidebar"] [data-baseweb="select"] * {{
   color: var(--ink) !important;
   background: transparent !important;
 }}
 
-/* ── METRIC CARDS ─────────────────────────────────────────────── */
+/* ── METRIC CARDS — jewel glassmorphism ──────────────────────── */
 [data-testid="metric-container"] {{
-  background: var(--glass-bg) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  background: var(--glass-1) !important;
+  backdrop-filter: blur(28px) saturate(1.6) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.6) !important;
   border: 1px solid var(--glass-border) !important;
+  border-top: 1px solid var(--glass-bright) !important;
   border-left: 3px solid var(--green) !important;
-  border-radius: var(--radius-md) !important;
-  padding: 22px 26px !important;
-  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.07) !important;
-  transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1) !important;
+  border-radius: var(--r-md) !important;
+  padding: 24px 28px !important;
+  box-shadow: var(--sh-sm), inset 0 1px 0 rgba(255,255,255,0.10) !important;
+  transition: all 0.32s cubic-bezier(0.34,1.56,0.64,1) !important;
   position: relative;
   overflow: hidden;
+  animation: cardFadeIn 0.6s ease both;
 }}
 [data-testid="metric-container"]::before {{
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--glass-shine) 0%, transparent 55%);
+  background: var(--glass-shine);
   pointer-events: none;
   border-radius: inherit;
 }}
+[data-testid="metric-container"]::after {{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,255,179,0.55) 40%, rgba(179,102,255,0.55) 70%, transparent 100%);
+  animation: shimmerLine 4s ease-in-out infinite;
+}}
 [data-testid="metric-container"]:hover {{
-  background: var(--glass-bg-hov) !important;
+  background: var(--glass-2) !important;
   border-left-color: var(--accent) !important;
-  box-shadow: var(--shadow-md), var(--glow-blue) !important;
-  transform: translateY(-4px) scale(1.01) !important;
+  box-shadow: var(--sh-md), var(--glow-blue) !important;
+  transform: translateY(-6px) scale(1.015) !important;
 }}
 [data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
-  font-size: 0.60rem !important;
+  font-size: 0.58rem !important;
   font-weight: 800 !important;
-  letter-spacing: 0.16em !important;
+  letter-spacing: 0.18em !important;
   text-transform: uppercase !important;
   color: var(--ink-muted) !important;
+  font-family: 'JetBrains Mono', monospace !important;
 }}
 [data-testid="stMetricValue"],
 [data-testid="stMetricValue"] > div {{
-  font-family: 'DM Mono', monospace !important;
-  font-size: 1.85rem !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 2.0rem !important;
   font-weight: 500 !important;
   color: var(--ink) !important;
-  letter-spacing: -0.03em !important;
+  letter-spacing: -0.04em !important;
+  text-shadow: 0 0 40px rgba(255,255,255,0.15) !important;
 }}
 [data-testid="stMetricDelta"] svg {{ display: none !important; }}
 
+@keyframes cardFadeIn {{
+  from {{ opacity: 0; transform: translateY(14px); }}
+  to   {{ opacity: 1; transform: translateY(0); }}
+}}
+@keyframes shimmerLine {{
+  0%,100% {{ opacity: 0.3; transform: scaleX(0.8); }}
+  50%     {{ opacity: 1.0; transform: scaleX(1.0); }}
+}}
+
 /* ── TABS ─────────────────────────────────────────────────────── */
 .stTabs [data-baseweb="tab-list"] {{
-  background: rgba(255,255,255,0.04) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border-radius: var(--radius-md) !important;
-  padding: 5px !important;
-  gap: 3px !important;
+  background: rgba(255,255,255,0.038) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: var(--r-lg) !important;
+  padding: 6px !important;
+  gap: 4px !important;
   border: 1px solid var(--glass-border) !important;
-  box-shadow: var(--shadow-sm) !important;
+  box-shadow: var(--sh-sm), inset 0 1px 0 rgba(255,255,255,0.07) !important;
 }}
 .stTabs [data-baseweb="tab"] {{
-  border-radius: var(--radius-sm) !important;
-  font-family: 'Public Sans', sans-serif !important;
+  border-radius: var(--r-md) !important;
+  font-family: 'Outfit', sans-serif !important;
   font-weight: 800 !important;
-  font-size: 0.68rem !important;
+  font-size: 0.67rem !important;
   color: var(--ink-muted) !important;
-  padding: 8px 20px !important;
+  padding: 9px 22px !important;
   background: transparent !important;
   border: 1px solid transparent !important;
-  transition: all 0.22s ease !important;
+  transition: all 0.24s cubic-bezier(0.4,0,0.2,1) !important;
   letter-spacing: 0.10em !important;
   text-transform: uppercase !important;
 }}
 .stTabs [data-baseweb="tab"]:hover {{
-  background: rgba(11,218,135,0.09) !important;
+  background: rgba(0,255,179,0.08) !important;
   color: var(--green) !important;
-  border-color: rgba(11,218,135,0.20) !important;
+  border-color: rgba(0,255,179,0.22) !important;
 }}
 .stTabs [aria-selected="true"] {{
-  background: rgba(11,218,135,0.14) !important;
+  background: rgba(0,255,179,0.12) !important;
   color: var(--green) !important;
-  box-shadow: var(--glow-green), inset 0 0 10px rgba(11,218,135,0.06) !important;
-  border-color: rgba(11,218,135,0.35) !important;
+  box-shadow: var(--glow-green), inset 0 0 14px rgba(0,255,179,0.06) !important;
+  border-color: rgba(0,255,179,0.40) !important;
 }}
 .stTabs [data-baseweb="tab-panel"] {{
   background: transparent !important;
-  padding-top: 1.8rem !important;
+  padding-top: 2rem !important;
 }}
 .stTabs [data-baseweb="tab-highlight"] {{ display: none !important; }}
 
 /* ── HEADINGS ─────────────────────────────────────────────────── */
 h1, h2, h3, h4 {{
-  font-family: 'Public Sans', sans-serif !important;
+  font-family: 'Outfit', sans-serif !important;
   color: var(--ink) !important;
-  letter-spacing: -0.025em;
-  font-weight: 900 !important;
+  letter-spacing: -0.03em;
+  font-weight: 800 !important;
 }}
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li,
 .stMarkdown p, .stMarkdown li {{
   color: var(--ink-soft);
-  line-height: 1.70;
+  line-height: 1.72;
   font-size: 0.88rem;
+  font-family: 'Outfit', sans-serif;
 }}
 
 /* ── WIDGET LABELS ────────────────────────────────────────────── */
@@ -355,9 +467,10 @@ h1, h2, h3, h4 {{
 .stCheckbox label, .stTextInput label {{
   color: var(--ink-muted) !important;
   font-weight: 800 !important;
-  font-size: 0.68rem !important;
-  letter-spacing: 0.12em !important;
+  font-size: 0.66rem !important;
+  letter-spacing: 0.14em !important;
   text-transform: uppercase !important;
+  font-family: 'JetBrains Mono', monospace !important;
 }}
 
 /* ── INPUTS ───────────────────────────────────────────────────── */
@@ -365,83 +478,96 @@ h1, h2, h3, h4 {{
 .stTextInput input,
 .stNumberInput input {{
   color: var(--ink) !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-sm) !important;
-  font-family: 'Public Sans', sans-serif !important;
+  background: rgba(255,255,255,0.055) !important;
+  border: 1px solid rgba(179,102,255,0.22) !important;
+  border-radius: var(--r-sm) !important;
+  font-family: 'Outfit', sans-serif !important;
   font-size: 0.87rem !important;
   box-shadow: none !important;
   transition: border-color 0.22s ease, box-shadow 0.22s ease !important;
-  backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(12px) !important;
 }}
 .stSelectbox [data-baseweb="select"] > div:focus-within,
 .stTextInput input:focus,
 .stNumberInput input:focus {{
-  border-color: rgba(0,116,217,0.60) !important;
-  box-shadow: 0 0 0 3px rgba(0,116,217,0.14), var(--glow-blue) !important;
+  border-color: rgba(77,159,255,0.65) !important;
+  box-shadow: 0 0 0 3px rgba(77,159,255,0.14), var(--glow-blue) !important;
 }}
 [data-baseweb="popover"] [data-baseweb="menu"] {{
-  background: rgba(8,2,18,0.96) !important;
-  backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-md) !important;
+  background: rgba(6,1,18,0.96) !important;
+  backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(179,102,255,0.22) !important;
+  border-radius: var(--r-md) !important;
 }}
 [data-baseweb="popover"] [role="option"] {{ color: var(--ink-soft) !important; }}
 [data-baseweb="popover"] [role="option"]:hover {{
-  background: rgba(11,218,135,0.12) !important;
+  background: rgba(0,255,179,0.10) !important;
   color: var(--green) !important;
 }}
 [data-testid="stSlider"] [role="slider"] {{
   background: var(--green) !important;
-  box-shadow: 0 0 12px rgba(11,218,135,0.70) !important;
+  box-shadow: 0 0 16px rgba(0,255,179,0.80) !important;
 }}
 [data-testid="stSlider"] [data-testid="stSliderThumbValue"] {{
   color: var(--green) !important;
-  font-family: 'DM Mono', monospace !important;
+  font-family: 'JetBrains Mono', monospace !important;
 }}
 
 /* ── DATAFRAME ────────────────────────────────────────────────── */
 [data-testid="stDataFrame"] {{
-  border-radius: var(--radius-md) !important;
+  border-radius: var(--r-md) !important;
   overflow: hidden !important;
   border: 1px solid var(--glass-border) !important;
-  box-shadow: var(--shadow-sm) !important;
-  background: rgba(255,255,255,0.03) !important;
-  backdrop-filter: blur(16px) !important;
+  box-shadow: var(--sh-sm) !important;
+  background: rgba(255,255,255,0.028) !important;
+  backdrop-filter: blur(20px) !important;
+  transition: box-shadow 0.28s !important;
+}}
+[data-testid="stDataFrame"]:hover {{
+  box-shadow: var(--sh-md), var(--glow-purple) !important;
 }}
 [data-testid="stDataFrame"] th {{
-  background: rgba(11,218,135,0.09) !important;
+  background: rgba(0,255,179,0.08) !important;
   color: var(--green) !important;
   font-weight: 800 !important;
   letter-spacing: 0.10em !important;
-  font-size: 0.68rem !important;
+  font-size: 0.66rem !important;
   text-transform: uppercase !important;
-  border-bottom: 1px solid rgba(11,218,135,0.20) !important;
+  border-bottom: 1px solid rgba(0,255,179,0.18) !important;
+  font-family: 'JetBrains Mono', monospace !important;
 }}
 [data-testid="stDataFrame"] td {{
   color: var(--ink-soft) !important;
-  border-color: rgba(255,255,255,0.05) !important;
+  border-color: rgba(255,255,255,0.04) !important;
   font-size: 0.85rem !important;
 }}
 [data-testid="stDataFrame"] tr:hover td {{
-  background: rgba(255,255,255,0.03) !important;
+  background: rgba(0,255,179,0.04) !important;
 }}
 
 /* ── EXPANDER ─────────────────────────────────────────────────── */
 [data-testid="stExpander"] {{
   border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-md) !important;
-  background: var(--glass-bg) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  box-shadow: var(--shadow-sm) !important;
+  border-radius: var(--r-md) !important;
+  background: var(--glass-1) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: var(--sh-sm) !important;
   overflow: hidden !important;
-  transition: all 0.25s ease !important;
+  transition: all 0.28s cubic-bezier(0.4,0,0.2,1) !important;
+  position: relative;
+}}
+[data-testid="stExpander"]::before {{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(179,102,255,0.55), transparent);
 }}
 [data-testid="stExpander"]:hover {{
-  box-shadow: var(--shadow-md), var(--glow-blue) !important;
-  border-color: rgba(0,116,217,0.30) !important;
-  background: var(--glass-bg-hov) !important;
+  box-shadow: var(--sh-md), var(--glow-purple) !important;
+  border-color: rgba(179,102,255,0.32) !important;
+  background: var(--glass-2) !important;
 }}
 [data-testid="stExpander"] summary p {{
   color: var(--ink) !important;
@@ -452,94 +578,119 @@ h1, h2, h3, h4 {{
 
 /* ── FORM ─────────────────────────────────────────────────────── */
 [data-testid="stForm"] {{
-  background: rgba(255,255,255,0.05) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
+  background: rgba(255,255,255,0.045) !important;
+  backdrop-filter: blur(32px) saturate(1.5) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(1.5) !important;
   border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-lg) !important;
-  padding: 30px 36px 36px !important;
-  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.07) !important;
+  border-top: 1px solid rgba(255,255,255,0.18) !important;
+  border-radius: var(--r-xl) !important;
+  padding: 32px 40px 40px !important;
+  box-shadow: var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.10) !important;
+  position: relative;
+}}
+[data-testid="stForm"]::before {{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--glass-shine);
+  border-radius: inherit;
+  pointer-events: none;
 }}
 
 /* ── SUBMIT BUTTON ────────────────────────────────────────────── */
 [data-testid="stFormSubmitButton"] > button {{
-  background: linear-gradient(135deg, rgba(0,116,217,0.90) 0%, rgba(153,102,204,0.80) 100%) !important;
-  border: 1px solid rgba(0,116,217,0.55) !important;
-  border-radius: var(--radius-sm) !important;
+  background: linear-gradient(135deg,
+    rgba(77,159,255,0.90)  0%,
+    rgba(179,102,255,0.80) 50%,
+    rgba(224,64,251,0.75)  100%) !important;
+  border: 1px solid rgba(77,159,255,0.55) !important;
+  border-radius: var(--r-md) !important;
   color: #fff !important;
-  font-family: 'Public Sans', sans-serif !important;
+  font-family: 'Outfit', sans-serif !important;
   font-weight: 900 !important;
-  font-size: 0.75rem !important;
-  letter-spacing: 0.14em !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.16em !important;
   text-transform: uppercase !important;
-  padding: 14px 36px !important;
+  padding: 15px 40px !important;
   width: 100% !important;
-  transition: all 0.24s cubic-bezier(0.34,1.56,0.64,1) !important;
-  box-shadow: 0 4px 24px rgba(0,116,217,0.35) !important;
-  backdrop-filter: blur(10px) !important;
+  transition: all 0.26s cubic-bezier(0.34,1.56,0.64,1) !important;
+  box-shadow: 0 4px 30px rgba(77,159,255,0.40), 0 0 0 1px rgba(255,255,255,0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  position: relative;
+  overflow: hidden;
+}}
+[data-testid="stFormSubmitButton"] > button::after {{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+  border-radius: inherit;
+  pointer-events: none;
 }}
 [data-testid="stFormSubmitButton"] > button:hover {{
-  background: linear-gradient(135deg, #0074D9 0%, {COLOR_AMETHYST} 100%) !important;
-  box-shadow: 0 0 40px rgba(0,116,217,0.60), 0 0 80px rgba(153,102,204,0.30) !important;
-  transform: translateY(-3px) scale(1.02) !important;
+  background: linear-gradient(135deg, #4d9fff 0%, #b366ff 50%, #e040fb 100%) !important;
+  box-shadow: 0 0 50px rgba(77,159,255,0.70), 0 0 100px rgba(179,102,255,0.35) !important;
+  transform: translateY(-4px) scale(1.025) !important;
 }}
 [data-testid="stFormSubmitButton"] > button:active {{
-  transform: translateY(0) scale(0.99) !important;
+  transform: translateY(0) scale(0.985) !important;
 }}
 
 /* ── REGULAR BUTTONS ──────────────────────────────────────────── */
 .stButton > button {{
-  background: rgba(255,255,255,0.06) !important;
-  backdrop-filter: blur(10px) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-sm) !important;
+  background: rgba(255,255,255,0.055) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(179,102,255,0.22) !important;
+  border-radius: var(--r-sm) !important;
   color: var(--ink) !important;
-  font-family: 'Public Sans', sans-serif !important;
+  font-family: 'Outfit', sans-serif !important;
   font-weight: 800 !important;
   font-size: 0.78rem !important;
-  padding: 10px 24px !important;
-  transition: all 0.24s cubic-bezier(0.34,1.56,0.64,1) !important;
-  letter-spacing: 0.06em !important;
+  padding: 11px 26px !important;
+  transition: all 0.26s cubic-bezier(0.34,1.56,0.64,1) !important;
+  letter-spacing: 0.07em !important;
 }}
 .stButton > button:hover {{
-  background: rgba(11,218,135,0.12) !important;
-  border-color: rgba(11,218,135,0.45) !important;
+  background: rgba(0,255,179,0.10) !important;
+  border-color: rgba(0,255,179,0.50) !important;
   box-shadow: var(--glow-green) !important;
-  transform: translateY(-3px) scale(1.02) !important;
+  transform: translateY(-4px) scale(1.025) !important;
   color: var(--green) !important;
 }}
 
 /* ── ALERT ────────────────────────────────────────────────────── */
 [data-testid="stAlert"] {{
-  border-radius: var(--radius-md) !important;
-  border: 1px solid var(--glass-border) !important;
-  background: rgba(255,255,255,0.05) !important;
-  backdrop-filter: blur(10px) !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid rgba(77,159,255,0.22) !important;
+  background: rgba(77,159,255,0.06) !important;
+  backdrop-filter: blur(12px) !important;
 }}
 [data-testid="stAlert"] p {{ color: var(--ink-soft) !important; }}
 
 hr {{
   border: none !important;
   border-top: 1px solid var(--glass-border) !important;
-  margin: 1.8rem 0 !important;
+  margin: 2rem 0 !important;
 }}
 
 /* ── CHROME ───────────────────────────────────────────────────── */
 #MainMenu, footer, [data-testid="stToolbar"] {{ visibility: hidden; }}
 header[data-testid="stHeader"] {{
-  background: rgba(5,1,10,0.75) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid var(--glass-border) !important;
+  background: rgba(4,1,13,0.78) !important;
+  backdrop-filter: blur(24px) saturate(1.5) !important;
+  border-bottom: 1px solid rgba(179,102,255,0.16) !important;
 }}
 
 /* ── SCROLLBAR ────────────────────────────────────────────────── */
 ::-webkit-scrollbar {{ width: 5px; height: 5px; }}
 ::-webkit-scrollbar-track {{ background: rgba(255,255,255,0.02); }}
 ::-webkit-scrollbar-thumb {{
-  background: rgba(11,218,135,0.28);
+  background: linear-gradient(180deg, rgba(0,255,179,0.35), rgba(179,102,255,0.35));
   border-radius: 99px;
 }}
-::-webkit-scrollbar-thumb:hover {{ background: rgba(11,218,135,0.50); }}
+::-webkit-scrollbar-thumb:hover {{
+  background: linear-gradient(180deg, rgba(0,255,179,0.60), rgba(179,102,255,0.60));
+}}
 
 /* ══════════════════════════════════════════════════════════════
    CUSTOM COMPONENTS
@@ -547,27 +698,34 @@ header[data-testid="stHeader"] {{
 
 /* HERO ─────────────────────────────────────────────────────── */
 .hero {{
-  background: var(--glass-bg);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  background: rgba(255,255,255,0.040);
+  backdrop-filter: blur(36px) saturate(1.6);
+  -webkit-backdrop-filter: blur(36px) saturate(1.6);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 48px 56px;
-  margin-bottom: 28px;
+  border-top: 1px solid rgba(255,255,255,0.20);
+  border-radius: var(--r-xl);
+  padding: 52px 60px;
+  margin-bottom: 32px;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow: var(--sh-lg), inset 0 1px 0 rgba(255,255,255,0.10);
+  animation: heroEntrance 0.8s cubic-bezier(0.22,1,0.36,1) both;
+}}
+@keyframes heroEntrance {{
+  from {{ opacity: 0; transform: translateY(24px); }}
+  to   {{ opacity: 1; transform: translateY(0); }}
 }}
 .hero::before {{
   content: "";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 90% 50%, rgba(11,218,135,0.13) 0%, transparent 55%),
-    radial-gradient(ellipse at 10% 50%, rgba(153,102,204,0.11) 0%, transparent 55%),
-    radial-gradient(ellipse at 50% 100%, rgba(0,116,217,0.08) 0%, transparent 50%);
+    radial-gradient(ellipse at 88% 50%, rgba(0,255,179,0.16) 0%, transparent 50%),
+    radial-gradient(ellipse at 12% 50%, rgba(179,102,255,0.14) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(77,159,255,0.10) 0%, transparent 45%),
+    linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 55%);
   pointer-events: none;
-  animation: heroShimmer 9s ease-in-out infinite alternate;
+  animation: heroShimmer 11s ease-in-out infinite alternate;
 }}
 .hero::after {{
   content: "";
@@ -576,160 +734,178 @@ header[data-testid="stHeader"] {{
   height: 1px;
   background: linear-gradient(90deg,
     transparent 0%,
-    rgba(11,218,135,0.50) 30%,
-    rgba(153,102,204,0.50) 70%,
+    rgba(0,255,179,0.70)  25%,
+    rgba(179,102,255,0.70) 55%,
+    rgba(224,64,251,0.60) 80%,
     transparent 100%);
-  animation: shimmerLine 4s ease-in-out infinite;
+  animation: shimmerLine 5s ease-in-out infinite;
 }}
 @keyframes heroShimmer {{
-  0%   {{ opacity: 0.55; }}
+  0%   {{ opacity: 0.50; }}
   100% {{ opacity: 1.00; }}
-}}
-@keyframes shimmerLine {{
-  0%,100% {{ opacity: 0.4; }}
-  50%     {{ opacity: 1.0; }}
 }}
 
 .hero-eyebrow {{
-  font-size: 0.60rem;
+  font-size: 0.58rem;
   font-weight: 900;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--green);
-  margin-bottom: 12px;
-  text-shadow: 0 0 16px rgba(11,218,135,0.70);
+  margin-bottom: 14px;
+  text-shadow: 0 0 20px rgba(0,255,179,0.80);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
 }}
 .hero-eyebrow::before {{
   content: "";
   display: inline-block;
-  width: 6px; height: 6px;
+  width: 7px; height: 7px;
   background: var(--green);
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(11,218,135,0.90);
-  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(0,255,179,1.0), 0 0 24px rgba(0,255,179,0.60);
+  animation: pulse 1.8s ease-in-out infinite;
 }}
 @keyframes pulse {{
-  0%,100% {{ opacity: 1; transform: scale(1); }}
-  50%     {{ opacity: 0.5; transform: scale(0.6); }}
+  0%,100% {{ opacity: 1; transform: scale(1);   box-shadow: 0 0 12px rgba(0,255,179,1), 0 0 24px rgba(0,255,179,0.6); }}
+  50%     {{ opacity: 0.45; transform: scale(0.55); box-shadow: 0 0 6px rgba(0,255,179,0.5); }}
 }}
 
 .hero h1 {{
-  font-family: 'Public Sans', sans-serif !important;
-  font-size: 3.0rem !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 3.2rem !important;
   font-weight: 900 !important;
   color: #fff !important;
-  margin: 0 0 16px 0 !important;
-  letter-spacing: -0.035em !important;
-  line-height: 1.06 !important;
+  margin: 0 0 18px 0 !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.04 !important;
+  text-shadow: 0 0 60px rgba(255,255,255,0.12) !important;
 }}
 .hero p {{
   color: var(--ink-muted) !important;
-  font-size: 0.90rem;
+  font-size: 0.92rem;
   margin: 0;
-  max-width: 520px;
-  line-height: 1.75;
+  max-width: 540px;
+  line-height: 1.78;
   font-weight: 400;
 }}
 .hero-glyph {{
   position: absolute;
-  right: 56px;
+  right: 60px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 10rem;
-  opacity: 0.04;
-  color: var(--green);
+  font-size: 11rem;
+  opacity: 0.045;
+  background: linear-gradient(135deg, var(--green), var(--amethyst));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1;
   pointer-events: none;
   user-select: none;
-  filter: blur(1px);
-  animation: glyphDrift 14s ease-in-out infinite alternate;
+  animation: glyphDrift 16s ease-in-out infinite alternate;
 }}
 @keyframes glyphDrift {{
-  0%   {{ transform: translateY(-54%) rotate(-5deg); opacity: 0.03; }}
-  100% {{ transform: translateY(-46%) rotate(5deg);  opacity: 0.07; }}
+  0%   {{ transform: translateY(-56%) rotate(-6deg) scale(0.96); opacity: 0.032; }}
+  100% {{ transform: translateY(-44%) rotate(6deg)  scale(1.04); opacity: 0.065; }}
 }}
 
 /* SIDEBAR BRAND ─────────────────────────────────────────────── */
 .sidebar-brand {{
-  font-family: 'Public Sans', sans-serif;
-  font-size: 1.35rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.40rem;
   font-weight: 900;
   color: #fff;
-  padding: 4px 0 18px 0;
-  border-bottom: 1px solid var(--glass-border);
-  margin-bottom: 20px;
-  letter-spacing: -0.015em;
-  text-shadow: 0 0 24px rgba(11,218,135,0.35);
+  padding: 4px 0 20px 0;
+  border-bottom: 1px solid rgba(179,102,255,0.20);
+  margin-bottom: 22px;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 28px rgba(0,255,179,0.35);
 }}
 .sidebar-brand span {{ color: var(--amethyst); }}
 
 /* SECTION HEADERS ───────────────────────────────────────────── */
 .section-hd {{
   margin: 0 0 4px 0;
-  font-size: 1.05rem;
-  font-weight: 900;
+  font-size: 1.08rem;
+  font-weight: 800;
   color: var(--ink);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.018em;
+  font-family: 'Outfit', sans-serif;
 }}
 .section-sub {{
   font-size: 0.82rem;
   color: var(--ink-muted);
-  margin: 0 0 22px 0;
+  margin: 0 0 24px 0;
   font-weight: 400;
 }}
 
 /* INFO BOX ──────────────────────────────────────────────────── */
 .info-box {{
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  border-left: 3px solid rgba(0,116,217,0.65);
-  border-radius: var(--radius-sm);
-  padding: 14px 20px;
+  background: rgba(77,159,255,0.07);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(77,159,255,0.20);
+  border-left: 3px solid rgba(77,159,255,0.75);
+  border-radius: var(--r-sm);
+  padding: 16px 22px;
   font-size: 0.84rem;
   color: var(--ink-soft);
-  margin-bottom: 16px;
-  line-height: 1.80;
-  box-shadow: 0 0 20px rgba(0,116,217,0.07);
+  margin-bottom: 18px;
+  line-height: 1.82;
+  box-shadow: 0 0 24px rgba(77,159,255,0.08);
+  position: relative;
+  overflow: hidden;
+}}
+.info-box::before {{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
 }}
 
 /* PILLS ─────────────────────────────────────────────────────── */
 .pill {{
   display: inline-block;
-  padding: 3px 13px;
+  padding: 4px 14px;
   border-radius: 99px;
-  font-size: 0.65rem;
+  font-size: 0.63rem;
   font-weight: 900;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   border: 1px solid transparent;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
+  font-family: 'JetBrains Mono', monospace;
+  transition: box-shadow 0.22s;
 }}
-.pill-expand   {{ background:rgba(11,218,135,0.15);  color:#0bda87; border-color:rgba(11,218,135,0.40);  box-shadow:0 0 12px rgba(11,218,135,0.25); }}
-.pill-maintain {{ background:rgba(228,208,10,0.15);  color:#E4D00A; border-color:rgba(228,208,10,0.40);  box-shadow:0 0 12px rgba(228,208,10,0.25); }}
-.pill-optimize {{ background:rgba(236,91,19,0.15);   color:#ec5b13; border-color:rgba(236,91,19,0.40);   box-shadow:0 0 12px rgba(236,91,19,0.25); }}
-.pill-drop     {{ background:rgba(224,17,95,0.15);   color:#E0115F; border-color:rgba(224,17,95,0.40);   box-shadow:0 0 12px rgba(224,17,95,0.25); }}
+.pill:hover {{ filter: brightness(1.15); }}
+.pill-expand   {{ background:rgba(0,255,179,0.14);  color:{COLOR_GREEN}; border-color:rgba(0,255,179,0.45);  box-shadow:0 0 16px rgba(0,255,179,0.30); }}
+.pill-maintain {{ background:rgba(245,230,66,0.14); color:{COLOR_YELLOW}; border-color:rgba(245,230,66,0.45);  box-shadow:0 0 16px rgba(245,230,66,0.30); }}
+.pill-optimize {{ background:rgba(255,107,53,0.14); color:{COLOR_ORANGE}; border-color:rgba(255,107,53,0.45);  box-shadow:0 0 16px rgba(255,107,53,0.30); }}
+.pill-drop     {{ background:rgba(255,45,120,0.14); color:{COLOR_PINK};   border-color:rgba(255,45,120,0.45);  box-shadow:0 0 16px rgba(255,45,120,0.30); }}
 
 /* RESULT CARDS ──────────────────────────────────────────────── */
 .result-card {{
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 32px 38px;
-  margin: 22px 0;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--r-xl);
+  padding: 36px 44px;
+  margin: 24px 0;
+  backdrop-filter: blur(32px) saturate(1.5);
+  -webkit-backdrop-filter: blur(32px) saturate(1.5);
+  box-shadow: var(--sh-lg);
   position: relative;
   overflow: hidden;
+  animation: resultReveal 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}}
+@keyframes resultReveal {{
+  from {{ opacity: 0; transform: translateY(20px) scale(0.98); }}
+  to   {{ opacity: 1; transform: translateY(0)    scale(1); }}
 }}
 .result-card::before {{
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 55%);
+  background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 55%);
   pointer-events: none;
   border-radius: inherit;
 }}
@@ -738,40 +914,45 @@ header[data-testid="stHeader"] {{
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.20), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
 }}
-.result-expand   {{ background:rgba(11,218,135,0.07);  border-left:4px solid {CHART_EXPAND};   box-shadow:var(--shadow-md),0 0 50px rgba(11,218,135,0.14); }}
-.result-maintain {{ background:rgba(228,208,10,0.07);  border-left:4px solid {CHART_MAINTAIN}; box-shadow:var(--shadow-md),0 0 50px rgba(228,208,10,0.14); }}
-.result-optimize {{ background:rgba(236,91,19,0.07);   border-left:4px solid {CHART_OPTIMIZE}; box-shadow:var(--shadow-md),0 0 50px rgba(236,91,19,0.14); }}
-.result-drop     {{ background:rgba(224,17,95,0.07);   border-left:4px solid {CHART_DROP};     box-shadow:var(--shadow-md),0 0 50px rgba(224,17,95,0.14); }}
+.result-expand   {{ background:rgba(0,255,179,0.07);  border-left:4px solid {CHART_EXPAND};   box-shadow:var(--sh-lg), 0 0 60px rgba(0,255,179,0.16); }}
+.result-maintain {{ background:rgba(245,230,66,0.07); border-left:4px solid {CHART_MAINTAIN}; box-shadow:var(--sh-lg), 0 0 60px rgba(245,230,66,0.16); }}
+.result-optimize {{ background:rgba(255,107,53,0.07); border-left:4px solid {CHART_OPTIMIZE}; box-shadow:var(--sh-lg), 0 0 60px rgba(255,107,53,0.16); }}
+.result-drop     {{ background:rgba(255,45,120,0.07); border-left:4px solid {CHART_DROP};     box-shadow:var(--sh-lg), 0 0 60px rgba(255,45,120,0.16); }}
 
 /* DIVIDER LABEL ─────────────────────────────────────────────── */
 .divider-label {{
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin: 30px 0 20px;
+  gap: 16px;
+  margin: 34px 0 22px;
   color: var(--ink-faint);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 900;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
 }}
 .divider-label::before, .divider-label::after {{
   content: "";
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+  background: linear-gradient(90deg, transparent, rgba(179,102,255,0.28), transparent);
 }}
 
 /* GLASS CHART WRAPPER ───────────────────────────────────────── */
 .chart-glass {{
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(16px);
+  background: rgba(255,255,255,0.035);
+  backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--r-md);
+  padding: 22px;
+  box-shadow: var(--sh-sm);
+  transition: box-shadow 0.28s;
+}}
+.chart-glass:hover {{
+  box-shadow: var(--sh-md), var(--glow-purple);
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -792,45 +973,43 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
     fig, ax = plt.subplots(figsize=figsize)
-    fig.patch.set_facecolor("#0d0520")
-    fig.patch.set_alpha(0.92)
-    ax.set_facecolor("#0a0118")
+    fig.patch.set_facecolor("#07021a")
+    fig.patch.set_alpha(0.94)
+    ax.set_facecolor("#05010f")
 
     for spine in ["top", "right"]:
         ax.spines[spine].set_visible(False)
-    ax.spines["left"].set_color((1, 1, 1, 0.10))
-    ax.spines["bottom"].set_color((1, 1, 1, 0.10))
+    ax.spines["left"].set_color((1, 1, 1, 0.08))
+    ax.spines["bottom"].set_color((1, 1, 1, 0.08))
 
-    ax.tick_params(colors=(1, 1, 1, 0.40), labelsize=8.5, length=0)
-    ax.xaxis.label.set_color((1, 1, 1, 0.50))
-    ax.yaxis.label.set_color((1, 1, 1, 0.50))
+    ax.tick_params(colors=(1, 1, 1, 0.38), labelsize=8.5, length=0)
+    ax.xaxis.label.set_color((1, 1, 1, 0.45))
+    ax.yaxis.label.set_color((1, 1, 1, 0.45))
     ax.title.set_color("#ffffff")
     ax.title.set_fontsize(11.5)
     ax.title.set_fontweight("bold")
     ax.title.set_fontfamily("sans-serif")
 
-    ax.grid(axis="y", color=(1, 1, 1, 0.05), linewidth=0.8, linestyle="--")
-    ax.grid(axis="x", color=(1, 1, 1, 0.03), linewidth=0.5, linestyle=":")
+    ax.grid(axis="y", color=(1, 1, 1, 0.045), linewidth=0.8, linestyle="--")
+    ax.grid(axis="x", color=(1, 1, 1, 0.025), linewidth=0.5, linestyle=":")
     ax.set_axisbelow(True)
 
-    # subtle inner glow border
     for spine in ["left", "bottom"]:
-        ax.spines[spine].set_linewidth(0.8)
+        ax.spines[spine].set_linewidth(0.7)
     return fig, ax
 
 
 def add_bar_glow(ax, bars, colors):
-    """Draw a soft glow beneath each bar by layering a wider, translucent copy."""
+    import matplotlib.patches as mp
+    import matplotlib.colors as mc
     for bar, color in zip(bars, colors):
-        import matplotlib.patches as mp
-        import matplotlib.colors as mc
         r, g, b, _ = mc.to_rgba(color)
         glow = mp.FancyBboxPatch(
-            (bar.get_x() - bar.get_width() * 0.15, min(bar.get_y(), 0)),
-            bar.get_width() * 1.30,
+            (bar.get_x() - bar.get_width() * 0.18, min(bar.get_y(), 0)),
+            bar.get_width() * 1.36,
             abs(bar.get_height()),
             boxstyle="round,pad=0",
-            facecolor=(r, g, b, 0.08),
+            facecolor=(r, g, b, 0.10),
             edgecolor="none",
             zorder=bar.get_zorder() - 1,
         )
@@ -841,7 +1020,7 @@ def col_seq(labels):
     return [DECISION_COLORS.get(l, "#CCCCCC") for l in labels]
 
 # ─────────────────────────────────────────────────────────────
-#  PATHS  (unchanged)
+#  PATHS
 # ─────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(__file__)
 DATA_PATH    = os.path.join(BASE_DIR, "airline_route_profitability.csv")
@@ -932,8 +1111,9 @@ if "pred_result" not in st.session_state:
 with st.sidebar:
     st.markdown('<div class="sidebar-brand">Sky<span>Lens</span></div>', unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.68rem;color:rgba(255,255,255,0.40);margin-bottom:20px;"
-        "font-weight:800;letter-spacing:0.12em;text-transform:uppercase'>Filter view</p>",
+        "<p style='font-size:0.65rem;color:rgba(255,255,255,0.38);margin-bottom:20px;"
+        "font-weight:800;letter-spacing:0.14em;text-transform:uppercase;"
+        "font-family:\"JetBrains Mono\",monospace'>Filter view</p>",
         unsafe_allow_html=True
     )
     route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
@@ -948,26 +1128,27 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("""
-    <p style='font-size:0.65rem;color:rgba(255,255,255,0.40);font-weight:900;
-    letter-spacing:0.14em;text-transform:uppercase;margin-bottom:12px'>Decision Labels</p>
-    <div style='display:flex;flex-direction:column;gap:10px;font-size:0.82rem;color:rgba(255,255,255,0.70)'>
-      <div style='display:flex;align-items:center;gap:10px'>
+    <p style='font-size:0.62rem;color:rgba(255,255,255,0.38);font-weight:900;
+    letter-spacing:0.16em;text-transform:uppercase;margin-bottom:14px;
+    font-family:"JetBrains Mono",monospace'>Decision Labels</p>
+    <div style='display:flex;flex-direction:column;gap:12px;font-size:0.82rem;color:rgba(255,255,255,0.68)'>
+      <div style='display:flex;align-items:center;gap:12px'>
         <span class='pill pill-expand'>Expand</span>High profit &amp; demand
       </div>
-      <div style='display:flex;align-items:center;gap:10px'>
+      <div style='display:flex;align-items:center;gap:12px'>
         <span class='pill pill-maintain'>Maintain</span>Stable performer
       </div>
-      <div style='display:flex;align-items:center;gap:10px'>
+      <div style='display:flex;align-items:center;gap:12px'>
         <span class='pill pill-optimize'>Optimize</span>Room to improve
       </div>
-      <div style='display:flex;align-items:center;gap:10px'>
+      <div style='display:flex;align-items:center;gap:12px'>
         <span class='pill pill-drop'>Drop</span>Losing money
       </div>
     </div>
     """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
-#  FILTERING  (logic unchanged)
+#  FILTERING
 # ─────────────────────────────────────────────────────────────
 fdf = df.copy()
 if sel_route    != "All": fdf = fdf[fdf["Route"]          == sel_route]
@@ -1027,7 +1208,7 @@ with tab1:
     d3.metric("Optimize", f"{optimize_pct:.1f}%")
     d4.metric("Drop",     f"{drop_pct:.1f}%")
 
-    st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:26px'></div>", unsafe_allow_html=True)
     st.markdown('<div class="divider-label">Composition</div>', unsafe_allow_html=True)
 
     left, right = st.columns([1, 1])
@@ -1044,14 +1225,13 @@ with tab1:
         }
         fig, ax = clean_fig((5.5, 5.0))
 
-        # glowing wedges
         wedges, texts, autotexts = ax.pie(
             dc.values,
             labels=dc.index,
             autopct="%1.1f%%",
             colors=[wc[l] for l in dc.index],
             startangle=90,
-            wedgeprops={"linewidth": 3, "edgecolor": "#0d0520"},
+            wedgeprops={"linewidth": 3, "edgecolor": "#07021a"},
             textprops={"color": "#ffffff", "fontsize": 9.5, "fontfamily": "sans-serif"},
             pctdistance=0.78,
             radius=0.90,
@@ -1063,7 +1243,6 @@ with tab1:
         for txt in texts:
             txt.set_color("rgba(255,255,255,0.75)")
 
-        # draw glow ring
         theta = np.linspace(0, 2 * np.pi, 300)
         ax.plot(0.95 * np.cos(theta), 0.95 * np.sin(theta),
                 color=(1, 1, 1, 0.04), linewidth=8, zorder=0)
@@ -1089,11 +1268,11 @@ with tab1:
             })
         )
         st.dataframe(summary, use_container_width=True, hide_index=True)
-        st.markdown("""
+        st.markdown(f"""
         <div class="info-box">
           <strong>How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
-          <strong style="color:#0bda87">Expand</strong> routes should have the highest values across all three columns.
+          <strong style="color:{COLOR_GREEN}">Expand</strong> routes should have the highest values across all three columns.
         </div>
         """, unsafe_allow_html=True)
 
@@ -1116,7 +1295,7 @@ with tab2:
             apd.index, apd.values,
             color=colors,
             width=0.48,
-            edgecolor="#0d0520",
+            edgecolor="#07021a",
             linewidth=1.5,
             zorder=3,
         )
@@ -1149,7 +1328,7 @@ with tab2:
             ald.index, ald.values,
             color=colors,
             width=0.48,
-            edgecolor="#0d0520",
+            edgecolor="#07021a",
             linewidth=1.5,
             zorder=3,
         )
@@ -1204,7 +1383,7 @@ with tab2:
     bars = ax.barh(
         cost_means.index, cost_means.values,
         color=bar_colors,
-        edgecolor="#0d0520",
+        edgecolor="#07021a",
         linewidth=1.5,
         height=0.52,
         zorder=3,
@@ -1259,7 +1438,7 @@ with tab3:
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         fig, ax = clean_fig((7, 5.2))
         bars = ax.barh(top.index, top.values,
-                       color=CHART_EXPAND, edgecolor="#0d0520", linewidth=1.5, height=0.52, zorder=3)
+                       color=CHART_EXPAND, edgecolor="#07021a", linewidth=1.5, height=0.52, zorder=3)
         add_bar_glow(ax, bars, [CHART_EXPAND] * len(bars))
         ax.set_xlabel("Total Profit ($)", fontsize=8.5)
         ax.set_title("Top 10 Routes", pad=14)
@@ -1276,7 +1455,7 @@ with tab3:
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         fig, ax = clean_fig((7, 5.2))
         bars = ax.barh(worst.index, worst.values,
-                       color=CHART_DROP, edgecolor="#0d0520", linewidth=1.5, height=0.52, zorder=3)
+                       color=CHART_DROP, edgecolor="#07021a", linewidth=1.5, height=0.52, zorder=3)
         add_bar_glow(ax, bars, [CHART_DROP] * len(bars))
         ax.set_xlabel("Total Profit ($)", fontsize=8.5)
         ax.set_title("Bottom 10 Routes", pad=14)
@@ -1330,7 +1509,7 @@ with tab4:
     bars = ax.bar(
         urbd.index, urbd["Unique Routes"],
         color=bc, width=0.48,
-        edgecolor="#0d0520", linewidth=1.5, zorder=3,
+        edgecolor="#07021a", linewidth=1.5, zorder=3,
     )
     add_bar_glow(ax, bars, bc)
     for b in bars:
@@ -1370,9 +1549,9 @@ with tab5:
     x = np.arange(len(comparison))
     w = 0.30
     b1 = ax.bar(x - w / 2, comparison["Accuracy"], w, label="Accuracy",
-                color=COLOR_ACCENT, edgecolor="#0d0520", linewidth=1.5, zorder=3)
+                color=COLOR_ACCENT, edgecolor="#07021a", linewidth=1.5, zorder=3)
     b2 = ax.bar(x + w / 2, comparison["Macro F1"], w, label="Macro F1",
-                color=COLOR_AMETHYST, edgecolor="#0d0520", linewidth=1.5, zorder=3)
+                color=COLOR_AMETHYST, edgecolor="#07021a", linewidth=1.5, zorder=3)
     add_bar_glow(ax, list(b1), [COLOR_ACCENT] * len(b1))
     add_bar_glow(ax, list(b2), [COLOR_AMETHYST] * len(b2))
     for b in list(b1) + list(b2):
@@ -1394,7 +1573,7 @@ with tab5:
 
     st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
-    st.markdown("""<div class="info-box">
+    st.markdown(f"""<div class="info-box">
     <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
     <span class='pill pill-optimize'>Cost-only</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
     <span class='pill pill-expand'>Pre-launch</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
@@ -1412,8 +1591,9 @@ with tab5:
 
         with col1:
             st.markdown(
-                "<p style='font-size:0.68rem;font-weight:900;color:rgba(255,255,255,0.40);"
-                "letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px'>Flight basics</p>",
+                "<p style='font-size:0.65rem;font-weight:900;color:rgba(255,255,255,0.38);"
+                "letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;"
+                "font-family:\"JetBrains Mono\",monospace'>Flight basics</p>",
                 unsafe_allow_html=True,
             )
             aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
@@ -1423,8 +1603,9 @@ with tab5:
 
         with col2:
             st.markdown(
-                "<p style='font-size:0.68rem;font-weight:900;color:rgba(255,255,255,0.40);"
-                "letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px'>Route context</p>",
+                "<p style='font-size:0.65rem;font-weight:900;color:rgba(255,255,255,0.38);"
+                "letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;"
+                "font-family:\"JetBrains Mono\",monospace'>Route context</p>",
                 unsafe_allow_html=True,
             )
             flight_hours   = st.number_input("Flight Hours",   min_value=0.5, max_value=20.0, value=6.0, step=0.1)
@@ -1435,8 +1616,9 @@ with tab5:
         if model_choice == "With Revenue Variables":
             with col3:
                 st.markdown(
-                    "<p style='font-size:0.68rem;font-weight:900;color:rgba(255,255,255,0.40);"
-                    "letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px'>Revenue</p>",
+                    "<p style='font-size:0.65rem;font-weight:900;color:rgba(255,255,255,0.38);"
+                    "letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;"
+                    "font-family:\"JetBrains Mono\",monospace'>Revenue</p>",
                     unsafe_allow_html=True,
                 )
                 ticket_revenue    = st.number_input("Ticket Revenue ($)",    min_value=0.0, value=120000.0, step=1000.0)
@@ -1445,8 +1627,9 @@ with tab5:
         elif model_choice == "Without Revenue Variables":
             with col3:
                 st.markdown(
-                    "<p style='font-size:0.68rem;font-weight:900;color:rgba(255,255,255,0.40);"
-                    "letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px'>Cost breakdown</p>",
+                    "<p style='font-size:0.65rem;font-weight:900;color:rgba(255,255,255,0.38);"
+                    "letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;"
+                    "font-family:\"JetBrains Mono\",monospace'>Cost breakdown</p>",
                     unsafe_allow_html=True,
                 )
                 fuel_cost               = st.number_input("Fuel Cost ($)",                 min_value=0.0, value=40000.0,  step=1000.0)
@@ -1546,15 +1729,15 @@ with tab5:
 
         st.markdown(f"""
         <div class='result-card {result_cls.get(pred, "result-expand")}'>
-          <div style='margin-bottom:12px'>
+          <div style='margin-bottom:14px'>
             <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
           </div>
-          <div style='font-family:"Public Sans",sans-serif;font-size:1.70rem;font-weight:900;
-                      color:{text_col.get(pred, "#111")};margin-bottom:12px;letter-spacing:-0.025em;
-                      text-shadow:0 0 30px {text_col.get(pred, "#111")}55'>
+          <div style='font-family:"Outfit",sans-serif;font-size:1.80rem;font-weight:900;
+                      color:{text_col.get(pred, "#111")};margin-bottom:14px;letter-spacing:-0.03em;
+                      text-shadow:0 0 40px {text_col.get(pred, "#111")}66'>
             Suggested Decision: {pred}
           </div>
-          <p style='color:rgba(255,255,255,0.60);margin:0;font-size:0.90rem;line-height:1.75'>
+          <p style='color:rgba(255,255,255,0.62);margin:0;font-size:0.92rem;line-height:1.78'>
             {explanations.get(pred, "")}
           </p>
         </div>
@@ -1581,7 +1764,7 @@ with tab5:
         bars = ax.bar(
             prob_df["Decision"], prob_df["Probability"],
             color=colors_prob,
-            width=0.44, edgecolor="#0d0520", linewidth=1.5, zorder=3,
+            width=0.44, edgecolor="#07021a", linewidth=1.5, zorder=3,
         )
         add_bar_glow(ax, bars, colors_prob)
         for b in bars:
@@ -1615,9 +1798,9 @@ with st.expander("Show filtered data"):
 #  FOOTER
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
-<div style='text-align:center;color:rgba(255,255,255,0.30);font-size:0.72rem;
-            padding:40px 0 20px;font-family:"Public Sans",sans-serif;
-            letter-spacing:0.06em'>
+<div style='text-align:center;color:rgba(255,255,255,0.28);font-size:0.70rem;
+            padding:44px 0 22px;font-family:"JetBrains Mono",monospace;
+            letter-spacing:0.10em'>
   ✦ &nbsp;SKYLENS ROUTE INTELLIGENCE&nbsp; · &nbsp;Built with Streamlit&nbsp; ✦
 </div>
 """, unsafe_allow_html=True)
