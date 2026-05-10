@@ -658,22 +658,21 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 #  CHART HELPER  (restyled, same data logic)
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
-    """Return a figure/ax pair styled to match the dark aurora dashboard theme."""
     fig, ax = plt.subplots(figsize=figsize)
     fig.patch.set_facecolor("#0d0520")
     fig.patch.set_alpha(0.85)
     ax.set_facecolor("none")
     for spine in ["top", "right"]:
         ax.spines[spine].set_visible(False)
-    ax.spines["left"].set_color("rgba(255,255,255,0.12)")
-    ax.spines["bottom"].set_color("rgba(255,255,255,0.12)")
-    ax.tick_params(colors="rgba(255,255,255,0.45)", labelsize=8.5)
-    ax.xaxis.label.set_color("rgba(255,255,255,0.55)")
-    ax.yaxis.label.set_color("rgba(255,255,255,0.55)")
+    ax.spines["left"].set_color((1, 1, 1, 0.12))        # ← tuple (R,G,B,A)
+    ax.spines["bottom"].set_color((1, 1, 1, 0.12))      # ← tuple
+    ax.tick_params(colors=(1, 1, 1, 0.45), labelsize=8.5)
+    ax.xaxis.label.set_color((1, 1, 1, 0.55))           # ← tuple
+    ax.yaxis.label.set_color((1, 1, 1, 0.55))           # ← tuple
     ax.title.set_color("#ffffff")
     ax.title.set_fontsize(11)
     ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color="rgba(255,255,255,0.06)", linewidth=0.8, linestyle="--")
+    ax.grid(axis="y", color=(1, 1, 1, 0.06), linewidth=0.8, linestyle="--")
     ax.set_axisbelow(True)
     return fig, ax
 
