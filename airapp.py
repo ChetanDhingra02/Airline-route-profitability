@@ -71,7 +71,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .sidebar-brand {{ font-size:1.12rem; font-weight:900; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:.02em; color:#f4f1e8!important; }} .sidebar-brand span {{ color:#fff!important; }}
 .hero {{
   max-width: 1040px;
-  margin: -72px auto 10px !important;
+  margin: -7px auto 10px !important;
   padding: 66px 72px !important;
   display: block !important;
   text-align: center;
