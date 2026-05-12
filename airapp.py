@@ -47,92 +47,52 @@ INK_MUTED = TEXT_MUTED
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-:root {{
-  --bg:#050505; --panel:rgba(18,18,22,.78); --panel2:rgba(24,24,30,.72);
-  --ink:#F7F7F8; --soft:#B9BBC6; --muted:#737684;
-  --blue:#5E6AD2; --violet:#8B5CF6; --green:#34D399; --yellow:#FBBF24; --orange:#FB923C; --red:#FB7185;
-  --border:rgba(255,255,255,.10); --border2:rgba(255,255,255,.16);
-}}
-html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; color:var(--ink)!important; -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }}
-.stApp {{
-  min-height:100vh!important; overflow-x:hidden!important; position:relative!important;
-  background:
-    radial-gradient(circle at 50% -10%, rgba(94,106,210,.18), transparent 32%),
-    radial-gradient(circle at 82% 20%, rgba(139,92,246,.10), transparent 28%),
-    radial-gradient(circle at 22% 76%, rgba(56,189,248,.055), transparent 26%),
-    linear-gradient(180deg,#050505 0%,#08080A 54%,#050505 100%)!important;
-}}
-.stApp:before {{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.14;
-  background-image:
-    radial-gradient(circle, rgba(255,255,255,.55) 0 1px, transparent 1.4px),
-    radial-gradient(circle, rgba(160,170,255,.38) 0 1px, transparent 1.3px);
-  background-size:180px 180px,260px 260px; background-position:20px 30px,120px 90px;
-}}
-.stApp:after {{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.045;
-  background:
-    linear-gradient(115deg, transparent 0 22%, rgba(255,255,255,.8) 22.1%, transparent 22.28%),
-    linear-gradient(35deg, transparent 0 54%, rgba(255,255,255,.8) 54.1%, transparent 54.24%),
-    linear-gradient(150deg, transparent 0 72%, rgba(255,255,255,.8) 72.1%, transparent 72.24%);
-}}
-.linear-bg {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
-.constellation {{ position:absolute; width:420px; height:220px; opacity:.16; }}
-.constellation.one {{ left:9%; top:13%; }} .constellation.two {{ right:8%; top:32%; transform:scale(.85) rotate(14deg); opacity:.10; }}
-.constellation:before {{ content:""; position:absolute; inset:0; background:linear-gradient(25deg,transparent 0 35%,rgba(255,255,255,.45) 35.1%,transparent 35.5%),linear-gradient(145deg,transparent 0 58%,rgba(255,255,255,.35) 58.1%,transparent 58.5%); }}
-.orb {{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.22; }} .orb.one {{ width:460px;height:460px;left:42%;top:-190px;background:#5E6AD2; }} .orb.two {{ width:320px;height:320px;right:-120px;bottom:10%;background:#8B5CF6;opacity:.12; }}
-.main .block-container {{ max-width:1240px!important; padding-top:2rem!important; padding-bottom:4rem!important; position:relative!important; z-index:3!important; }}
-[data-testid="stSidebar"] {{ background:rgba(8,8,10,.72)!important; border-right:1px solid var(--border)!important; backdrop-filter:blur(24px) saturate(140%)!important; box-shadow:16px 0 60px rgba(0,0,0,.32)!important; }}
-[data-testid="stSidebar"] * {{ color:var(--soft)!important; }}
-.sidebar-brand {{ font-size:1.18rem; font-weight:800; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid var(--border); letter-spacing:-.04em; color:white!important; }}
-.sidebar-brand span {{ color:#A8B1FF!important; -webkit-text-fill-color:unset!important; background:none!important; }}
-.hero,.feature-inner,[data-testid="metric-container"],[data-testid="stForm"],[data-testid="stDataFrame"],[data-testid="stExpander"],.info-box,.result-card,.plotly-card {{
-  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025)),rgba(18,18,22,.82)!important;
-  border:1px solid var(--border)!important; border-radius:24px!important;
-  box-shadow:0 24px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06)!important;
-  backdrop-filter:blur(20px) saturate(140%)!important; -webkit-backdrop-filter:blur(20px) saturate(140%)!important;
-}}
-.hero {{ padding:44px 46px!important; margin-bottom:22px!important; overflow:hidden; position:relative; }}
-.hero:before {{ content:""; position:absolute; width:420px; height:420px; right:-180px; top:-210px; background:radial-gradient(circle,rgba(94,106,210,.20),transparent 68%); pointer-events:none; }}
-.hero h1 {{ font-family:'Inter',system-ui,sans-serif!important; font-size:clamp(2.25rem,5vw,4.8rem)!important; line-height:.95!important; letter-spacing:-.085em!important; color:white!important; margin:0!important; text-transform:none!important; }}
-.hero p {{ color:var(--soft)!important; max-width:680px; font-size:1rem!important; line-height:1.65!important; margin:.9rem 0 0!important; }}
-.hero-eyebrow {{ color:#A8B1FF; font-size:.72rem; font-weight:800; letter-spacing:.18em; text-transform:uppercase; margin-bottom:14px; }}
-.hero-badge {{ display:inline-flex; margin-top:22px; padding:9px 14px; border:1px solid rgba(255,255,255,.12); border-radius:999px; color:#E9EAFF; background:rgba(94,106,210,.12); font-size:.72rem; font-weight:700; letter-spacing:.04em; }}
-.hero-glyph,.hero-star {{ display:none!important; }}
-.feature-grid {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:8px 0 26px; }}
-.feature-card {{ position:relative; transition:transform .25s ease; }} .feature-card:hover {{ transform:translateY(-3px); }}
-.feature-card:before {{ content:""; position:absolute; inset:18px; background:var(--card-gradient); filter:blur(42px); opacity:.12; z-index:-1; }}
-.feature-inner {{ min-height:170px!important; padding:22px!important; border-radius:24px!important; border:1px solid var(--border)!important; }}
-.feature-icon {{ font-size:24px; margin-bottom:28px; opacity:.9; }}
-.feature-inner h3 {{ font-family:'Inter',system-ui,sans-serif!important; color:white!important; font-size:1.05rem!important; margin:0 0 8px!important; text-transform:none!important; letter-spacing:-.04em!important; }}
-.feature-inner p {{ color:rgba(185,187,198,.78)!important; font-size:.86rem!important; line-height:1.58!important; margin:0!important; }}
-[data-testid="metric-container"] {{ padding:22px!important; transition:transform .22s ease,border-color .22s ease!important; }}
-[data-testid="metric-container"]:hover,.plotly-card:hover,.feature-card:hover {{ border-color:var(--border2)!important; box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 38px rgba(94,106,210,.10),inset 0 1px 0 rgba(255,255,255,.08)!important; }}
-[data-testid="metric-container"]:hover {{ transform:translateY(-3px)!important; }}
-[data-testid="stMetricLabel"] p {{ color:var(--muted)!important; font-size:.66rem!important; letter-spacing:.12em!important; text-transform:uppercase!important; font-weight:700!important; }}
-[data-testid="stMetricValue"],[data-testid="stMetricValue"]>div {{ color:white!important; font-size:2rem!important; font-weight:800!important; letter-spacing:-.06em!important; }}
-.stTabs [data-baseweb="tab-list"] {{ gap:4px; padding:5px; border-radius:18px; background:rgba(18,18,22,.70); border:1px solid var(--border); backdrop-filter:blur(20px); }}
-.stTabs [data-baseweb="tab"] {{ border-radius:13px!important; color:var(--muted)!important; font-weight:700!important; padding:9px 14px!important; }}
-.stTabs [aria-selected="true"] {{ background:rgba(255,255,255,.07)!important; color:white!important; border:1px solid rgba(255,255,255,.09)!important; }} .stTabs [data-baseweb="tab-highlight"] {{ display:none!important; }}
-.section-hd {{ font-family:'Inter',system-ui,sans-serif!important; font-size:1.05rem!important; color:white!important; font-weight:750!important; letter-spacing:-.04em!important; margin:0 0 6px!important; }}
-.section-sub {{ color:var(--muted)!important; margin:0 0 18px!important; line-height:1.65!important; }}
-.divider-label {{ display:flex; gap:14px; align-items:center; margin:28px 0 18px; color:#A8B1FF; font-size:.66rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }} .divider-label:before,.divider-label:after {{ content:""; height:1px; flex:1; background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent); }}
-.info-box {{ padding:18px 20px!important; color:var(--soft)!important; line-height:1.7; }} .info-box strong {{ color:white!important; }}
-.pill {{ display:inline-block; padding:5px 10px; border-radius:999px; font-size:.62rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border:1px solid transparent; }}
-.pill-expand{{background:rgba(52,211,153,.10);color:#A7F3D0;border-color:rgba(52,211,153,.25)}} .pill-maintain{{background:rgba(251,191,36,.10);color:#FDE68A;border-color:rgba(251,191,36,.24)}} .pill-optimize{{background:rgba(251,146,60,.10);color:#FDBA74;border-color:rgba(251,146,60,.24)}} .pill-drop{{background:rgba(251,113,133,.10);color:#FDA4AF;border-color:rgba(251,113,133,.24)}}
-.result-card {{ padding:26px 28px!important; margin:24px 0!important; }} .result-expand{{border-left:3px solid #34D399!important}}.result-maintain{{border-left:3px solid #FBBF24!important}}.result-optimize{{border-left:3px solid #FB923C!important}}.result-drop{{border-left:3px solid #FB7185!important}}
-.stSelectbox label,.stNumberInput label,.stSlider label,.stRadio label,.stCheckbox label,.stTextInput label {{ color:var(--soft)!important; font-weight:700!important; font-size:.70rem!important; letter-spacing:.07em!important; text-transform:uppercase!important; }}
-.stSelectbox [data-baseweb="select"]>div,.stTextInput input,.stNumberInput input {{ background:rgba(5,5,5,.55)!important; border:1px solid var(--border)!important; border-radius:12px!important; color:white!important; min-height:40px!important; }}
-[data-testid="stForm"] {{ padding:24px 26px 28px!important; }} [data-testid="stFormSubmitButton"]>button,.stButton>button {{ border-radius:999px!important; font-weight:800!important; border:1px solid rgba(255,255,255,.14)!important; background:#5E6AD2!important; color:white!important; box-shadow:0 12px 34px rgba(94,106,210,.22)!important; transition:transform .2s ease!important; }} [data-testid="stFormSubmitButton"]>button:hover,.stButton>button:hover {{ transform:translateY(-2px)!important; background:#6F7BE8!important; }}
-[data-testid="stDataFrame"] div,[data-testid="stDataFrame"] span {{ color:var(--soft)!important; }}
-.plotly-card {{ border-radius:24px; padding:16px 16px 6px; margin-bottom:18px; }}
-.plotly-card-title {{ font-size:1.02rem; font-weight:750; color:white; letter-spacing:-.04em; margin:4px 6px 10px; }}
-hr {{ border:none!important; border-top:1px solid rgba(255,255,255,.10)!important; }} ::selection {{ background:rgba(94,106,210,.28); }}
-@media(max-width:900px) {{ .feature-grid {{ grid-template-columns:1fr; }} }}
+:root {{ --bg:#030303; --ink:#f4f1e8; --soft:#b9b6ad; --muted:#77736a; --line:rgba(255,255,255,.18); --glass:rgba(36,36,34,.52); --glass2:rgba(255,255,255,.055); --accent:#f4f1e8; }}
+html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; color:var(--ink)!important; -webkit-font-smoothing:antialiased; }}
+.stApp {{ background:#030303!important; min-height:100vh!important; overflow-x:hidden!important; }}
+.stApp:before {{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.22; background-image: radial-gradient(circle,rgba(255,255,255,.95) 0 1px,transparent 1.4px), radial-gradient(circle,rgba(255,255,255,.45) 0 1px,transparent 1.3px); background-size:150px 150px,240px 240px; background-position:20px 40px,100px 20px; }}
+.stApp:after {{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.15; background: radial-gradient(circle at 23% 44%,rgba(120,160,190,.18),transparent 18%), radial-gradient(circle at 78% 37%,rgba(160,150,185,.13),transparent 20%), radial-gradient(circle at 53% 85%,rgba(255,255,255,.06),transparent 22%); }}
+.cosmos-bg {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
+.constellation {{ position:absolute; width:210px; height:150px; opacity:.46; filter:drop-shadow(0 0 5px rgba(255,255,255,.45)); }}
+.constellation svg {{ width:100%; height:100%; }}
+.constellation line {{ stroke:rgba(255,255,255,.48); stroke-width:.7; }} .constellation circle {{ fill:rgba(255,255,255,.88); }}
+.c1{{left:3%;top:10%}} .c2{{left:49%;top:4%;transform:scale(1.25) rotate(-8deg)}} .c3{{right:6%;top:10%;transform:rotate(15deg)}} .c4{{left:4%;bottom:12%;transform:rotate(22deg)}} .c5{{right:9%;bottom:16%;transform:scale(1.4)}}
+.cosmos-nav {{ position:relative; z-index:4; display:flex; align-items:center; justify-content:space-between; margin:4px auto 108px; max-width:1260px; padding:24px 4px 0; }}
+.cosmos-brand {{ font-size:1.62rem; font-weight:900; letter-spacing:.06em; color:#f6f3ea; }}
+.cosmos-links {{ display:flex; gap:34px; margin-left:-240px; }} .cosmos-links span {{ color:rgba(244,241,232,.58); font-size:.92rem; letter-spacing:.04em; }} .cosmos-links span:first-child {{ color:#fff; border-bottom:1px solid rgba(255,255,255,.72); padding-bottom:6px; }}
+.cosmos-login,.cosmos-pill {{ border:1px solid rgba(255,255,255,.28); background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.035)); color:#f5f1e9; border-radius:999px; padding:10px 18px; box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 20px rgba(255,255,255,.10); font-size:.86rem; }}
+.main .block-container {{ max-width:1260px!important; padding-top:.2rem!important; padding-bottom:4rem!important; position:relative!important; z-index:3!important; }}
+[data-testid="stSidebar"] {{ background:rgba(5,5,5,.72)!important; border-right:1px solid rgba(255,255,255,.10)!important; backdrop-filter:blur(22px)!important; }} [data-testid="stSidebar"] * {{ color:var(--soft)!important; }}
+.sidebar-brand {{ font-size:1.12rem; font-weight:900; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:.02em; color:#f4f1e8!important; }} .sidebar-brand span {{ color:#fff!important; }}
+.hero {{ display:none!important; }}
+.feature-grid {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:40px; margin:-80px auto 30px; max-width:1030px; }}
+.feature-card {{ position:relative; min-height:356px; border-radius:20px; overflow:hidden; background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.035)),rgba(34,34,32,.54); border:1px solid rgba(255,255,255,.24); box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 0 0 1px rgba(255,255,255,.04),0 28px 80px rgba(0,0,0,.52),0 0 38px rgba(255,255,255,.10); backdrop-filter:blur(18px) saturate(125%); transition:transform .25s ease, box-shadow .25s ease; }}
+.feature-card:hover {{ transform:translateY(-6px); box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 36px 95px rgba(0,0,0,.62),0 0 48px rgba(255,255,255,.14); }}
+.feature-card:before {{ content:""; position:absolute; inset:0; opacity:.58; background:radial-gradient(circle at 50% 70%,rgba(235,225,205,.50),transparent 20%),radial-gradient(circle at 46% 68%,rgba(145,160,180,.45),transparent 28%),radial-gradient(circle at 80% 35%,rgba(120,160,180,.22),transparent 30%),linear-gradient(180deg,rgba(255,255,255,.05),transparent 40%); filter:blur(.2px); }}
+.feature-card:nth-child(2):before {{ opacity:.40; background:radial-gradient(circle at 65% 22%,rgba(255,255,255,.35),transparent 2%),radial-gradient(circle at 50% 40%,rgba(255,255,255,.18),transparent 18%),linear-gradient(140deg,transparent,rgba(255,255,255,.08),transparent); }}
+.feature-card:nth-child(3):before {{ opacity:.52; background:radial-gradient(circle at 75% 54%,rgba(120,170,190,.36),transparent 27%),radial-gradient(circle at 60% 68%,rgba(200,160,150,.22),transparent 30%),radial-gradient(circle at 28% 40%,rgba(255,255,255,.18),transparent 10%); }}
+.feature-inner {{ position:relative; z-index:2; min-height:356px!important; padding:42px 30px!important; background:transparent!important; border:none!important; box-shadow:none!important; display:flex; flex-direction:column; justify-content:space-between; }}
+.feature-icon {{ display:none; }} .feature-inner h3 {{ color:#f7f3ea!important; font-size:2.05rem!important; line-height:1.08!important; letter-spacing:.075em!important; text-transform:uppercase!important; font-weight:900!important; margin:0!important; max-width:260px; text-shadow:0 2px 18px rgba(0,0,0,.5); }} .feature-inner p {{ color:rgba(245,241,232,.72)!important; font-size:1.02rem!important; line-height:1.35!important; max-width:260px; margin:12px 0 0!important; }}
+.feature-inner:after {{ content:"Explore"; width:max-content; border:1px solid rgba(255,255,255,.34); border-radius:999px; padding:8px 18px; color:#fff; background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04)); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 0 20px rgba(255,255,255,.12); font-weight:600; font-size:.86rem; }}
+.cosmos-mini {{ display:flex; justify-content:center; gap:54px; margin:20px 0 26px; color:rgba(245,241,232,.62); text-align:center; }} .cosmos-mini div {{ font-size:.78rem; }} .cosmos-cta {{ text-align:center; margin-bottom:34px; }}
+[data-testid="metric-container"],[data-testid="stForm"],[data-testid="stDataFrame"],[data-testid="stExpander"],.info-box,.result-card,.plotly-card {{ background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.026)),rgba(25,25,25,.70)!important; border:1px solid rgba(255,255,255,.14)!important; border-radius:20px!important; box-shadow:0 24px 70px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.10)!important; backdrop-filter:blur(18px)!important; }}
+[data-testid="metric-container"] {{ padding:20px!important; }} [data-testid="stMetricLabel"] p {{ color:rgba(245,241,232,.55)!important; font-size:.64rem!important; letter-spacing:.12em!important; text-transform:uppercase!important; }} [data-testid="stMetricValue"],[data-testid="stMetricValue"]>div {{ color:#f7f3ea!important; font-size:1.8rem!important; font-weight:850!important; }}
+.stTabs [data-baseweb="tab-list"] {{ gap:4px; padding:5px; border-radius:18px; background:rgba(18,18,18,.72); border:1px solid rgba(255,255,255,.12); }} .stTabs [data-baseweb="tab"] {{ color:rgba(245,241,232,.50)!important; font-weight:700!important; border-radius:13px!important; }} .stTabs [aria-selected="true"] {{ background:rgba(255,255,255,.08)!important; color:#fff!important; }} .stTabs [data-baseweb="tab-highlight"] {{ display:none!important; }}
+.section-hd {{ color:#f7f3ea!important; font-weight:850!important; letter-spacing:-.03em!important; }} .section-sub {{ color:rgba(245,241,232,.50)!important; }} .divider-label {{ display:flex; gap:14px; align-items:center; margin:30px 0 18px; color:rgba(245,241,232,.72); font-size:.66rem; font-weight:900; letter-spacing:.16em; text-transform:uppercase; }} .divider-label:before,.divider-label:after {{ content:""; height:1px; flex:1; background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent); }}
+.pill {{ display:inline-block; padding:5px 10px; border-radius:999px; font-size:.62rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border:1px solid transparent; }} .pill-expand{{background:rgba(52,211,153,.10);color:#A7F3D0;border-color:rgba(52,211,153,.25)}} .pill-maintain{{background:rgba(251,191,36,.10);color:#FDE68A;border-color:rgba(251,191,36,.24)}} .pill-optimize{{background:rgba(251,146,60,.10);color:#FDBA74;border-color:rgba(251,146,60,.24)}} .pill-drop{{background:rgba(251,113,133,.10);color:#FDA4AF;border-color:rgba(251,113,133,.24)}} .result-expand{{border-left:3px solid #34D399!important}}.result-maintain{{border-left:3px solid #FBBF24!important}}.result-optimize{{border-left:3px solid #FB923C!important}}.result-drop{{border-left:3px solid #FB7185!important}}
+.stSelectbox label,.stNumberInput label,.stSlider label {{ color:rgba(245,241,232,.70)!important; font-weight:700!important; }} .stSelectbox [data-baseweb="select"]>div,.stTextInput input,.stNumberInput input {{ background:rgba(5,5,5,.58)!important; border:1px solid rgba(255,255,255,.14)!important; border-radius:13px!important; color:white!important; }} [data-testid="stFormSubmitButton"]>button,.stButton>button {{ border-radius:999px!important; border:1px solid rgba(255,255,255,.30)!important; background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05))!important; color:#fff!important; box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 24px rgba(255,255,255,.10)!important; }}
+.plotly-card {{ padding:16px 16px 6px; margin-bottom:18px; }} .plotly-card-title {{ color:#f7f3ea; font-weight:850; letter-spacing:-.03em; margin:4px 6px 10px; }}
+@media(max-width:900px) {{ .cosmos-nav{{margin-bottom:40px}} .cosmos-links{{display:none}} .feature-grid{{grid-template-columns:1fr;margin-top:-20px}} }}
 </style>
-<div class="linear-bg"><div class="orb one"></div><div class="orb two"></div><div class="constellation one"></div><div class="constellation two"></div></div>
+<div class="cosmos-bg">
+  <div class="constellation c1"><svg viewBox="0 0 200 140"><line x1="20" y1="20" x2="45" y2="70"/><line x1="45" y1="70" x2="78" y2="62"/><line x1="78" y1="62" x2="105" y2="95"/><line x1="45" y1="70" x2="55" y2="115"/><circle cx="20" cy="20" r="2"/><circle cx="45" cy="70" r="3"/><circle cx="78" cy="62" r="2"/><circle cx="105" cy="95" r="3"/><circle cx="55" cy="115" r="2"/></svg></div>
+  <div class="constellation c2"><svg viewBox="0 0 240 120"><line x1="15" y1="70" x2="55" y2="45"/><line x1="55" y1="45" x2="105" y2="48"/><line x1="105" y1="48" x2="150" y2="25"/><line x1="150" y1="25" x2="205" y2="15"/><line x1="105" y1="48" x2="115" y2="90"/><line x1="115" y1="90" x2="178" y2="105"/><circle cx="15" cy="70" r="2"/><circle cx="55" cy="45" r="2.5"/><circle cx="105" cy="48" r="2"/><circle cx="150" cy="25" r="2.5"/><circle cx="205" cy="15" r="2"/><circle cx="115" cy="90" r="2"/><circle cx="178" cy="105" r="2"/></svg></div>
+  <div class="constellation c3"><svg viewBox="0 0 210 140"><line x1="20" y1="35" x2="65" y2="55"/><line x1="65" y1="55" x2="105" y2="48"/><line x1="105" y1="48" x2="135" y2="82"/><line x1="135" y1="82" x2="168" y2="118"/><circle cx="20" cy="35" r="2"/><circle cx="65" cy="55" r="2"/><circle cx="105" cy="48" r="2.5"/><circle cx="135" cy="82" r="2"/><circle cx="168" cy="118" r="2"/></svg></div>
+  <div class="constellation c4"><svg viewBox="0 0 210 150"><line x1="25" y1="20" x2="60" y2="70"/><line x1="60" y1="70" x2="100" y2="55"/><line x1="100" y1="55" x2="140" y2="98"/><line x1="140" y1="98" x2="180" y2="130"/><circle cx="25" cy="20" r="2"/><circle cx="60" cy="70" r="2.5"/><circle cx="100" cy="55" r="2"/><circle cx="140" cy="98" r="2"/><circle cx="180" cy="130" r="2.5"/></svg></div>
+  <div class="constellation c5"><svg viewBox="0 0 230 120"><line x1="20" y1="75" x2="70" y2="60"/><line x1="70" y1="60" x2="120" y2="72"/><line x1="120" y1="72" x2="165" y2="50"/><line x1="165" y1="50" x2="210" y2="35"/><circle cx="20" cy="75" r="2"/><circle cx="70" cy="60" r="2"/><circle cx="120" cy="72" r="2.5"/><circle cx="165" cy="50" r="2"/><circle cx="210" cy="35" r="2"/></svg></div>
+</div>
+<div class="cosmos-nav"><div class="cosmos-brand">SKYLENS</div><div class="cosmos-links"><span>Explore</span><span>Features</span><span>Routes</span><span>Predict</span></div><div class="cosmos-login">Dashboard</div></div>
 """, unsafe_allow_html=True)
-
 # ─────────────────────────────────────────────────────────────
 #  FINAL CLEAN PLOTLY HELPERS — single source of truth
 # ─────────────────────────────────────────────────────────────
@@ -462,12 +422,16 @@ st.markdown("""
 
 st.markdown("""
 <div class="feature-grid">
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#38BDF8 0%,#7DD3FC 45%,#2563EB 100%)"><div class="feature-inner"><div class="feature-icon">✈️</div><h3>Route Intelligence</h3><p>Monitor route profitability, load factor, and network performance through a polished executive dashboard.</p></div></div>
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#FACC15 0%,#FB923C 45%,#FB7185 100%)"><div class="feature-inner"><div class="feature-icon">📡</div><h3>Decision Engine</h3><p>Classify routes into Expand, Maintain, Optimize, or Drop with model-backed confidence scores.</p></div></div>
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#22C55E 0%,#2DD4BF 45%,#A78BFA 100%)"><div class="feature-inner"><div class="feature-icon">💹</div><h3>Profit Signals</h3><p>Surface the costs, demand patterns, and stability issues that drive airline profitability.</p></div></div>
+  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#38BDF8 0%,#7DD3FC 45%,#2563EB 100%)"><div class="feature-inner"><div class="feature-icon">✈️</div><h3>PROJECT<br>SKYLENS</h3><p>Explore airline route profitability like never before.</p></div></div>
+  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#FACC15 0%,#FB923C 45%,#FB7185 100%)"><div class="feature-inner"><div class="feature-icon">📡</div><h3>COSMIC<br>ROUTE MAPS</h3><p>View interactive decisions, routes, costs and demand signals.</p></div></div>
+  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#22C55E 0%,#2DD4BF 45%,#A78BFA 100%)"><div class="feature-inner"><div class="feature-icon">💹</div><h3>PROFITABILITY<br>HUB</h3><p>Connect operational signals with smarter route decisions.</p></div></div>
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<div class="cosmos-mini"><div>◎<br>Routes</div><div>✦<br>Decisions</div><div>▤<br>Profit Signals</div></div>
+<div class="cosmos-cta"><span class="cosmos-pill">LAUNCH DASHBOARD</span></div>
+""", unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────
