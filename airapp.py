@@ -127,7 +127,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 }}
 .hero p {{
   margin: 20px auto 0 !important;
-  max-width: 680px;
+  max-width: 68px;
   color: rgba(245,241,232,.68) !important;
   font-size: 1.03rem !important;
   line-height: 1.6 !important;
