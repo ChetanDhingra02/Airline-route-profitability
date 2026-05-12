@@ -168,10 +168,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     display:none!important;
 }}
 
-/* =========================
-   GLASS CARDS / BIGGER BOXES
-========================= */
-
+/* BASE GLASS STYLE ONLY */
 [data-testid="metric-container"],
 [data-testid="stForm"],
 [data-testid="stDataFrame"],
@@ -179,42 +176,32 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .info-box,
 .result-card,
 .plotly-card {{
-
     background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.075),
-            rgba(255,255,255,.026)
-        ),
+        linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.026)),
         rgba(25,25,25,.70)!important;
-
     border:3px solid rgba(255,255,255,.14)!important;
-
     border-radius:40px!important;
-
     box-shadow:
         0 24px 70px rgba(0,0,0,.46),
         inset 0 1px 0 rgba(255,255,255,.10)!important;
-
     backdrop-filter:blur(18px)!important;
+}}
 
-    /* NEW — MAKES BOX BIGGER */
-    padding:36px 42px!important;
-    min-height:160px!important;
+/* ONLY TEXT / EXPLANATION BOXES GET BIG */
+.info-box,
+.result-card {{
+    padding:34px 42px!important;
+    min-height:150px!important;
     width:100%!important;
 }}
 
-/* TEXT SPACING INSIDE BOXES */
-
+/* TEXT INSIDE INFO BOXES */
 .info-box p,
-.result-card p,
-.plotly-card p {{
+.result-card p {{
     line-height:1.8!important;
     font-size:1.02rem!important;
     color:rgba(245,241,232,.92)!important;
 }}
-
-/* TITLES INSIDE BOXES */
 
 .info-box h1,
 .info-box h2,
@@ -229,12 +216,10 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     letter-spacing:-0.03em!important;
 }}
 
-/* =========================
-   METRICS
-========================= */
-
+/* METRICS */
 [data-testid="metric-container"] {{
-    padding:40px 50px!important;
+    padding:28px 34px!important;
+    min-height:auto!important;
 }}
 
 [data-testid="stMetricLabel"] p {{
@@ -251,10 +236,14 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     font-weight:850!important;
 }}
 
-/* =========================
-   TABS
-========================= */
+/* TABLES / EXPANDERS */
+[data-testid="stDataFrame"],
+[data-testid="stExpander"] {{
+    padding:18px!important;
+    min-height:0!important;
+}}
 
+/* TABS */
 .stTabs [data-baseweb="tab-list"] {{
     gap:4px;
     padding:5px;
@@ -278,10 +267,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     display:none!important;
 }}
 
-/* =========================
-   HEADINGS
-========================= */
-
+/* HEADINGS */
 .section-hd {{
     color:#f7f3ea!important;
     font-weight:850!important;
@@ -309,18 +295,10 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     content:"";
     height:1px;
     flex:1;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.18),
-        transparent
-    );
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
 }}
 
-/* =========================
-   PILLS
-========================= */
-
+/* PILLS */
 .pill {{
     display:inline-block;
     padding:5px 10px;
@@ -335,47 +313,44 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .pill-expand {{
     background:rgba(52,211,153,.10);
     color:#A7F3D0;
-    border-color:rgba(52,211,153,.25)
+    border-color:rgba(52,211,153,.25);
 }}
 
 .pill-maintain {{
     background:rgba(251,191,36,.10);
     color:#FDE68A;
-    border-color:rgba(251,191,36,.24)
+    border-color:rgba(251,191,36,.24);
 }}
 
 .pill-optimize {{
     background:rgba(251,146,60,.10);
     color:#FDBA74;
-    border-color:rgba(251,146,60,.24)
+    border-color:rgba(251,146,60,.24);
 }}
 
 .pill-drop {{
     background:rgba(251,113,133,.10);
     color:#FDA4AF;
-    border-color:rgba(251,113,133,.24)
+    border-color:rgba(251,113,133,.24);
 }}
 
 .result-expand {{
-    border-left:3px solid #34D399!important
+    border-left:3px solid #34D399!important;
 }}
 
 .result-maintain {{
-    border-left:3px solid #FBBF24!important
+    border-left:3px solid #FBBF24!important;
 }}
 
 .result-optimize {{
-    border-left:3px solid #FB923C!important
+    border-left:3px solid #FB923C!important;
 }}
 
 .result-drop {{
-    border-left:3px solid #FB7185!important
+    border-left:3px solid #FB7185!important;
 }}
 
-/* =========================
-   INPUTS
-========================= */
-
+/* INPUTS */
 .stSelectbox label,
 .stNumberInput label,
 .stSlider label {{
@@ -396,28 +371,19 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .stButton>button {{
     border-radius:999px!important;
     border:1px solid rgba(255,255,255,.30)!important;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.18),
-            rgba(255,255,255,.05)
-        )!important;
-
+    background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05))!important;
     color:#fff!important;
-
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.22),
         0 0 24px rgba(255,255,255,.10)!important;
 }}
 
-/* =========================
-   PLOTLY
-========================= */
-
+/* PLOTLY CHART CARDS */
 .plotly-card {{
-    padding:24px 24px 14px!important;
-    margin-bottom:22px!important;
+    padding:18px 18px 10px!important;
+    margin-bottom:18px!important;
+    min-height:0!important;
+    width:100%!important;
 }}
 
 .plotly-card-title {{
@@ -428,30 +394,30 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     font-size:1.18rem;
 }}
 
-/* =========================
-   MOBILE
-========================= */
-
+/* MOBILE */
 @media(max-width:900px) {{
-
     .cosmos-nav {{
-        margin-bottom:40px
+        margin-bottom:40px;
     }}
 
     .cosmos-links {{
-        display:none
+        display:none;
     }}
 
     .feature-grid {{
         grid-template-columns:1fr;
-        margin-top:-20px
+        margin-top:-20px;
     }}
 
     .info-box,
-    .result-card,
-    .plotly-card {{
+    .result-card {{
         padding:24px!important;
         min-height:auto!important;
+    }}
+
+    .plotly-card {{
+        padding:16px!important;
+        min-height:0!important;
     }}
 }}
 <div class="twinkle-layer"><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span></div>
