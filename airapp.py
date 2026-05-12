@@ -74,49 +74,29 @@ html, body, [class*="css"]{
     -webkit-font-smoothing:antialiased;
 }
 
-/* BASE APP — pure dark, nebula injected via fixed div below */
-.stApp{
-    background: #05070f !important;
+/* BASE APP — nebula directly on stApp, background-attachment keeps it fixed */
+.stApp {
+    background:
+        radial-gradient(ellipse 80% 55% at 50% 0%,   rgba(80,50,170,.22),  transparent 55%),
+        radial-gradient(ellipse 55% 65% at 0%   45%,  rgba(25,90,200,.13),  transparent 55%),
+        radial-gradient(ellipse 60% 55% at 100% 55%,  rgba(190,90,35,.10),  transparent 55%),
+        radial-gradient(ellipse 90% 75% at 50% 55%,   rgba(55,25,115,.14),  transparent 70%),
+        #05070f !important;
+    background-attachment: fixed !important;
     overflow-x: hidden;
 }
 
-/* The actual nebula lives in a fixed <div id="cosmos-bg"> injected via JS */
-#cosmos-bg {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
+/* Star field on the html element (sits behind everything, truly fixed) */
+html {
     background:
-        radial-gradient(ellipse 80% 55% at 50% 0%,
-            rgba(80,50,170,.22) 0%,
-            transparent 55%),
-        radial-gradient(ellipse 55% 65% at 0% 45%,
-            rgba(25,90,200,.13) 0%,
-            transparent 55%),
-        radial-gradient(ellipse 60% 55% at 100% 55%,
-            rgba(190,90,35,.10) 0%,
-            transparent 55%),
-        radial-gradient(ellipse 90% 75% at 50% 55%,
-            rgba(55,25,115,.14) 0%,
-            transparent 70%),
+        radial-gradient(circle, rgba(255,255,255,.9)  0 0.7px, transparent 0.9px),
+        radial-gradient(circle, rgba(200,220,255,.55) 0 0.5px, transparent 0.7px),
         #05070f;
-}
-
-/* Star field inside fixed div */
-#cosmos-stars {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    opacity: .10;
-    background-image:
-        radial-gradient(circle, rgba(255,255,255,.9) 0 0.7px, transparent 0.9px),
-        radial-gradient(circle, rgba(200,220,255,.55) 0 0.5px, transparent 0.7px);
     background-size: 150px 150px, 80px 80px;
     background-position: 0 0, 40px 40px;
 }
 
-/* Streamlit layers must sit above the fixed bg */
+/* Streamlit layers sit above */
 .stApp > * { position: relative; z-index: 1; }
 
 /* ------------------------------------------------ */
@@ -313,6 +293,114 @@ html, body, [class*="css"]{
     font-weight:800!important;
 
     margin-bottom:12px!important;
+}
+
+/* ------------------------------------------------ */
+/* SIDEBAR BRAND */
+/* ------------------------------------------------ */
+
+.sidebar-brand{
+    font-family:'Cinzel',serif;
+    font-size:1.05rem;
+    font-weight:700;
+    letter-spacing:.12em;
+    color:#FFFDF8;
+    text-transform:uppercase;
+    margin-bottom:18px;
+    display:block;
+}
+.sidebar-brand span{
+    color:#38BDF8;
+}
+
+/* ------------------------------------------------ */
+/* PILLS */
+/* ------------------------------------------------ */
+
+.pill{
+    display:inline-block;
+    padding:3px 12px;
+    border-radius:999px;
+    font-size:.70rem;
+    font-weight:700;
+    letter-spacing:.07em;
+    font-family:'DM Sans',sans-serif;
+}
+.pill-expand  { background:rgba(34,197,94,.20);  color:#22C55E; border:1px solid rgba(34,197,94,.35); }
+.pill-maintain{ background:rgba(250,204,21,.18);  color:#FACC15; border:1px solid rgba(250,204,21,.30); }
+.pill-optimize{ background:rgba(251,146,60,.18);  color:#FB923C; border:1px solid rgba(251,146,60,.30); }
+.pill-drop    { background:rgba(251,113,133,.18); color:#FB7185; border:1px solid rgba(251,113,133,.30); }
+
+/* ------------------------------------------------ */
+/* SECTION LABELS */
+/* ------------------------------------------------ */
+
+.section-hd{
+    font-family:'DM Sans',sans-serif;
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.45);
+    margin-bottom:14px;
+}
+
+.divider-label{
+    font-family:'DM Sans',sans-serif;
+    font-size:.68rem;
+    font-weight:700;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.30);
+    text-align:center;
+    margin:24px 0 18px 0;
+    position:relative;
+}
+.divider-label::before,.divider-label::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:38%;
+    height:1px;
+    background:rgba(255,255,255,.08);
+}
+.divider-label::before{ left:0; }
+.divider-label::after { right:0; }
+
+.col-label{
+    font-family:'DM Sans',sans-serif;
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#38BDF8;
+    margin-bottom:10px;
+}
+
+/* ------------------------------------------------ */
+/* RESULT CARDS */
+/* ------------------------------------------------ */
+
+.result-card{
+    padding:28px!important;
+    margin-bottom:20px;
+}
+.result-expand  { border-left:4px solid #22C55E!important; }
+.result-maintain{ border-left:4px solid #FACC15!important; }
+.result-optimize{ border-left:4px solid #FB923C!important; }
+.result-drop    { border-left:4px solid #FB7185!important; }
+
+/* ------------------------------------------------ */
+/* INFO BOX */
+/* ------------------------------------------------ */
+
+.info-box{
+    padding:16px 20px!important;
+    font-family:'DM Sans',sans-serif;
+    font-size:.84rem;
+    color:rgba(255,255,255,.70);
+    line-height:1.65;
+    margin:10px 0;
 }
 
 /* ------------------------------------------------ */
@@ -730,19 +818,6 @@ st.markdown("""
     letter-spacing: .10em;
 }
 </style>
-
-<script>
-// Inject fixed background layers BEHIND Streamlit's DOM
-(function() {
-    if (document.getElementById('cosmos-bg')) return;
-    var bg = document.createElement('div');
-    bg.id = 'cosmos-bg';
-    document.body.insertBefore(bg, document.body.firstChild);
-    var stars = document.createElement('div');
-    stars.id = 'cosmos-stars';
-    document.body.insertBefore(stars, document.body.firstChild);
-})();
-</script>
 
 <!-- SINGLE HERO -->
 <div class="hero">
