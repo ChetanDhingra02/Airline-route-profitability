@@ -168,34 +168,74 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     display:none!important;
 }}
 
-/* BASE GLASS STYLE ONLY */
+/* ========================================
+   BASE GLASS STYLE
+======================================== */
+
 [data-testid="metric-container"],
-[data-testid="stForm"],
 [data-testid="stDataFrame"],
 [data-testid="stExpander"],
 .info-box,
 .result-card,
 .plotly-card {{
     background:
-        linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.026)),
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.075),
+            rgba(255,255,255,.026)
+        ),
         rgba(25,25,25,.70)!important;
+
     border:3px solid rgba(255,255,255,.14)!important;
+
     border-radius:40px!important;
+
     box-shadow:
         0 24px 70px rgba(0,0,0,.46),
         inset 0 1px 0 rgba(255,255,255,.10)!important;
+
     backdrop-filter:blur(18px)!important;
 }}
 
-/* ONLY TEXT / EXPLANATION BOXES GET BIG */
+/* ========================================
+   FORM CONTAINER
+======================================== */
+
+[data-testid="stForm"] {{
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.06),
+            rgba(255,255,255,.02)
+        ),
+        rgba(25,25,25,.64)!important;
+
+    border:3px solid rgba(255,255,255,.13)!important;
+
+    border-radius:34px!important;
+
+    box-shadow:
+        0 20px 55px rgba(0,0,0,.36),
+        inset 0 1px 0 rgba(255,255,255,.09)!important;
+
+    backdrop-filter:blur(18px)!important;
+
+    padding:22px 26px!important;
+
+    min-height:0!important;
+}}
+
+/* ========================================
+   INFO / EXPLANATION BOXES
+======================================== */
+
 .info-box,
 .result-card {{
-    padding:34px 42px!important;
-    min-height:150px!important;
+    padding:28px 34px!important;
+    min-height:115px!important;
     width:100%!important;
 }}
 
-/* TEXT INSIDE INFO BOXES */
 .info-box p,
 .result-card p {{
     line-height:1.8!important;
@@ -216,7 +256,10 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     letter-spacing:-0.03em!important;
 }}
 
-/* METRICS */
+/* ========================================
+   METRICS
+======================================== */
+
 [data-testid="metric-container"] {{
     padding:28px 34px!important;
     min-height:auto!important;
@@ -236,14 +279,20 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     font-weight:850!important;
 }}
 
-/* TABLES / EXPANDERS */
+/* ========================================
+   TABLES / EXPANDERS
+======================================== */
+
 [data-testid="stDataFrame"],
 [data-testid="stExpander"] {{
     padding:18px!important;
     min-height:0!important;
 }}
 
-/* TABS */
+/* ========================================
+   TABS
+======================================== */
+
 .stTabs [data-baseweb="tab-list"] {{
     gap:4px;
     padding:5px;
@@ -267,7 +316,10 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     display:none!important;
 }}
 
-/* HEADINGS */
+/* ========================================
+   HEADINGS
+======================================== */
+
 .section-hd {{
     color:#f7f3ea!important;
     font-weight:850!important;
@@ -295,10 +347,19 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     content:"";
     height:1px;
     flex:1;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.18),
+            transparent
+        );
 }}
 
-/* PILLS */
+/* ========================================
+   PILLS
+======================================== */
+
 .pill {{
     display:inline-block;
     padding:5px 10px;
@@ -350,7 +411,10 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     border-left:3px solid #FB7185!important;
 }}
 
-/* INPUTS */
+/* ========================================
+   INPUTS
+======================================== */
+
 .stSelectbox label,
 .stNumberInput label,
 .stSlider label {{
@@ -367,18 +431,34 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     color:white!important;
 }}
 
+/* ========================================
+   BUTTONS
+======================================== */
+
 [data-testid="stFormSubmitButton"]>button,
 .stButton>button {{
     border-radius:999px!important;
+
     border:1px solid rgba(255,255,255,.30)!important;
-    background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05))!important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.18),
+            rgba(255,255,255,.05)
+        )!important;
+
     color:#fff!important;
+
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.22),
         0 0 24px rgba(255,255,255,.10)!important;
 }}
 
-/* PLOTLY CHART CARDS */
+/* ========================================
+   PLOTLY CARDS
+======================================== */
+
 .plotly-card {{
     padding:18px 18px 10px!important;
     margin-bottom:18px!important;
@@ -394,8 +474,12 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     font-size:1.18rem;
 }}
 
-/* MOBILE */
+/* ========================================
+   MOBILE
+======================================== */
+
 @media(max-width:900px) {{
+
     .cosmos-nav {{
         margin-bottom:40px;
     }}
@@ -418,6 +502,10 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
     .plotly-card {{
         padding:16px!important;
         min-height:0!important;
+    }}
+
+    [data-testid="stForm"] {{
+        padding:18px!important;
     }}
 }}
 <div class="twinkle-layer"><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span></div>
