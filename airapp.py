@@ -35,6 +35,11 @@ COLOR_YELLOW      = "#facc15"             # Maintain
 COLOR_ORANGE      = "#fb923c"             # Optimize
 COLOR_PINK        = "#fb7185"             # Drop
 
+# Convert our semi-transparent CSS border colour into an RGBA tuple for
+# Matplotlib. Matplotlib does not understand CSS rgba strings directly,
+# so we approximate the 16% opacity white by specifying an RGBA tuple.
+COLOR_BORDER_MD_RGBA = (1.0, 1.0, 1.0, 0.16)
+
 # Chart palette tuned for dark backgrounds
 CHART_EXPAND   = COLOR_GREEN
 CHART_MAINTAIN = COLOR_YELLOW
@@ -1009,7 +1014,7 @@ with tab1:
             autopct="%1.1f%%",
             colors=[wc[l] for l in dc.index],
             startangle=90,
-            wedgeprops={"linewidth": 3, "edgecolor": COLOR_BORDER_MD},
+            wedgeprops={"linewidth": 3, "edgecolor": COLOR_BORDER_MD_RGBA},
             textprops={"color": COLOR_INK, "fontsize": 9.5, "fontfamily": "Syne"},
             pctdistance=0.78,
         )
@@ -1062,7 +1067,7 @@ with tab2:
             apd.index, apd.values,
             color=col_seq(apd.index.tolist()),
             width=0.5,
-            edgecolor=COLOR_BORDER_MD,
+            edgecolor=COLOR_BORDER_MD_RGBA,
             linewidth=2,
         )
         for b in bars:
@@ -1089,7 +1094,7 @@ with tab2:
             ald.index, ald.values,
             color=col_seq(ald.index.tolist()),
             width=0.5,
-            edgecolor=COLOR_BORDER_MD,
+            edgecolor=COLOR_BORDER_MD_RGBA,
             linewidth=2,
         )
         for b in bars:
@@ -1138,7 +1143,7 @@ with tab2:
     bars = ax.barh(
         cost_means.index, cost_means.values,
         color=CHART_NEUTRAL[:len(cost_means)],
-        edgecolor=COLOR_BORDER_MD,
+        edgecolor=COLOR_BORDER_MD_RGBA,
         linewidth=2,
         height=0.55,
     )
@@ -1189,7 +1194,7 @@ with tab3:
         )
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         fig, ax = clean_fig((7, 5))
-        ax.barh(top.index, top.values, color=CHART_EXPAND, edgecolor=COLOR_BORDER_MD, linewidth=2, height=0.55)
+        ax.barh(top.index, top.values, color=CHART_EXPAND, edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)")
         ax.set_title("Top 10 Routes")
         st.pyplot(fig)
@@ -1202,7 +1207,7 @@ with tab3:
         )
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         fig, ax = clean_fig((7, 5))
-        ax.barh(worst.index, worst.values, color=CHART_DROP, edgecolor=COLOR_BORDER_MD, linewidth=2, height=0.55)
+        ax.barh(worst.index, worst.values, color=CHART_DROP, edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)")
         ax.set_title("Bottom 10 Routes")
         st.pyplot(fig)
@@ -1253,7 +1258,7 @@ with tab4:
     bars = ax.bar(
         urbd.index, urbd["Unique Routes"],
         color=bc, width=0.5,
-        edgecolor=COLOR_BORDER_MD, linewidth=2,
+        edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2,
     )
     for b in bars:
         h = b.get_height()
@@ -1290,9 +1295,9 @@ with tab5:
     x = np.arange(len(comparison))
     w = 0.30
     b1 = ax.bar(x - w / 2, comparison["Accuracy"], w, label="Accuracy",
-                color=CHART_NEUTRAL[0], edgecolor=COLOR_BORDER_MD, linewidth=2)
+                color=CHART_NEUTRAL[0], edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2)
     b2 = ax.bar(x + w / 2, comparison["Macro F1"], w, label="Macro F1",
-                color=CHART_NEUTRAL[2], edgecolor=COLOR_BORDER_MD, linewidth=2)
+                color=CHART_NEUTRAL[2], edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2)
     for b in list(b1) + list(b2):
         h = b.get_height()
         ax.text(b.get_x() + b.get_width() / 2, h + 0.006, f"{h:.0%}",
@@ -1493,7 +1498,7 @@ with tab5:
         bars = ax.bar(
             prob_df["Decision"], prob_df["Probability"],
             color=[bar_cp.get(d, "#CCCCCC") for d in prob_df["Decision"]],
-            width=0.45, edgecolor=COLOR_BORDER_MD, linewidth=2,
+            width=0.45, edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2,
         )
         for b in bars:
             h = b.get_height()
