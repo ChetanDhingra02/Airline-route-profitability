@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import json
 import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
 st.set_page_config(
     page_title="SkyLens · Airline Profitability Command Center",
@@ -116,7 +117,7 @@ html, body, [class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important
 .info-box {{ padding:20px 24px!important; color:var(--soft)!important; line-height:1.7; }} .info-box strong {{ color:white!important; }}
 .pill {{ display:inline-block; padding:5px 11px; border-radius:999px; font-size:.64rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; border:1px solid transparent; }}
 .pill-expand{{background:rgba(34,197,94,.12);color:#86EFAC;border-color:rgba(34,197,94,.32)}} .pill-maintain{{background:rgba(250,204,21,.12);color:#FDE68A;border-color:rgba(250,204,21,.32)}} .pill-optimize{{background:rgba(251,146,60,.12);color:#FDBA74;border-color:rgba(251,146,60,.32)}} .pill-drop{{background:rgba(251,113,133,.12);color:#FDA4AF;border-color:rgba(251,113,133,.32)}}
-.result-card {{ padding:28px 30px!important; margin:24px 0!important; }} .result-expand{border-left:4px solid #22C55E!important}.result-maintain{border-left:4px solid #FACC15!important}.result-optimize{border-left:4px solid #FB923C!important}.result-drop{border-left:4px solid #FB7185!important}
+.result-card {{ padding:28px 30px!important; margin:24px 0!important; }} .result-expand{{border-left:4px solid #22C55E!important}}.result-maintain{{border-left:4px solid #FACC15!important}}.result-optimize{{border-left:4px solid #FB923C!important}}.result-drop{{border-left:4px solid #FB7185!important}}
 .stSelectbox label,.stNumberInput label,.stSlider label,.stRadio label,.stCheckbox label,.stTextInput label {{ color:var(--soft)!important; font-weight:800!important; font-size:.72rem!important; letter-spacing:.08em!important; text-transform:uppercase!important; }}
 .stSelectbox [data-baseweb="select"]>div,.stTextInput input,.stNumberInput input {{ background:rgba(8,11,18,.72)!important; border:1px solid rgba(255,255,255,.13)!important; border-radius:16px!important; color:white!important; min-height:42px!important; }}
 [data-testid="stForm"] {{ padding:26px 28px 30px!important; }} [data-testid="stFormSubmitButton"]>button,.stButton>button {{ border-radius:999px!important; font-weight:900!important; border:1px solid rgba(255,255,255,.14)!important; background:linear-gradient(135deg,#38BDF8,#2563EB)!important; color:white!important; box-shadow:0 12px 34px rgba(37,99,235,.28)!important; transition:transform .22s ease!important; }} [data-testid="stFormSubmitButton"]>button:hover,.stButton>button:hover {{ transform:translateY(-3px)!important; }}
