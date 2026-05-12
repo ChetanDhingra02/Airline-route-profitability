@@ -39,6 +39,7 @@ DECISION_COLORS = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN, "Optimize
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
 ACCENT = CYAN
+ACCENT_2 = VIOLET
 INK = TEXT
 INK_SOFT = TEXT_SOFT
 INK_MUTED = TEXT_MUTED
