@@ -74,7 +74,7 @@ html, body, [class*="css"]{
     -webkit-font-smoothing:antialiased;
 }
 
-/* BASE APP — nebula directly on stApp, background-attachment keeps it fixed */
+/* BASE APP -- nebula directly on stApp, background-attachment keeps it fixed */
 .stApp {
     background:
         radial-gradient(ellipse 80% 55% at 50% 0%,   rgba(80,50,170,.22),  transparent 55%),
@@ -125,11 +125,11 @@ html {
 }
 
 /* ------------------------------------------------ */
-/* HERO — defined in second style block below */
+/* HERO -- defined in second style block below */
 /* ------------------------------------------------ */
 
 /* ------------------------------------------------ */
-/* GLASS CARDS — frosted white glass */
+/* GLASS CARDS -- frosted white glass */
 /* ------------------------------------------------ */
 
 [data-testid="metric-container"],
@@ -416,7 +416,7 @@ html {
 </style>
 """, unsafe_allow_html=True)
 # ─────────────────────────────────────────────────────────────
-#  FINAL CLEAN PLOTLY HELPERS — single source of truth
+#  FINAL CLEAN PLOTLY HELPERS -- single source of truth
 # ─────────────────────────────────────────────────────────────
 def _fmt_money(v):
     if abs(v) >= 1_000_000:
@@ -738,7 +738,7 @@ st.markdown("""
     overflow: hidden;
     margin-bottom: 40px !important;
 
-    /* frosted glass — same treatment as metric cards */
+    /* frosted glass -- same treatment as metric cards */
     background: linear-gradient(
         145deg,
         rgba(255,255,255,.18) 0%,
@@ -823,7 +823,7 @@ st.markdown("""
 <div class="hero">
   <div class="hero-eyebrow">✦ &nbsp; Airline Route Intelligence &nbsp; ✦</div>
   <h1>SKYLENS<br>DASHBOARD</h1>
-  <p>Analyze route profitability, operational signals, and model-backed decisions — all in one polished command view.</p>
+  <p>Analyze route profitability, operational signals, and model-backed decisions &mdash; all in one polished command view.</p>
   <div class="hero-badge">✦ &nbsp; Explore dashboard below</div>
 </div>
 """, unsafe_allow_html=True)
@@ -1117,7 +1117,7 @@ with tab5:
     st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
     st.markdown(f"""<div class="info-box">
-    <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
+    <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate &mdash; use when you have ticket &amp; ancillary revenue data.<br><br>
     <span class='pill pill-optimize'>Cost-only</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
     <span class='pill pill-expand'>Pre-launch</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
     </div>""", unsafe_allow_html=True)
@@ -1233,9 +1233,9 @@ with tab5:
         text_col   = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
                       "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
         explanations = {
-            "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
-            "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
-            "Optimize": "This route has potential but something is holding it back — efficiency or demand may need attention before investing more.",
+            "Expand":   "This route shows strong performance signals &mdash; high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
+            "Maintain": "This route is working well and performing steadily. No urgent changes needed &mdash; keep monitoring.",
+            "Optimize": "This route has potential but something is holding it back &mdash; efficiency or demand may need attention before investing more.",
             "Drop":     "This route is losing money. A deeper review is recommended to determine whether it can be restructured or should be discontinued.",
         }
 
