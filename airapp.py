@@ -70,7 +70,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 [data-testid="stSidebar"] {{ background:rgba(5,5,5,.72)!important; border-right:1px solid rgba(255,255,255,.10)!important; backdrop-filter:blur(22px)!important; }} [data-testid="stSidebar"] * {{ color:var(--soft)!important; }}
 .sidebar-brand {{ font-size:1.12rem; font-weight:900; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:.02em; color:#f4f1e8!important; }} .sidebar-brand span {{ color:#fff!important; }}
 .hero {{
-  max-width: 1040px;
+  max-width: 104px;
   margin: -72px auto 42px !important;
   padding: 66px 72px !important;
   display: block !important;
@@ -106,7 +106,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .hero:after {{
   content:"";
   position:absolute;
-  width:180px;
+  width:18px;
   height:1px;
   left:50%;
   bottom:34px;
@@ -127,7 +127,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 }}
 .hero p {{
   margin: 20px auto 0 !important;
-  max-width: 68px;
+  max-width: 689px;
   color: rgba(245,241,232,.68) !important;
   font-size: 1.03rem !important;
   line-height: 1.6 !important;
