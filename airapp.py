@@ -843,7 +843,10 @@ def clean_fig(figsize=(8, 4)):
     ax.title.set_color("#e5e1e4")
     ax.title.set_fontsize(11.5)
     ax.title.set_fontweight("600")
-    ax.title.set_pad(14)
+    # set_pad is not a valid Text method; padding is applied via set_title pad param
+    # so we store it and apply it when titles are set via a monkey-patched helper.
+    # For now we just configure a reasonable top pad on the axes directly:
+    ax.tick_params(axis="x", pad=6)
 
     # ── Grid ────────────────────────────────────────────────────────────────
     # Fine dashed horizontal guide lines at very low opacity
@@ -1194,7 +1197,7 @@ with tab2:
                 fontsize=8, color=COLOR_INK_SOFT, fontweight="700",
             )
         ax.set_ylabel("Average Profit ($)")
-        ax.set_title("Average Profit by Decision")
+        ax.set_title("Average Profit by Decision", pad=14)
         st.pyplot(fig)
 
     with right:
@@ -1221,7 +1224,7 @@ with tab2:
                 fontsize=8, color=COLOR_INK_SOFT, fontweight="700",
             )
         ax.set_ylabel("Average Seat Occupancy")
-        ax.set_title("Seat Occupancy by Decision")
+        ax.set_title("Seat Occupancy by Decision", pad=14)
         st.pyplot(fig)
 
     st.markdown('<div class="divider-label">Cost breakdown</div>', unsafe_allow_html=True)
@@ -1271,7 +1274,7 @@ with tab2:
             va="center", fontsize=8, color=COLOR_INK_SOFT, fontweight="700",
         )
     ax.set_xlabel("Average Cost per Flight ($)")
-    ax.set_title("Top Cost Drivers")
+    ax.set_title("Top Cost Drivers", pad=14)
     st.pyplot(fig)
 
 # ── TAB 3 · ROUTE ACTIONS ────────────────────────────────────
@@ -1310,7 +1313,7 @@ with tab3:
         fig, ax = clean_fig((7, 5))
         ax.barh(top.index, top.values, color=CHART_EXPAND, edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)")
-        ax.set_title("Top 10 Routes")
+        ax.set_title("Top 10 Routes", pad=14)
         st.pyplot(fig)
 
     with right:
@@ -1323,7 +1326,7 @@ with tab3:
         fig, ax = clean_fig((7, 5))
         ax.barh(worst.index, worst.values, color=CHART_DROP, edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)")
-        ax.set_title("Bottom 10 Routes")
+        ax.set_title("Bottom 10 Routes", pad=14)
         st.pyplot(fig)
 
 # ── TAB 4 · ROUTE STABILITY ──────────────────────────────────
@@ -1383,7 +1386,7 @@ with tab4:
             ha="center", fontsize=9, color=COLOR_INK_SOFT, fontweight="700",
         )
     ax.set_ylabel("Number of Unique Routes")
-    ax.set_title("Unique Routes per Decision Category")
+    ax.set_title("Unique Routes per Decision Category", pad=14)
     st.pyplot(fig)
 
     patches = [mpatches.Patch(color=bc_map.get(d, "#CCCCCC"), label=d) for d in ORDER]
@@ -1420,7 +1423,7 @@ with tab5:
     ax.set_xticklabels(comparison["Model"], fontsize=8.5)
     ax.set_ylim(0, 1.15)
     ax.set_ylabel("Score")
-    ax.set_title("Model Accuracy & F1 Comparison")
+    ax.set_title("Model Accuracy & F1 Comparison", pad=14)
     ax.legend(frameon=False, fontsize=9, labelcolor=COLOR_INK)
     plt.xticks(rotation=10)
     st.pyplot(fig)
@@ -1624,7 +1627,7 @@ with tab5:
             )
         ax.set_ylim(0, 1.18)
         ax.set_ylabel("Probability")
-        ax.set_title("Model Confidence per Decision")
+        ax.set_title("Model Confidence per Decision", pad=14)
         st.pyplot(fig)
 
         st.dataframe(
