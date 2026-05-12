@@ -71,7 +71,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .sidebar-brand {{ font-size:1.12rem; font-weight:900; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:.02em; color:#f4f1e8!important; }} .sidebar-brand span {{ color:#fff!important; }}
 .hero {{
   max-width: 1040px;
-  margin: -50px auto 10px !important;
+  margin: -40px auto 10px !important;
   padding: 30px 72px !important;
   display: block !important;
   text-align: left;
@@ -494,6 +494,13 @@ st.markdown("""
   </div>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+    <style>
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 15px; /* Adjust this value for more or less space */
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
 #  TABS
