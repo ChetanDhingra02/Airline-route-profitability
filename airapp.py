@@ -1001,6 +1001,174 @@ svg rect:hover, svg path:hover, svg circle:hover{
   opacity:.96 !important;
 }
 
+
+/* ========================================================================
+   V4 LIQUID GLASS POLISH — CSS/HTML ONLY
+   Smaller hero, no screenshot chips, deeper background, polished cards.
+   ======================================================================== */
+
+:root{
+  --liquid-edge:rgba(255,255,255,.30);
+  --liquid-edge-soft:rgba(255,255,255,.15);
+  --liquid-fill:rgba(255,255,255,.070);
+  --liquid-fill-hi:rgba(255,255,255,.135);
+  --liquid-cyan:rgba(122,239,255,.30);
+  --liquid-violet:rgba(170,118,255,.34);
+  --liquid-pink:rgba(255,112,196,.20);
+}
+
+/* Push the atmosphere visually far behind the UI */
+.stApp{
+  background:
+    radial-gradient(ellipse 900px 520px at 12% -12%, rgba(108,78,255,.24), transparent 64%),
+    radial-gradient(ellipse 760px 440px at 90% 6%, rgba(86,226,255,.13), transparent 62%),
+    radial-gradient(ellipse 840px 600px at 50% 118%, rgba(255,75,169,.09), transparent 66%),
+    linear-gradient(180deg,#050713 0%,#070817 48%,#03040b 100%) !important;
+}
+.stApp:before{
+  opacity:.28 !important;
+  filter:blur(.2px) !important;
+  transform:translateZ(-220px) scale(1.15);
+}
+.stApp:after{
+  opacity:.18 !important;
+  transform:translateZ(-260px) scale(1.18);
+}
+
+/* Compact premium hero */
+.motion-hero.liquid-hero{
+  min-height:0 !important;
+  padding:24px 30px 26px !important;
+  margin:0 0 22px !important;
+  border-radius:28px !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.115), rgba(255,255,255,.036) 48%, rgba(255,255,255,.075)),
+    radial-gradient(circle at 16% 0%, rgba(122,239,255,.16), transparent 35%),
+    radial-gradient(circle at 82% 22%, rgba(170,118,255,.20), transparent 42%) !important;
+  border:1px solid var(--liquid-edge-soft) !important;
+  border-top-color:rgba(255,255,255,.32) !important;
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.46),
+    0 0 44px rgba(122,239,255,.065),
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 -1px 0 rgba(255,255,255,.07) !important;
+  backdrop-filter:blur(30px) saturate(185%) contrast(112%) !important;
+  -webkit-backdrop-filter:blur(30px) saturate(185%) contrast(112%) !important;
+  animation:heroEnter .75s var(--motion-ease) both, liquidFloat 8s ease-in-out infinite alternate !important;
+}
+.motion-hero.liquid-hero:before{
+  background:
+    linear-gradient(112deg, transparent 0%, rgba(255,255,255,.30) 34%, rgba(122,239,255,.14) 45%, transparent 58%),
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.20), transparent 18%) !important;
+  animation:sheenSweep 7s ease-in-out infinite !important;
+}
+.motion-hero.liquid-hero:after{
+  content:"" !important;
+  right:28px !important;
+  top:22px !important;
+  bottom:auto !important;
+  width:150px !important;
+  height:150px !important;
+  border-radius:999px !important;
+  background:
+    radial-gradient(circle at 38% 32%, rgba(255,255,255,.28), rgba(122,239,255,.11) 34%, rgba(170,118,255,.08) 62%, transparent 70%) !important;
+  filter:blur(.2px) drop-shadow(0 28px 48px rgba(0,0,0,.22)) !important;
+  opacity:.70 !important;
+  transform:translateZ(70px);
+  animation:glassOrbDrift 6s ease-in-out infinite alternate !important;
+}
+.motion-kicker{
+  padding:7px 12px !important;
+  font-size:.66rem !important;
+  background:rgba(255,255,255,.075) !important;
+  border-color:rgba(255,255,255,.18) !important;
+}
+.motion-hero.liquid-hero h1{
+  margin:14px 0 8px !important;
+  max-width:760px !important;
+  font-size:clamp(2.10rem,4.2vw,4.10rem) !important;
+  line-height:.98 !important;
+  letter-spacing:-.060em !important;
+}
+.motion-hero.liquid-hero p{
+  max-width:620px !important;
+  font-size:.95rem !important;
+  line-height:1.55 !important;
+  color:rgba(240,238,255,.70) !important;
+}
+.motion-hero-actions,.motion-chip{display:none !important;}
+
+@keyframes liquidFloat{
+  to{transform:translateY(-4px) rotateX(.8deg) rotateY(-.35deg);}
+}
+@keyframes glassOrbDrift{
+  to{transform:translate3d(-14px,10px,90px) scale(1.04);}
+}
+
+/* Make every major Streamlit card read as actual polished glass */
+[data-testid="metric-container"],
+[data-testid="stExpander"],
+.info-box,
+.result-card,
+div[data-testid="stForm"],
+div[data-testid="stVerticalBlock"] > div:has(iframe){
+  background:
+    linear-gradient(142deg, rgba(255,255,255,.155) 0%, rgba(255,255,255,.052) 42%, rgba(255,255,255,.092) 100%) !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  border-top-color:rgba(255,255,255,.38) !important;
+  box-shadow:
+    0 28px 74px rgba(0,0,0,.43),
+    0 12px 34px rgba(0,0,0,.22),
+    0 0 56px rgba(122,239,255,.07),
+    inset 0 1px 0 rgba(255,255,255,.27),
+    inset 0 -1px 0 rgba(255,255,255,.08) !important;
+  backdrop-filter:blur(34px) saturate(190%) contrast(112%) !important;
+  -webkit-backdrop-filter:blur(34px) saturate(190%) contrast(112%) !important;
+}
+[data-testid="metric-container"]:after,
+.info-box:after,
+.result-card:after,
+div[data-testid="stForm"]:after{
+  background:
+    linear-gradient(120deg, rgba(255,255,255,.30), transparent 22%, transparent 72%, rgba(122,239,255,.15)),
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.28), transparent 18%),
+    radial-gradient(circle at 88% 0%, rgba(170,118,255,.22), transparent 30%) !important;
+  opacity:.62 !important;
+}
+[data-testid="metric-container"]:hover,
+[data-testid="stExpander"]:hover,
+.info-box:hover,
+.result-card:hover,
+div[data-testid="stForm"]:hover{
+  transform:translateY(-8px) rotateX(1.4deg) rotateY(-.8deg) translateZ(24px) !important;
+  border-color:rgba(255,255,255,.30) !important;
+  box-shadow:
+    0 38px 95px rgba(0,0,0,.50),
+    0 0 68px rgba(122,239,255,.13),
+    0 0 84px rgba(170,118,255,.12),
+    inset 0 1px 0 rgba(255,255,255,.34),
+    inset 0 -1px 0 rgba(255,255,255,.10) !important;
+}
+
+/* Chart iframe cards get a little 3D lift without touching chart logic */
+div[data-testid="stVerticalBlock"] > div:has(iframe){
+  border-radius:24px !important;
+  overflow:hidden !important;
+  transition:transform .40s var(--motion-ease), box-shadow .40s ease, border-color .40s ease !important;
+}
+div[data-testid="stVerticalBlock"] > div:has(iframe):hover{
+  transform:translateY(-7px) rotateX(1.2deg) translateZ(18px) !important;
+}
+
+/* Let Streamlit tabs feel like a floating glass control, not a screenshot bar */
+.stTabs [data-baseweb="tab-list"]{
+  top:.45rem !important;
+  background:rgba(7,9,20,.50) !important;
+  border-color:rgba(255,255,255,.17) !important;
+  backdrop-filter:blur(30px) saturate(180%) !important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%) !important;
+}
+
 </style>
 
 <script>
@@ -1625,19 +1793,12 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 #  HERO HEADER
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
-<section class="motion-hero">
-  <div class="motion-kicker"><span></span> Route Intelligence Platform</div>
-  <h1>SkyLens<br/>Motion Dashboard</h1>
+<section class="motion-hero liquid-hero">
+  <div class="motion-kicker"><span></span> SkyLens Intelligence</div>
+  <h1>Route Intelligence,<br/>Refracted in Motion.</h1>
   <p>
-    A cinematic glassmorphism interface for exploring airline route performance,
-    confidence signals, and decision recommendations. Model logic remains unchanged.
+    Explore airline performance, confidence signals, and route decisions through a polished liquid-glass command surface.
   </p>
-  <div class="motion-hero-actions">
-    <div class="motion-chip">3D glass cards</div>
-    <div class="motion-chip">Animated SVG charts</div>
-    <div class="motion-chip">Sticky motion tabs</div>
-    <div class="motion-chip">No model logic changed</div>
-  </div>
 </section>
 """, unsafe_allow_html=True)
 
