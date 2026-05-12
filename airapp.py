@@ -44,478 +44,370 @@ INK = TEXT
 INK_SOFT = TEXT_SOFT
 INK_MUTED = TEXT_MUTED
 
-st.markdown(f"""
+st.markdown("""
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-:root {{ --bg:#030303; --ink:#f4f1e8; --soft:#b9b6ad; --muted:#77736a; --line:rgba(255,255,255,.18); --glass:rgba(36,36,34,.52); --glass2:rgba(255,255,255,.055); --accent:#f4f1e8; }}
-html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; color:var(--ink)!important; -webkit-font-smoothing:antialiased; }}
-.stApp {{ background:#030303!important; min-height:100vh!important; overflow-x:hidden!important; }}
-.stApp:before {{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.22; background-image: radial-gradient(circle,rgba(255,255,255,.95) 0 1px,transparent 1.4px), radial-gradient(circle,rgba(255,255,255,.45) 0 1px,transparent 1.3px); background-size:150px 150px,240px 240px; background-position:20px 40px,100px 20px; }}
 
-.twinkle-layer {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
-.twinkle {{ position:absolute; width:2px; height:2px; border-radius:999px; background:rgba(255,255,255,.72); box-shadow:0 0 8px rgba(255,255,255,.55); opacity:.18; animation:twinkle 4.8s ease-in-out infinite; }}
-.twinkle:nth-child(1){{left:8%;top:16%;animation-delay:.2s}} .twinkle:nth-child(2){{left:18%;top:52%;animation-delay:1.4s}} .twinkle:nth-child(3){{left:34%;top:22%;animation-delay:2.1s}} .twinkle:nth-child(4){{left:61%;top:14%;animation-delay:.9s}} .twinkle:nth-child(5){{left:86%;top:26%;animation-delay:1.9s}} .twinkle:nth-child(6){{left:76%;top:70%;animation-delay:3.2s}} .twinkle:nth-child(7){{left:41%;top:81%;animation-delay:2.7s}} .twinkle:nth-child(8){{left:12%;top:78%;animation-delay:3.8s}}
-@keyframes twinkle {{ 0%,100%{{opacity:.10;transform:scale(.72)}} 50%{{opacity:.55;transform:scale(1.35)}} }}
-.stApp:after {{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.15; background: radial-gradient(circle at 23% 44%,rgba(120,160,190,.18),transparent 18%), radial-gradient(circle at 78% 37%,rgba(160,150,185,.13),transparent 20%), radial-gradient(circle at 53% 85%,rgba(255,255,255,.06),transparent 22%); }}
-.cosmos-bg {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
-.constellation {{ position:absolute; width:210px; height:150px; opacity:.46; filter:drop-shadow(0 0 5px rgba(255,255,255,.45)); }}
-.constellation svg {{ width:100%; height:100%; }}
-.constellation line {{ stroke:rgba(255,255,255,.48); stroke-width:.7; }} .constellation circle {{ fill:rgba(255,255,255,.88); }}
-.c1{{left:3%;top:10%}} .c2{{left:49%;top:4%;transform:scale(1.25) rotate(-8deg)}} .c3{{right:6%;top:10%;transform:rotate(15deg)}} .c4{{left:4%;bottom:12%;transform:rotate(22deg)}} .c5{{right:9%;bottom:16%;transform:scale(1.4)}}
-.cosmos-nav {{ position:relative; z-index:4; display:flex; align-items:center; justify-content:space-between; margin:4px auto 92px; max-width:1260px; padding:24px 4px 0; }}
-.cosmos-brand {{ font-size:1.62rem; font-weight:900; letter-spacing:.06em; color:#f6f3ea; }}
-.cosmos-links {{ display:flex; gap:34px; margin-left:-240px; }} .cosmos-links span {{ color:rgba(244,241,232,.58); font-size:.92rem; letter-spacing:.04em; }} .cosmos-links span:first-child {{ color:#fff; border-bottom:1px solid rgba(255,255,255,.72); padding-bottom:6px; }}
-.cosmos-login,.cosmos-pill {{ border:1px solid rgba(255,255,255,.28); background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.035)); color:#f5f1e9; border-radius:999px; padding:10px 18px; box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 20px rgba(255,255,255,.10); font-size:.86rem; }}
-.main .block-container {{ max-width:1260px!important; padding-top:.2rem!important; padding-bottom:4rem!important; position:relative!important; z-index:3!important; }}
-[data-testid="stSidebar"] {{ background:rgba(5,5,5,.72)!important; border-right:1px solid rgba(255,255,255,.10)!important; backdrop-filter:blur(22px)!important; }} [data-testid="stSidebar"] * {{ color:var(--soft)!important; }}
-.sidebar-brand {{ font-size:1.12rem; font-weight:900; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:.02em; color:#f4f1e8!important; }} .sidebar-brand span {{ color:#fff!important; }}
-.hero {{
-  max-width: 1040px;
-  margin: -40px auto 10px !important;
-  padding: 30px 72px !important;
-  display: block !important;
-  text-align: left;
-  position: relative;
-  overflow: hidden;
-  border-radius: 28px !important;
-  background:
-    radial-gradient(circle at 50% 115%, rgba(245,241,232,.20), transparent 34%),
-    radial-gradient(circle at 18% 12%, rgba(255,255,255,.10), transparent 28%),
-    radial-gradient(circle at 82% 24%, rgba(120,160,190,.12), transparent 32%),
-    linear-gradient(180deg, rgba(255,255,255,.105), rgba(255,255,255,.032)),
-    rgba(32,32,30,.58) !important;
-  border: 1px solid rgba(255,255,255,.24) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.24),
-    inset 0 -1px 0 rgba(255,255,255,.07),
-    0 42px 120px rgba(0,0,0,.64),
-    0 0 62px rgba(255,255,255,.10) !important;
-  backdrop-filter: blur(22px) saturate(125%) !important;
-}}
-.hero:before {{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 45% 72%, rgba(245,236,214,.20), transparent 16%),
-    radial-gradient(circle at 51% 78%, rgba(160,180,200,.16), transparent 25%),
-    linear-gradient(115deg, transparent 0 42%, rgba(255,255,255,.08) 49%, transparent 56%);
-  opacity:.72;
-}}
-.hero:after {{
-  content:"";
-  position:absolute;
-  width:18px;
-  height:1px;
-  left:50%;
-  bottom:34px;
-  transform:translateX(-50%);
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.46),transparent);
-  opacity:.72;
-}}
-.hero-left {{ position:relative; z-index:2; }}
-.hero h1 {{
-  font-size: clamp(8rem, 7vw, 6.2rem) !important;
-  line-height: .90 !important;
-  letter-spacing: .095em !important;
-  text-transform: uppercase !important;
-  color: #f7f3ea !important;
-  margin: 0 !important;
-  font-weight: 900 !important;
-  text-shadow: 0 4px 28px rgba(0,0,0,.58);
-}}
-.hero p {{
-  margin: 20px auto 0 !important;
-  max-width: 689px;
-  color: rgba(245,241,232,.68) !important;
-  font-size: 1.03rem !important;
-  line-height: 1.6 !important;
-}}
-.hero-eyebrow {{
-  color: rgba(245,241,232,.62);
-  font-size: .94rem;
-  font-weight: 900;
-  letter-spacing: .28em;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-}}
-.hero-badge {{
-  display: inline-flex;
-  margin-top: 30px;
-  padding: 10px 20px;
-  border: 1px solid rgba(255,255,255,.30);
-  border-radius: 99px;
-  color: #fff;
-  background: linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 0 24px rgba(255,255,255,.10);
-  font-size: .82rem;
-  font-weight: 700;
-  position:relative;
-  z-index:5;
-}}
-.hero-glyph,
-.hero-star {{
-    display:none!important;
-}}
+:root{
+    --bg:#060816;
+    --text:#F8F6F2;
+    --muted:#A8B0C0;
 
-.feature-grid,
-.feature-card,
-.feature-inner,
-.feature-icon,
-.cosmos-mini,
-.cosmos-cta {{
-    display:none!important;
-}}
+    --glass:rgba(255,255,255,0.08);
+    --glass2:rgba(255,255,255,0.12);
 
-/* ========================================
-   BASE GLASS STYLE
-======================================== */
+    --border:rgba(255,255,255,0.10);
 
-[data-testid="metric-container"],
-[data-testid="stDataFrame"],
-[data-testid="stExpander"],
-.info-box,
-.result-card,
-.plotly-card {{
+    --shadow:
+        0 10px 50px rgba(0,0,0,.45),
+        inset 0 1px 1px rgba(255,255,255,.18);
+}
+
+/* ------------------------------------------------ */
+/* BASE */
+/* ------------------------------------------------ */
+
+html, body, [class*="css"]{
+    font-family:'Inter',sans-serif!important;
+    color:var(--text)!important;
+    -webkit-font-smoothing:antialiased;
+}
+
+.stApp{
     background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.075),
-            rgba(255,255,255,.026)
-        ),
-        rgba(25,25,25,.70)!important;
+        radial-gradient(circle at top,
+            rgba(120,140,255,.14),
+            transparent 30%),
 
-    border:3px solid rgba(255,255,255,.14)!important;
+        radial-gradient(circle at bottom right,
+            rgba(255,190,140,.08),
+            transparent 25%),
 
-    border-radius:40px!important;
+        radial-gradient(circle at left,
+            rgba(80,180,255,.07),
+            transparent 25%),
 
-    box-shadow:
-        0 24px 70px rgba(0,0,0,.46),
-        inset 0 1px 0 rgba(255,255,255,.10)!important;
+        #060816;
 
-    backdrop-filter:blur(18px)!important;
-}}
+    overflow-x:hidden;
+}
 
-/* ========================================
-   FORM CONTAINER
-======================================== */
+/* subtle stars */
 
-[data-testid="stForm"] {{
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.06),
-            rgba(255,255,255,.02)
-        ),
-        rgba(25,25,25,.64)!important;
+.stApp::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.10;
 
-    border:3px solid rgba(255,255,255,.13)!important;
+    background-image:
+        radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.2px);
+
+    background-size:180px 180px;
+}
+
+/* ------------------------------------------------ */
+/* SIDEBAR */
+/* ------------------------------------------------ */
+
+[data-testid="stSidebar"]{
+    background:rgba(10,14,28,.55)!important;
+
+    border-right:1px solid rgba(255,255,255,.08)!important;
+
+    backdrop-filter:blur(24px)!important;
+}
+
+[data-testid="stSidebar"] *{
+    color:#EDE7DC!important;
+}
+
+/* ------------------------------------------------ */
+/* MAIN */
+/* ------------------------------------------------ */
+
+.block-container{
+    padding-top:2rem!important;
+    max-width:1280px!important;
+}
+
+/* ------------------------------------------------ */
+/* HERO */
+/* ------------------------------------------------ */
+
+.hero{
+    position:relative;
+
+    padding:80px!important;
 
     border-radius:34px!important;
 
-    box-shadow:
-        0 20px 55px rgba(0,0,0,.36),
-        inset 0 1px 0 rgba(255,255,255,.09)!important;
+    overflow:hidden;
 
-    backdrop-filter:blur(18px)!important;
+    margin-bottom:40px!important;
 
-    padding:22px 26px!important;
-
-    min-height:0!important;
-}}
-
-/* ========================================
-   INFO / EXPLANATION BOXES
-======================================== */
-
-.info-box,
-.result-card {{
-    padding:28px 34px!important;
-    min-height:115px!important;
-    width:100%!important;
-}}
-
-.info-box p,
-.result-card p {{
-    line-height:1.8!important;
-    font-size:1.02rem!important;
-    color:rgba(245,241,232,.92)!important;
-}}
-
-.info-box h1,
-.info-box h2,
-.info-box h3,
-.result-card h1,
-.result-card h2,
-.result-card h3 {{
-    font-size:1.35rem!important;
-    margin-bottom:14px!important;
-    color:#f7f3ea!important;
-    font-weight:850!important;
-    letter-spacing:-0.03em!important;
-}}
-
-/* ========================================
-   METRICS
-======================================== */
-
-[data-testid="metric-container"] {{
-    padding:28px 34px!important;
-    min-height:auto!important;
-}}
-
-[data-testid="stMetricLabel"] p {{
-    color:rgba(245,241,232,.55)!important;
-    font-size:.64rem!important;
-    letter-spacing:.12em!important;
-    text-transform:uppercase!important;
-}}
-
-[data-testid="stMetricValue"],
-[data-testid="stMetricValue"]>div {{
-    color:#f7f3ea!important;
-    font-size:1.8rem!important;
-    font-weight:850!important;
-}}
-
-/* ========================================
-   TABLES / EXPANDERS
-======================================== */
-
-[data-testid="stDataFrame"],
-[data-testid="stExpander"] {{
-    padding:18px!important;
-    min-height:0!important;
-}}
-
-/* ========================================
-   TABS
-======================================== */
-
-.stTabs [data-baseweb="tab-list"] {{
-    gap:4px;
-    padding:5px;
-    border-radius:25px;
-    background:rgba(18,18,18,.72);
-    border:1px solid rgba(255,255,255,.12);
-}}
-
-.stTabs [data-baseweb="tab"] {{
-    color:rgba(245,241,232,.50)!important;
-    font-weight:700!important;
-    border-radius:13px!important;
-}}
-
-.stTabs [aria-selected="true"] {{
-    background:rgba(255,255,255,.08)!important;
-    color:#fff!important;
-}}
-
-.stTabs [data-baseweb="tab-highlight"] {{
-    display:none!important;
-}}
-
-/* ========================================
-   HEADINGS
-======================================== */
-
-.section-hd {{
-    color:#f7f3ea!important;
-    font-weight:850!important;
-    letter-spacing:-.03em!important;
-}}
-
-.section-sub {{
-    color:rgba(245,241,232,.50)!important;
-}}
-
-.divider-label {{
-    display:flex;
-    gap:14px;
-    align-items:center;
-    margin:30px 0 18px;
-    color:rgba(245,241,232,.72);
-    font-size:.66rem;
-    font-weight:900;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-}}
-
-.divider-label:before,
-.divider-label:after {{
-    content:"";
-    height:1px;
-    flex:1;
     background:
         linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,.18),
-            transparent
+            145deg,
+            rgba(255,255,255,.14),
+            rgba(255,255,255,.04)
+        )!important;
+
+    border:1px solid rgba(255,255,255,.10)!important;
+
+    backdrop-filter:blur(28px) saturate(180%)!important;
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,.50),
+        inset 0 1px 1px rgba(255,255,255,.18);
+}
+
+.hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            120deg,
+            transparent 20%,
+            rgba(255,255,255,.05) 50%,
+            transparent 80%
         );
-}}
 
-/* ========================================
-   PILLS
-======================================== */
+    pointer-events:none;
+}
 
-.pill {{
-    display:inline-block;
-    padding:5px 10px;
+.hero h1{
+    font-size:clamp(3rem,7vw,6rem)!important;
+
+    line-height:.9!important;
+
+    letter-spacing:.08em!important;
+
+    text-transform:uppercase!important;
+
+    font-weight:900!important;
+
+    color:#FFFDF8!important;
+}
+
+.hero p{
+    color:rgba(255,255,255,.70)!important;
+
+    font-size:1.05rem!important;
+
+    line-height:1.7!important;
+
+    max-width:700px;
+}
+
+.hero-eyebrow{
+    color:rgba(255,255,255,.55)!important;
+
+    font-size:.75rem!important;
+
+    letter-spacing:.3em!important;
+
+    text-transform:uppercase!important;
+}
+
+.hero-badge{
+    display:inline-flex;
+
+    margin-top:28px;
+
+    padding:12px 22px;
+
     border-radius:999px;
-    font-size:.62rem;
-    font-weight:800;
-    letter-spacing:.06em;
-    text-transform:uppercase;
-    border:1px solid transparent;
-}}
 
-.pill-expand {{
-    background:rgba(52,211,153,.10);
-    color:#A7F3D0;
-    border-color:rgba(52,211,153,.25);
-}}
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.16),
+            rgba(255,255,255,.05)
+        );
 
-.pill-maintain {{
-    background:rgba(251,191,36,.10);
-    color:#FDE68A;
-    border-color:rgba(251,191,36,.24);
-}}
+    border:1px solid rgba(255,255,255,.12);
 
-.pill-optimize {{
-    background:rgba(251,146,60,.10);
-    color:#FDBA74;
-    border-color:rgba(251,146,60,.24);
-}}
+    backdrop-filter:blur(20px);
 
-.pill-drop {{
-    background:rgba(251,113,133,.10);
-    color:#FDA4AF;
-    border-color:rgba(251,113,133,.24);
-}}
+    color:#fff;
+}
 
-.result-expand {{
-    border-left:3px solid #34D399!important;
-}}
+/* ------------------------------------------------ */
+/* GLASS CARDS */
+/* ------------------------------------------------ */
 
-.result-maintain {{
-    border-left:3px solid #FBBF24!important;
-}}
+[data-testid="metric-container"],
+[data-testid="stDataFrame"],
+[data-testid="stForm"],
+.plotly-card,
+.result-card,
+.info-box{
 
-.result-optimize {{
-    border-left:3px solid #FB923C!important;
-}}
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.12),
+            rgba(255,255,255,.04)
+        )!important;
 
-.result-drop {{
-    border-left:3px solid #FB7185!important;
-}}
+    border:1px solid rgba(255,255,255,.10)!important;
 
-/* ========================================
-   INPUTS
-======================================== */
+    border-radius:28px!important;
 
-.stSelectbox label,
-.stNumberInput label,
-.stSlider label {{
-    color:rgba(245,241,232,.70)!important;
-    font-weight:700!important;
-}}
+    backdrop-filter:blur(24px) saturate(180%)!important;
 
-.stSelectbox [data-baseweb="select"]>div,
-.stTextInput input,
-.stNumberInput input {{
-    background:rgba(5,5,5,.58)!important;
-    border:1px solid rgba(255,255,255,.14)!important;
-    border-radius:13px!important;
-    color:white!important;
-}}
+    box-shadow:var(--shadow)!important;
+}
 
-/* ========================================
-   BUTTONS
-======================================== */
+/* ------------------------------------------------ */
+/* METRICS */
+/* ------------------------------------------------ */
 
-[data-testid="stFormSubmitButton"]>button,
-.stButton>button {{
+[data-testid="metric-container"]{
+    padding:22px!important;
+}
+
+[data-testid="stMetricLabel"]{
+    color:rgba(255,255,255,.55)!important;
+
+    text-transform:uppercase!important;
+
+    letter-spacing:.15em!important;
+}
+
+[data-testid="stMetricValue"]{
+    color:#FFFDF9!important;
+
+    font-weight:800!important;
+}
+
+/* ------------------------------------------------ */
+/* BUTTONS */
+/* ------------------------------------------------ */
+
+.stButton>button,
+[data-testid="stFormSubmitButton"] button{
+
     border-radius:999px!important;
 
-    border:1px solid rgba(255,255,255,.30)!important;
+    border:1px solid rgba(255,255,255,.14)!important;
 
     background:
         linear-gradient(
-            180deg,
-            rgba(255,255,255,.18),
-            rgba(255,255,255,.05)
+            145deg,
+            rgba(110,150,255,.30),
+            rgba(255,255,255,.08)
         )!important;
 
     color:#fff!important;
 
+    font-weight:700!important;
+
+    backdrop-filter:blur(20px)!important;
+
+    transition:all .25s ease!important;
+
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.22),
-        0 0 24px rgba(255,255,255,.10)!important;
-}}
+        0 0 24px rgba(110,150,255,.15),
+        inset 0 1px 1px rgba(255,255,255,.18)!important;
+}
 
-/* ========================================
-   PLOTLY CARDS
-======================================== */
+.stButton>button:hover,
+[data-testid="stFormSubmitButton"] button:hover{
 
-.plotly-card {{
-    padding:18px 18px 10px!important;
-    margin-bottom:18px!important;
-    min-height:0!important;
-    width:100%!important;
-}}
+    transform:translateY(-2px);
 
-.plotly-card-title {{
-    color:#f7f3ea;
-    font-weight:850;
-    letter-spacing:-.03em;
-    margin:4px 6px 14px;
-    font-size:1.18rem;
-}}
+    box-shadow:
+        0 0 40px rgba(110,150,255,.25),
+        inset 0 1px 1px rgba(255,255,255,.18)!important;
+}
 
-/* ========================================
-   MOBILE
-======================================== */
+/* ------------------------------------------------ */
+/* INPUTS */
+/* ------------------------------------------------ */
 
-@media(max-width:900px) {{
+.stTextInput input,
+.stNumberInput input,
+.stSelectbox div[data-baseweb="select"]{
 
-    .cosmos-nav {{
-        margin-bottom:40px;
-    }}
+    background:rgba(255,255,255,.05)!important;
 
-    .cosmos-links {{
-        display:none;
-    }}
+    border:1px solid rgba(255,255,255,.08)!important;
 
-    .feature-grid {{
-        grid-template-columns:1fr;
-        margin-top:-20px;
-    }}
+    border-radius:18px!important;
 
-    .info-box,
-    .result-card {{
-        padding:24px!important;
-        min-height:auto!important;
-    }}
+    color:#fff!important;
 
-    .plotly-card {{
-        padding:16px!important;
-        min-height:0!important;
-    }}
+    backdrop-filter:blur(16px)!important;
+}
 
-    [data-testid="stForm"] {{
-        padding:18px!important;
-    }}
-}}
-<div class="twinkle-layer"><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span></div>
-<div class="cosmos-bg">
-  <div class="constellation c1"><svg viewBox="0 0 200 140"><line x1="20" y1="20" x2="45" y2="70"/><line x1="45" y1="70" x2="78" y2="62"/><line x1="78" y1="62" x2="105" y2="95"/><line x1="45" y1="70" x2="55" y2="115"/><circle cx="20" cy="20" r="2"/><circle cx="45" cy="70" r="3"/><circle cx="78" cy="62" r="2"/><circle cx="105" cy="95" r="3"/><circle cx="55" cy="115" r="2"/></svg></div>
-  <div class="constellation c2"><svg viewBox="0 0 240 120"><line x1="15" y1="70" x2="55" y2="45"/><line x1="55" y1="45" x2="105" y2="48"/><line x1="105" y1="48" x2="150" y2="25"/><line x1="150" y1="25" x2="205" y2="15"/><line x1="105" y1="48" x2="115" y2="90"/><line x1="115" y1="90" x2="178" y2="105"/><circle cx="15" cy="70" r="2"/><circle cx="55" cy="45" r="2.5"/><circle cx="105" cy="48" r="2"/><circle cx="150" cy="25" r="2.5"/><circle cx="205" cy="15" r="2"/><circle cx="115" cy="90" r="2"/><circle cx="178" cy="105" r="2"/></svg></div>
-  <div class="constellation c3"><svg viewBox="0 0 210 140"><line x1="20" y1="35" x2="65" y2="55"/><line x1="65" y1="55" x2="105" y2="48"/><line x1="105" y1="48" x2="135" y2="82"/><line x1="135" y1="82" x2="168" y2="118"/><circle cx="20" cy="35" r="2"/><circle cx="65" cy="55" r="2"/><circle cx="105" cy="48" r="2.5"/><circle cx="135" cy="82" r="2"/><circle cx="168" cy="118" r="2"/></svg></div>
-  <div class="constellation c4"><svg viewBox="0 0 210 150"><line x1="25" y1="20" x2="60" y2="70"/><line x1="60" y1="70" x2="100" y2="55"/><line x1="100" y1="55" x2="140" y2="98"/><line x1="140" y1="98" x2="180" y2="130"/><circle cx="25" cy="20" r="2"/><circle cx="60" cy="70" r="2.5"/><circle cx="100" cy="55" r="2"/><circle cx="140" cy="98" r="2"/><circle cx="180" cy="130" r="2.5"/></svg></div>
-  <div class="constellation c5"><svg viewBox="0 0 230 120"><line x1="20" y1="75" x2="70" y2="60"/><line x1="70" y1="60" x2="120" y2="72"/><line x1="120" y1="72" x2="165" y2="50"/><line x1="165" y1="50" x2="210" y2="35"/><circle cx="20" cy="75" r="2"/><circle cx="70" cy="60" r="2"/><circle cx="120" cy="72" r="2.5"/><circle cx="165" cy="50" r="2"/><circle cx="210" cy="35" r="2"/></svg></div>
-</div>
+/* ------------------------------------------------ */
+/* TABS */
+/* ------------------------------------------------ */
+
+.stTabs [data-baseweb="tab-list"]{
+
+    background:rgba(255,255,255,.03)!important;
+
+    border:1px solid rgba(255,255,255,.08)!important;
+
+    border-radius:20px!important;
+
+    padding:6px!important;
+}
+
+.stTabs [data-baseweb="tab"]{
+
+    color:rgba(255,255,255,.50)!important;
+
+    border-radius:14px!important;
+
+    font-weight:700!important;
+}
+
+.stTabs [aria-selected="true"]{
+
+    background:rgba(255,255,255,.10)!important;
+
+    color:#fff!important;
+}
+
+.stTabs [data-baseweb="tab-highlight"]{
+    display:none!important;
+}
+
+/* ------------------------------------------------ */
+/* PLOTLY */
+/* ------------------------------------------------ */
+
+.plotly-card{
+    padding:18px!important;
+}
+
+.plotly-card-title{
+    color:#FFFDF8!important;
+
+    font-weight:800!important;
+
+    margin-bottom:12px!important;
+}
+
+/* ------------------------------------------------ */
+/* CLEANUP */
+/* ------------------------------------------------ */
+
+.twinkle-layer,
+.constellation,
+.cosmos-bg{
+    display:none!important;
+}
+
+</style>
 """, unsafe_allow_html=True)
 # ─────────────────────────────────────────────────────────────
 #  FINAL CLEAN PLOTLY HELPERS — single source of truth
@@ -834,16 +726,13 @@ st.markdown("""
 <div class="hero">
   <div class="hero-left">
     <div class="hero-eyebrow">AIRLINE ROUTE INTELLIGENCE</div>
+    <h1>SKYLENS<br>DASHBOARD</h1>
+    <p>Analyze route profitability, operational signals, and model-backed decisions in one polished command view.</p>
   </div>
+  <div class="hero-badge">Explore dashboard below</div>
+</div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <style>
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 15px; /* Adjust this value for more or less space */
-    }
-    </style>
-""", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
 #  TABS
