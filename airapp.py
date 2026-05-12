@@ -60,6 +60,11 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 # ─────────────────────────────────────────────────────────────
 #  GLOBAL CSS
 # ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
+#  COSMIC GLASSMORPHISM THEME — FIXED VERSION
+#  Replace your ENTIRE st.markdown("""<style>...</style>""")
+# ─────────────────────────────────────────────────────────────
+
 st.markdown("""
 <style>
 
@@ -70,8 +75,9 @@ ROOT
 ========================================================= */
 
 :root{
+
     --bg:#040816;
-    --bg2:#09101f;
+    --bg2:#08101f;
 
     --text:#f4f7ff;
     --muted:#c5cee6;
@@ -89,9 +95,6 @@ ROOT
         0 10px 40px rgba(0,0,0,0.45),
         inset 0 1px 0 rgba(255,255,255,0.10);
 
-    --blueGlow:rgba(120,140,255,0.34);
-    --pinkGlow:rgba(255,140,220,0.20);
-
     --radius:28px;
     --blur:18px;
 
@@ -103,11 +106,17 @@ ROOT
 GLOBAL
 ========================================================= */
 
-html, body, [class*="css"]{
-    font-family: 'Inter', sans-serif !important;
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
+html,
+body,
+[class*="css"]{
+
+    font-family:'Inter',sans-serif !important;
+
+    color:var(--text);
+
+    -webkit-font-smoothing:antialiased;
 }
+
 
 /* hide streamlit chrome */
 
@@ -116,6 +125,7 @@ header,
 footer{
     visibility:hidden;
 }
+
 
 /* =========================================================
 BACKGROUND
@@ -126,135 +136,167 @@ BACKGROUND
     background:
 
         radial-gradient(
-            circle at 50% 50%,
-            rgba(120,90,255,0.20) 0%,
-            rgba(90,120,255,0.12) 18%,
-            rgba(0,0,0,0) 42%
+            circle at 50% 40%,
+            rgba(120,90,255,0.16) 0%,
+            rgba(90,120,255,0.08) 18%,
+            transparent 42%
         ),
 
         radial-gradient(
             circle at 20% 20%,
-            rgba(180,120,255,0.10),
+            rgba(180,120,255,0.08),
             transparent 28%
         ),
 
         radial-gradient(
             circle at 80% 30%,
-            rgba(90,180,255,0.08),
+            rgba(90,180,255,0.06),
             transparent 26%
-        ),
-
-        radial-gradient(
-            circle at 60% 85%,
-            rgba(255,120,200,0.06),
-            transparent 30%
         ),
 
         linear-gradient(
             180deg,
-            rgba(4,6,18,0.92),
-            rgba(7,10,24,0.96)
-        ),
+            #040816 0%,
+            #070b1b 55%,
+            #08101f 100%
+        );
 
-        url("https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=2400&q=80");
+    background-attachment:fixed;
 
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    min-height:100vh;
 
-    overflow:hidden;
     position:relative;
 }
 
 
 /* =========================================================
-ANIMATED SWIRL
+ANIMATED NEBULA
 ========================================================= */
 
 .stApp::before{
 
     content:"";
+
     position:fixed;
-    inset:-25%;
-    z-index:0;
+
+    top:-30%;
+    left:-30%;
+
+    width:160%;
+    height:160%;
+
     pointer-events:none;
+
+    z-index:0;
+
+    opacity:0.75;
 
     background:
         conic-gradient(
             from 0deg,
-            rgba(120,140,255,0.06),
-            rgba(200,120,255,0.05),
-            rgba(120,220,255,0.04),
-            rgba(120,140,255,0.06)
+            rgba(120,140,255,0.04),
+            rgba(200,120,255,0.03),
+            rgba(120,220,255,0.025),
+            rgba(120,140,255,0.04)
         );
 
-    filter: blur(120px);
+    filter:blur(120px);
 
-    animation: cosmicRotate 42s linear infinite;
+    animation:cosmicRotate 60s linear infinite;
 }
+
 
 /* stars */
 
 .stApp::after{
 
     content:"";
+
     position:fixed;
+
     inset:0;
-    z-index:0;
+
     pointer-events:none;
 
+    z-index:0;
+
+    opacity:0.45;
+
     background-image:
-        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.7), transparent),
-        radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.8), transparent),
+        radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,0.7), transparent),
         radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.5), transparent),
-        radial-gradient(2px 2px at 85% 20%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(2px 2px at 85% 20%, rgba(255,255,255,0.6), transparent),
         radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,0.4), transparent);
-
-    animation: twinkle 8s ease-in-out infinite alternate;
-
-    opacity:0.55;
 }
+
 
 @keyframes cosmicRotate{
 
     0%{
-        transform: rotate(0deg) scale(1);
+        transform:rotate(0deg) scale(1);
     }
 
     50%{
-        transform: rotate(180deg) scale(1.15);
+        transform:rotate(180deg) scale(1.15);
     }
 
     100%{
-        transform: rotate(360deg) scale(1);
-    }
-}
-
-@keyframes twinkle{
-
-    from{
-        opacity:0.25;
-    }
-
-    to{
-        opacity:0.8;
+        transform:rotate(360deg) scale(1);
     }
 }
 
 
 /* =========================================================
-LAYOUT
+LAYOUT FIXES
 ========================================================= */
 
 .main .block-container{
 
+    position:relative !important;
+
+    z-index:5 !important;
+
     max-width:1400px;
 
-    padding-top:1.8rem;
+    padding-top:2rem;
+
     padding-bottom:4rem;
+}
+
+
+/* sidebar fix */
+
+[data-testid="stSidebar"]{
 
     position:relative;
-    z-index:2;
+
+    z-index:10 !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(8,12,28,0.82),
+            rgba(8,12,28,0.72)
+        ) !important;
+
+    border-right:1px solid rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(24px);
+}
+
+
+/* ensure all content visible */
+
+section.main,
+.block-container,
+.element-container,
+.stTabs,
+[data-testid="metric-container"]{
+
+    position:relative;
+
+    z-index:5;
 }
 
 
@@ -271,32 +313,10 @@ h1,h2,h3,h4,h5,h6{
     letter-spacing:-0.03em;
 }
 
-p,label,span{
+p,
+label,
+span{
     color:var(--muted);
-}
-
-
-/* =========================================================
-SIDEBAR
-========================================================= */
-
-[data-testid="stSidebar"]{
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(8,12,28,0.82),
-            rgba(8,12,28,0.72)
-        ) !important;
-
-    border-right:1px solid rgba(255,255,255,0.08);
-
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-}
-
-[data-testid="stSidebar"] *{
-    color:var(--muted) !important;
 }
 
 
@@ -314,28 +334,29 @@ div[data-baseweb="select"] > div,
 .stNumberInput > div > div,
 .stTextArea textarea,
 .stDateInput > div > div,
-.stMultiSelect > div{
+.stMultiSelect > div,
+.stDataFrame{
 
     position:relative;
 
-    background: var(--glass) !important;
+    background:var(--glass) !important;
 
     border:1px solid var(--border) !important;
 
-    border-radius: var(--radius) !important;
+    border-radius:var(--radius) !important;
 
-    backdrop-filter: blur(var(--blur)) saturate(140%);
-    -webkit-backdrop-filter: blur(var(--blur)) saturate(140%);
+    backdrop-filter:blur(var(--blur)) saturate(140%);
+    -webkit-backdrop-filter:blur(var(--blur)) saturate(140%);
 
-    box-shadow: var(--shadow);
+    box-shadow:var(--shadow);
 
     overflow:hidden;
 
-    transition: var(--transition);
+    transition:var(--transition);
 }
 
 
-/* glowing border */
+/* glowing edge */
 
 .glass::before,
 [data-testid="metric-container"]::before,
@@ -345,6 +366,7 @@ div[data-baseweb="select"] > div,
     content:"";
 
     position:absolute;
+
     inset:0;
 
     border-radius:inherit;
@@ -363,8 +385,8 @@ div[data-baseweb="select"] > div,
         linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
 
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
+    -webkit-mask-composite:xor;
+            mask-composite:exclude;
 
     pointer-events:none;
 }
@@ -377,9 +399,9 @@ div[data-baseweb="select"] > div,
 .info-box:hover,
 .result-card:hover{
 
-    transform: translateY(-4px);
+    transform:translateY(-4px);
 
-    border-color: rgba(255,255,255,0.24) !important;
+    border-color:rgba(255,255,255,0.24) !important;
 
     box-shadow:
         0 12px 44px rgba(0,0,0,0.55),
@@ -436,7 +458,7 @@ BUTTONS
 
     padding:0.75rem 1.6rem !important;
 
-    backdrop-filter: blur(12px);
+    backdrop-filter:blur(12px);
 
     box-shadow:
         0 0 20px rgba(120,140,255,0.25),
@@ -447,9 +469,9 @@ BUTTONS
 
 .stButton > button:hover{
 
-    transform: translateY(-2px);
+    transform:translateY(-2px);
 
-    border-color: rgba(255,255,255,0.34) !important;
+    border-color:rgba(255,255,255,0.34) !important;
 
     box-shadow:
         0 0 32px rgba(120,140,255,0.42),
@@ -470,7 +492,7 @@ textarea{
 .stNumberInput input,
 textarea{
 
-    background: rgba(255,255,255,0.03) !important;
+    background:rgba(255,255,255,0.03) !important;
 
     border-radius:18px !important;
 
@@ -512,7 +534,7 @@ TABS
 
     border-radius:999px;
 
-    background: rgba(255,255,255,0.04);
+    background:rgba(255,255,255,0.04);
 
     color:#cbd5f1;
 
@@ -547,7 +569,7 @@ TABLES
 
     border:1px solid rgba(255,255,255,0.08);
 
-    background: rgba(255,255,255,0.03);
+    background:rgba(255,255,255,0.03);
 }
 
 
@@ -569,7 +591,7 @@ CHARTS
 
     border:1px solid rgba(255,255,255,0.08) !important;
 
-    backdrop-filter: blur(18px);
+    backdrop-filter:blur(18px);
 }
 
 
@@ -599,7 +621,7 @@ SCROLLBAR
 
 
 /* =========================================================
-OPTIONAL HERO SECTION
+HERO
 ========================================================= */
 
 .hero{
@@ -621,7 +643,7 @@ OPTIONAL HERO SECTION
 
     border:1px solid rgba(255,255,255,0.14);
 
-    backdrop-filter: blur(24px);
+    backdrop-filter:blur(24px);
 
     box-shadow:
         0 10px 50px rgba(0,0,0,0.45);
@@ -646,50 +668,21 @@ OPTIONAL HERO SECTION
             transparent 70%
         );
 
-    filter: blur(40px);
+    filter:blur(40px);
 }
 
 
 /* =========================================================
-PILLS
+INFO BOX
 ========================================================= */
 
-.pill{
+.info-box{
 
-    display:inline-flex;
+    padding:1rem 1.2rem;
 
-    align-items:center;
-    justify-content:center;
+    margin-top:1rem;
 
-    padding:0.6rem 1.2rem;
-
-    border-radius:999px;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,0.14),
-            rgba(255,255,255,0.05)
-        );
-
-    border:1px solid rgba(255,255,255,0.18);
-
-    color:white !important;
-
-    text-decoration:none;
-
-    box-shadow:
-        0 0 20px rgba(120,140,255,0.18);
-
-    transition:all 0.25s ease;
-}
-
-.pill:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 0 28px rgba(120,140,255,0.34);
+    line-height:1.6;
 }
 
 
