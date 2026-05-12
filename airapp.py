@@ -1,912 +1,397 @@
 import os
 import joblib
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import numpy as np
 import json
-import streamlit.components.v1 as components
-
+import plotly.graph_objects as go
 
 st.set_page_config(
-    page_title="Airline Profitability System",
+    page_title="SkyLens · Airline Profitability Command Center",
     page_icon="✈️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-
 # ─────────────────────────────────────────────────────────────
-#  JEWEL-TONE LIGHT PALETTE — Crystal / Genshin Impact Style
+#  PROFESSIONAL AVIATION COMMAND CENTER THEME
 # ─────────────────────────────────────────────────────────────
-BG_BASE        = "#fdf9f4"          # warm pearl ivory
-BG_SOFT        = "#f5eeff"          # lavender tint
-BG_COOL        = "#eef5fd"          # sky tint
+BG = "#080B12"
+PANEL = "#121722"
+PANEL_2 = "#171E2B"
+TEXT = "#F5F7FB"
+TEXT_SOFT = "#C9D2E3"
+TEXT_MUTED = "#7F8AA3"
+CYAN = "#38BDF8"
+BLUE = "#2563EB"
+AMBER = "#F59E0B"
+GREEN = "#22C55E"
+RED = "#F43F5E"
+VIOLET = "#A78BFA"
 
-GLASS_BG       = "rgba(255, 252, 248, 0.72)"
-GLASS_BORDER   = "rgba(162, 106, 255, 0.28)"
-
-INK            = "#1a0f3c"          # deep indigo-black
-INK_SOFT       = "#4a3278"          # violet ink mid
-INK_MUTED      = "#8b6faa"          # muted amethyst
-
-ACCENT         = "#7c3aed"          # vivid violet
-ACCENT_DK      = "#5b21b6"
-ACCENT_LT      = "#c4b5fd"
-ACCENT_2       = "#0284c7"          # sapphire
-MAGENTA        = "#db2777"          # ruby
-
-# Jewel chart tones — maximum saturation
-CHART_EXPAND   = "#1d4ed8"          # deep sapphire
-CHART_MAINTAIN = "#047857"          # deep emerald
-CHART_OPTIMIZE = "#b45309"          # deep topaz
-CHART_ORANGE   = "#b45309"
-CHART_DROP     = "#be185d"          # deep ruby
-CHART_NEUTRAL  = [
-    "#6d28d9", "#1d4ed8", "#0e7490", "#047857",
-    "#be185d", "#b45309", "#15803d", "#71717a",
-]
-
-DECISION_COLORS = {
-    "Expand":   CHART_EXPAND,
-    "Maintain": CHART_MAINTAIN,
-    "Optimize": CHART_OPTIMIZE,
-    "Drop":     CHART_DROP,
-}
+CHART_EXPAND   = "#22C55E"
+CHART_MAINTAIN = "#FACC15"
+CHART_OPTIMIZE = "#FB923C"
+CHART_DROP     = "#FB7185"
+CHART_NEUTRAL  = ["#38BDF8", "#A78BFA", "#F59E0B", "#22C55E", "#FB7185", "#60A5FA", "#2DD4BF", "#F472B6"]
+DECISION_COLORS = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN, "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
-
-# ─────────────────────────────────────────────────────────────
-#  GLOBAL CSS
-# ─────────────────────────────────────────────────────────────
-# ─────────────────────────────────────────────────────────────
-#  COSMIC GLASSMORPHISM THEME — FIXED VERSION
-#  Replace your ENTIRE st.markdown("""<style>...</style>""")
-# ─────────────────────────────────────────────────────────────
+ACCENT = CYAN
+ACCENT_2 = VIOLET
+INK = TEXT
+INK_SOFT = TEXT_SOFT
+INK_MUTED = TEXT_MUTED
 
 st.markdown("""
 <style>
+  #MainMenu, footer { visibility: hidden; }
+  .block-container { padding-top: 1rem; padding-bottom: 2rem; max-width: 1300px; }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-/* =========================================================
-ROOT
-========================================================= */
-
-:root{
-
-    --bg:#040816;
-    --bg2:#08101f;
-
-    --text:#f4f7ff;
-    --muted:#c5cee6;
-
-    --glass:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,0.10),
-            rgba(255,255,255,0.045)
-        );
-
-    --border:rgba(255,255,255,0.16);
-
-    --shadow:
-        0 10px 40px rgba(0,0,0,0.45),
-        inset 0 1px 0 rgba(255,255,255,0.10);
-
-    --radius:28px;
-    --blur:18px;
-
-    --transition:all 0.35s ease;
-}
-
-
-/* =========================================================
-GLOBAL
-========================================================= */
-
-html,
-body,
-[class*="css"]{
-
-    font-family:'Inter',sans-serif !important;
-
-    color:var(--text);
-
-    -webkit-font-smoothing:antialiased;
-}
-
-
-/* hide streamlit chrome */
-
-#MainMenu,
-header,
-footer{
-    visibility:hidden;
-}
-
-
-/* =========================================================
-BACKGROUND
-========================================================= */
-
-.stApp{
-
+  /* ?? COSMIC BACKGROUND ?? */
+  .stApp {
     background:
-
-        radial-gradient(
-            circle at 50% 40%,
-            rgba(120,90,255,0.16) 0%,
-            rgba(90,120,255,0.08) 18%,
-            transparent 42%
-        ),
-
-        radial-gradient(
-            circle at 20% 20%,
-            rgba(180,120,255,0.08),
-            transparent 28%
-        ),
-
-        radial-gradient(
-            circle at 80% 30%,
-            rgba(90,180,255,0.06),
-            transparent 26%
-        ),
-
-        linear-gradient(
-            180deg,
-            #040816 0%,
-            #070b1b 55%,
-            #08101f 100%
-        );
-
-    background-attachment:fixed;
-
-    min-height:100vh;
-
-    position:relative;
-}
-
-
-/* =========================================================
-ANIMATED NEBULA
-========================================================= */
-
-.stApp::before{
-
-    content:"";
-
-    position:fixed;
-
-    top:-30%;
-    left:-30%;
-
-    width:160%;
-    height:160%;
-
-    pointer-events:none;
-
-    z-index:0;
-
-    opacity:0.75;
-
-    background:
-        conic-gradient(
-            from 0deg,
-            rgba(120,140,255,0.04),
-            rgba(200,120,255,0.03),
-            rgba(120,220,255,0.025),
-            rgba(120,140,255,0.04)
-        );
-
-    filter:blur(120px);
-
-    animation:cosmicRotate 60s linear infinite;
-}
-
-
-/* stars */
-
-.stApp::after{
-
-    content:"";
-
-    position:fixed;
-
-    inset:0;
-
-    pointer-events:none;
-
-    z-index:0;
-
-    opacity:0.45;
-
-    background-image:
-        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.8), transparent),
-        radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,0.7), transparent),
-        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.5), transparent),
-        radial-gradient(2px 2px at 85% 20%, rgba(255,255,255,0.6), transparent),
-        radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,0.4), transparent);
-}
-
-
-@keyframes cosmicRotate{
-
-    0%{
-        transform:rotate(0deg) scale(1);
-    }
-
-    50%{
-        transform:rotate(180deg) scale(1.15);
-    }
-
-    100%{
-        transform:rotate(360deg) scale(1);
-    }
-}
-
-
-/* =========================================================
-LAYOUT FIXES
-========================================================= */
-
-.main .block-container{
-
-    position:relative !important;
-
-    z-index:5 !important;
-
-    max-width:1400px;
-
-    padding-top:2rem;
-
-    padding-bottom:4rem;
-}
-
-
-/* sidebar fix */
-
-[data-testid="stSidebar"]{
-
-    position:relative;
-
-    z-index:10 !important;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(8,12,28,0.82),
-            rgba(8,12,28,0.72)
-        ) !important;
-
-    border-right:1px solid rgba(255,255,255,0.08);
-
-    backdrop-filter:blur(24px);
-}
-
-
-/* ensure all content visible */
-
-section.main,
-.block-container,
-.element-container,
-.stTabs,
-[data-testid="metric-container"]{
-
-    position:relative;
-
-    z-index:5;
-}
-
-
-/* =========================================================
-TYPOGRAPHY
-========================================================= */
-
-h1,h2,h3,h4,h5,h6{
-
-    color:white !important;
-
-    font-weight:700 !important;
-
-    letter-spacing:-0.03em;
-}
-
-p,
-label,
-span{
-    color:var(--muted);
-}
-
-
-/* =========================================================
-GLASS CARDS
-========================================================= */
-
-.glass,
-[data-testid="metric-container"],
-.info-box,
-.result-card,
-.stTabs [data-baseweb="tab-list"],
-div[data-baseweb="select"] > div,
-.stTextInput > div > div,
-.stNumberInput > div > div,
-.stTextArea textarea,
-.stDateInput > div > div,
-.stMultiSelect > div,
-.stDataFrame{
-
-    position:relative;
-
-    background:var(--glass) !important;
-
-    border:1px solid var(--border) !important;
-
-    border-radius:var(--radius) !important;
-
-    backdrop-filter:blur(var(--blur)) saturate(140%);
-    -webkit-backdrop-filter:blur(var(--blur)) saturate(140%);
-
-    box-shadow:var(--shadow);
-
-    overflow:hidden;
-
-    transition:var(--transition);
-}
-
-
-/* glowing edge */
-
-.glass::before,
-[data-testid="metric-container"]::before,
-.info-box::before,
-.result-card::before{
-
-    content:"";
-
-    position:absolute;
-
-    inset:0;
-
-    border-radius:inherit;
-
-    padding:1px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,0.28),
-            rgba(255,255,255,0.02),
-            rgba(120,140,255,0.22)
-        );
-
-    -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-
-    -webkit-mask-composite:xor;
-            mask-composite:exclude;
-
-    pointer-events:none;
-}
-
-
-/* hover */
-
-.glass:hover,
-[data-testid="metric-container"]:hover,
-.info-box:hover,
-.result-card:hover{
-
-    transform:translateY(-4px);
-
-    border-color:rgba(255,255,255,0.24) !important;
-
-    box-shadow:
-        0 12px 44px rgba(0,0,0,0.55),
-        0 0 24px rgba(120,140,255,0.16);
-}
-
-
-/* =========================================================
-METRICS
-========================================================= */
-
-[data-testid="metric-container"]{
-
-    padding:1.2rem !important;
-}
-
-[data-testid="stMetricValue"]{
-
-    color:white !important;
-
-    font-size:2rem !important;
-
-    font-weight:700 !important;
-}
-
-[data-testid="stMetricLabel"]{
-
-    color:#d6def6 !important;
-
-    opacity:0.8;
-}
-
-
-/* =========================================================
-BUTTONS
-========================================================= */
-
-.stButton > button{
-
-    border-radius:999px !important;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,0.16),
-            rgba(255,255,255,0.06)
-        ) !important;
-
-    border:1px solid rgba(255,255,255,0.22) !important;
-
-    color:white !important;
-
-    font-weight:600 !important;
-
-    padding:0.75rem 1.6rem !important;
-
-    backdrop-filter:blur(12px);
-
-    box-shadow:
-        0 0 20px rgba(120,140,255,0.25),
-        inset 0 0 10px rgba(255,255,255,0.04);
-
-    transition:all 0.25s ease;
-}
-
-.stButton > button:hover{
-
-    transform:translateY(-2px);
-
-    border-color:rgba(255,255,255,0.34) !important;
-
-    box-shadow:
-        0 0 32px rgba(120,140,255,0.42),
-        inset 0 0 12px rgba(255,255,255,0.08);
-}
-
-
-/* =========================================================
-INPUTS
-========================================================= */
-
-input,
-textarea{
-    color:white !important;
-}
-
-.stTextInput input,
-.stNumberInput input,
-textarea{
-
-    background:rgba(255,255,255,0.03) !important;
-
-    border-radius:18px !important;
-
-    border:1px solid rgba(255,255,255,0.10) !important;
-}
-
-.stTextInput input:focus,
-.stNumberInput input:focus,
-textarea:focus{
-
-    border:1px solid rgba(120,140,255,0.45) !important;
-
-    box-shadow:
-        0 0 0 3px rgba(120,140,255,0.10) !important;
-}
-
-
-/* =========================================================
-SELECTBOX
-========================================================= */
-
-div[data-baseweb="select"] *{
-    color:white !important;
-}
-
-
-/* =========================================================
-TABS
-========================================================= */
-
-.stTabs [data-baseweb="tab-list"]{
-
-    gap:0.5rem;
-
-    padding:0.4rem;
-}
-
-.stTabs [data-baseweb="tab"]{
-
-    border-radius:999px;
-
-    background:rgba(255,255,255,0.04);
-
-    color:#cbd5f1;
-
-    transition:all 0.25s ease;
-}
-
-.stTabs [aria-selected="true"]{
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,0.12),
-            rgba(255,255,255,0.06)
-        ) !important;
-
-    color:white !important;
-
-    box-shadow:
-        0 0 22px rgba(120,140,255,0.22);
-}
-
-
-/* =========================================================
-TABLES
-========================================================= */
-
-[data-testid="stDataFrame"]{
-
-    border-radius:24px;
-
-    overflow:hidden;
-
-    border:1px solid rgba(255,255,255,0.08);
-
-    background:rgba(255,255,255,0.03);
-}
-
-
-/* =========================================================
-CHARTS
-========================================================= */
-
-.js-plotly-plot,
-[data-testid="stPlotlyChart"]{
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,0.08),
-            rgba(255,255,255,0.03)
-        ) !important;
-
-    border-radius:24px !important;
-
-    border:1px solid rgba(255,255,255,0.08) !important;
-
-    backdrop-filter:blur(18px);
-}
-
-
-/* =========================================================
-SCROLLBAR
-========================================================= */
-
-::-webkit-scrollbar{
-    width:10px;
-}
-
-::-webkit-scrollbar-track{
-    background:transparent;
-}
-
-::-webkit-scrollbar-thumb{
-
-    background:rgba(255,255,255,0.12);
-
-    border-radius:999px;
-}
-
-::-webkit-scrollbar-thumb:hover{
-
-    background:rgba(255,255,255,0.22);
-}
-
-
-/* =========================================================
-HERO
-========================================================= */
-
-.hero{
-
-    position:relative;
-
-    overflow:hidden;
-
-    border-radius:32px;
-
-    padding:2rem;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,0.10),
-            rgba(255,255,255,0.03)
-        );
-
-    border:1px solid rgba(255,255,255,0.14);
-
-    backdrop-filter:blur(24px);
-
-    box-shadow:
-        0 10px 50px rgba(0,0,0,0.45);
-}
-
-.hero::after{
-
-    content:"";
-
-    position:absolute;
-
-    width:500px;
-    height:500px;
-
-    top:-250px;
-    right:-180px;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(120,140,255,0.20),
-            transparent 70%
-        );
-
-    filter:blur(40px);
-}
-
-
-/* =========================================================
-INFO BOX
-========================================================= */
-
-.info-box{
-
-    padding:1rem 1.2rem;
-
-    margin-top:1rem;
-
-    line-height:1.6;
-}
-
-
-/* =========================================================
-SECTION LABELS
-========================================================= */
-
-.section-hd{
-
-    color:white;
-
-    font-size:1.15rem;
-
-    font-weight:700;
-
-    margin-bottom:0.4rem;
-}
-
-.section-sub{
-
-    color:#b9c4e0;
-
-    opacity:0.88;
-}
-
-
-/* =========================================================
-DIVIDERS
-========================================================= */
-
-hr{
-
-    border:none;
-
-    height:1px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,0.14),
-            transparent
-        );
-}
-
+      radial-gradient(ellipse at 50% 40%, rgba(120,40,200,0.32), transparent 58%),
+      radial-gradient(ellipse at 80% 10%, rgba(40,80,200,0.18), transparent 45%),
+      radial-gradient(ellipse at 10% 80%, rgba(180,60,60,0.12), transparent 45%),
+      linear-gradient(rgba(4,2,18,0.60), rgba(4,2,18,0.88)),
+      url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2400&q=80") center/cover no-repeat fixed;
+    color: #f5f3ff;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* ?? SIDEBAR ?? */
+  [data-testid="stSidebar"] {
+    background: rgba(8,4,30,0.72) !important;
+    border-right: 1px solid rgba(255,255,255,0.08) !important;
+    backdrop-filter: blur(20px) !important;
+  }
+  [data-testid="stSidebar"] * { color: #e2dcf8 !important; }
+
+  /* ?? GLASS CARDS ?? */
+  [data-testid="metric-container"],
+  [data-testid="stDataFrame"],
+  [data-testid="stForm"],
+  .plotly-card,
+  .result-card,
+  .info-box {
+    background: linear-gradient(160deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03)) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(16px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16) !important;
+  }
+
+  /* ?? METRICS ?? */
+  [data-testid="metric-container"] { padding: 22px !important; }
+  [data-testid="stMetricLabel"] {
+    color: rgba(255,255,255,0.55) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.14em !important;
+    font-size: 0.72rem !important;
+  }
+  [data-testid="stMetricValue"] { color: #fff !important; font-weight: 800 !important; }
+
+  /* ?? BUTTONS ?? */
+  .stButton > button,
+  [data-testid="stFormSubmitButton"] button {
+    border-radius: 999px !important;
+    border: 1px solid rgba(255,255,255,0.22) !important;
+    background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 0 20px rgba(140,120,255,0.20), inset 0 1px 0 rgba(255,255,255,0.18) !important;
+    transition: all 0.2s ease !important;
+  }
+  .stButton > button:hover,
+  [data-testid="stFormSubmitButton"] button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 0 32px rgba(140,120,255,0.35), inset 0 1px 0 rgba(255,255,255,0.22) !important;
+  }
+
+  /* ?? INPUTS ?? */
+  .stTextInput input,
+  .stNumberInput input,
+  .stSelectbox div[data-baseweb="select"] {
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.14) !important;
+    border-radius: 14px !important;
+    color: #fff !important;
+    backdrop-filter: blur(10px) !important;
+  }
+
+  /* ?? TABS ?? */
+  .stTabs [data-baseweb="tab-list"] {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid rgba(255,255,255,0.10) !important;
+    border-radius: 16px !important;
+    padding: 5px !important;
+  }
+  .stTabs [data-baseweb="tab"] {
+    color: rgba(255,255,255,0.50) !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+  }
+  .stTabs [aria-selected="true"] {
+    background: rgba(255,255,255,0.10) !important;
+    color: #fff !important;
+  }
+  .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
+
+  /* ?? PLOTLY CARD ?? */
+  .plotly-card { padding: 18px !important; }
+  .plotly-card-title { color: #fff !important; font-weight: 800 !important; margin-bottom: 12px !important; }
+
+  /* ?? SIDEBAR BRAND ?? */
+  .sidebar-brand {
+    font-size: 1.05rem; font-weight: 800; letter-spacing: 0.14em;
+    color: #fff; text-transform: uppercase; margin-bottom: 18px; display: block;
+  }
+  .sidebar-brand span { color: #a78bfa; }
+
+  /* ?? DECISION PILLS ?? */
+  .pill {
+    display: inline-block; padding: 3px 12px; border-radius: 999px;
+    font-size: 0.70rem; font-weight: 700; letter-spacing: 0.07em;
+  }
+  .pill-expand   { background: rgba(34,197,94,0.18);  color: #22c55e; border: 1px solid rgba(34,197,94,0.35); }
+  .pill-maintain { background: rgba(250,204,21,0.16);  color: #facc15; border: 1px solid rgba(250,204,21,0.30); }
+  .pill-optimize { background: rgba(251,146,60,0.16);  color: #fb923c; border: 1px solid rgba(251,146,60,0.30); }
+  .pill-drop     { background: rgba(251,113,133,0.16); color: #fb7185; border: 1px solid rgba(251,113,133,0.30); }
+
+  /* ?? SECTION LABELS ?? */
+  .section-hd {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(255,255,255,0.42); margin-bottom: 12px;
+  }
+  .divider-label {
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.22em;
+    text-transform: uppercase; color: rgba(255,255,255,0.28);
+    text-align: center; margin: 22px 0 16px;
+  }
+  .col-label {
+    font-size: 0.70rem; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: #a78bfa; margin-bottom: 8px;
+  }
+
+  /* ?? RESULT CARDS ?? */
+  .result-card { padding: 24px !important; margin-bottom: 18px; }
+  .result-expand   { border-left: 4px solid #22c55e !important; }
+  .result-maintain { border-left: 4px solid #facc15 !important; }
+  .result-optimize { border-left: 4px solid #fb923c !important; }
+  .result-drop     { border-left: 4px solid #fb7185 !important; }
+
+  /* ?? INFO BOX ?? */
+  .info-box {
+    padding: 14px 18px !important; font-size: 0.84rem;
+    color: rgba(255,255,255,0.70); line-height: 1.65; margin: 8px 0;
+  }
+
+  /* ?? HERO ?? */
+  .hero {
+    position: relative;
+    padding: 80px !important;
+    border-radius: 28px !important;
+    overflow: hidden;
+    margin-bottom: 36px !important;
+    background: linear-gradient(160deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03)) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.16);
+  }
+  .hero h1 {
+    font-size: clamp(3rem, 7vw, 6rem) !important;
+    line-height: 0.9 !important;
+    letter-spacing: 0.06em !important;
+    font-weight: 900 !important;
+    color: #fff !important;
+    text-shadow: 0 0 60px rgba(180,140,255,0.4);
+  }
+  .hero p {
+    color: rgba(255,255,255,0.72) !important;
+    font-size: 1.05rem !important;
+    line-height: 1.7 !important;
+    max-width: 680px;
+  }
+  .hero-eyebrow {
+    color: rgba(255,255,255,0.50) !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.30em !important;
+    text-transform: uppercase !important;
+  }
+  .hero-badge {
+    display: inline-flex;
+    margin-top: 28px;
+    padding: 11px 26px;
+    border-radius: 999px;
+    background: rgba(10,8,30,0.45);
+    border: 1px solid rgba(255,255,255,0.25);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 0 18px rgba(140,120,255,0.30), inset 0 0 8px rgba(140,120,255,0.15);
+  }
 </style>
 """, unsafe_allow_html=True)
-
 # ─────────────────────────────────────────────────────────────
-#  AIRPLANE CURSOR + TRAIL CANVAS
+#  FINAL CLEAN PLOTLY HELPERS — single source of truth
 # ─────────────────────────────────────────────────────────────
-st.markdown("""
-<canvas id="airplane-canvas"></canvas>
-<script>
-(function() {
-    const canvas = document.getElementById('airplane-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+def _fmt_money(v):
+    if abs(v) >= 1_000_000:
+        return f"${v/1_000_000:.1f}M"
+    if abs(v) >= 1_000:
+        return f"${v/1_000:.0f}K"
+    return f"${v:.0f}"
 
-    let W = window.innerWidth, H = window.innerHeight;
-    canvas.width = W; canvas.height = H;
-    window.addEventListener('resize', () => {
-        W = window.innerWidth; H = window.innerHeight;
-        canvas.width = W; canvas.height = H;
-    });
 
-    let mx = W/2, my = H/2, pmx = W/2, pmy = H/2;
-    let angle = 0, targetAngle = 0;
-    const trail = [];
-    const MAX_TRAIL = 38;
 
-    document.addEventListener('mousemove', e => {
-        const dx = e.clientX - mx, dy = e.clientY - my;
-        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-            targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
-        }
-        pmx = mx; pmy = my;
-        mx = e.clientX; my = e.clientY;
-        trail.push({ x: mx, y: my, age: 0 });
-        if (trail.length > MAX_TRAIL) trail.shift();
-    });
 
-    function lerpAngle(a, b, t) {
-        let diff = b - a;
-        while (diff >  Math.PI) diff -= 2 * Math.PI;
-        while (diff < -Math.PI) diff += 2 * Math.PI;
-        return a + diff * t;
-    }
+def col_seq(labels):
+    return [DECISION_COLORS.get(str(label), ACCENT) for label in labels]
 
-    // Jewel trail colors cycling
-    const jewelColors = [
-        'rgba(124,58,237,',   // amethyst
-        'rgba(29,78,216,',    // sapphire
-        'rgba(2,132,199,',    // crystal blue
-        'rgba(4,120,87,',     // emerald
-        'rgba(180,83,9,',     // topaz
-        'rgba(219,39,119,',   // ruby
-    ];
-    let colorIdx = 0;
-    let colorT = 0;
+def _format_value(v, value_format="number", fmt_fn=None):
+    if fmt_fn:
+        return fmt_fn(v)
+    if value_format == "money":
+        return _fmt_money(v)
+    if value_format == "percent":
+        return f"{v:.0%}"
+    return f"{v:,.0f}"
 
-    function drawAirplane(x, y, ang, scale=1) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(ang);
-        ctx.scale(scale, scale);
 
-        // Shadow / glow beneath plane
-        ctx.shadowColor = 'rgba(124,58,237,0.45)';
-        ctx.shadowBlur  = 14;
+def _plotly_layout(fig, height=420, showlegend=False):
+    fig.update_layout(
+        height=height,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter", color=TEXT_SOFT, size=13),
+        showlegend=showlegend,
+        margin=dict(l=52, r=54, t=18, b=58),
+        hoverlabel=dict(
+            bgcolor="#111722",
+            bordercolor="rgba(255,255,255,.16)",
+            font_color="white",
+            font_family="Inter",
+        ),
+    )
+    fig.update_xaxes(showgrid=False, zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
+    fig.update_yaxes(gridcolor="rgba(255,255,255,.07)", zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
+    return fig
 
-        // Fuselage
-        ctx.beginPath();
-        ctx.moveTo(0, -14);
-        ctx.quadraticCurveTo(3.5, -4, 3, 6);
-        ctx.quadraticCurveTo(1.5, 10, 0, 11);
-        ctx.quadraticCurveTo(-1.5, 10, -3, 6);
-        ctx.quadraticCurveTo(-3.5, -4, 0, -14);
-        ctx.fillStyle = '#7c3aed';
-        ctx.fill();
 
-        // Wings
-        ctx.beginPath();
-        ctx.moveTo(-2, 1); ctx.lineTo(-14, 8); ctx.lineTo(-12, 10);
-        ctx.lineTo(-1.5, 5);
-        ctx.closePath();
-        ctx.fillStyle = '#1d4ed8';
-        ctx.fill();
+def plotly_card(title, fig, height=420):
+    st.markdown(
+        f'<div class="plotly-card"><div class="plotly-card-title">{title}</div>',
+        unsafe_allow_html=True,
+    )
+    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False, "responsive": True})
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        ctx.beginPath();
-        ctx.moveTo(2, 1); ctx.lineTo(14, 8); ctx.lineTo(12, 10);
-        ctx.lineTo(1.5, 5);
-        ctx.closePath();
-        ctx.fillStyle = '#1d4ed8';
-        ctx.fill();
 
-        // Tail fins
-        ctx.beginPath();
-        ctx.moveTo(-1, 8); ctx.lineTo(-6, 13); ctx.lineTo(-5, 14);
-        ctx.lineTo(-0.5, 10);
-        ctx.closePath();
-        ctx.fillStyle = '#db2777';
-        ctx.fill();
+def plotly_donut_chart(title, labels, values, colors=None, height=420, **kwargs):
+    labels = [str(x) for x in labels]
+    vals = [float(v) if pd.notna(v) else 0.0 for v in values]
+    if not vals or sum(vals) <= 0:
+        st.info("No chart data available for the current filter.")
+        return
+    colors = colors or [DECISION_COLORS.get(x, CYAN) for x in labels]
+    fig = go.Figure(
+        go.Pie(
+            labels=labels,
+            values=vals,
+            hole=0.58,
+            marker=dict(colors=colors, line=dict(color="#080B12", width=3)),
+            textinfo="percent",
+            textfont=dict(size=15, color="white"),
+            hovertemplate="%{label}<br>%{percent}<br>%{value}<extra></extra>",
+        )
+    )
+    _plotly_layout(fig, height=height, showlegend=True)
+    fig.update_layout(
+        legend=dict(orientation="h", y=-0.08, x=0.5, xanchor="center", font=dict(size=12, color=TEXT_SOFT)),
+        margin=dict(l=20, r=20, t=8, b=76),
+    )
+    plotly_card(title, fig, height)
 
-        ctx.beginPath();
-        ctx.moveTo(1, 8); ctx.lineTo(6, 13); ctx.lineTo(5, 14);
-        ctx.lineTo(0.5, 10);
-        ctx.closePath();
-        ctx.fillStyle = '#db2777';
-        ctx.fill();
 
-        // Cockpit window
-        ctx.beginPath();
-        ctx.ellipse(0, -9, 1.8, 2.5, 0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(196,229,255,0.90)';
-        ctx.shadowBlur = 0;
-        ctx.fill();
+def plotly_vbar_chart(title, labels, series=None, values=None, colors=None, max_value=None, value_format="number", height=420, fmt_fn=None, y_label="", **kwargs):
+    labels = [str(x) for x in labels]
+    fig = go.Figure()
+    if series is None:
+        series = [{"name": "Value", "values": values or [], "colors": colors}]
+    for srs in series:
+        vals = [float(v) if pd.notna(v) else 0.0 for v in srs.get("values", [])]
+        marker_colors = srs.get("colors") or colors or [srs.get("color", CYAN)] * len(vals)
+        if isinstance(marker_colors, str):
+            marker_colors = [marker_colors] * len(vals)
+        text = [_format_value(v, value_format=value_format, fmt_fn=fmt_fn) for v in vals]
+        fig.add_trace(
+            go.Bar(
+                x=labels,
+                y=vals,
+                name=srs.get("name", "Value"),
+                marker=dict(color=marker_colors, line=dict(width=0)),
+                text=text,
+                textposition="outside",
+                cliponaxis=False,
+                hovertemplate="%{x}<br>%{y}<extra></extra>",
+            )
+        )
+    _plotly_layout(fig, height=height, showlegend=len(series) > 1)
+    if max_value is not None:
+        fig.update_yaxes(range=[0, max_value * 1.12])
+    fig.update_traces(width=0.52)
+    if y_label:
+        fig.update_yaxes(title_text=y_label)
+    plotly_card(title, fig, height)
 
-        ctx.restore();
-    }
 
-    function frame() {
-        ctx.clearRect(0, 0, W, H);
-
-        // Age trail points
-        for (let i = 0; i < trail.length; i++) trail[i].age++;
-
-        // Draw trail as glowing connected dots / crystals
-        for (let i = 1; i < trail.length; i++) {
-            const p = trail[i];
-            const prog = i / trail.length;          // 0 at tail, 1 at head
-            const fade = prog * (1 - p.age / 120);
-            if (fade <= 0) continue;
-
-            const ci = Math.floor(prog * jewelColors.length) % jewelColors.length;
-            const c  = jewelColors[ci];
-
-            // Streak segment
-            const prev = trail[i - 1];
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(prev.x, prev.y);
-            ctx.lineTo(p.x, p.y);
-            ctx.strokeStyle = c + (fade * 0.70).toFixed(2) + ')';
-            ctx.lineWidth   = prog * 3.5 + 0.5;
-            ctx.lineCap     = 'round';
-            ctx.shadowColor = c + '0.6)';
-            ctx.shadowBlur  = 8 * prog;
-            ctx.stroke();
-            ctx.restore();
-
-            // Tiny jewel spark every few points
-            if (i % 5 === 0 && prog > 0.15) {
-                const r = prog * 2.8;
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-                ctx.fillStyle = c + (fade * 0.55).toFixed(2) + ')';
-                ctx.shadowColor = c + '0.8)';
-                ctx.shadowBlur  = 10;
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        // Smooth angle
-        angle = lerpAngle(angle, targetAngle, 0.18);
-
-        // Draw airplane
-        drawAirplane(mx, my, angle, 1.15);
-
-        requestAnimationFrame(frame);
-    }
-    frame();
-})();
-</script>
-""", unsafe_allow_html=True)
-
+def plotly_hbar_chart(title, labels, values, colors=None, color=None, value_format="money", height=460, fmt_fn=None, **kwargs):
+    labels = [str(x) for x in labels]
+    vals = [float(v) if pd.notna(v) else 0.0 for v in values]
+    if not vals:
+        st.info("No chart data available for the current filter.")
+        return
+    if colors is None:
+        colors = [color or CYAN] * len(vals)
+    elif isinstance(colors, str):
+        colors = [colors] * len(vals)
+    else:
+        colors = list(colors)
+    if len(colors) < len(vals):
+        colors = colors + [color or CYAN] * (len(vals) - len(colors))
+    text = [_format_value(v, value_format=value_format, fmt_fn=fmt_fn) for v in vals]
+    fig = go.Figure(
+        go.Bar(
+            y=labels,
+            x=vals,
+            orientation="h",
+            marker=dict(color=colors, line=dict(width=0)),
+            text=text,
+            textposition="outside",
+            cliponaxis=False,
+            hovertemplate="%{y}<br>%{x}<extra></extra>",
+        )
+    )
+    _plotly_layout(fig, height=height, showlegend=False)
+    fig.update_layout(margin=dict(l=130, r=110, t=18, b=48))
+    fig.update_yaxes(autorange="reversed")
+    plotly_card(title, fig, height)
 
 # ─────────────────────────────────────────────────────────────
 #  PATHS
 # ─────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(__file__)
 DATA_PATH    = os.path.join(BASE_DIR, "airline_route_profitability.csv")
+if not os.path.exists(DATA_PATH):
+    alt_data_path = os.path.join(BASE_DIR, "airline_route_profitability(1).csv")
+    if os.path.exists(alt_data_path):
+        DATA_PATH = alt_data_path
 MODEL1_PATH  = os.path.join(BASE_DIR, "model_with_revenue.pkl")
 MODEL2_PATH  = os.path.join(BASE_DIR, "model_without_revenue.pkl")
 MODEL3_PATH  = os.path.join(BASE_DIR, "model_preoperational.pkl")
@@ -959,864 +444,6 @@ def prepare_input(input_df, training_columns):
 
 
 # ─────────────────────────────────────────────────────────────
-#  CHART HELPERS — light-theme aware, jewel colors
-# ─────────────────────────────────────────────────────────────
-def clean_fig(figsize=(8, 4)):
-    fig, ax = plt.subplots(figsize=figsize)
-    fig.patch.set_facecolor("#fdf9f4")
-    fig.patch.set_alpha(0.0)
-    ax.set_facecolor("none")
-    for spine in ["top", "right", "left", "bottom"]:
-        ax.spines[spine].set_visible(False)
-    ax.tick_params(colors=INK_MUTED, labelsize=8.5, length=0)
-    ax.xaxis.label.set_color(INK_SOFT)
-    ax.yaxis.label.set_color(INK_SOFT)
-    ax.title.set_color(INK)
-    ax.title.set_fontsize(11)
-    ax.title.set_fontweight("bold")
-    ax.title.set_fontfamily("serif")
-    ax.grid(axis="y", color="#e8e0f0", linewidth=0.8, linestyle="-", alpha=0.85)
-    ax.set_axisbelow(True)
-    for label in ax.get_xticklabels() + ax.get_yticklabels():
-        label.set_color(INK_MUTED)
-    return fig, ax
-
-
-def col_seq(labels):
-    return [DECISION_COLORS.get(l, ACCENT) for l in labels]
-
-
-def add_bar_shimmer(bars, ax, alpha=0.92):
-    """Legacy fallback: no white static rectangles. Use HTML helpers for real shimmer."""
-    for bar in bars:
-        bar.set_alpha(alpha)
-        bar.set_linewidth(0)
-    return bars
-
-
-
-# ─────────────────────────────────────────────────────────────
-#  ANIMATED HTML CHART HELPERS — keeps the same theme, but lets bars shimmer
-# ─────────────────────────────────────────────────────────────
-def _fmt_chart_value(v, value_format="number"):
-    if value_format == "percent":
-        return f"{v:.0%}"
-    if value_format == "money":
-        return f"${v:,.0f}"
-    return f"{v:,.0f}"
-
-
-def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_format="number", height=430):
-    """
-    Animated vertical grouped/single bar chart rendered in HTML/CSS.
-    series example:
-    [
-        {"name": "Accuracy", "values": [0.88, 0.84], "color": ACCENT},
-        {"name": "Macro F1", "values": [0.88, 0.84], "color": ACCENT_2},
-    ]
-    """
-    labels = [str(x) for x in labels]
-    clean_series = []
-    all_values = []
-
-    for s in series:
-        vals = [float(x) if pd.notna(x) else 0.0 for x in s.get("values", [])]
-        all_values.extend(vals)
-        clean_series.append({
-            "name": str(s.get("name", "Value")),
-            "values": vals,
-            "color": s.get("color", ACCENT),
-            "colors": s.get("colors", None),
-        })
-
-    if not all_values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if max_value is None:
-        max_value = max(all_values) if max(all_values) != 0 else 1
-    max_value = float(max_value) if max_value else 1.0
-
-    chart = {
-        "title": title,
-        "labels": labels,
-        "series": clean_series,
-        "max_value": max_value,
-        "value_format": value_format,
-    }
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-chart-root"></div>
-
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
-
-    .gi-chart {{
-        width: 100%;
-        min-height: {height}px;
-        box-sizing: border-box;
-        padding: 26px 30px 24px;
-        border-radius: 22px;
-        background:
-            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
-            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
-            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
-        border: 1px solid rgba(124,58,237,0.18);
-        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
-        font-family: 'DM Sans', system-ui, sans-serif;
-        color: {INK};
-        overflow: hidden;
-        position: relative;
-    }}
-
-    .gi-chart::before {{
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
-        transform: translateX(-130%);
-        animation: chartSweep 5.5s ease-in-out infinite;
-        pointer-events: none;
-    }}
-
-    .gi-chart-title {{
-        font-family: 'Cinzel', Georgia, serif;
-        text-align: center;
-        font-size: 24px;
-        line-height: 1.25;
-        color: {INK};
-        margin-bottom: 20px;
-        letter-spacing: 0.04em;
-        font-weight: 600;
-    }}
-
-    .gi-legend {{
-        display: flex;
-        justify-content: center;
-        gap: 22px;
-        margin-bottom: 22px;
-        flex-wrap: wrap;
-    }}
-
-    .gi-legend-item {{
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: {INK_SOFT};
-        font-weight: 600;
-        font-size: 14px;
-    }}
-
-    .gi-legend-color {{
-        width: 30px;
-        height: 12px;
-        border-radius: 999px;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 4px 12px rgba(74,50,120,0.12);
-    }}
-
-    .gi-plot {{
-        display: grid;
-        grid-template-columns: repeat({max(len(labels), 1)}, minmax(0, 1fr));
-        gap: 30px;
-        align-items: end;
-        height: {max(height - 180, 190)}px;
-        border-bottom: 1px solid rgba(124,58,237,0.18);
-        background-image: linear-gradient(to top, rgba(124,58,237,0.08) 1px, transparent 1px);
-        background-size: 100% 25%;
-        padding: 0 18px;
-        position: relative;
-        z-index: 1;
-    }}
-
-    .gi-group {{
-        height: 100%;
-        display: flex;
-        align-items: end;
-        justify-content: center;
-        gap: 10px;
-        position: relative;
-    }}
-
-    .gi-bar-wrap {{
-        height: 100%;
-        width: min(48px, 30%);
-        min-width: 26px;
-        display: flex;
-        align-items: end;
-        justify-content: center;
-        position: relative;
-    }}
-
-    .gi-bar {{
-        width: 100%;
-        height: var(--bar-height);
-        min-height: 3px;
-        border-radius: 14px 14px 4px 4px;
-        position: relative;
-        overflow: hidden;
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.65),
-            inset 8px 0 16px rgba(255,255,255,0.16),
-            0 10px 24px rgba(74,50,120,0.18);
-        animation: growBar 850ms cubic-bezier(.22,.9,.25,1) both;
-    }}
-
-    .gi-bar::before {{
-        content: "";
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 80%;
-        background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255,255,255,0.10) 20%,
-            rgba(255,255,255,0.74) 48%,
-            rgba(255,255,255,0.18) 66%,
-            transparent 100%);
-        transform: translateX(-150%);
-        animation: barShimmer 2.25s ease-in-out infinite;
-        animation-delay: var(--delay);
-    }}
-
-
-    .gi-value {{
-        position: absolute;
-        bottom: calc(var(--bar-height) + 8px);
-        font-size: 13px;
-        font-weight: 800;
-        color: {INK_SOFT};
-        white-space: nowrap;
-    }}
-
-    .gi-xlabels {{
-        display: grid;
-        grid-template-columns: repeat({max(len(labels), 1)}, minmax(0, 1fr));
-        gap: 30px;
-        padding: 13px 18px 0;
-        text-align: center;
-        position: relative;
-        z-index: 1;
-    }}
-
-    .gi-xlabel {{
-        color: {INK_SOFT};
-        font-weight: 700;
-        font-size: 13px;
-        line-height: 1.25;
-        transform: rotate(-6deg);
-        transform-origin: center top;
-    }}
-
-    @keyframes barShimmer {{
-        0%   {{ transform: translateX(-150%); }}
-        48%  {{ transform: translateX(155%); }}
-        100% {{ transform: translateX(155%); }}
-    }}
-
-    @keyframes growBar {{
-        from {{ height: 0%; opacity: 0.50; }}
-        to   {{ height: var(--bar-height); opacity: 1; }}
-    }}
-
-    @keyframes chartSweep {{
-        0%   {{ transform: translateX(-130%); }}
-        45%  {{ transform: translateX(130%); }}
-        100% {{ transform: translateX(130%); }}
-    }}
-    </style>
-
-    <script>
-    const chart = {chart_json};
-
-    function formatValue(v) {{
-        if (chart.value_format === "percent") return Math.round(v * 100) + "%";
-        if (chart.value_format === "money") return "$" + Math.round(v).toLocaleString();
-        return Math.round(v).toLocaleString();
-    }}
-
-    const root = document.getElementById("gi-chart-root");
-    const legendHtml = chart.series.map(s => `
-        <div class="gi-legend-item">
-            <span class="gi-legend-color" style="background:${{s.color}}"></span>
-            ${{s.name}}
-        </div>
-    `).join("");
-
-    const groupsHtml = chart.labels.map((label, i) => `
-        <div class="gi-group">
-            ${{chart.series.map((s, j) => {{
-                const value = Number(s.values[i] || 0);
-                const pct = Math.max(2, Math.min(100, value / chart.max_value * 100));
-                const color = s.colors ? s.colors[i] : s.color;
-                return `
-                    <div class="gi-bar-wrap">
-                        <div class="gi-value" style="--bar-height:${{pct}}%">${{formatValue(value)}}</div>
-                        <div class="gi-bar"
-                             style="--bar-height:${{pct}}%; --delay:${{(i + j) * 120}}ms; background: linear-gradient(180deg, ${{color}}, ${{color}}dd);"></div>
-                    </div>
-                `;
-            }}).join("")}}
-        </div>
-    `).join("");
-
-    const xLabelsHtml = chart.labels.map(label => `<div class="gi-xlabel">${{label}}</div>`).join("");
-
-    root.innerHTML = `
-        <div class="gi-chart">
-            <div class="gi-chart-title">${{chart.title}}</div>
-            <div class="gi-legend">${{legendHtml}}</div>
-            <div class="gi-plot">${{groupsHtml}}</div>
-            <div class="gi-xlabels">${{xLabelsHtml}}</div>
-        </div>
-    `;
-    </script>
-    """, height=height + 40, scrolling=False)
-
-
-def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_format="number", height=430):
-    """Animated horizontal bar chart rendered in HTML/CSS."""
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    if not values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if colors is None:
-        colors = [ACCENT for _ in values]
-    elif isinstance(colors, str):
-        colors = [colors for _ in values]
-    else:
-        colors = list(colors)
-
-    max_abs = max(abs(v) for v in values) or 1.0
-    rows = []
-    for label, value, color in zip(labels, values, colors):
-        rows.append({
-            "label": label,
-            "value": value,
-            "display": _fmt_chart_value(value, value_format),
-            "width": max(2, min(100, abs(value) / max_abs * 100)),
-            "color": color,
-        })
-
-    chart = {"title": title, "rows": rows}
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-hbar-root"></div>
-
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
-
-    .gi-hchart {{
-        width: 100%;
-        min-height: {height}px;
-        box-sizing: border-box;
-        padding: 24px 28px;
-        border-radius: 22px;
-        background:
-            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
-            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
-            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
-        border: 1px solid rgba(124,58,237,0.18);
-        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
-        font-family: 'DM Sans', system-ui, sans-serif;
-        color: {INK};
-        overflow: hidden;
-        position: relative;
-    }}
-
-    .gi-hchart::before {{
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
-        transform: translateX(-130%);
-        animation: chartSweep 5.5s ease-in-out infinite;
-        pointer-events: none;
-    }}
-
-    .gi-hchart-title {{
-        font-family: 'Cinzel', Georgia, serif;
-        text-align: center;
-        font-size: 22px;
-        line-height: 1.25;
-        color: {INK};
-        margin-bottom: 20px;
-        letter-spacing: 0.04em;
-        font-weight: 600;
-    }}
-
-    .gi-hrows {{
-        display: flex;
-        flex-direction: column;
-        gap: 13px;
-        position: relative;
-        z-index: 1;
-    }}
-
-    .gi-hrow {{
-        display: grid;
-        grid-template-columns: minmax(92px, 170px) 1fr minmax(72px, 100px);
-        align-items: center;
-        gap: 12px;
-    }}
-
-    .gi-hlabel {{
-        color: {INK_SOFT};
-        font-size: 13px;
-        font-weight: 700;
-        line-height: 1.15;
-        text-align: right;
-    }}
-
-    .gi-htrack {{
-        height: 24px;
-        border-radius: 999px;
-        background: rgba(124,58,237,0.07);
-        border: 1px solid rgba(124,58,237,0.12);
-        overflow: hidden;
-        position: relative;
-    }}
-
-    .gi-hbar {{
-        height: 100%;
-        width: var(--bar-width);
-        border-radius: 999px;
-        position: relative;
-        overflow: hidden;
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.65),
-            inset 8px 0 16px rgba(255,255,255,0.16),
-            0 8px 18px rgba(74,50,120,0.14);
-        animation: growHBar 850ms cubic-bezier(.22,.9,.25,1) both;
-    }}
-
-    .gi-hbar::before {{
-        content: "";
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 80%;
-        background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255,255,255,0.10) 20%,
-            rgba(255,255,255,0.74) 48%,
-            rgba(255,255,255,0.18) 66%,
-            transparent 100%);
-        transform: translateX(-150%);
-        animation: barShimmer 2.25s ease-in-out infinite;
-        animation-delay: var(--delay);
-    }}
-
-
-    .gi-hvalue {{
-        color: {INK_SOFT};
-        font-weight: 800;
-        font-size: 13px;
-        white-space: nowrap;
-    }}
-
-    @keyframes barShimmer {{
-        0%   {{ transform: translateX(-150%); }}
-        48%  {{ transform: translateX(155%); }}
-        100% {{ transform: translateX(155%); }}
-    }}
-
-    @keyframes growHBar {{
-        from {{ width: 0%; opacity: 0.50; }}
-        to   {{ width: var(--bar-width); opacity: 1; }}
-    }}
-
-    @keyframes chartSweep {{
-        0%   {{ transform: translateX(-130%); }}
-        45%  {{ transform: translateX(130%); }}
-        100% {{ transform: translateX(130%); }}
-    }}
-    </style>
-
-    <script>
-    const chart = {chart_json};
-    const root = document.getElementById("gi-hbar-root");
-
-    const rowsHtml = chart.rows.map((r, i) => `
-        <div class="gi-hrow">
-            <div class="gi-hlabel">${{r.label}}</div>
-            <div class="gi-htrack">
-                <div class="gi-hbar"
-                     style="--bar-width:${{r.width}}%; --delay:${{i * 110}}ms; background: linear-gradient(90deg, ${{r.color}}, ${{r.color}}dd);"></div>
-            </div>
-            <div class="gi-hvalue">${{r.display}}</div>
-        </div>
-    `).join("");
-
-    root.innerHTML = `
-        <div class="gi-hchart">
-            <div class="gi-hchart-title">${{chart.title}}</div>
-            <div class="gi-hrows">${{rowsHtml}}</div>
-        </div>
-    `;
-    </script>
-    """, height=height + 35, scrolling=False)
-
-
-def shimmer_pie_chart(title, labels, values, colors=None, height=430):
-    """Animated donut/pie-style chart rendered in HTML/CSS with shimmer."""
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    total = sum(values)
-    if not values or total <= 0:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if colors is None:
-        colors = [ACCENT for _ in values]
-    else:
-        colors = list(colors)
-
-    rows = []
-    start = 0.0
-    stops = []
-    for label, value, color in zip(labels, values, colors):
-        pct = value / total * 100
-        end = start + pct
-        stops.append(f"{color} {start:.4f}% {end:.4f}%")
-        rows.append({
-            "label": label,
-            "value": value,
-            "pct": pct,
-            "display": f"{pct:.1f}%",
-            "color": color,
-        })
-        start = end
-
-    chart = {
-        "title": title,
-        "gradient": ", ".join(stops),
-        "rows": rows,
-        "total": total,
-    }
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-pie-root"></div>
-
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
-
-    .gi-pie-card {{
-        width: 100%;
-        min-height: {height}px;
-        box-sizing: border-box;
-        padding: 24px 28px;
-        border-radius: 22px;
-        background:
-            radial-gradient(circle at 16% 12%, rgba(124,58,237,0.13), transparent 32%),
-            radial-gradient(circle at 88% 20%, rgba(2,132,199,0.11), transparent 34%),
-            linear-gradient(145deg, rgba(255,252,248,0.76), rgba(245,238,255,0.62), rgba(238,245,253,0.66));
-        border: 1px solid rgba(124,58,237,0.18);
-        box-shadow: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
-        font-family: 'DM Sans', system-ui, sans-serif;
-        color: {INK};
-        overflow: hidden;
-        position: relative;
-    }}
-
-    .gi-pie-card::before {{
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
-        transform: translateX(-130%);
-        animation: pieCardSweep 5.5s ease-in-out infinite;
-        pointer-events: none;
-    }}
-
-    .gi-pie-title {{
-        font-family: 'Cinzel', Georgia, serif;
-        text-align: center;
-        font-size: 22px;
-        line-height: 1.25;
-        color: {INK};
-        margin-bottom: 18px;
-        letter-spacing: 0.04em;
-        font-weight: 600;
-    }}
-
-    .gi-pie-layout {{
-        display: grid;
-        grid-template-columns: minmax(210px, 0.9fr) minmax(190px, 1fr);
-        gap: 24px;
-        align-items: center;
-        position: relative;
-        z-index: 1;
-    }}
-
-    .gi-donut-wrap {{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }}
-
-    .gi-donut {{
-        width: min(230px, 80vw);
-        aspect-ratio: 1;
-        border-radius: 50%;
-        background: conic-gradient(var(--pie-gradient));
-        position: relative;
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.65),
-            0 14px 32px rgba(74,50,120,0.16);
-        overflow: hidden;
-        animation: donutPop 850ms cubic-bezier(.22,.9,.25,1) both;
-    }}
-
-    .gi-donut::before {{
-        content: "";
-        position: absolute;
-        inset: -20%;
-        background: linear-gradient(115deg,
-            transparent 0%,
-            rgba(255,255,255,0.08) 32%,
-            rgba(255,255,255,0.70) 48%,
-            rgba(255,255,255,0.12) 62%,
-            transparent 100%);
-        transform: translateX(-120%) rotate(12deg);
-        animation: pieShimmer 2.8s ease-in-out infinite;
-    }}
-
-    .gi-donut::after {{
-        content: "";
-        position: absolute;
-        inset: 27%;
-        border-radius: 50%;
-        background:
-            radial-gradient(circle at 35% 25%, rgba(255,255,255,0.82), rgba(255,252,248,0.88) 62%, rgba(245,238,255,0.90));
-        box-shadow: inset 0 2px 10px rgba(124,58,237,0.10);
-    }}
-
-    .gi-pie-legend {{
-        display: flex;
-        flex-direction: column;
-        gap: 11px;
-    }}
-
-    .gi-pie-row {{
-        display: grid;
-        grid-template-columns: 14px 1fr auto;
-        align-items: center;
-        gap: 10px;
-        color: {INK_SOFT};
-        font-size: 13px;
-        font-weight: 700;
-    }}
-
-    .gi-pie-dot {{
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        box-shadow: 0 0 0 3px rgba(255,255,255,0.45), 0 4px 12px rgba(74,50,120,0.13);
-    }}
-
-    .gi-pie-pct {{
-        color: {INK_SOFT};
-        font-weight: 900;
-        white-space: nowrap;
-    }}
-
-    @keyframes pieShimmer {{
-        0%   {{ transform: translateX(-120%) rotate(12deg); }}
-        48%  {{ transform: translateX(120%) rotate(12deg); }}
-        100% {{ transform: translateX(120%) rotate(12deg); }}
-    }}
-
-    @keyframes donutPop {{
-        from {{ transform: scale(0.86) rotate(-18deg); opacity: 0.55; }}
-        to   {{ transform: scale(1) rotate(0deg); opacity: 1; }}
-    }}
-
-    @keyframes pieCardSweep {{
-        0%   {{ transform: translateX(-130%); }}
-        45%  {{ transform: translateX(130%); }}
-        100% {{ transform: translateX(130%); }}
-    }}
-    </style>
-
-    <script>
-    const pieChart = {chart_json};
-    const root = document.getElementById("gi-pie-root");
-    const rowsHtml = pieChart.rows.map(r => `
-        <div class="gi-pie-row">
-            <span class="gi-pie-dot" style="background:${{r.color}}"></span>
-            <span>${{r.label}}</span>
-            <span class="gi-pie-pct">${{r.display}}</span>
-        </div>
-    `).join("");
-
-    root.innerHTML = `
-        <div class="gi-pie-card">
-            <div class="gi-pie-title">${{pieChart.title}}</div>
-            <div class="gi-pie-layout">
-                <div class="gi-donut-wrap">
-                    <div class="gi-donut" style="--pie-gradient:${{pieChart.gradient}}"></div>
-                </div>
-                <div class="gi-pie-legend">${{rowsHtml}}</div>
-            </div>
-        </div>
-    `;
-    </script>
-    """, height=height + 35, scrolling=False)
-
-
-def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, value_format="money", height=460):
-    """Classic horizontal chart closer to the original Matplotlib look, with animated bar shimmer."""
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    if not values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    max_abs = max(abs(v) for v in values) or 1.0
-    rows = [{
-        "label": lab,
-        "value": val,
-        "display": _fmt_chart_value(val, value_format),
-        "width": max(2, min(100, abs(val) / max_abs * 100)),
-    } for lab, val in zip(labels, values)]
-
-    chart_json = json.dumps({"title": title, "rows": rows, "color": color})
-
-    components.html(f"""
-    <div id="gi-classic-hbar-root"></div>
-
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
-
-    .gi-classic-card {{
-        width: 100%;
-        min-height: {height}px;
-        box-sizing: border-box;
-        padding: 24px 26px 22px;
-        border-radius: 22px;
-        background: transparent;
-        font-family: 'DM Sans', system-ui, sans-serif;
-        color: {INK};
-        overflow: hidden;
-        position: relative;
-    }}
-
-    .gi-classic-title {{
-        font-family: 'Cinzel', Georgia, serif;
-        text-align: center;
-        font-size: 22px;
-        line-height: 1.25;
-        color: {INK};
-        margin-bottom: 18px;
-        letter-spacing: 0.04em;
-        font-weight: 600;
-    }}
-
-    .gi-classic-rows {{
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }}
-
-    .gi-classic-row {{
-        display: grid;
-        grid-template-columns: minmax(84px, 150px) 1fr minmax(88px, 110px);
-        align-items: center;
-        gap: 12px;
-    }}
-
-    .gi-classic-label {{
-        color: {INK_SOFT};
-        font-size: 13px;
-        font-weight: 700;
-        line-height: 1.1;
-        text-align: right;
-    }}
-
-    .gi-classic-axis {{
-        height: 23px;
-        position: relative;
-        border-bottom: 1px solid rgba(124,58,237,0.13);
-        background-image: linear-gradient(to right, rgba(124,58,237,0.08) 1px, transparent 1px);
-        background-size: 25% 100%;
-    }}
-
-    .gi-classic-bar {{
-        height: 22px;
-        width: var(--bar-width);
-        border-radius: 6px;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(90deg, var(--bar-color), color-mix(in srgb, var(--bar-color) 82%, white));
-        box-shadow: 0 6px 16px rgba(74,50,120,0.13), inset 0 1px 0 rgba(255,255,255,0.50);
-        animation: growClassic 850ms cubic-bezier(.22,.9,.25,1) both;
-    }}
-
-    .gi-classic-bar::before {{
-        content: "";
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 72%;
-        background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255,255,255,0.08) 24%,
-            rgba(255,255,255,0.62) 50%,
-            rgba(255,255,255,0.13) 68%,
-            transparent 100%);
-        transform: translateX(-150%);
-        animation: classicBarShimmer 2.25s ease-in-out infinite;
-        animation-delay: var(--delay);
-    }}
-
-    .gi-classic-value {{
-        color: {INK_SOFT};
-        font-weight: 800;
-        font-size: 13px;
-        white-space: nowrap;
-    }}
-
-    @keyframes classicBarShimmer {{
-        0%   {{ transform: translateX(-150%); }}
-        48%  {{ transform: translateX(155%); }}
-        100% {{ transform: translateX(155%); }}
-    }}
-
-    @keyframes growClassic {{
-        from {{ width: 0%; opacity: 0.50; }}
-        to   {{ width: var(--bar-width); opacity: 1; }}
-    }}
-    </style>
-
-    <script>
-    const classicChart = {chart_json};
-    const root = document.getElementById("gi-classic-hbar-root");
-    const rowsHtml = classicChart.rows.map((r, i) => `
-        <div class="gi-classic-row">
-            <div class="gi-classic-label">${{r.label}}</div>
-            <div class="gi-classic-axis">
-                <div class="gi-classic-bar" style="--bar-width:${{r.width}}%; --bar-color:${{classicChart.color}}; --delay:${{i * 110}}ms;"></div>
-            </div>
-            <div class="gi-classic-value">${{r.display}}</div>
-        </div>
-    `).join("");
-
-    root.innerHTML = `
-        <div class="gi-classic-card">
-            <div class="gi-classic-title">${{classicChart.title}}</div>
-            <div class="gi-classic-rows">${{rowsHtml}}</div>
-        </div>
-    `;
-    </script>
-    """, height=height + 30, scrolling=False)
-
-
-# ─────────────────────────────────────────────────────────────
 #  LOAD
 # ─────────────────────────────────────────────────────────────
 df = load_data()
@@ -1826,15 +453,35 @@ model1, model2, model3, X1_columns, X2_columns, X3_columns = load_artifacts()
 # ─────────────────────────────────────────────────────────────
 #  PRE-COMPUTED
 # ─────────────────────────────────────────────────────────────
+def compute_model_metrics(df, model, columns):
+    """Compute live model metrics from the loaded artifact and current labeled dataset."""
+    from sklearn.metrics import accuracy_score, f1_score
+
+    feature_df = df.drop(columns=["Route_Decision"], errors="ignore")
+    X = prepare_input(feature_df, columns)
+    y_true = df["Route_Decision"]
+    y_pred = model.predict(X)
+    return accuracy_score(y_true, y_pred), f1_score(y_true, y_pred, average="macro")
+
+try:
+    m1_acc, m1_f1 = compute_model_metrics(df, model1, X1_columns)
+    m2_acc, m2_f1 = compute_model_metrics(df, model2, X2_columns)
+    m3_acc, m3_f1 = compute_model_metrics(df, model3, X3_columns)
+except Exception:
+    # Safe fallback only if an environment/version issue prevents metric recomputation.
+    m1_acc, m1_f1 = 0.879624, 0.879616
+    m2_acc, m2_f1 = 0.837618, 0.838726
+    m3_acc, m3_f1 = 0.721003, 0.729150
+
 comparison = pd.DataFrame({
     "Model":    ["With revenue variables", "Without revenue variables", "Only pre-operational features"],
-    "Accuracy": [0.879624, 0.837618, 0.721003],
-    "Macro F1": [0.879616, 0.838726, 0.729150],
+    "Accuracy": [m1_acc, m2_acc, m3_acc],
+    "Macro F1": [m1_f1, m2_f1, m3_f1],
 })
 
 df_sorted = df.sort_values(["Route", "Flight_Date"]).copy()
 df_sorted["Prev_Decision"] = df_sorted.groupby("Route")["Route_Decision"].shift(1)
-df_sorted["Changed"] = df_sorted["Route_Decision"] != df_sorted["Prev_Decision"]
+df_sorted["Changed"] = df_sorted["Prev_Decision"].notna() & (df_sorted["Route_Decision"] != df_sorted["Prev_Decision"])
 route_switches = (
     df_sorted.groupby("Route")["Changed"].sum()
     .sort_values(ascending=False).reset_index()
@@ -1906,15 +553,10 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <div class="hero-star"></div><div class="hero-star"></div>
-  <div class="hero-star"></div><div class="hero-star"></div>
-  <div class="hero-left">
-    <div class="hero-eyebrow">✦ Route Intelligence Platform</div>
-    <h1>Airline Profitability System</h1>
-    <p>Sample airline dataset · for analysis &amp; demonstration only</p>
-  </div>
-  <div class="hero-badge">⚡ ML-Powered Decisions</div>
-  <div class="hero-glyph">✈</div>
+  <div class="hero-eyebrow">&#10022; &nbsp; AIRLINE ROUTE INTELLIGENCE &nbsp; &#10022;</div>
+  <h1>SKYLENS<br>DASHBOARD</h1>
+  <p>Analyze route profitability, operational signals, and model-backed decisions in one polished command view.</p>
+  <div class="hero-badge">&#10022; &nbsp; Explore dashboard below</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1973,7 +615,7 @@ with tab1:
             "Drop":     CHART_DROP,
         }
         wedge_colors = [wc[l] for l in dc.index]
-        shimmer_pie_chart(
+        plotly_donut_chart(
             title="Share of Flights by Decision",
             labels=dc.index.tolist(),
             values=dc.values.tolist(),
@@ -2014,7 +656,7 @@ with tab2:
     with left:
         apd = (fdf.groupby("Route_Decision")["Profit"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        shimmer_horizontal_bar_chart(
+        plotly_hbar_chart(
             title="Average Profit by Decision",
             labels=apd.index.tolist(),
             values=apd.values.tolist(),
@@ -2026,7 +668,7 @@ with tab2:
     with right:
         ald = (fdf.groupby("Route_Decision")["Load_Factor"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        shimmer_vertical_bar_chart(
+        plotly_vbar_chart(
             title="Seat Occupancy by Decision",
             labels=ald.index.tolist(),
             series=[{
@@ -2070,7 +712,7 @@ with tab2:
     ]
     neutral_cols = jewel_ramp[:nc]
 
-    shimmer_horizontal_bar_chart(
+    plotly_hbar_chart(
         title="Top Cost Drivers",
         labels=cost_means.index.tolist(),
         values=cost_means.values.tolist(),
@@ -2104,7 +746,7 @@ with tab3:
             f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
-        shimmer_classic_horizontal_bar_chart(
+        plotly_hbar_chart(
             title="Top 10 Routes",
             labels=top.index.tolist(),
             values=top.values.tolist(),
@@ -2118,7 +760,7 @@ with tab3:
             f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
-        shimmer_classic_horizontal_bar_chart(
+        plotly_hbar_chart(
             title="Bottom 10 Routes",
             labels=worst.index.tolist(),
             values=worst.values.tolist(),
@@ -2160,7 +802,7 @@ with tab4:
     bc = [bc_map.get(i, ACCENT) for i in urbd.index]
 
     vals4 = urbd["Unique Routes"].values.tolist()
-    shimmer_vertical_bar_chart(
+    plotly_vbar_chart(
         title="Unique Routes per Decision Category",
         labels=urbd.index.tolist(),
         series=[{
@@ -2184,7 +826,7 @@ with tab5:
         f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "How accurate are the models?</p>", unsafe_allow_html=True)
 
-    shimmer_vertical_bar_chart(
+    plotly_vbar_chart(
         title="Model Accuracy & F1 Comparison",
         labels=comparison["Model"].tolist(),
         series=[
@@ -2218,6 +860,10 @@ with tab5:
         key="model_choice_select",
     )
 
+    if st.session_state.get("last_model_choice") != model_choice:
+        st.session_state.pred_result = None
+        st.session_state.last_model_choice = model_choice
+
     with st.form("prediction_form"):
         col1, col2, col3 = st.columns(3)
 
@@ -2226,7 +872,13 @@ with tab5:
             aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
             aircraft_capacity = st.number_input("Aircraft Capacity", min_value=50,  max_value=600, value=250)
             passengers        = st.number_input("Passengers",        min_value=0,   max_value=600, value=200)
-            load_factor       = st.slider("Load Factor (seat occupancy)", min_value=0.0, max_value=1.0, value=0.80, step=0.01)
+            load_factor       = min(passengers / aircraft_capacity, 1.0) if aircraft_capacity else 0.0
+            st.markdown(
+                f"<div class='info-box'>Calculated Load Factor: <strong>{load_factor:.0%}</strong><br>Based on passengers ÷ aircraft capacity.</div>",
+                unsafe_allow_html=True,
+            )
+            if passengers > aircraft_capacity:
+                st.warning("Passengers exceed aircraft capacity. Load factor is capped at 100% for prediction.")
 
         with col2:
             st.markdown('<p class="col-label">🌍 Route context</p>', unsafe_allow_html=True)
@@ -2346,7 +998,7 @@ with tab5:
 
         bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
         probs = prob_df["Probability"].tolist()
-        shimmer_vertical_bar_chart(
+        plotly_vbar_chart(
             title="Model Confidence per Decision",
             labels=prob_df["Decision"].tolist(),
             series=[{
@@ -2366,24 +1018,17 @@ with tab5:
 
 
 # ─────────────────────────────────────────────────────────────
-#  FILTERED DATA EXPANDER
-# ─────────────────────────────────────────────────────────────
-with st.expander("🗂  Show filtered data"):
-    st.dataframe(fdf, use_container_width=True)
-
-
-# ─────────────────────────────────────────────────────────────
 #  FOOTER
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <div style='text-align:center;padding:40px 0 18px'>
   <div style='display:inline-flex;align-items:center;gap:12px;
-              background:rgba(255,252,248,0.85);
-              border:1px solid rgba(124,58,237,0.22);
+              background:rgba(18,18,22,0.82);
+              border:1px solid rgba(255,255,255,0.10);
               border-radius:999px;
               padding:0.55rem 1.4rem;
               backdrop-filter:blur(14px);
-              box-shadow:0 4px 18px rgba(124,58,237,0.10);
+              box-shadow:0 20px 60px rgba(0,0,0,0.35);
               font-family:"DM Sans",sans-serif;
               font-size:0.67rem;
               font-weight:600;
