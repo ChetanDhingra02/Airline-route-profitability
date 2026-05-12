@@ -1,11 +1,11 @@
 import os
 import joblib
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import json
 import plotly.graph_objects as go
-import matplotlib.pyplot as plt
 
 st.set_page_config(
     page_title="SkyLens · Airline Profitability Command Center",
