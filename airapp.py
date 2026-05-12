@@ -109,51 +109,42 @@ html, body, .stApp {
   color: var(--ink) !important;
 }
 
-/* Aurora blobs — purely decorative, pointer-events:none */
-.stApp::before,
-.stApp::after {
-  content: "";
+/* Aurora blob divs injected via st.markdown */
+.aurora-blob {
   position: fixed;
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
-  filter: blur(90px);
   mix-blend-mode: screen;
 }
-.stApp::before {
+.aurora-blob-1 {
   width: 70vw; height: 55vw;
   top: -15%; left: -20%;
   background: radial-gradient(ellipse,
-    rgba(0,180,160,0.40) 0%,
+    rgba(0,180,160,0.42) 0%,
     rgba(78,166,255,0.28) 40%,
     transparent 70%);
+  filter: blur(90px);
   animation: aurora1 22s ease-in-out infinite;
 }
-.stApp::after {
+.aurora-blob-2 {
   width: 60vw; height: 50vw;
   bottom: -10%; right: -15%;
   background: radial-gradient(ellipse,
-    rgba(139,92,246,0.35) 0%,
+    rgba(139,92,246,0.38) 0%,
     rgba(52,211,153,0.22) 40%,
     transparent 70%);
+  filter: blur(90px);
   animation: aurora2 28s ease-in-out infinite;
 }
-
-/* Third aurora blob via a pseudo on main */
-.main::before {
-  content: "";
-  position: fixed;
+.aurora-blob-3 {
   width: 40vw; height: 40vw;
   top: 40%; left: 35%;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(100px);
-  mix-blend-mode: screen;
   background: radial-gradient(ellipse,
     rgba(78,166,255,0.22) 0%,
     rgba(0,200,180,0.15) 50%,
     transparent 70%);
+  filter: blur(100px);
   animation: aurora3 34s ease-in-out infinite;
 }
 
@@ -684,21 +675,28 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
     """Return a figure/ax pair styled for the aurora dark theme."""
+    # All colours are matplotlib-compatible (R,G,B,A) tuples with values 0-1
+    SPINE_COLOR  = (0.47, 0.71, 1.00, 0.18)   # soft blue, very translucent
+    TICK_COLOR   = (1.00, 1.00, 1.00, 0.45)   # white 45% opacity
+    LABEL_COLOR  = (1.00, 1.00, 1.00, 0.45)
+    TITLE_COLOR  = (1.00, 1.00, 1.00, 0.85)
+    GRID_COLOR   = (0.47, 0.71, 1.00, 0.08)
+
     fig, ax = plt.subplots(figsize=figsize)
     fig.patch.set_facecolor("none")
     fig.patch.set_alpha(0)
     ax.set_facecolor("none")
     for spine in ["top", "right"]:
         ax.spines[spine].set_visible(False)
-    ax.spines["left"].set_color("rgba(120,180,255,0.18)")
-    ax.spines["bottom"].set_color("rgba(120,180,255,0.18)")
-    ax.tick_params(colors="rgba(255,255,255,0.45)", labelsize=8.5)
-    ax.xaxis.label.set_color("rgba(255,255,255,0.45)")
-    ax.yaxis.label.set_color("rgba(255,255,255,0.45)")
-    ax.title.set_color("rgba(255,255,255,0.85)")
+    ax.spines["left"].set_color(SPINE_COLOR)
+    ax.spines["bottom"].set_color(SPINE_COLOR)
+    ax.tick_params(colors=TICK_COLOR, labelsize=8.5)
+    ax.xaxis.label.set_color(LABEL_COLOR)
+    ax.yaxis.label.set_color(LABEL_COLOR)
+    ax.title.set_color(TITLE_COLOR)
     ax.title.set_fontsize(11)
     ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color="rgba(120,180,255,0.08)", linewidth=0.8, linestyle="--")
+    ax.grid(axis="y", color=GRID_COLOR, linewidth=0.8, linestyle="--")
     ax.set_axisbelow(True)
     return fig, ax
 
@@ -830,6 +828,15 @@ if sel_route    != "All": fdf = fdf[fdf["Route"]          == sel_route]
 if sel_aircraft != "All": fdf = fdf[fdf["Aircraft_Type"]  == sel_aircraft]
 if sel_season   != "All": fdf = fdf[fdf["Season"]         == sel_season]
 if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
+
+# ─────────────────────────────────────────────────────────────
+#  AURORA BLOBS  (real DOM elements — CSS ::before won't work in Streamlit)
+# ─────────────────────────────────────────────────────────────
+st.markdown("""
+<div class="aurora-blob aurora-blob-1"></div>
+<div class="aurora-blob aurora-blob-2"></div>
+<div class="aurora-blob aurora-blob-3"></div>
+""", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
 #  HERO HEADER
