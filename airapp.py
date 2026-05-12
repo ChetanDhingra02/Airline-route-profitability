@@ -1893,6 +1893,7 @@ with tab5:
                 it_systems_cost         = st.number_input("IT Systems Cost ($)",            min_value=0.0, value=3000.0,   step=250.0)
 
         submitted = st.form_submit_button("✈  Get Route Decision")
+        render_prediction_result()
 
 
     # ── PREDICTION LOGIC ────────────────────────────────────
@@ -1935,8 +1936,4 @@ with tab5:
 
         st.session_state.pred_result = {"prediction": pred, "probabilities": prob, "classes": cls}
         st.session_state.active_tab_label = PREDICTION_TAB_LABEL
-
-        # Re-render with Prediction Tool selected, then show the result near the top.
-        if TABS_DEFAULT_SUPPORTED:
-            st.rerun()
 
