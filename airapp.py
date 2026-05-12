@@ -1,9 +1,9 @@
 import os
+import json
 import joblib
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import numpy as np
 
 st.set_page_config(
@@ -14,860 +14,1023 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────
-#  THEME SYSTEM  (change these variables to restyle the whole app)
+#  PALETTE TOKENS
 # ─────────────────────────────────────────────────────────────
-# Palette – updated for a dark glassmorphic theme
-# These colours mirror the provided inspiration HTML with purple primaries and warm accent hues.
-COLOR_BG          = "#131315"             # base canvas (very dark charcoal)
-COLOR_SURFACE     = "rgba(32,31,33,0.60)" # glass panel surface (semi‑transparent)
-COLOR_BORDER      = "rgba(255,255,255,0.08)"   # subtle white border for panels
-COLOR_BORDER_MD   = "rgba(255,255,255,0.16)"
+C_EXPAND   = "#4ade80"
+C_MAINTAIN = "#facc15"
+C_OPTIMIZE = "#fb923c"
+C_DROP     = "#fb7185"
+C_NEUTRAL  = ["#6e40c9","#9150d8","#b480e7","#d2a4f5","#efc5d5","#f3b5c6","#fcb9b2","#ffcc99"]
+DECISION_COLORS = {"Expand": C_EXPAND, "Maintain": C_MAINTAIN, "Optimize": C_OPTIMIZE, "Drop": C_DROP}
+ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
-COLOR_INK         = "#e5e1e4"             # primary text (off‑white)
-COLOR_INK_SOFT    = "#c4c0c5"             # secondary text
-COLOR_INK_MUTED   = "#9b8c9e"             # tertiary text
-
-COLOR_ACCENT      = "#e9b3ff"             # primary accent (lavender)
-COLOR_ACCENT_DARK = "#9026c3"             # accent dark variant
-
-COLOR_GREEN       = "#4ade80"             # Expand
-COLOR_YELLOW      = "#facc15"             # Maintain
-COLOR_ORANGE      = "#fb923c"             # Optimize
-COLOR_PINK        = "#fb7185"             # Drop
-
-# Convert our semi-transparent CSS border colour into an RGBA tuple for
-# Matplotlib. Matplotlib does not understand CSS rgba strings directly,
-# so we approximate the 16% opacity white by specifying an RGBA tuple.
-COLOR_BORDER_MD_RGBA = (1.0, 1.0, 1.0, 0.16)
-
-# Chart palette tuned for dark backgrounds
-CHART_EXPAND   = COLOR_GREEN
-CHART_MAINTAIN = COLOR_YELLOW
-CHART_OPTIMIZE = COLOR_ORANGE
-CHART_DROP     = COLOR_PINK
-CHART_NEUTRAL  = [
-    "#6e40c9", "#9150d8", "#b480e7", "#d2a4f5",
-    "#efc5d5", "#f3b5c6", "#fcb9b2", "#ffcc99"
-]
-
-st.markdown(f"""
+# ─────────────────────────────────────────────────────────────
+#  GLOBAL CSS  — injected once into the Streamlit host page
+# ─────────────────────────────────────────────────────────────
+st.markdown("""
 <style>
-/* ═══════════════════════════════════════════════════════════════
-   SKYLENS — GLASSMORPHISM DESIGN SYSTEM v6
-   Space Grotesk + Manrope · Deep Obsidian · Electric Purple
-   ═══════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap');
+/* ── TOKENS ─────────────────────────────────────────────────── */
+:root {
+  --bg:           #0b0b0d;
+  --surface:      rgba(20,19,22,0.72);
+  --surface-hi:   rgba(32,30,36,0.85);
+  --border:       rgba(255,255,255,0.06);
+  --border-md:    rgba(255,255,255,0.13);
+  --border-hi:    rgba(255,255,255,0.22);
+  --border-glow:  rgba(233,179,255,0.30);
+  --ink:          #e5e1e4;
+  --ink-soft:     #c4bfc6;
+  --ink-muted:    #9b8c9e;
+  --ink-ghost:    #3e3444;
+  --accent:       #e9b3ff;
+  --accent-mid:   #c863fb;
+  --accent-dk:    #9026c3;
+  --pink:         #ffb2b7;
+  --green:        #4ade80;
+  --yellow:       #facc15;
+  --orange:       #fb923c;
+  --red:          #fb7185;
+  --blur-sm:      blur(16px);
+  --blur-md:      blur(28px);
+  --blur-lg:      blur(48px);
+  --blur-xl:      blur(72px);
+  --sh-sm:        0 4px 16px rgba(0,0,0,.60),0 1px 3px rgba(0,0,0,.40);
+  --sh-md:        0 8px 32px rgba(0,0,0,.65),0 2px 8px rgba(0,0,0,.50),0 0 0 1px rgba(255,255,255,.04);
+  --sh-lg:        0 16px 48px rgba(0,0,0,.70),0 4px 16px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06);
+  --sh-xl:        0 24px 64px rgba(0,0,0,.75),0 8px 24px rgba(233,179,255,.08),0 0 0 1px rgba(255,255,255,.07);
+  --glow:         0 0 40px rgba(233,179,255,.18),0 0 80px rgba(233,179,255,.08);
+  --r-sm:  10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px; --r-2xl: 36px;
+}
 
-/* ── DESIGN TOKENS ─────────────────────────────────────────────── */
-:root {{
-  /* Core palette */
-  --bg:              #0b0b0d;
-  --bg-1:            #0e0e10;
-  --bg-2:            #131315;
-  --surface-dim:     #131315;
-  --surface:         rgba(20, 19, 22, 0.72);
-  --surface-hi:      rgba(32, 30, 36, 0.82);
-  --surface-raised:  rgba(42, 40, 48, 0.88);
-
-  /* Borders */
-  --border:          rgba(255,255,255,0.06);
-  --border-md:       rgba(255,255,255,0.12);
-  --border-hi:       rgba(255,255,255,0.20);
-  --border-glow:     rgba(233,179,255,0.25);
-
-  /* Ink */
-  --ink:             #e5e1e4;
-  --ink-soft:        #c4bfc6;
-  --ink-muted:       #9b8c9e;
-  --ink-ghost:       #4f4352;
-
-  /* Accents */
-  --accent:          #e9b3ff;
-  --accent-dk:       #9026c3;
-  --accent-mid:      #c863fb;
-  --accent-glow:     rgba(233,179,255,0.15);
-  --pink:            #ffb2b7;
-  --pink-dk:         #d00242;
-  --orange:          #ffb868;
-  --green:           #4ade80;
-  --yellow:          #facc15;
-  --red:             #fb7185;
-
-  /* Decision */
-  --expand:          #4ade80;
-  --maintain:        #facc15;
-  --optimize:        #fb923c;
-  --drop:            #fb7185;
-
-  /* Glassmorphism */
-  --blur-sm:         blur(16px);
-  --blur-md:         blur(32px);
-  --blur-lg:         blur(52px);
-  --blur-xl:         blur(72px);
-
-  /* Shadows — tinted with purple */
-  --shadow-xs:       0 2px 8px rgba(0,0,0,0.55);
-  --shadow-sm:       0 4px 16px rgba(0,0,0,0.60), 0 1px 3px rgba(0,0,0,0.40);
-  --shadow-md:       0 8px 32px rgba(0,0,0,0.65), 0 2px 8px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.04);
-  --shadow-lg:       0 16px 48px rgba(0,0,0,0.70), 0 4px 16px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06);
-  --shadow-xl:       0 24px 64px rgba(0,0,0,0.75), 0 8px 24px rgba(233,179,255,0.08), 0 0 0 1px rgba(255,255,255,0.07);
-  --glow-accent:     0 0 40px rgba(233,179,255,0.18), 0 0 80px rgba(233,179,255,0.08);
-
-  /* Radii */
-  --r-sm:   10px;
-  --r-md:   16px;
-  --r-lg:   22px;
-  --r-xl:   28px;
-  --r-2xl:  36px;
-}}
-
-/* ── FULL-APP BACKGROUND WITH DEPTH LAYERS ─────────────────────── */
-html, body, [class*="css"] {{
+/* ── FULL-APP DEEP BG ───────────────────────────────────────── */
+html, body, [class*="css"] {
   font-family: 'Manrope', system-ui, sans-serif !important;
   color: var(--ink) !important;
   -webkit-font-smoothing: antialiased;
-}}
-
-/* Deep cosmic void background */
-.stApp {{
+}
+.stApp {
   background:
-    radial-gradient(ellipse 80% 60% at 15% -10%,  rgba(144, 38, 195, 0.22) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 85% 110%,  rgba(208, 2,  66,  0.16) 0%, transparent 55%),
-    radial-gradient(ellipse 90% 70% at 50% 50%,   rgba(11, 11, 13,  1.00) 0%, transparent 100%),
+    radial-gradient(ellipse 80% 60% at 15% -10%,  rgba(144,38,195,.24) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 110%,  rgba(208,2,66,.18) 0%, transparent 55%),
     linear-gradient(160deg, #0f0c12 0%, #0b0b0d 40%, #0a0810 100%) !important;
   min-height: 100vh !important;
-  position: relative;
-}}
-
-/* Animated ambient orbs via pseudo elements on the block-container */
-.main .block-container {{
+}
+.main .block-container {
   padding-top: 2.5rem !important;
-  padding-bottom: 4rem !important;
-  max-width: 1340px !important;
-  position: relative;
-}}
-.main .block-container::before,
-.main .block-container::after {{
+  padding-bottom: 5rem !important;
+  max-width: 1360px !important;
+}
+
+/* ── AMBIENT ORB LAYER ──────────────────────────────────────── */
+.stApp::before {
   content: "";
   position: fixed;
-  border-radius: 50%;
+  top: -200px; left: -200px;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(233,179,255,.09) 0%, transparent 70%);
+  filter: blur(80px);
   pointer-events: none;
   z-index: 0;
-  animation: orbFloat 18s ease-in-out infinite;
-}}
-.main .block-container::before {{
-  width: 700px; height: 700px;
-  top: -200px; left: -200px;
-  background: radial-gradient(circle, rgba(233,179,255,0.10) 0%, transparent 70%);
-  filter: blur(80px);
-  animation-delay: 0s;
-}}
-.main .block-container::after {{
+  animation: orbA 20s ease-in-out infinite;
+}
+.stApp::after {
+  content: "";
+  position: fixed;
+  bottom: -200px; right: -200px;
   width: 600px; height: 600px;
-  bottom: -150px; right: -150px;
-  background: radial-gradient(circle, rgba(208,2,66,0.10) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(208,2,66,.09) 0%, transparent 70%);
   filter: blur(80px);
-  animation-delay: -9s;
-}}
-@keyframes orbFloat {{
-  0%, 100% {{ transform: translate(0, 0) scale(1); }}
-  33%        {{ transform: translate(40px, -30px) scale(1.05); }}
-  66%        {{ transform: translate(-25px, 20px) scale(0.97); }}
-}}
+  pointer-events: none;
+  z-index: 0;
+  animation: orbB 25s ease-in-out infinite;
+}
+@keyframes orbA { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(50px,-40px) scale(1.06)} 66%{transform:translate(-30px,25px) scale(.96)} }
+@keyframes orbB { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-40px,30px) scale(1.04)} 66%{transform:translate(25px,-20px) scale(.97)} }
 
-/* ── SCROLL ANIMATIONS ─────────────────────────────────────────── */
-@keyframes fadeSlideUp {{
-  from {{ opacity: 0; transform: translateY(28px); }}
-  to   {{ opacity: 1; transform: translateY(0); }}
-}}
-@keyframes fadeIn {{
-  from {{ opacity: 0; }}
-  to   {{ opacity: 1; }}
-}}
-@keyframes scaleIn {{
-  from {{ opacity: 0; transform: scale(0.96) translateY(16px); }}
-  to   {{ opacity: 1; transform: scale(1)    translateY(0); }}
-}}
-
-/* Apply entrance animation to main content blocks */
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"],
-[data-testid="stHorizontalBlock"] {{
-  animation: fadeSlideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
-}}
-.element-container {{
-  animation: fadeSlideUp 0.50s cubic-bezier(0.22,1,0.36,1) both;
-}}
-
-/* ── SIDEBAR — DEEP GLASS PANEL ────────────────────────────────── */
-[data-testid="stSidebar"] {{
-  background: rgba(14, 13, 17, 0.82) !important;
+/* ── SIDEBAR ────────────────────────────────────────────────── */
+[data-testid="stSidebar"] {
+  background: rgba(12,11,16,.88) !important;
   backdrop-filter: var(--blur-lg) !important;
   -webkit-backdrop-filter: var(--blur-lg) !important;
   border-right: 1px solid var(--border-md) !important;
-  box-shadow: 4px 0 40px rgba(0,0,0,0.70), inset -1px 0 0 rgba(255,255,255,0.04) !important;
-}}
-
+  box-shadow: 4px 0 40px rgba(0,0,0,.75), inset -1px 0 0 rgba(255,255,255,.03) !important;
+}
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,
 [data-testid="stSidebar"] label,
 [data-testid="stSidebar"] div,
-[data-testid="stSidebar"] small {{
+[data-testid="stSidebar"] small {
   color: var(--ink-soft) !important;
   font-family: 'Manrope', sans-serif !important;
-}}
+}
+[data-testid="stSidebar"]::-webkit-scrollbar { width: 3px; }
+[data-testid="stSidebar"]::-webkit-scrollbar-track { background: transparent; }
+[data-testid="stSidebar"]::-webkit-scrollbar-thumb { background: var(--ink-ghost); border-radius: 3px; }
 
-/* Sidebar scrollbar */
-[data-testid="stSidebar"]::-webkit-scrollbar {{ width: 3px; }}
-[data-testid="stSidebar"]::-webkit-scrollbar-track {{ background: transparent; }}
-[data-testid="stSidebar"]::-webkit-scrollbar-thumb {{ background: var(--ink-ghost); border-radius: 3px; }}
-
-/* ── METRIC CARDS — ELEVATED GLASS ─────────────────────────────── */
-[data-testid="metric-container"] {{
-  background:
-    linear-gradient(145deg, rgba(42,38,52,0.90) 0%, rgba(22,20,28,0.85) 100%) !important;
+/* ── METRIC CARDS — TRUE GLASS BUOYANCY ────────────────────── */
+[data-testid="metric-container"] {
+  background: linear-gradient(145deg, rgba(44,40,58,.92) 0%, rgba(22,20,30,.88) 100%) !important;
   backdrop-filter: var(--blur-md) !important;
   -webkit-backdrop-filter: var(--blur-md) !important;
   border: 1px solid var(--border-md) !important;
-  border-top: 1px solid rgba(255,255,255,0.18) !important;
+  border-top: 1px solid rgba(255,255,255,.20) !important;
   border-radius: var(--r-xl) !important;
-  padding: 28px 30px !important;
-  box-shadow: var(--shadow-lg) !important;
-  margin-bottom: 28px !important;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease !important;
-}}
-[data-testid="metric-container"]::before {{
+  padding: 30px 32px !important;
+  box-shadow: var(--sh-lg), 0 -1px 0 rgba(255,255,255,.06) inset !important;
+  margin-bottom: 24px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: transform .40s cubic-bezier(.22,1,.36,1), box-shadow .40s ease !important;
+  /* Buoyancy: cards appear to float above the deep bg */
+  transform: translateY(0) !important;
+}
+[data-testid="metric-container"]::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
   pointer-events: none;
-}}
-[data-testid="metric-container"]::after {{
+}
+[data-testid="metric-container"]::after {
   content: "";
   position: absolute;
   top: -60px; right: -40px;
-  width: 140px; height: 140px;
-  background: radial-gradient(circle, rgba(233,179,255,0.08) 0%, transparent 70%);
+  width: 150px; height: 150px;
+  background: radial-gradient(circle, rgba(233,179,255,.07) 0%, transparent 70%);
   pointer-events: none;
-}}
-[data-testid="metric-container"]:hover {{
-  transform: translateY(-6px) !important;
-  box-shadow: var(--shadow-xl), var(--glow-accent) !important;
+}
+[data-testid="metric-container"]:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: var(--sh-xl), var(--glow) !important;
   border-color: var(--border-glow) !important;
-}}
-
-[data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
+}
+[data-testid="metric-container"] [data-testid="stMetricLabel"] p {
   font-family: 'Manrope', sans-serif !important;
-  font-size: 0.68rem !important;
+  font-size: .66rem !important;
   font-weight: 700 !important;
-  letter-spacing: 0.12em !important;
+  letter-spacing: .14em !important;
   text-transform: uppercase !important;
   color: var(--ink-muted) !important;
-}}
+}
 [data-testid="stMetricValue"],
-[data-testid="stMetricValue"] > div {{
+[data-testid="stMetricValue"] > div {
   font-family: 'DM Mono', monospace !important;
-  font-size: 2.0rem !important;
+  font-size: 2.1rem !important;
   font-weight: 500 !important;
   color: var(--ink) !important;
-  letter-spacing: -0.03em !important;
+  letter-spacing: -.035em !important;
   line-height: 1.1 !important;
-}}
-[data-testid="stMetricDelta"] {{
+}
+[data-testid="stMetricDelta"] {
   font-family: 'Manrope', sans-serif !important;
-  font-size: 0.78rem !important;
+  font-size: .78rem !important;
   font-weight: 600 !important;
-}}
+}
 
-/* ── TABS ───────────────────────────────────────────────────────── */
-.stTabs [data-baseweb="tab-list"] {{
-  background: rgba(14,13,17,0.80) !important;
+/* ── TABS ───────────────────────────────────────────────────── */
+.stTabs [data-baseweb="tab-list"] {
+  background: rgba(12,11,16,.85) !important;
   backdrop-filter: var(--blur-sm) !important;
   border: 1px solid var(--border-md) !important;
   border-radius: var(--r-lg) !important;
   padding: 5px !important;
   gap: 3px !important;
-  box-shadow: var(--shadow-sm) !important;
-}}
-.stTabs [data-baseweb="tab"] {{
+  box-shadow: var(--sh-sm) !important;
+}
+.stTabs [data-baseweb="tab"] {
   border-radius: var(--r-md) !important;
   font-family: 'Manrope', sans-serif !important;
   font-weight: 600 !important;
-  font-size: 0.80rem !important;
+  font-size: .80rem !important;
   color: var(--ink-muted) !important;
-  padding: 9px 20px !important;
+  padding: 9px 22px !important;
   background: transparent !important;
   border: none !important;
-  letter-spacing: 0.01em !important;
-  transition: all 0.20s ease !important;
-}}
-.stTabs [data-baseweb="tab"]:hover {{
-  background: rgba(255,255,255,0.06) !important;
+  letter-spacing: .01em !important;
+  transition: all .20s ease !important;
+}
+.stTabs [data-baseweb="tab"]:hover {
+  background: rgba(255,255,255,.06) !important;
   color: var(--ink-soft) !important;
-}}
-.stTabs [aria-selected="true"] {{
-  background: linear-gradient(135deg, rgba(233,179,255,0.22) 0%, rgba(200,99,251,0.18) 100%) !important;
+}
+.stTabs [aria-selected="true"] {
+  background: linear-gradient(135deg, rgba(233,179,255,.22) 0%, rgba(200,99,251,.18) 100%) !important;
   color: var(--accent) !important;
-  border: 1px solid rgba(233,179,255,0.25) !important;
-  box-shadow: 0 2px 12px rgba(233,179,255,0.20), inset 0 1px 0 rgba(255,255,255,0.15) !important;
-}}
-.stTabs [data-baseweb="tab-panel"] {{
+  border: 1px solid rgba(233,179,255,.28) !important;
+  box-shadow: 0 2px 12px rgba(233,179,255,.22), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+.stTabs [data-baseweb="tab-panel"] {
   background: transparent !important;
   padding-top: 2rem !important;
-}}
-.stTabs [data-baseweb="tab-highlight"] {{
-  display: none !important;
-}}
+}
+.stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 
-/* ── HEADINGS ───────────────────────────────────────────────────── */
-h1, h2, h3, h4 {{
+/* ── HEADINGS ───────────────────────────────────────────────── */
+h1,h2,h3,h4 {
   font-family: 'Space Grotesk', sans-serif !important;
   color: var(--ink) !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -.02em !important;
   font-weight: 600 !important;
-}}
+}
 [data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] li,
-.stMarkdown p, .stMarkdown li {{
+[data-testid="stMarkdownContainer"] li {
   color: var(--ink-soft) !important;
   line-height: 1.70 !important;
-  font-size: 0.90rem !important;
-}}
+  font-size: .90rem !important;
+}
 
-/* ── WIDGET LABELS ──────────────────────────────────────────────── */
-.stSelectbox label, .stNumberInput label,
-.stSlider label, .stRadio label,
-.stCheckbox label, .stTextInput label {{
-  color: var(--ink-soft) !important;
-  font-weight: 600 !important;
-  font-size: 0.78rem !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  font-family: 'Manrope', sans-serif !important;
-}}
-
-/* ── SELECT / INPUT ─────────────────────────────────────────────── */
+/* ── INPUTS ─────────────────────────────────────────────────── */
+.stSelectbox label,.stNumberInput label,
+.stSlider label,.stRadio label,.stCheckbox label,.stTextInput label {
+  color: var(--ink-soft) !important; font-weight: 600 !important;
+  font-size: .78rem !important; letter-spacing: .06em !important;
+  text-transform: uppercase !important; font-family: 'Manrope', sans-serif !important;
+}
 .stSelectbox [data-baseweb="select"] div,
-.stTextInput input,
-.stNumberInput input {{
+.stTextInput input, .stNumberInput input {
   color: var(--ink) !important;
-  background: rgba(20,18,25,0.80) !important;
-  backdrop-filter: blur(10px) !important;
+  background: rgba(18,16,24,.85) !important;
   border: 1px solid var(--border-md) !important;
   border-radius: var(--r-sm) !important;
   font-family: 'Manrope', sans-serif !important;
-  font-size: 0.88rem !important;
-  box-shadow: none !important;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
-}}
+  font-size: .88rem !important;
+  transition: border-color .18s ease, box-shadow .18s ease !important;
+}
 .stSelectbox [data-baseweb="select"] div:focus-within,
-.stTextInput input:focus,
-.stNumberInput input:focus {{
+.stTextInput input:focus, .stNumberInput input:focus {
   border-color: var(--accent-mid) !important;
-  box-shadow: 0 0 0 3px rgba(200,99,251,0.18), 0 0 16px rgba(200,99,251,0.12) !important;
-}}
+  box-shadow: 0 0 0 3px rgba(200,99,251,.20), 0 0 18px rgba(200,99,251,.14) !important;
+}
 
-/* Slider track */
-.stSlider [data-baseweb="slider"] [role="slider"] {{
-  background: var(--accent) !important;
-  border: 2px solid var(--accent-mid) !important;
-  box-shadow: 0 0 12px rgba(233,179,255,0.40) !important;
-}}
-.stSlider [data-baseweb="slider"] div[data-testid="stSliderThumb"] {{
-  background: var(--accent) !important;
-}}
-
-/* ── DATAFRAME ──────────────────────────────────────────────────── */
-[data-testid="stDataFrame"] {{
+/* ── DATAFRAME ──────────────────────────────────────────────── */
+[data-testid="stDataFrame"] {
   border-radius: var(--r-lg) !important;
   overflow: hidden !important;
   border: 1px solid var(--border-md) !important;
-  box-shadow: var(--shadow-md) !important;
-  background: rgba(16,14,20,0.80) !important;
+  box-shadow: var(--sh-md) !important;
+  background: rgba(14,12,20,.85) !important;
   backdrop-filter: var(--blur-md) !important;
-}}
-[data-testid="stDataFrame"] th {{
-  background: rgba(233,179,255,0.06) !important;
-  color: var(--ink-muted) !important;
-  font-size: 0.70rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
-  border-bottom: 1px solid var(--border-md) !important;
-}}
-[data-testid="stDataFrame"] td {{
-  color: var(--ink-soft) !important;
-  font-size: 0.86rem !important;
-  border-bottom: 1px solid var(--border) !important;
-}}
+}
 
-/* ── EXPANDER ───────────────────────────────────────────────────── */
-[data-testid="stExpander"] {{
+/* ── EXPANDER ───────────────────────────────────────────────── */
+[data-testid="stExpander"] {
   border: 1px solid var(--border-md) !important;
   border-radius: var(--r-lg) !important;
-  background: rgba(18,16,22,0.82) !important;
+  background: rgba(16,14,22,.85) !important;
   backdrop-filter: var(--blur-sm) !important;
-  box-shadow: var(--shadow-sm) !important;
+  box-shadow: var(--sh-sm) !important;
   overflow: hidden !important;
-  margin-top: 12px !important;
-}}
-[data-testid="stExpander"] summary p {{
+  margin-top: 16px !important;
+  transition: box-shadow .30s ease !important;
+}
+[data-testid="stExpander"]:hover {
+  box-shadow: var(--sh-md) !important;
+}
+[data-testid="stExpander"] summary p {
   color: var(--ink) !important;
   font-weight: 600 !important;
-  font-size: 0.88rem !important;
+  font-size: .88rem !important;
   font-family: 'Space Grotesk', sans-serif !important;
-}}
+}
 
-/* ── FORM ────────────────────────────────────────────────────────── */
-[data-testid="stForm"] {{
-  background:
-    linear-gradient(145deg, rgba(38,34,48,0.90) 0%, rgba(18,16,24,0.88) 100%) !important;
+/* ── FORM ───────────────────────────────────────────────────── */
+[data-testid="stForm"] {
+  background: linear-gradient(145deg, rgba(38,34,52,.92) 0%, rgba(18,16,26,.90) 100%) !important;
   backdrop-filter: var(--blur-lg) !important;
   -webkit-backdrop-filter: var(--blur-lg) !important;
   border: 1px solid var(--border-md) !important;
-  border-top: 1px solid rgba(255,255,255,0.16) !important;
+  border-top: 1px solid rgba(255,255,255,.18) !important;
   border-radius: var(--r-2xl) !important;
   padding: 40px 44px !important;
-  box-shadow: var(--shadow-xl) !important;
-  position: relative;
-  overflow: hidden;
+  box-shadow: var(--sh-xl) !important;
+  position: relative !important;
+  overflow: hidden !important;
   margin-top: 8px !important;
-}}
-[data-testid="stForm"]::before {{
+}
+[data-testid="stForm"]::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(233,179,255,0.40) 40%, rgba(208,2,66,0.30) 70%, transparent 100%);
-}}
-[data-testid="stForm"]::after {{
-  content: "";
-  position: absolute;
-  top: -100px; right: -80px;
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(233,179,255,0.06) 0%, transparent 70%);
-  pointer-events: none;
-}}
+  background: linear-gradient(90deg, transparent 0%, rgba(233,179,255,.45) 40%, rgba(208,2,66,.32) 70%, transparent 100%);
+}
 
-/* ── SUBMIT BUTTON ──────────────────────────────────────────────── */
-[data-testid="stFormSubmitButton"] > button {{
+/* ── SUBMIT BUTTON ──────────────────────────────────────────── */
+[data-testid="stFormSubmitButton"] > button {
   background: linear-gradient(135deg, var(--accent-mid) 0%, var(--accent-dk) 100%) !important;
   border: none !important;
   border-radius: var(--r-md) !important;
   color: #1a0028 !important;
   font-family: 'Space Grotesk', sans-serif !important;
   font-weight: 700 !important;
-  font-size: 0.88rem !important;
-  letter-spacing: 0.04em !important;
+  font-size: .88rem !important;
+  letter-spacing: .04em !important;
   text-transform: uppercase !important;
   padding: 14px 36px !important;
   width: 100% !important;
-  transition: all 0.25s cubic-bezier(0.22,1,0.36,1) !important;
-  box-shadow: 0 6px 24px rgba(200,99,251,0.40), 0 2px 8px rgba(200,99,251,0.30) !important;
-}}
-[data-testid="stFormSubmitButton"] > button:hover {{
+  transition: all .25s cubic-bezier(.22,1,.36,1) !important;
+  box-shadow: 0 6px 24px rgba(200,99,251,.42), 0 2px 8px rgba(200,99,251,.32) !important;
+}
+[data-testid="stFormSubmitButton"] > button:hover {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-mid) 100%) !important;
-  box-shadow: 0 10px 32px rgba(233,179,255,0.55), 0 4px 12px rgba(233,179,255,0.35) !important;
+  box-shadow: 0 10px 36px rgba(233,179,255,.58), 0 4px 16px rgba(233,179,255,.38) !important;
   transform: translateY(-3px) !important;
-}}
-[data-testid="stFormSubmitButton"] > button:active {{
-  transform: translateY(-1px) !important;
-}}
+}
 
-/* ── REGULAR BUTTONS ─────────────────────────────────────────────── */
-.stButton > button {{
-  background: rgba(30,26,38,0.80) !important;
-  backdrop-filter: blur(10px) !important;
+/* ── BUTTONS ────────────────────────────────────────────────── */
+.stButton > button {
+  background: rgba(30,26,40,.85) !important;
+  backdrop-filter: blur(12px) !important;
   border: 1px solid var(--border-md) !important;
   border-radius: var(--r-md) !important;
   color: var(--ink) !important;
   font-family: 'Space Grotesk', sans-serif !important;
   font-weight: 600 !important;
-  font-size: 0.85rem !important;
-  padding: 10px 26px !important;
-  transition: all 0.25s cubic-bezier(0.22,1,0.36,1) !important;
-  box-shadow: var(--shadow-sm) !important;
-}}
-.stButton > button:hover {{
-  background: rgba(44,38,58,0.90) !important;
+  transition: all .25s cubic-bezier(.22,1,.36,1) !important;
+  box-shadow: var(--sh-sm) !important;
+}
+.stButton > button:hover {
+  background: rgba(48,42,66,.90) !important;
   border-color: var(--border-glow) !important;
-  box-shadow: var(--shadow-md), 0 0 20px rgba(233,179,255,0.12) !important;
+  box-shadow: var(--sh-md), 0 0 24px rgba(233,179,255,.14) !important;
   transform: translateY(-3px) !important;
-}}
+}
 
-/* ── ALERT ──────────────────────────────────────────────────────── */
-[data-testid="stAlert"] {{
+/* ── ALERTS ─────────────────────────────────────────────────── */
+[data-testid="stAlert"] {
   border-radius: var(--r-lg) !important;
   border: 1px solid var(--border-md) !important;
   backdrop-filter: var(--blur-sm) !important;
-  background: rgba(18,16,22,0.80) !important;
-}}
-[data-testid="stAlert"] p {{ color: inherit !important; }}
+  background: rgba(16,14,22,.85) !important;
+}
 
-hr {{
+/* ── HR ─────────────────────────────────────────────────────── */
+hr {
   border: none !important;
   height: 1px !important;
   background: linear-gradient(90deg, transparent, var(--border-hi), transparent) !important;
   margin: 2rem 0 !important;
-}}
+}
 
-/* ══════════════════════════════════════════════════════════════════
-   CUSTOM COMPONENT CLASSES
-   ══════════════════════════════════════════════════════════════════ */
+/* ── SCROLL ANIMATION ENGINE ────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(32px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes scaleUp {
+  from { opacity:0; transform:scale(.96) translateY(20px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
 
-/* ── HERO BANNER ────────────────────────────────────────────────── */
-.hero {{
-  background:
-    linear-gradient(145deg, rgba(52,42,72,0.92) 0%, rgba(22,18,32,0.90) 60%, rgba(14,10,22,0.95) 100%);
-  backdrop-filter: var(--blur-xl) !important;
-  -webkit-backdrop-filter: var(--blur-xl) !important;
+/* ── CUSTOM COMPONENTS ──────────────────────────────────────── */
+.hero {
+  background: linear-gradient(145deg, rgba(52,42,72,.94) 0%, rgba(22,18,34,.92) 60%, rgba(14,10,24,.96) 100%);
+  backdrop-filter: var(--blur-xl);
+  -webkit-backdrop-filter: var(--blur-xl);
   border: 1px solid var(--border-md);
-  border-top: 1px solid rgba(255,255,255,0.20);
+  border-top: 1px solid rgba(255,255,255,.22);
   border-radius: var(--r-2xl);
-  padding: 60px 72px;
-  margin-bottom: 48px;
+  padding: 64px 80px;
+  margin-bottom: 56px;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-xl), var(--glow-accent);
-  animation: scaleIn 0.70s cubic-bezier(0.22,1,0.36,1) both;
-}}
-/* Top edge light leak */
-.hero::before {{
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(233,179,255,0.60) 35%, rgba(208,2,66,0.40) 65%, transparent 100%);
-}}
-/* Radial ambient inside card */
-.hero::after {{
-  content: "";
-  position: absolute;
-  top: -120px; right: -80px;
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(233,179,255,0.12) 0%, transparent 65%);
-  pointer-events: none;
-}}
-.hero-eyebrow {{
-  font-family: 'Manrope', sans-serif;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}}
-.hero-eyebrow::before {{
-  content: "";
-  width: 24px; height: 1px;
-  background: var(--accent);
-  opacity: 0.6;
-}}
-.hero h1 {{
-  font-family: 'Space Grotesk', sans-serif !important;
-  font-size: 3.2rem !important;
-  font-weight: 600 !important;
-  color: var(--ink) !important;
-  margin: 0 0 16px 0 !important;
-  letter-spacing: -0.03em !important;
-  line-height: 1.10 !important;
-  background: linear-gradient(135deg, #f0e8ff 0%, var(--accent) 50%, var(--pink) 100%);
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}}
-.hero p {{
-  color: var(--ink-soft) !important;
-  font-family: 'Manrope', sans-serif !important;
-  font-size: 1.0rem !important;
-  line-height: 1.72 !important;
-  margin: 0 !important;
-  max-width: 560px;
-}}
-.hero-glyph {{
-  position: absolute;
-  right: 72px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 9rem;
-  opacity: 0.06;
-  color: var(--accent);
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
-  filter: blur(2px);
-}}
+  box-shadow: var(--sh-xl), var(--glow);
+  animation: scaleUp .75s cubic-bezier(.22,1,.36,1) both;
+}
+.hero::before {
+  content:"";
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgba(233,179,255,.65) 35%,rgba(208,2,66,.44) 65%,transparent 100%);
+}
+.hero::after {
+  content:"";
+  position:absolute; top:-130px; right:-90px;
+  width:520px; height:520px;
+  background:radial-gradient(circle,rgba(233,179,255,.13) 0%,transparent 65%);
+  pointer-events:none;
+}
+.hero-eyebrow {
+  font-family:'Manrope',sans-serif;
+  font-size:.66rem; font-weight:700; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--ink-muted);
+  margin-bottom:16px; display:flex; align-items:center; gap:12px;
+}
+.hero-eyebrow::before {
+  content:""; width:28px; height:1px;
+  background:var(--accent); opacity:.7;
+}
+.hero h1 {
+  font-family:'Space Grotesk',sans-serif !important;
+  font-size:3.4rem !important; font-weight:700 !important;
+  margin:0 0 18px 0 !important; letter-spacing:-.035em !important;
+  line-height:1.08 !important;
+  background:linear-gradient(135deg,#f2eaff 0%,var(--accent) 50%,var(--pink) 100%);
+  -webkit-background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  background-clip:text !important;
+}
+.hero p {
+  color:var(--ink-soft) !important;
+  font-family:'Manrope',sans-serif !important;
+  font-size:1.02rem !important; line-height:1.75 !important;
+  margin:0 !important; max-width:580px;
+}
+.hero-glyph {
+  position:absolute; right:80px; top:50%;
+  transform:translateY(-50%);
+  font-size:10rem; opacity:.055;
+  color:var(--accent); line-height:1;
+  pointer-events:none; user-select:none; filter:blur(3px);
+}
 
-/* ── SIDEBAR BRAND ──────────────────────────────────────────────── */
-.sidebar-brand {{
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.40rem;
-  font-weight: 700;
-  color: var(--ink);
-  padding: 6px 0 20px 0;
-  border-bottom: 1px solid var(--border-md);
-  margin-bottom: 20px;
-  letter-spacing: -0.025em;
-}}
-.sidebar-brand span {{
-  background: linear-gradient(135deg, var(--accent), var(--pink));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}}
+.sidebar-brand {
+  font-family:'Space Grotesk',sans-serif;
+  font-size:1.45rem; font-weight:700; color:var(--ink);
+  padding:6px 0 22px; border-bottom:1px solid var(--border-md);
+  margin-bottom:22px; letter-spacing:-.025em;
+}
+.sidebar-brand span {
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
 
-/* ── SECTION HEADER ─────────────────────────────────────────────── */
-.section-hd {{
-  font-family: 'Space Grotesk', sans-serif !important;
-  font-size: 1.08rem !important;
-  font-weight: 600 !important;
-  color: var(--ink) !important;
-  letter-spacing: -0.015em !important;
-  margin: 0 0 5px 0 !important;
-}}
-.section-sub {{
-  font-family: 'Manrope', sans-serif !important;
-  font-size: 0.875rem !important;
-  color: var(--ink-muted) !important;
-  margin: 0 0 22px 0 !important;
-  line-height: 1.6 !important;
-}}
+.section-hd {
+  font-family:'Space Grotesk',sans-serif !important;
+  font-size:1.10rem !important; font-weight:600 !important;
+  color:var(--ink) !important; letter-spacing:-.015em !important;
+  margin:0 0 6px 0 !important;
+}
+.section-sub {
+  font-family:'Manrope',sans-serif !important;
+  font-size:.88rem !important; color:var(--ink-muted) !important;
+  margin:0 0 24px 0 !important; line-height:1.65 !important;
+}
 
-/* ── INFO BOX — GLASS CARD ──────────────────────────────────────── */
-.info-box {{
-  background:
-    linear-gradient(145deg, rgba(32,28,42,0.90) 0%, rgba(18,16,24,0.85) 100%) !important;
-  backdrop-filter: var(--blur-md) !important;
-  -webkit-backdrop-filter: var(--blur-md) !important;
-  border: 1px solid var(--border-md) !important;
-  border-top: 1px solid rgba(255,255,255,0.14) !important;
-  border-radius: var(--r-lg) !important;
-  padding: 22px 26px !important;
-  font-size: 0.875rem !important;
-  color: var(--ink-soft) !important;
-  margin-bottom: 20px !important;
-  line-height: 1.75 !important;
-  box-shadow: var(--shadow-md) !important;
-  position: relative;
-  overflow: hidden;
-}}
-.info-box::before {{
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(233,179,255,0.30), transparent);
-}}
-.info-box strong {{
-  color: var(--ink) !important;
-  font-weight: 700 !important;
-}}
+.info-box {
+  background:linear-gradient(145deg,rgba(32,28,44,.92) 0%,rgba(18,16,26,.88) 100%) !important;
+  backdrop-filter:var(--blur-md) !important;
+  border:1px solid var(--border-md) !important;
+  border-top:1px solid rgba(255,255,255,.15) !important;
+  border-radius:var(--r-lg) !important;
+  padding:22px 28px !important;
+  font-size:.875rem !important; color:var(--ink-soft) !important;
+  margin-bottom:20px !important; line-height:1.80 !important;
+  box-shadow:var(--sh-md) !important;
+  position:relative; overflow:hidden;
+  transition:box-shadow .30s ease, transform .30s ease !important;
+}
+.info-box:hover {
+  box-shadow:var(--sh-lg) !important;
+  transform:translateY(-2px) !important;
+}
+.info-box::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(233,179,255,.32),transparent);
+}
+.info-box strong { color:var(--ink) !important; font-weight:700 !important; }
 
-/* ── DECISION PILLS ─────────────────────────────────────────────── */
-.pill {{
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 99px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  border: 1px solid transparent;
-  font-family: 'Manrope', sans-serif;
-}}
-.pill-expand   {{ background: rgba(74,222,128,0.15); color: #4ade80; border-color: rgba(74,222,128,0.35); }}
-.pill-maintain {{ background: rgba(250,204,21,0.15); color: #facc15; border-color: rgba(250,204,21,0.35); }}
-.pill-optimize {{ background: rgba(251,146,60,0.15); color: #fb923c; border-color: rgba(251,146,60,0.35); }}
-.pill-drop     {{ background: rgba(251,113,133,0.15); color: #fb7185; border-color: rgba(251,113,133,0.35); }}
+.pill {
+  display:inline-block; padding:3px 12px; border-radius:99px;
+  font-size:.66rem; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; border:1px solid transparent;
+  font-family:'Manrope',sans-serif;
+}
+.pill-expand   {background:rgba(74,222,128,.15);color:#4ade80;border-color:rgba(74,222,128,.38);}
+.pill-maintain {background:rgba(250,204,21,.15);color:#facc15;border-color:rgba(250,204,21,.38);}
+.pill-optimize {background:rgba(251,146,60,.15);color:#fb923c;border-color:rgba(251,146,60,.38);}
+.pill-drop     {background:rgba(251,113,133,.15);color:#fb7185;border-color:rgba(251,113,133,.38);}
 
-/* ── RESULT CARDS — FULL GLASS ──────────────────────────────────── */
-.result-card {{
-  background:
-    linear-gradient(145deg, rgba(36,32,48,0.92) 0%, rgba(18,16,26,0.90) 100%) !important;
-  backdrop-filter: var(--blur-lg) !important;
-  -webkit-backdrop-filter: var(--blur-lg) !important;
-  border: 1px solid var(--border-md) !important;
-  border-radius: var(--r-2xl) !important;
-  padding: 40px 44px !important;
-  margin: 32px 0 !important;
-  box-shadow: var(--shadow-xl) !important;
-  position: relative;
-  overflow: hidden;
-  animation: scaleIn 0.55s cubic-bezier(0.22,1,0.36,1) both;
-  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease !important;
-}}
-.result-card::before {{
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-}}
-.result-card:hover {{
-  transform: translateY(-4px) !important;
-  box-shadow: var(--shadow-xl), 0 0 60px rgba(233,179,255,0.10) !important;
-}}
-.result-expand   {{ border-left: 3px solid {CHART_EXPAND} !important; }}
-.result-maintain {{ border-left: 3px solid {CHART_MAINTAIN} !important; }}
-.result-optimize {{ border-left: 3px solid {CHART_OPTIMIZE} !important; }}
-.result-drop     {{ border-left: 3px solid {CHART_DROP} !important; }}
+.result-card {
+  background:linear-gradient(145deg,rgba(38,34,52,.94) 0%,rgba(18,16,28,.92) 100%) !important;
+  backdrop-filter:var(--blur-lg) !important;
+  border:1px solid var(--border-md) !important;
+  border-radius:var(--r-2xl) !important;
+  padding:44px 48px !important;
+  margin:36px 0 !important;
+  box-shadow:var(--sh-xl) !important;
+  position:relative; overflow:hidden;
+  animation:scaleUp .55s cubic-bezier(.22,1,.36,1) both;
+  transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease !important;
+}
+.result-card::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+}
+.result-card:hover {
+  transform:translateY(-6px) !important;
+  box-shadow:var(--sh-xl),0 0 70px rgba(233,179,255,.12) !important;
+}
+.result-expand   {border-left:3px solid #4ade80 !important;}
+.result-maintain {border-left:3px solid #facc15 !important;}
+.result-optimize {border-left:3px solid #fb923c !important;}
+.result-drop     {border-left:3px solid #fb7185 !important;}
+.result-expand::after   {content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(74,222,128,.12) 0%,transparent 70%);pointer-events:none;}
+.result-maintain::after {content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(250,204,21,.12) 0%,transparent 70%);pointer-events:none;}
+.result-optimize::after {content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(251,146,60,.12) 0%,transparent 70%);pointer-events:none;}
+.result-drop::after     {content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(251,113,133,.12) 0%,transparent 70%);pointer-events:none;}
 
-/* Colored glow on result card matching decision */
-.result-expand::after   {{ content: ""; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(74,222,128,0.10) 0%, transparent 70%); pointer-events: none; }}
-.result-maintain::after {{ content: ""; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(250,204,21,0.10) 0%, transparent 70%); pointer-events: none; }}
-.result-optimize::after {{ content: ""; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(251,146,60,0.10) 0%, transparent 70%); pointer-events: none; }}
-.result-drop::after     {{ content: ""; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(251,113,133,0.10) 0%, transparent 70%); pointer-events: none; }}
+.divider-label {
+  display:flex; align-items:center; gap:16px;
+  margin:44px 0 24px; color:var(--ink-muted);
+  font-size:.68rem; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; font-family:'Manrope',sans-serif;
+}
+.divider-label::before { content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--border-hi)); }
+.divider-label::after  { content:""; flex:1; height:1px; background:linear-gradient(90deg,var(--border-hi),transparent); }
 
-/* ── DIVIDER LABEL (light-leak style) ──────────────────────────── */
-.divider-label {{
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 36px 0 20px;
-  color: var(--ink-muted);
-  font-size: 0.70rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-family: 'Manrope', sans-serif;
-}}
-.divider-label::before {{
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-hi));
-}}
-.divider-label::after {{
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, var(--border-hi), transparent);
-}}
-
-/* ── MATPLOTLIB CHART CONTAINERS ────────────────────────────────── */
-[data-testid="stImage"],
-.stPlotlyChart,
-[data-testid="stpyplot"] {{
+/* ── iframes (SVG charts) — glass wrapper ───────────────────── */
+iframe {
   border-radius: var(--r-xl) !important;
-  overflow: hidden !important;
-}}
+  border: none !important;
+  display: block !important;
+}
 
-/* ── VERTICAL BREATHING ROOM ────────────────────────────────────── */
-[data-testid="stVerticalBlock"] > div {{
-  margin-bottom: 6px;
-}}
+/* ── scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--ink-ghost); border-radius:5px; }
+::-webkit-scrollbar-thumb:hover { background:var(--ink-muted); }
 
-/* ── SCROLLBAR ──────────────────────────────────────────────────── */
-::-webkit-scrollbar {{ width: 5px; height: 5px; }}
-::-webkit-scrollbar-track {{ background: transparent; }}
-::-webkit-scrollbar-thumb {{ background: var(--ink-ghost); border-radius: 5px; }}
-::-webkit-scrollbar-thumb:hover {{ background: var(--ink-muted); }}
-
-/* ── RADIO ──────────────────────────────────────────────────────── */
-.stRadio [data-testid="stWidgetLabel"] p {{
-  font-size: 0.78rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  color: var(--ink-soft) !important;
-}}
-
+/* ── vertical rhythm ────────────────────────────────────────── */
+[data-testid="stHorizontalBlock"] { gap:20px !important; }
 </style>
+
+<script>
+/* ── SCROLL-REVEAL ENGINE ──────────────────────────────────── */
+(function() {
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.style.opacity = "1";
+        e.target.style.transform = "translateY(0)";
+        io.unobserve(e.target);
+      }
+    });
+  },{ threshold:0.06, rootMargin:"0px 0px -30px 0px" });
+
+  function attach(){
+    var els = document.querySelectorAll(
+      "[data-testid='metric-container'], [data-testid='stDataFrame'], " +
+      "[data-testid='stExpander'], .element-container"
+    );
+    els.forEach(function(el, i){
+      if(!el.dataset.sr){
+        el.dataset.sr = "1";
+        el.style.opacity = "0";
+        el.style.transform = "translateY(28px)";
+        el.style.transition = "opacity .6s cubic-bezier(.22,1,.36,1) " + (i%5)*0.06 + "s, transform .6s cubic-bezier(.22,1,.36,1) " + (i%5)*0.06 + "s";
+        io.observe(el);
+      }
+    });
+  }
+  setTimeout(attach, 200);
+  new MutationObserver(function(){ setTimeout(attach, 100); })
+    .observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
-#  DECISION CONFIG  (unchanged from original)
+#  SVG CHART RENDERER HELPERS
+#  Each function receives already-computed Python data and
+#  returns an st.components.v1.html call with a self-contained
+#  glass-panel SVG chart.  No matplotlib anywhere.
 # ─────────────────────────────────────────────────────────────
-DECISION_COLORS = {
-    "Expand":   CHART_EXPAND,
-    "Maintain": CHART_MAINTAIN,
-    "Optimize": CHART_OPTIMIZE,
-    "Drop":     CHART_DROP,
-}
-ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
+
+CHART_CSS = """
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: transparent;
+    font-family: 'Space Grotesk', sans-serif;
+    overflow: hidden;
+  }
+  .card {
+    background: linear-gradient(145deg, rgba(34,30,48,.96) 0%, rgba(16,14,24,.94) 100%);
+    border: 1px solid rgba(255,255,255,.12);
+    border-top: 1px solid rgba(255,255,255,.20);
+    border-radius: 20px;
+    padding: 22px 24px 18px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.70), 0 4px 16px rgba(0,0,0,.55),
+                0 0 0 1px rgba(255,255,255,.06),
+                0 -1px 0 rgba(255,255,255,.06) inset;
+    position: relative;
+    overflow: hidden;
+    transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+    cursor: default;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 64px rgba(0,0,0,.75), 0 8px 24px rgba(233,179,255,.10),
+                0 0 0 1px rgba(255,255,255,.09),
+                0 0 60px rgba(233,179,255,.08);
+  }
+  .card::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.30), transparent);
+    pointer-events: none;
+  }
+  .card::after {
+    content: "";
+    position: absolute; top: -60px; right: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(233,179,255,.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .chart-title {
+    font-size: 13px; font-weight: 600; color: #e5e1e4;
+    letter-spacing: -.01em; margin-bottom: 14px;
+  }
+  svg { display: block; }
+  .axis-label { font-size: 9px; fill: #9b8c9e; font-family: 'Space Grotesk', sans-serif; }
+  .value-label { font-size: 9.5px; fill: #c4bfc6; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .grid-line { stroke: rgba(255,255,255,.045); stroke-width: .8; stroke-dasharray: 5,4; }
+  .bar-rect { transition: opacity .2s; cursor: pointer; }
+  .bar-rect:hover { opacity: .82; filter: brightness(1.15); }
+
+  /* bar entrance animation */
+  @keyframes barGrow {
+    from { transform: scaleY(0); transform-origin: bottom; }
+    to   { transform: scaleY(1); transform-origin: bottom; }
+  }
+  @keyframes barGrowH {
+    from { transform: scaleX(0); transform-origin: left; }
+    to   { transform: scaleX(1); transform-origin: left; }
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .bar-anim { animation: barGrow .65s cubic-bezier(.22,1,.36,1) both; }
+  .bar-anim-h { animation: barGrowH .65s cubic-bezier(.22,1,.36,1) both; }
+  .fade-in { animation: fadeIn .50s ease both; }
+
+  /* pie slice pulse on hover */
+  .pie-slice { transition: opacity .2s, filter .2s; cursor: pointer; }
+  .pie-slice:hover { opacity: .85; filter: brightness(1.18) drop-shadow(0 0 8px currentColor); }
+</style>
+"""
+
+def _fmt_money(v):
+    if abs(v) >= 1_000_000:
+        return f"${v/1_000_000:.1f}M"
+    if abs(v) >= 1_000:
+        return f"${v/1_000:.0f}K"
+    return f"${v:.0f}"
+
+def _grid_lines(ax_x, ax_y, w, h, n=5):
+    """Return SVG horizontal grid line strings."""
+    lines = []
+    for i in range(1, n + 1):
+        y = ax_y + h - (h * i / n)
+        lines.append(f'<line class="grid-line" x1="{ax_x}" y1="{y:.1f}" x2="{ax_x+w}" y2="{y:.1f}"/>')
+    return "\n".join(lines)
+
+def _grid_lines_v(ax_x, ax_y, w, h, n=4):
+    """Return SVG vertical grid line strings (for horizontal bar charts)."""
+    lines = []
+    for i in range(1, n + 1):
+        x = ax_x + (w * i / n)
+        lines.append(f'<line class="grid-line" x1="{x:.1f}" y1="{ax_y}" x2="{x:.1f}" y2="{ax_y+h}"/>')
+    return "\n".join(lines)
+
+
+def render_vbar_chart(title, labels, values, colors, height=340,
+                      fmt_fn=None, y_label="", uid="chart"):
+    """Vertical bar chart — pure SVG inside a glass card."""
+    if fmt_fn is None:
+        fmt_fn = lambda v: f"{v:,.0f}"
+    n = len(labels)
+    W, H = 560, height
+    pad_l, pad_r, pad_t, pad_b = 54, 20, 28, 44
+    ax_w = W - pad_l - pad_r
+    ax_h = H - pad_t - pad_b
+    bar_w = ax_w / n * 0.52
+    bar_gap = ax_w / n
+
+    vmax = max(abs(v) for v in values) if values else 1
+    vmin = min(values) if values else 0
+    has_neg = vmin < 0
+
+    def to_y(v):
+        if has_neg:
+            total = vmax - vmin
+            return pad_t + ax_h - ((v - vmin) / total) * ax_h
+        else:
+            return pad_t + ax_h - (v / vmax) * ax_h
+
+    zero_y = to_y(0) if has_neg else pad_t + ax_h
+
+    bars_svg = []
+    labels_svg = []
+    val_labels = []
+
+    for i, (lbl, v, col) in enumerate(zip(labels, values, colors)):
+        cx = pad_l + bar_gap * i + bar_gap / 2
+        bx = cx - bar_w / 2
+        by = to_y(v)
+        bh = abs(zero_y - by)
+        delay = i * 0.08
+
+        # gradient def id
+        gid = f"{uid}_g{i}"
+        bars_svg.append(f"""
+<defs>
+  <linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="{col}" stop-opacity=".95"/>
+    <stop offset="100%" stop-color="{col}" stop-opacity=".55"/>
+  </linearGradient>
+</defs>
+<rect class="bar-rect bar-anim" rx="5" ry="5"
+  x="{bx:.1f}" y="{min(by, zero_y):.1f}" width="{bar_w:.1f}" height="{bh:.1f}"
+  fill="url(#{gid})"
+  style="filter:drop-shadow(0 4px 12px {col}44);animation-delay:{delay:.2f}s"/>""")
+
+        # x-axis label
+        labels_svg.append(
+            f'<text class="axis-label" x="{cx:.1f}" y="{pad_t+ax_h+18}" text-anchor="middle">{lbl}</text>'
+        )
+        # value label above bar
+        label_y = min(by, zero_y) - 6
+        if label_y < pad_t + 6:
+            label_y = min(by, zero_y) + bh + 14
+        val_labels.append(
+            f'<text class="value-label fade-in" x="{cx:.1f}" y="{label_y:.1f}" text-anchor="middle"'
+            f' style="animation-delay:{delay+0.3:.2f}s">{fmt_fn(v)}</text>'
+        )
+
+    # y-axis tick labels
+    y_ticks = []
+    for i in range(6):
+        val = vmin + (vmax - vmin) * i / 5 if has_neg else vmax * i / 5
+        y = to_y(val)
+        y_ticks.append(
+            f'<text class="axis-label" x="{pad_l-8}" y="{y+3:.1f}" text-anchor="end">{fmt_fn(val)}</text>'
+        )
+
+    html = f"""<!DOCTYPE html><html><head>{CHART_CSS}</head><body>
+<div class="card">
+  <div class="chart-title">{title}</div>
+  <svg viewBox="0 0 {W} {H}" width="100%" style="max-height:{H}px">
+    <!-- grid -->
+    {_grid_lines(pad_l, pad_t, ax_w, ax_h)}
+    <!-- zero line -->
+    <line x1="{pad_l}" y1="{zero_y:.1f}" x2="{pad_l+ax_w}" y2="{zero_y:.1f}"
+          stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+    <!-- bars -->
+    {''.join(bars_svg)}
+    <!-- axis labels -->
+    {''.join(labels_svg)}
+    {''.join(val_labels)}
+    {''.join(y_ticks)}
+    <!-- y-axis label -->
+    <text class="axis-label" x="12" y="{pad_t + ax_h//2}" text-anchor="middle"
+          transform="rotate(-90,12,{pad_t + ax_h//2})">{y_label}</text>
+  </svg>
+</div>
+</body></html>"""
+    return html
+
+
+def render_hbar_chart(title, labels, values, colors, height=None, fmt_fn=None, x_label="", uid="hchart"):
+    """Horizontal bar chart — pure SVG inside a glass card."""
+    if fmt_fn is None:
+        fmt_fn = _fmt_money
+    n = len(labels)
+    W = 560
+    H = height or max(260, 42 * n + 80)
+    pad_l, pad_r, pad_t, pad_b = 110, 80, 28, 32
+    ax_w = W - pad_l - pad_r
+    ax_h = H - pad_t - pad_b
+    bar_h = ax_h / n * 0.58
+    bar_gap = ax_h / n
+
+    vmax = max(values) if values else 1
+
+    bars_svg = []
+    for i, (lbl, v, col) in enumerate(zip(labels, values, colors)):
+        cy = pad_t + bar_gap * i + bar_gap / 2
+        by = cy - bar_h / 2
+        bw = (v / vmax) * ax_w
+        delay = i * 0.07
+        gid = f"{uid}_g{i}"
+
+        bars_svg.append(f"""
+<defs>
+  <linearGradient id="{gid}" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="{col}" stop-opacity=".90"/>
+    <stop offset="100%" stop-color="{col}" stop-opacity=".50"/>
+  </linearGradient>
+</defs>
+<rect class="bar-rect bar-anim-h" rx="4" ry="4"
+  x="{pad_l}" y="{by:.1f}" width="{bw:.1f}" height="{bar_h:.1f}"
+  fill="url(#{gid})"
+  style="filter:drop-shadow(0 3px 10px {col}44);animation-delay:{delay:.2f}s"/>
+<text class="axis-label" x="{pad_l-8}" y="{cy+3.5:.1f}" text-anchor="end" font-size="9">{lbl}</text>
+<text class="value-label fade-in" x="{pad_l+bw+6:.1f}" y="{cy+3.5:.1f}"
+  style="animation-delay:{delay+0.25:.2f}s">{fmt_fn(v)}</text>""")
+
+    html = f"""<!DOCTYPE html><html><head>{CHART_CSS}</head><body>
+<div class="card">
+  <div class="chart-title">{title}</div>
+  <svg viewBox="0 0 {W} {H}" width="100%" style="max-height:{H}px">
+    {_grid_lines_v(pad_l, pad_t, ax_w, ax_h)}
+    <line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{pad_t+ax_h}"
+          stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+    {''.join(bars_svg)}
+    <text class="axis-label" x="{pad_l + ax_w//2}" y="{H-6}" text-anchor="middle">{x_label}</text>
+  </svg>
+</div>
+</body></html>"""
+    return html
+
+
+def render_pie_chart(title, labels, values, colors, height=320, uid="pie"):
+    """Donut / pie chart — pure SVG inside a glass card."""
+    total = sum(values)
+    if total == 0:
+        return ""
+    W, H = 480, height
+    cx, cy, r_outer, r_inner = W // 2, H // 2 - 10, min(W, H) // 2 - 50, 55
+
+    slices = []
+    legend = []
+    angle = -90.0  # start at top
+
+    for i, (lbl, v, col) in enumerate(zip(labels, values, colors)):
+        frac = v / total
+        sweep = frac * 360
+        start_rad = angle * 3.14159265 / 180
+        end_rad = (angle + sweep) * 3.14159265 / 180
+
+        x1 = cx + r_outer * __import__('math').cos(start_rad)
+        y1 = cy + r_outer * __import__('math').sin(start_rad)
+        x2 = cx + r_outer * __import__('math').cos(end_rad)
+        y2 = cy + r_outer * __import__('math').sin(end_rad)
+        xi1 = cx + r_inner * __import__('math').cos(end_rad)
+        yi1 = cy + r_inner * __import__('math').sin(end_rad)
+        xi2 = cx + r_inner * __import__('math').cos(start_rad)
+        yi2 = cy + r_inner * __import__('math').sin(start_rad)
+        large = 1 if sweep > 180 else 0
+
+        # label position
+        mid_rad = (angle + sweep / 2) * 3.14159265 / 180
+        lx = cx + (r_outer * 0.72) * __import__('math').cos(mid_rad)
+        ly = cy + (r_outer * 0.72) * __import__('math').sin(mid_rad)
+
+        d = (f"M {x1:.2f} {y1:.2f} "
+             f"A {r_outer} {r_outer} 0 {large} 1 {x2:.2f} {y2:.2f} "
+             f"L {xi1:.2f} {yi1:.2f} "
+             f"A {r_inner} {r_inner} 0 {large} 0 {xi2:.2f} {yi2:.2f} Z")
+
+        delay = i * 0.10
+        gid = f"{uid}_pg{i}"
+        slices.append(f"""
+<defs>
+  <radialGradient id="{gid}" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="{col}" stop-opacity=".95"/>
+    <stop offset="100%" stop-color="{col}" stop-opacity=".65"/>
+  </radialGradient>
+</defs>
+<path class="pie-slice fade-in" d="{d}" fill="url(#{gid})"
+  stroke="rgba(11,11,13,1)" stroke-width="2.5"
+  style="filter:drop-shadow(0 4px 14px {col}55);animation-delay:{delay:.2f}s">
+  <title>{lbl}: {frac:.1%}</title>
+</path>
+<text class="value-label fade-in" x="{lx:.1f}" y="{ly+4:.1f}"
+  text-anchor="middle" font-size="10"
+  style="animation-delay:{delay+0.25:.2f}s">{frac:.0%}</text>""")
+
+        # legend row
+        lrow_y = H - 60 + i * 0 + 0  # will compute below
+        legend.append((col, lbl, frac))
+        angle += sweep
+
+    # legend below chart
+    legend_svg = []
+    lx0 = 20
+    ly0 = H - 36
+    for i, (col, lbl, frac) in enumerate(legend):
+        ox = lx0 + i * (W // len(legend))
+        legend_svg.append(
+            f'<rect x="{ox}" y="{ly0}" width="10" height="10" rx="3" fill="{col}" opacity=".85"/>'
+            f'<text class="axis-label" x="{ox+14}" y="{ly0+9}">{lbl} {frac:.1%}</text>'
+        )
+
+    html = f"""<!DOCTYPE html><html><head>{CHART_CSS}</head><body>
+<div class="card">
+  <div class="chart-title">{title}</div>
+  <svg viewBox="0 0 {W} {H}" width="100%" style="max-height:{H}px">
+    {''.join(slices)}
+    {''.join(legend_svg)}
+  </svg>
+</div>
+</body></html>"""
+    return html
+
+
+def render_grouped_bar_chart(title, group_labels, series, colors, height=300, uid="grp"):
+    """Grouped bar chart for model comparison."""
+    n_groups = len(group_labels)
+    n_series = len(series)
+    W, H = 640, height
+    pad_l, pad_r, pad_t, pad_b = 50, 20, 36, 56
+    ax_w = W - pad_l - pad_r
+    ax_h = H - pad_t - pad_b
+    group_w = ax_w / n_groups
+    bar_w = group_w * 0.35
+    bar_offsets = [-(n_series - 1) * bar_w / 2 + i * bar_w for i in range(n_series)]
+
+    all_vals = [v for s in series for v in s["values"]]
+    vmax = max(all_vals) * 1.15
+
+    def to_y(v):
+        return pad_t + ax_h - (v / vmax) * ax_h
+
+    bars_svg = []
+    legend_svg = []
+
+    for si, s in enumerate(series):
+        col = colors[si]
+        gid_base = f"{uid}_s{si}"
+        for gi, (lbl, v) in enumerate(zip(group_labels, s["values"])):
+            cx = pad_l + group_w * gi + group_w / 2 + bar_offsets[si]
+            by = to_y(v)
+            bh = pad_t + ax_h - by
+            delay = (gi * n_series + si) * 0.06
+            gid = f"{gid_base}g{gi}"
+            bars_svg.append(f"""
+<defs>
+  <linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="{col}" stop-opacity=".95"/>
+    <stop offset="100%" stop-color="{col}" stop-opacity=".50"/>
+  </linearGradient>
+</defs>
+<rect class="bar-rect bar-anim" rx="4"
+  x="{cx - bar_w/2:.1f}" y="{by:.1f}" width="{bar_w:.1f}" height="{bh:.1f}"
+  fill="url(#{gid})" style="filter:drop-shadow(0 3px 10px {col}44);animation-delay:{delay:.2f}s"/>
+<text class="value-label fade-in" x="{cx:.1f}" y="{by-5:.1f}" text-anchor="middle" font-size="8.5"
+  style="animation-delay:{delay+0.25:.2f}s">{v:.0%}</text>""")
+
+        # legend
+        lx = pad_l + si * 110
+        legend_svg.append(
+            f'<rect x="{lx}" y="{H-20}" width="10" height="10" rx="3" fill="{col}" opacity=".85"/>'
+            f'<text class="axis-label" x="{lx+14}" y="{H-11}">{s["label"]}</text>'
+        )
+
+    # x-axis group labels
+    x_labels = []
+    for gi, lbl in enumerate(group_labels):
+        cx = pad_l + group_w * gi + group_w / 2
+        # wrap long labels
+        words = lbl.split()
+        if len(words) > 2:
+            line1 = " ".join(words[:2])
+            line2 = " ".join(words[2:])
+            x_labels.append(
+                f'<text class="axis-label" x="{cx:.1f}" y="{pad_t+ax_h+14}" text-anchor="middle">{line1}</text>'
+                f'<text class="axis-label" x="{cx:.1f}" y="{pad_t+ax_h+25}" text-anchor="middle">{line2}</text>'
+            )
+        else:
+            x_labels.append(
+                f'<text class="axis-label" x="{cx:.1f}" y="{pad_t+ax_h+14}" text-anchor="middle">{lbl}</text>'
+            )
+
+    y_ticks = []
+    for i in range(6):
+        val = vmax * i / 5
+        y = to_y(val)
+        y_ticks.append(
+            f'<text class="axis-label" x="{pad_l-8}" y="{y+3:.1f}" text-anchor="end">{val:.0%}</text>'
+        )
+
+    html = f"""<!DOCTYPE html><html><head>{CHART_CSS}</head><body>
+<div class="card">
+  <div class="chart-title">{title}</div>
+  <svg viewBox="0 0 {W} {H}" width="100%" style="max-height:{H}px">
+    {_grid_lines(pad_l, pad_t, ax_w, ax_h)}
+    <line x1="{pad_l}" y1="{pad_t+ax_h}" x2="{pad_l+ax_w}" y2="{pad_t+ax_h}"
+          stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+    {''.join(bars_svg)}
+    {''.join(x_labels)}
+    {''.join(y_ticks)}
+    {''.join(legend_svg)}
+  </svg>
+</div>
+</body></html>"""
+    return html
+
+
+def svg_chart(html_str, height):
+    """Render the chart HTML in a transparent iframe."""
+    components.html(html_str, height=height, scrolling=False)
+
 
 # ─────────────────────────────────────────────────────────────
-#  CHART HELPER  (restyled, same data logic)
-# ─────────────────────────────────────────────────────────────
-def clean_fig(figsize=(8, 4)):
-    """
-    Return a matplotlib figure/axes pair styled for the deep glassmorphic dark theme.
-
-    Charts use a very dark semi-transparent fill so they appear as sunken glass
-    panels against the ambient background. Subtle horizontal grid lines at low
-    opacity guide the eye without cluttering. All text uses the Space Grotesk /
-    Manrope palette from the design system.
-    """
-    fig, ax = plt.subplots(figsize=figsize)
-
-    # Figure background: deep translucent panel (matches --surface colour)
-    fig.patch.set_facecolor("#0f0d14")
-    fig.patch.set_alpha(0.0)   # fully transparent — let CSS glass panel show
-
-    # Axes background: very subtle dark fill to give chart area slight depth
-    ax.set_facecolor((0.07, 0.06, 0.10, 0.60))
-
-    # ── Spines ──────────────────────────────────────────────────────────────
-    # Remove top & right; keep left/bottom but render them very dimly
-    for s in ["top", "right"]:
-        ax.spines[s].set_visible(False)
-    ax.spines["left"].set_color("#2a2532")
-    ax.spines["left"].set_linewidth(1.2)
-    ax.spines["bottom"].set_color("#2a2532")
-    ax.spines["bottom"].set_linewidth(1.2)
-
-    # ── Ticks & Labels ──────────────────────────────────────────────────────
-    ax.tick_params(
-        axis="both", which="both",
-        colors="#9b8c9e",
-        labelsize=8.5,
-        length=0,          # no tick marks, just labels
-        pad=6,
-    )
-    for label in ax.get_xticklabels() + ax.get_yticklabels():
-        label.set_fontfamily("sans-serif")
-
-    ax.xaxis.label.set_color("#9b8c9e")
-    ax.xaxis.label.set_fontsize(9)
-    ax.yaxis.label.set_color("#9b8c9e")
-    ax.yaxis.label.set_fontsize(9)
-
-    # ── Title ───────────────────────────────────────────────────────────────
-    ax.title.set_color("#e5e1e4")
-    ax.title.set_fontsize(11.5)
-    ax.title.set_fontweight("600")
-    # set_pad is not a valid Text method; padding is applied via set_title pad param
-    # so we store it and apply it when titles are set via a monkey-patched helper.
-    # For now we just configure a reasonable top pad on the axes directly:
-    ax.tick_params(axis="x", pad=6)
-
-    # ── Grid ────────────────────────────────────────────────────────────────
-    # Fine dashed horizontal guide lines at very low opacity
-    ax.grid(
-        axis="y",
-        color=(1.0, 1.0, 1.0, 0.055),
-        linewidth=0.8,
-        linestyle=(0, (6, 4)),   # custom dash: 6 on, 4 off
-    )
-    ax.set_axisbelow(True)
-
-    # ── Figure padding ──────────────────────────────────────────────────────
-    fig.tight_layout(pad=1.6)
-
-    return fig, ax
-
-def col_seq(labels):
-    return [DECISION_COLORS.get(l, "#CCCCCC") for l in labels]
-
-# ─────────────────────────────────────────────────────────────
-#  PATHS  (unchanged)
+#  PATHS
 # ─────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(__file__)
 DATA_PATH    = os.path.join(BASE_DIR, "airline_route_profitability.csv")
@@ -919,13 +1082,13 @@ def prepare_input(input_df, training_columns):
     return enc.reindex(columns=training_columns, fill_value=0)
 
 # ─────────────────────────────────────────────────────────────
-#  LOAD  (unchanged)
+#  LOAD
 # ─────────────────────────────────────────────────────────────
 df = load_data()
 model1, model2, model3, X1_columns, X2_columns, X3_columns = load_artifacts()
 
 # ─────────────────────────────────────────────────────────────
-#  PRE-COMPUTED DATA  (unchanged)
+#  PRE-COMPUTED DATA
 # ─────────────────────────────────────────────────────────────
 comparison = pd.DataFrame({
     "Model":    ["With revenue variables", "Without revenue variables", "Only pre-operational features"],
@@ -956,8 +1119,8 @@ if "pred_result" not in st.session_state:
 with st.sidebar:
     st.markdown('<div class="sidebar-brand">Sky<span>Lens</span></div>', unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.75rem;color:#9b8c9e;margin-bottom:18px;font-weight:500;"
-        "letter-spacing:0.05em;text-transform:uppercase'>Filter view</p>",
+        "<p style='font-size:.74rem;color:#9b8c9e;margin-bottom:18px;font-weight:600;"
+        "letter-spacing:.06em;text-transform:uppercase'>Filter view</p>",
         unsafe_allow_html=True
     )
     route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
@@ -972,9 +1135,9 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("""
-    <p style='font-size:0.72rem;color:#9b8c9e;font-weight:700;letter-spacing:0.10em;
-    text-transform:uppercase;margin-bottom:10px'>Decision Labels</p>
-    <div style='display:flex;flex-direction:column;gap:8px;font-size:0.82rem;color:#c4c0c5'>
+    <p style='font-size:.70rem;color:#9b8c9e;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;margin-bottom:12px'>Decision Labels</p>
+    <div style='display:flex;flex-direction:column;gap:10px;font-size:.82rem;color:#c4bfc6'>
       <div><span class='pill pill-expand'>Expand</span>&nbsp;&nbsp;High profit &amp; demand</div>
       <div><span class='pill pill-maintain'>Maintain</span>&nbsp;&nbsp;Stable performer</div>
       <div><span class='pill pill-optimize'>Optimize</span>&nbsp;&nbsp;Room to improve</div>
@@ -983,7 +1146,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
-#  FILTERING  (logic unchanged)
+#  FILTERING
 # ─────────────────────────────────────────────────────────────
 fdf = df.copy()
 if sel_route    != "All": fdf = fdf[fdf["Route"]          == sel_route]
@@ -998,76 +1161,10 @@ st.markdown("""
 <div class="hero">
   <div class="hero-eyebrow">Route Intelligence Platform</div>
   <h1>SkyLens Dashboard</h1>
-  <p>
-    Built on a sample airline dataset for analysis and demonstration purposes only.
-    Does not reflect real-time airline operations or current flight decisions.
-  </p>
+  <p>Built on a sample airline dataset for analysis and demonstration purposes only.
+     Does not reflect real-time airline operations or current flight decisions.</p>
   <div class="hero-glyph">&#9992;</div>
 </div>
-
-<!-- SCROLL-REVEAL ENGINE -->
-<style>
-  .sr-hidden {
-    opacity: 0;
-    transform: translateY(32px);
-    transition: opacity 0.65s cubic-bezier(0.22,1,0.36,1),
-                transform 0.65s cubic-bezier(0.22,1,0.36,1);
-  }
-  .sr-visible { opacity: 1 !important; transform: translateY(0) !important; }
-  [data-testid="stpyplot"] > div,
-  [data-testid="stImage"] {
-    background: linear-gradient(145deg, rgba(28,24,38,0.90) 0%, rgba(14,12,20,0.85) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.10);
-    border-top: 1px solid rgba(255,255,255,0.16);
-    border-radius: 20px !important;
-    padding: 18px 18px 10px 18px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.65), 0 2px 8px rgba(0,0,0,0.50);
-    margin-bottom: 4px;
-    position: relative;
-    overflow: hidden;
-  }
-  [data-testid="stpyplot"] > div::before,
-  [data-testid="stImage"]::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
-    pointer-events: none;
-    z-index: 1;
-  }
-  .element-container + .element-container { margin-top: 10px; }
-  [data-testid="stHorizontalBlock"] { gap: 20px !important; }
-</style>
-<script>
-(function() {
-  var io = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) {
-        e.target.classList.remove("sr-hidden");
-        e.target.classList.add("sr-visible");
-        io.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
-  function attach() {
-    document.querySelectorAll(
-      ".element-container, [data-testid='metric-container'], [data-testid='stDataFrame'], [data-testid='stExpander']"
-    ).forEach(function(el, i) {
-      if (!el.dataset.srAttached) {
-        el.dataset.srAttached = "1";
-        el.classList.add("sr-hidden");
-        el.style.transitionDelay = (i % 6) * 0.06 + "s";
-        io.observe(el);
-      }
-    });
-  }
-  attach();
-  new MutationObserver(attach).observe(document.body, { childList: true, subtree: true });
-})();
-</script>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
@@ -1084,8 +1181,8 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # ── TAB 1 · OVERVIEW ─────────────────────────────────────────
 with tab1:
     n          = len(fdf)
-    avg_profit = fdf["Profit"].mean()
-    avg_load   = fdf["Load_Factor"].mean()
+    avg_profit = fdf["Profit"].mean() if n else 0
+    avg_load   = fdf["Load_Factor"].mean() if n else 0
     n_routes   = fdf["Route"].nunique()
 
     expand_pct   = (fdf["Route_Decision"] == "Expand").mean()   * 100 if n else 0
@@ -1093,16 +1190,14 @@ with tab1:
     optimize_pct = (fdf["Route_Decision"] == "Optimize").mean() * 100 if n else 0
     drop_pct     = (fdf["Route_Decision"] == "Drop").mean()     * 100 if n else 0
 
-    # Primary KPIs
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Total Flights",   f"{n:,}")
     c2.metric("Unique Routes",   f"{n_routes}")
     c3.metric("Average Profit",  f"${avg_profit:,.0f}")
     c4.metric("Avg Load Factor", f"{avg_load:.0%}")
 
-    st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
-    # Decision split KPIs
     d1, d2, d3, d4 = st.columns(4)
     d1.metric("Expand",   f"{expand_pct:.1f}%")
     d2.metric("Maintain", f"{maintain_pct:.1f}%")
@@ -1118,29 +1213,11 @@ with tab1:
         st.markdown('<p class="section-hd">Decision mix</p>', unsafe_allow_html=True)
         dc = fdf["Route_Decision"].value_counts()
         dc = dc.reindex([x for x in ORDER if x in dc.index]).dropna()
-        wc = {
-            "Expand":   CHART_EXPAND,
-            "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_OPTIMIZE,
-            "Drop":     CHART_DROP,
-        }
-        fig, ax = clean_fig((5, 4.6))
-        wedges, texts, autotexts = ax.pie(
-            dc.values,
-            labels=dc.index,
-            autopct="%1.1f%%",
-            colors=[wc[l] for l in dc.index],
-            startangle=90,
-            wedgeprops={"linewidth": 3, "edgecolor": COLOR_BORDER_MD_RGBA},
-            textprops={"color": COLOR_INK, "fontsize": 9.5, "fontfamily": "Syne"},
-            pctdistance=0.78,
-        )
-        for at in autotexts:
-            at.set_fontsize(8.5)
-            at.set_color(COLOR_INK)
-            at.set_fontweight("bold")
-        ax.set_title("Share of Flights by Decision", pad=14)
-        st.pyplot(fig)
+        pie_labels = dc.index.tolist()
+        pie_values = dc.values.tolist()
+        pie_colors = [DECISION_COLORS.get(l, "#888") for l in pie_labels]
+        svg_chart(render_pie_chart("Share of Flights by Decision",
+                                   pie_labels, pie_values, pie_colors, height=300, uid="pie1"), 330)
 
     with right:
         st.markdown('<p class="section-hd">Average metrics by decision</p>', unsafe_allow_html=True)
@@ -1159,7 +1236,7 @@ with tab1:
         )
         st.dataframe(summary, use_container_width=True, hide_index=True)
         st.markdown("""
-        <div class="info-box">
+        <div class="info-box" style="margin-top:16px">
           <strong>How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
           <strong>Expand</strong> routes should have the highest values across all three columns.
@@ -1179,26 +1256,12 @@ with tab2:
             .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()])
             .dropna()
         )
-        fig, ax = clean_fig((6, 4))
-        bars = ax.bar(
-            apd.index, apd.values,
-            color=col_seq(apd.index.tolist()),
-            width=0.5,
-            edgecolor=COLOR_BORDER_MD_RGBA,
-            linewidth=2,
-        )
-        for b in bars:
-            h = b.get_height()
-            ax.text(
-                b.get_x() + b.get_width() / 2,
-                h + abs(apd.values).max() * 0.025,
-                f"${h:,.0f}",
-                ha="center", va="bottom",
-                fontsize=8, color=COLOR_INK_SOFT, fontweight="700",
-            )
-        ax.set_ylabel("Average Profit ($)")
-        ax.set_title("Average Profit by Decision", pad=14)
-        st.pyplot(fig)
+        svg_chart(render_vbar_chart(
+            "Average Profit by Decision",
+            apd.index.tolist(), apd.values.tolist(),
+            [DECISION_COLORS.get(l, "#888") for l in apd.index],
+            height=320, fmt_fn=_fmt_money, y_label="Avg Profit ($)", uid="tab2_profit"
+        ), 360)
 
     with right:
         ald = (
@@ -1206,26 +1269,12 @@ with tab2:
             .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()])
             .dropna()
         )
-        fig, ax = clean_fig((6, 4))
-        bars = ax.bar(
-            ald.index, ald.values,
-            color=col_seq(ald.index.tolist()),
-            width=0.5,
-            edgecolor=COLOR_BORDER_MD_RGBA,
-            linewidth=2,
-        )
-        for b in bars:
-            h = b.get_height()
-            ax.text(
-                b.get_x() + b.get_width() / 2,
-                h + 0.006,
-                f"{h:.0%}",
-                ha="center", va="bottom",
-                fontsize=8, color=COLOR_INK_SOFT, fontweight="700",
-            )
-        ax.set_ylabel("Average Seat Occupancy")
-        ax.set_title("Seat Occupancy by Decision", pad=14)
-        st.pyplot(fig)
+        svg_chart(render_vbar_chart(
+            "Seat Occupancy by Decision",
+            ald.index.tolist(), ald.values.tolist(),
+            [DECISION_COLORS.get(l, "#888") for l in ald.index],
+            height=320, fmt_fn=lambda v: f"{v:.0%}", y_label="Avg Load Factor", uid="tab2_load"
+        ), 360)
 
     st.markdown('<div class="divider-label">Cost breakdown</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Where is the money going?</p>', unsafe_allow_html=True)
@@ -1240,42 +1289,23 @@ with tab2:
     avail_costs = [c for c in cost_cols if c in fdf.columns]
     cost_means  = fdf[avail_costs].mean().sort_values(ascending=True).tail(8)
     label_map   = {
-        "Fuel_Cost":               "Fuel",
-        "Maintenance_Cost":        "Maintenance",
-        "Crew_Cost":               "Crew",
-        "Depreciation_Cost":       "Depreciation",
-        "Insurance_Cost":          "Insurance",
-        "Airport_Fees":            "Airport Fees",
-        "Catering_Cost":           "Catering",
-        "Handling_Cost":           "Handling",
-        "Navigation_Fees":         "Navigation",
-        "Sales_Distribution_Cost": "Sales & Dist.",
-        "Passenger_Service_Cost":  "Pax Service",
-        "Overhead_Cost":           "Overhead",
-        "Marketing_Cost":          "Marketing",
-        "IT_Systems_Cost":         "IT Systems",
+        "Fuel_Cost":"Fuel","Maintenance_Cost":"Maintenance","Crew_Cost":"Crew",
+        "Depreciation_Cost":"Depreciation","Insurance_Cost":"Insurance",
+        "Airport_Fees":"Airport Fees","Catering_Cost":"Catering","Handling_Cost":"Handling",
+        "Navigation_Fees":"Navigation","Sales_Distribution_Cost":"Sales & Dist.",
+        "Passenger_Service_Cost":"Pax Service","Overhead_Cost":"Overhead",
+        "Marketing_Cost":"Marketing","IT_Systems_Cost":"IT Systems",
     }
-    cost_means.index = [label_map.get(i, i) for i in cost_means.index]
-    fig, ax = clean_fig((9, 4))
-    bars = ax.barh(
-        cost_means.index, cost_means.values,
-        color=CHART_NEUTRAL[:len(cost_means)],
-        edgecolor=COLOR_BORDER_MD_RGBA,
-        linewidth=2,
-        height=0.55,
-    )
-    mx = cost_means.max()
-    for b in bars:
-        w = b.get_width()
-        ax.text(
-            w + mx * 0.012,
-            b.get_y() + b.get_height() / 2,
-            f"${w:,.0f}",
-            va="center", fontsize=8, color=COLOR_INK_SOFT, fontweight="700",
-        )
-    ax.set_xlabel("Average Cost per Flight ($)")
-    ax.set_title("Top Cost Drivers", pad=14)
-    st.pyplot(fig)
+    cost_labels = [label_map.get(i, i) for i in cost_means.index]
+    cost_values = cost_means.values.tolist()
+    cost_colors = C_NEUTRAL[:len(cost_labels)]
+
+    svg_chart(render_hbar_chart(
+        "Top Cost Drivers",
+        cost_labels, cost_values, cost_colors,
+        height=max(280, 42 * len(cost_labels) + 80),
+        fmt_fn=_fmt_money, x_label="Average Cost per Flight ($)", uid="tab2_costs"
+    ), max(320, 42 * len(cost_labels) + 120))
 
 # ── TAB 3 · ROUTE ACTIONS ────────────────────────────────────
 with tab3:
@@ -1283,51 +1313,43 @@ with tab3:
     st.markdown('<p class="section-sub">A quick view of your best and worst performing routes.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        "<p style='font-size:0.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
-        "Top routes currently classified as Expand</p>",
-        unsafe_allow_html=True,
+        "<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
+        "Top routes currently classified as Expand</p>", unsafe_allow_html=True,
     )
     expand_routes = (
         fdf[fdf["Route_Decision"] == "Expand"]
         .sort_values("Profit", ascending=False)
         [["Route", "Profit", "Profit_Margin", "Load_Factor"]]
         .head(10)
-        .rename(columns={
-            "Profit":        "Avg Profit ($)",
-            "Profit_Margin": "Profit Margin",
-            "Load_Factor":   "Load Factor",
-        })
+        .rename(columns={"Profit":"Avg Profit ($)","Profit_Margin":"Profit Margin","Load_Factor":"Load Factor"})
     )
     st.dataframe(expand_routes, use_container_width=True, hide_index=True)
 
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
     left, right = st.columns(2)
 
     with left:
-        st.markdown(
-            "<p style='font-size:0.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
-            "Top 10 routes by total profit</p>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
-        fig, ax = clean_fig((7, 5))
-        ax.barh(top.index, top.values, color=CHART_EXPAND, edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2, height=0.55)
-        ax.set_xlabel("Total Profit ($)")
-        ax.set_title("Top 10 Routes", pad=14)
-        st.pyplot(fig)
+        svg_chart(render_hbar_chart(
+            "Top 10 Routes",
+            top.index.tolist(), top.values.tolist(),
+            [C_EXPAND] * len(top),
+            height=max(260, 42 * len(top) + 80),
+            fmt_fn=_fmt_money, x_label="Total Profit ($)", uid="tab3_top"
+        ), max(300, 42 * len(top) + 120))
 
     with right:
-        st.markdown(
-            "<p style='font-size:0.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
-            "Bottom 10 routes by total profit</p>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
-        fig, ax = clean_fig((7, 5))
-        ax.barh(worst.index, worst.values, color=CHART_DROP, edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2, height=0.55)
-        ax.set_xlabel("Total Profit ($)")
-        ax.set_title("Bottom 10 Routes", pad=14)
-        st.pyplot(fig)
+        worst_abs = worst.abs()
+        svg_chart(render_hbar_chart(
+            "Bottom 10 Routes",
+            worst.index.tolist(), worst_abs.values.tolist(),
+            [C_DROP] * len(worst),
+            height=max(260, 42 * len(worst) + 80),
+            fmt_fn=lambda v: f"−{_fmt_money(v)}", x_label="Loss Magnitude ($)", uid="tab3_bot"
+        ), max(300, 42 * len(worst) + 120))
 
 # ── TAB 4 · ROUTE STABILITY ──────────────────────────────────
 with tab4:
@@ -1336,97 +1358,47 @@ with tab4:
 
     left, right = st.columns(2)
     with left:
-        st.markdown(
-            "<p style='font-size:0.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
-            "Routes with most decision changes</p>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Routes with most decision changes</p>", unsafe_allow_html=True)
         st.dataframe(route_switches.head(10), use_container_width=True, hide_index=True)
     with right:
-        st.markdown(
-            "<p style='font-size:0.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
-            "Routes seen in the most decision states</p>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Routes seen in the most decision states</p>", unsafe_allow_html=True)
         st.dataframe(route_variability.head(10), use_container_width=True, hide_index=True)
 
     st.markdown('<div class="divider-label">Distribution</div>', unsafe_allow_html=True)
-    st.markdown(
-        "<p style='font-size:0.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
-        "How many unique routes appear in each category?</p>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>How many unique routes appear in each category?</p>", unsafe_allow_html=True)
 
     urbd = (
         df.groupby("Route_Decision")["Route"].nunique().reset_index()
         .rename(columns={"Route": "Unique Routes"})
         .set_index("Route_Decision")
-        .reindex(ORDER)
-        .dropna()
+        .reindex(ORDER).dropna()
     )
-    bc_map = {
-        "Expand":   CHART_EXPAND,
-        "Maintain": CHART_MAINTAIN,
-        "Optimize": CHART_OPTIMIZE,
-        "Drop":     CHART_DROP,
-    }
-    bc = [bc_map.get(i, "#CCCCCC") for i in urbd.index]
-    fig, ax = clean_fig((8, 4))
-    bars = ax.bar(
-        urbd.index, urbd["Unique Routes"],
-        color=bc, width=0.5,
-        edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2,
-    )
-    for b in bars:
-        h = b.get_height()
-        ax.text(
-            b.get_x() + b.get_width() / 2,
-            h + 0.3,
-            f"{int(h)}",
-            ha="center", fontsize=9, color=COLOR_INK_SOFT, fontweight="700",
-        )
-    ax.set_ylabel("Number of Unique Routes")
-    ax.set_title("Unique Routes per Decision Category", pad=14)
-    st.pyplot(fig)
-
-    patches = [mpatches.Patch(color=bc_map.get(d, "#CCCCCC"), label=d) for d in ORDER]
-    fig2, ax2 = plt.subplots(figsize=(5, 0.5))
-    fig2.patch.set_alpha(0)
-    ax2.axis("off")
-    ax2.legend(handles=patches, loc="center", frameon=False, ncol=4,
-               prop={"size": 9}, labelcolor=COLOR_INK)
-    st.pyplot(fig2)
+    svg_chart(render_vbar_chart(
+        "Unique Routes per Decision Category",
+        urbd.index.tolist(),
+        urbd["Unique Routes"].tolist(),
+        [DECISION_COLORS.get(d, "#888") for d in urbd.index],
+        height=300, fmt_fn=lambda v: str(int(v)),
+        y_label="Unique Routes", uid="tab4_urbd"
+    ), 340)
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
 with tab5:
     st.markdown('<p class="section-hd">Simulate a route scenario</p>', unsafe_allow_html=True)
     st.markdown('<p class="section-sub">Enter route characteristics and our model will suggest the best decision.</p>', unsafe_allow_html=True)
 
-    # Model accuracy chart
-    st.markdown(
-        "<p style='font-size:0.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
-        "How accurate are the models?</p>",
-        unsafe_allow_html=True,
-    )
-    fig, ax = clean_fig((8, 3.5))
-    x = np.arange(len(comparison))
-    w = 0.30
-    b1 = ax.bar(x - w / 2, comparison["Accuracy"], w, label="Accuracy",
-                color=CHART_NEUTRAL[0], edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2)
-    b2 = ax.bar(x + w / 2, comparison["Macro F1"], w, label="Macro F1",
-                color=CHART_NEUTRAL[2], edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2)
-    for b in list(b1) + list(b2):
-        h = b.get_height()
-        ax.text(b.get_x() + b.get_width() / 2, h + 0.006, f"{h:.0%}",
-                ha="center", fontsize=7.5, color=COLOR_INK_SOFT, fontweight="700")
-    ax.set_xticks(x)
-    ax.set_xticklabels(comparison["Model"], fontsize=8.5)
-    ax.set_ylim(0, 1.15)
-    ax.set_ylabel("Score")
-    ax.set_title("Model Accuracy & F1 Comparison", pad=14)
-    ax.legend(frameon=False, fontsize=9, labelcolor=COLOR_INK)
-    plt.xticks(rotation=10)
-    st.pyplot(fig)
+    st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>How accurate are the models?</p>", unsafe_allow_html=True)
+
+    svg_chart(render_grouped_bar_chart(
+        "Model Accuracy & F1 Comparison",
+        comparison["Model"].tolist(),
+        [
+            {"label": "Accuracy", "values": comparison["Accuracy"].tolist()},
+            {"label": "Macro F1", "values": comparison["Macro F1"].tolist()},
+        ],
+        [C_NEUTRAL[0], C_NEUTRAL[2]],
+        height=280, uid="tab5_models"
+    ), 320)
 
     st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
@@ -1442,27 +1414,18 @@ with tab5:
         key="model_choice_select",
     )
 
-    # ── FORM (logic unchanged) ────────────────────────────────
     with st.form("prediction_form"):
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown(
-                "<p style='font-size:0.75rem;font-weight:700;color:#9b8c9e;letter-spacing:0.08em;"
-                "text-transform:uppercase;margin-bottom:12px'>Flight basics</p>",
-                unsafe_allow_html=True,
-            )
+            st.markdown("<p style='font-size:.74rem;font-weight:700;color:#9b8c9e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px'>Flight basics</p>", unsafe_allow_html=True)
             aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
             aircraft_capacity = st.number_input("Aircraft Capacity", min_value=50,  max_value=600, value=250)
             passengers        = st.number_input("Passengers",        min_value=0,   max_value=600, value=200)
             load_factor       = st.slider("Load Factor (seat occupancy)", min_value=0.0, max_value=1.0, value=0.80, step=0.01)
 
         with col2:
-            st.markdown(
-                "<p style='font-size:0.75rem;font-weight:700;color:#9b8c9e;letter-spacing:0.08em;"
-                "text-transform:uppercase;margin-bottom:12px'>Route context</p>",
-                unsafe_allow_html=True,
-            )
+            st.markdown("<p style='font-size:.74rem;font-weight:700;color:#9b8c9e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px'>Route context</p>", unsafe_allow_html=True)
             flight_hours   = st.number_input("Flight Hours",   min_value=0.5, max_value=20.0, value=6.0, step=0.1)
             season_val     = st.selectbox("Season",            sorted(df["Season"].dropna().unique()))
             route_category = st.selectbox("Route Category",    sorted(df["Route_Category"].dropna().unique()))
@@ -1470,21 +1433,13 @@ with tab5:
 
         if model_choice == "With Revenue Variables":
             with col3:
-                st.markdown(
-                    "<p style='font-size:0.75rem;font-weight:700;color:#9b8c9e;letter-spacing:0.08em;"
-                    "text-transform:uppercase;margin-bottom:12px'>Revenue</p>",
-                    unsafe_allow_html=True,
-                )
+                st.markdown("<p style='font-size:.74rem;font-weight:700;color:#9b8c9e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px'>Revenue</p>", unsafe_allow_html=True)
                 ticket_revenue    = st.number_input("Ticket Revenue ($)",    min_value=0.0, value=120000.0, step=1000.0)
                 ancillary_revenue = st.number_input("Ancillary Revenue ($)", min_value=0.0, value=10000.0,  step=500.0)
 
         elif model_choice == "Without Revenue Variables":
             with col3:
-                st.markdown(
-                    "<p style='font-size:0.75rem;font-weight:700;color:#9b8c9e;letter-spacing:0.08em;"
-                    "text-transform:uppercase;margin-bottom:12px'>Cost breakdown</p>",
-                    unsafe_allow_html=True,
-                )
+                st.markdown("<p style='font-size:.74rem;font-weight:700;color:#9b8c9e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px'>Cost breakdown</p>", unsafe_allow_html=True)
                 fuel_cost               = st.number_input("Fuel Cost ($)",                 min_value=0.0, value=40000.0,  step=1000.0)
                 maintenance_cost        = st.number_input("Maintenance Cost ($)",          min_value=0.0, value=15000.0,  step=500.0)
                 crew_cost               = st.number_input("Crew Cost ($)",                 min_value=0.0, value=8000.0,   step=500.0)
@@ -1502,7 +1457,7 @@ with tab5:
 
         submitted = st.form_submit_button("Get Route Decision →")
 
-    # ── PREDICTION LOGIC (unchanged) ─────────────────────────
+    # ── PREDICTION LOGIC ─────────────────────────────────────
     if submitted:
         if model_choice == "With Revenue Variables":
             row = {
@@ -1548,31 +1503,16 @@ with tab5:
 
         st.session_state.pred_result = {"prediction": pred, "probabilities": prob, "classes": cls}
 
-    # ── RESULT DISPLAY (unchanged logic, restyled) ────────────
+    # ── RESULT DISPLAY ────────────────────────────────────────
     if st.session_state.pred_result is not None:
         res  = st.session_state.pred_result
         pred = res["prediction"]
         prob = res["probabilities"]
         cls  = res["classes"]
 
-        pill_cls = {
-            "Expand":   "pill-expand",
-            "Maintain": "pill-maintain",
-            "Optimize": "pill-optimize",
-            "Drop":     "pill-drop",
-        }
-        result_cls = {
-            "Expand":   "result-expand",
-            "Maintain": "result-maintain",
-            "Optimize": "result-optimize",
-            "Drop":     "result-drop",
-        }
-        text_col = {
-            "Expand":   COLOR_GREEN,
-            "Maintain": COLOR_YELLOW,
-            "Optimize": COLOR_ORANGE,
-            "Drop":     COLOR_PINK,
-        }
+        pill_cls   = {"Expand":"pill-expand","Maintain":"pill-maintain","Optimize":"pill-optimize","Drop":"pill-drop"}
+        result_cls = {"Expand":"result-expand","Maintain":"result-maintain","Optimize":"result-optimize","Drop":"result-drop"}
+        text_col   = {"Expand":C_EXPAND,"Maintain":C_MAINTAIN,"Optimize":C_OPTIMIZE,"Drop":C_DROP}
         explanations = {
             "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
             "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
@@ -1582,62 +1522,40 @@ with tab5:
 
         st.markdown(f"""
         <div class='result-card {result_cls.get(pred, "result-expand")}'>
-          <div style='margin-bottom:10px'>
-            <span class='pill {pill_cls.get(pred, "")}' style='font-size:0.68rem'>{pred}</span>
+          <div style='margin-bottom:12px'>
+            <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
           </div>
-          <div style='font-family:"Syne",sans-serif;font-size:1.65rem;font-weight:800;
-                      color:{text_col.get(pred, "#e5e1e4")};margin-bottom:10px;letter-spacing:-0.02em'>
+          <div style='font-family:"Space Grotesk",sans-serif;font-size:1.80rem;font-weight:700;
+                      color:{text_col.get(pred, "#e5e1e4")};margin-bottom:12px;letter-spacing:-.025em'>
             Suggested Decision: {pred}
           </div>
-          <p style='color:#c4c0c5;margin:0;font-size:0.90rem;line-height:1.70'>
+          <p style='color:#c4bfc6;margin:0;font-size:.92rem;line-height:1.75;font-family:"Manrope",sans-serif'>
             {explanations.get(pred, "")}
           </p>
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown(
-            "<p style='font-size:0.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
-            "Confidence by decision option</p>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Confidence by decision option</p>", unsafe_allow_html=True)
 
         prob_df = (
             pd.DataFrame({"Decision": cls, "Probability": prob})
             .sort_values("Probability", ascending=False)
         )
-        bar_cp = {
-            "Expand":   CHART_EXPAND,
-            "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_OPTIMIZE,
-            "Drop":     CHART_DROP,
-        }
-        fig, ax = clean_fig((6, 3.5))
-        bars = ax.bar(
-            prob_df["Decision"], prob_df["Probability"],
-            color=[bar_cp.get(d, "#CCCCCC") for d in prob_df["Decision"]],
-            width=0.45, edgecolor=COLOR_BORDER_MD_RGBA, linewidth=2,
-        )
-        for b in bars:
-            h = b.get_height()
-            ax.text(
-                b.get_x() + b.get_width() / 2,
-                h + 0.013,
-                f"{h:.0%}",
-                ha="center", fontsize=9, color=COLOR_INK_SOFT, fontweight="700",
-            )
-        ax.set_ylim(0, 1.18)
-        ax.set_ylabel("Probability")
-        ax.set_title("Model Confidence per Decision", pad=14)
-        st.pyplot(fig)
+        svg_chart(render_vbar_chart(
+            "Model Confidence per Decision",
+            prob_df["Decision"].tolist(),
+            prob_df["Probability"].tolist(),
+            [DECISION_COLORS.get(d, "#888") for d in prob_df["Decision"]],
+            height=280, fmt_fn=lambda v: f"{v:.0%}", y_label="Probability", uid="tab5_conf"
+        ), 320)
 
         st.dataframe(
             prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
-            use_container_width=True,
-            hide_index=True,
+            use_container_width=True, hide_index=True,
         )
 
 # ─────────────────────────────────────────────────────────────
-#  FILTERED DATA EXPANDER  (unchanged)
+#  FILTERED DATA EXPANDER
 # ─────────────────────────────────────────────────────────────
 with st.expander("Show filtered data"):
     st.dataframe(fdf, use_container_width=True)
@@ -1646,23 +1564,9 @@ with st.expander("Show filtered data"):
 #  FOOTER
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
-<div style='text-align:center;color:#AAAAAA;font-size:0.75rem;
-            padding:36px 0 16px;font-family:"Syne",sans-serif;
-            letter-spacing:0.04em'>
-  SKYLENS ROUTE INTELLIGENCE &nbsp;·&nbsp; Built with Streamlit
+<div style='text-align:center;color:#4f4352;font-size:.74rem;
+            padding:48px 0 20px;font-family:"Manrope",sans-serif;
+            letter-spacing:.08em;text-transform:uppercase'>
+  SkyLens Route Intelligence &nbsp;·&nbsp; Built with Streamlit
 </div>
 """, unsafe_allow_html=True)
-
-# ─────────────────────────────────────────────────────────────
-#  HOW TO TWEAK THE THEME
-# ─────────────────────────────────────────────────────────────
-# All visual tokens live at the top of this file under "THEME SYSTEM".
-# To switch to a dark mode: change COLOR_BG to #0E0E0E, COLOR_SURFACE to
-# #1A1A1A, COLOR_INK to #FFFFFF, COLOR_INK_SOFT to #CCCCCC, and update
-# --bg / --surface / --ink in the CSS :root block accordingly.
-#
-# To change the accent color (buttons, focus rings): update COLOR_ACCENT
-# and --accent in :root.
-#
-# Chart colors are controlled by CHART_EXPAND / CHART_MAINTAIN /
-# CHART_ORANGE / CHART_DROP and CHART_NEUTRAL at the top of the file.
