@@ -1,1044 +1,1349 @@
-
 import os
+import json
 import joblib
 import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import numpy as np
-import json
 import streamlit.components.v1 as components
-
+import pandas as pd
+import numpy as np
 
 st.set_page_config(
-    page_title="Airline Profitability System",
-    page_icon="🌫️",
+    page_title="SkyLens · Route Intelligence",
+    page_icon="✈️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-
 # ─────────────────────────────────────────────────────────────
-#  PIXEL / SUPER MARIO PALETTE
+#  PALETTE TOKENS
 # ─────────────────────────────────────────────────────────────
-BG_BASE        = "#e8f4f8"          # sky blue (Mario sky)
-BG_SOFT        = "#d4ecd4"          # grass green tint
-BG_COOL        = "#fff9e6"          # coin yellow tint
-
-GLASS_BG       = "rgba(255, 255, 255, 0.82)"
-GLASS_BORDER   = "rgba(44, 117, 44, 0.40)"
-
-INK            = "#1a1a2e"          # dark navy pixel ink
-INK_SOFT       = "#2c3e50"          # medium dark
-INK_MUTED      = "#5a6c7d"          # muted slate
-
-ACCENT         = "#e63946"          # Mario red
-ACCENT_DK      = "#c1121f"          # dark red
-ACCENT_LT      = "#ff8fa3"          # light red
-ACCENT_2       = "#1d6a96"          # Mario blue (overalls)
-MAGENTA        = "#f4a261"          # coin orange
-
-# Pixel chart tones
-CHART_EXPAND   = "#2d6a4f"          # forest green (go!)
-CHART_MAINTAIN = "#1d6a96"          # Mario blue
-CHART_OPTIMIZE = "#e9c46a"          # coin yellow
-CHART_ORANGE   = "#f4a261"
-CHART_DROP     = "#e63946"          # Mario red (stop)
-CHART_NEUTRAL  = [
-    "#e63946", "#1d6a96", "#2d6a4f", "#e9c46a",
-    "#f4a261", "#7f768b", "#2ec4b6", "#264653",
-]
-
-DECISION_COLORS = {
-    "Expand":   CHART_EXPAND,
-    "Maintain": CHART_MAINTAIN,
-    "Optimize": CHART_OPTIMIZE,
-    "Drop":     CHART_DROP,
-}
+C_EXPAND   = "#4ade80"
+C_MAINTAIN = "#facc15"
+C_OPTIMIZE = "#fb923c"
+C_DROP     = "#fb7185"
+C_NEUTRAL  = ["#6e40c9","#9150d8","#b480e7","#d2a4f5","#efc5d5","#f3b5c6","#fcb9b2","#ffcc99"]
+DECISION_COLORS = {"Expand": C_EXPAND, "Maintain": C_MAINTAIN, "Optimize": C_OPTIMIZE, "Drop": C_DROP}
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
-
 # ─────────────────────────────────────────────────────────────
-#  GLOBAL CSS — PIXEL / 8-BIT GAME THEME
+#  GLOBAL CSS  — injected once into the Streamlit host page
 # ─────────────────────────────────────────────────────────────
-st.markdown(f"""
+st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap');
 
-:root {{
-    --sky:         {BG_BASE};
-    --grass:       {BG_SOFT};
-    --coin:        {BG_COOL};
-    --ink:         {INK};
-    --ink-soft:    {INK_SOFT};
-    --ink-muted:   {INK_MUTED};
-    --red:         {ACCENT};
-    --red-dk:      {ACCENT_DK};
-    --red-lt:      {ACCENT_LT};
-    --blue:        {ACCENT_2};
-    --orange:      {MAGENTA};
-    --green:       {CHART_EXPAND};
-    --coin-y:      {CHART_OPTIMIZE};
-    --px-border:   4px;
-    --px-shadow:   4px 4px 0px rgba(0,0,0,0.35);
-    --px-shadow-lg: 6px 6px 0px rgba(0,0,0,0.35);
-    --px-inset:    inset -3px -3px 0px rgba(0,0,0,0.25), inset 2px 2px 0px rgba(255,255,255,0.35);
-}}
+/* ── TOKENS ─────────────────────────────────────────────────── */
+:root {
+  --bg:           #0b0b0d;
+  --surface:      rgba(20,19,22,0.72);
+  --surface-hi:   rgba(32,30,36,0.85);
+  --border:       rgba(255,255,255,0.06);
+  --border-md:    rgba(255,255,255,0.13);
+  --border-hi:    rgba(255,255,255,0.22);
+  --border-glow:  rgba(233,179,255,0.30);
+  --ink:          #e5e1e4;
+  --ink-soft:     #c4bfc6;
+  --ink-muted:    #9b8c9e;
+  --ink-ghost:    #3e3444;
+  --accent:       #e9b3ff;
+  --accent-mid:   #c863fb;
+  --accent-dk:    #9026c3;
+  --pink:         #ffb2b7;
+  --green:        #4ade80;
+  --yellow:       #facc15;
+  --orange:       #fb923c;
+  --red:          #fb7185;
+  --blur-sm:      blur(16px);
+  --blur-md:      blur(28px);
+  --blur-lg:      blur(48px);
+  --blur-xl:      blur(72px);
+  --sh-sm:        0 4px 16px rgba(0,0,0,.60),0 1px 3px rgba(0,0,0,.40);
+  --sh-md:        0 8px 32px rgba(0,0,0,.65),0 2px 8px rgba(0,0,0,.50),0 0 0 1px rgba(255,255,255,.04);
+  --sh-lg:        0 16px 48px rgba(0,0,0,.70),0 4px 16px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06);
+  --sh-xl:        0 24px 64px rgba(0,0,0,.75),0 8px 24px rgba(233,179,255,.08),0 0 0 1px rgba(255,255,255,.07);
+  --glow:         0 0 40px rgba(233,179,255,.18),0 0 80px rgba(233,179,255,.08);
+  --r-sm:  10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px; --r-2xl: 36px;
+}
 
-/* Pixel checkerboard keyframes */
-@keyframes floatIn    {{ from {{ opacity:0; transform:translateY(16px); }} to {{ opacity:1; transform:translateY(0); }} }}
-@keyframes coinSpin   {{ 0%,100% {{ transform:scaleX(1); }} 40% {{ transform:scaleX(0.1); }} 60% {{ transform:scaleX(1); }} }}
-@keyframes bobUp      {{ 0%,100% {{ transform:translateY(0); }} 50% {{ transform:translateY(-6px); }} }}
-@keyframes blinkCursor {{ 0%,49% {{ opacity:1; }} 50%,100% {{ opacity:0; }} }}
-@keyframes pixelSlide {{ from {{ transform:translateX(-100%); }} to {{ transform:translateX(120vw); }} }}
-@keyframes starPop    {{ 0% {{ transform:scale(0) rotate(0deg); opacity:0; }}
-                         60% {{ transform:scale(1.3) rotate(20deg); opacity:1; }}
-                         100% {{ transform:scale(1) rotate(15deg); opacity:0.85; }} }}
-@keyframes groundScroll {{ from {{ background-position:0 0; }} to {{ background-position:-64px 0; }} }}
-@keyframes coinFloat  {{ 0%,100% {{ transform:translateY(0) rotate(0deg); }}
-                         50% {{ transform:translateY(-8px) rotate(10deg); }} }}
-@keyframes pixelPulse {{ 0%,100% {{ box-shadow: 4px 4px 0px rgba(0,0,0,0.35); }}
-                         50% {{ box-shadow: 4px 4px 0px rgba(0,0,0,0.35), 0 0 0 3px {ACCENT}55; }} }}
+/* ── FULL-APP DEEP BG ───────────────────────────────────────── */
+html, body, [class*="css"] {
+  font-family: 'Manrope', system-ui, sans-serif !important;
+  color: var(--ink) !important;
+  -webkit-font-smoothing: antialiased;
+}
+.stApp {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% -10%,  rgba(144,38,195,.24) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 110%,  rgba(208,2,66,.18) 0%, transparent 55%),
+    linear-gradient(160deg, #0f0c12 0%, #0b0b0d 40%, #0a0810 100%) !important;
+  min-height: 100vh !important;
+}
+.main .block-container {
+  padding-top: 2.5rem !important;
+  padding-bottom: 5rem !important;
+  max-width: 1360px !important;
+}
 
-html, body, [class*="css"] {{
-    font-family: 'Nunito', system-ui, sans-serif !important;
-    -webkit-font-smoothing: auto !important;
-    color: {INK} !important;
-    image-rendering: pixelated;
-}}
+/* ── AMBIENT ORB LAYER ──────────────────────────────────────── */
+.stApp::before {
+  content: "";
+  position: fixed;
+  top: -200px; left: -200px;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(233,179,255,.09) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: orbA 20s ease-in-out infinite;
+}
+.stApp::after {
+  content: "";
+  position: fixed;
+  bottom: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(208,2,66,.09) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: orbB 25s ease-in-out infinite;
+}
+@keyframes orbA { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(50px,-40px) scale(1.06)} 66%{transform:translate(-30px,25px) scale(.96)} }
+@keyframes orbB { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-40px,30px) scale(1.04)} 66%{transform:translate(25px,-20px) scale(.97)} }
 
-/* ── App background: checkered sky pattern ── */
-.stApp {{
-    min-height: 100vh;
-    background-color: #87CEEB;
-    background-image:
-        /* Pixel cloud shapes using box gradients */
-        radial-gradient(ellipse at 15% 22%, rgba(255,255,255,0.75) 0, rgba(255,255,255,0.75) 6%, transparent 7%),
-        radial-gradient(ellipse at 18% 20%, rgba(255,255,255,0.75) 0, rgba(255,255,255,0.75) 5%, transparent 6%),
-        radial-gradient(ellipse at 21% 22%, rgba(255,255,255,0.75) 0, rgba(255,255,255,0.75) 5%, transparent 6%),
-        radial-gradient(ellipse at 60% 12%, rgba(255,255,255,0.72) 0, rgba(255,255,255,0.72) 5%, transparent 6%),
-        radial-gradient(ellipse at 63% 10%, rgba(255,255,255,0.72) 0, rgba(255,255,255,0.72) 4%, transparent 5%),
-        radial-gradient(ellipse at 80% 30%, rgba(255,255,255,0.60) 0, rgba(255,255,255,0.60) 4%, transparent 5%),
-        radial-gradient(ellipse at 83% 28%, rgba(255,255,255,0.60) 0, rgba(255,255,255,0.60) 3%, transparent 4%),
-        /* Checkerboard tile overlay */
-        repeating-conic-gradient(rgba(255,255,255,0.06) 0% 25%, transparent 0% 50%) 0 0 / 32px 32px,
-        /* Main sky gradient */
-        linear-gradient(180deg, #5bb8e8 0%, #87CEEB 40%, #a8dff5 70%, #c8f0d0 85%, #5a9e50 100%);
-    background-attachment: fixed;
-}}
+/* ── SIDEBAR ────────────────────────────────────────────────── */
+[data-testid="stSidebar"] {
+  background: rgba(12,11,16,.88) !important;
+  backdrop-filter: var(--blur-lg) !important;
+  -webkit-backdrop-filter: var(--blur-lg) !important;
+  border-right: 1px solid var(--border-md) !important;
+  box-shadow: 4px 0 40px rgba(0,0,0,.75), inset -1px 0 0 rgba(255,255,255,.03) !important;
+}
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] small {
+  color: var(--ink-soft) !important;
+  font-family: 'Manrope', sans-serif !important;
+}
+[data-testid="stSidebar"]::-webkit-scrollbar { width: 3px; }
+[data-testid="stSidebar"]::-webkit-scrollbar-track { background: transparent; }
+[data-testid="stSidebar"]::-webkit-scrollbar-thumb { background: var(--ink-ghost); border-radius: 3px; }
 
-/* Ground strip at the very bottom */
-.stApp::after {{
-    content: "";
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 24px;
-    background: repeating-linear-gradient(
-        90deg,
-        #5a9e50 0px, #5a9e50 16px,
-        #4a8a40 16px, #4a8a40 32px
-    );
-    z-index: 0;
-    pointer-events: none;
-}}
+/* ── METRIC CARDS — TRUE GLASS BUOYANCY ────────────────────── */
+[data-testid="metric-container"] {
+  background: linear-gradient(145deg, rgba(44,40,58,.92) 0%, rgba(22,20,30,.88) 100%) !important;
+  backdrop-filter: var(--blur-md) !important;
+  -webkit-backdrop-filter: var(--blur-md) !important;
+  border: 1px solid var(--border-md) !important;
+  border-top: 1px solid rgba(255,255,255,.20) !important;
+  border-radius: var(--r-xl) !important;
+  padding: 30px 32px !important;
+  box-shadow: var(--sh-lg), 0 -1px 0 rgba(255,255,255,.06) inset !important;
+  margin-bottom: 24px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: transform .40s cubic-bezier(.22,1,.36,1), box-shadow .40s ease !important;
+  /* Buoyancy: cards appear to float above the deep bg */
+  transform: translateY(0) !important;
+}
+[data-testid="metric-container"]::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+  pointer-events: none;
+}
+[data-testid="metric-container"]::after {
+  content: "";
+  position: absolute;
+  top: -60px; right: -40px;
+  width: 150px; height: 150px;
+  background: radial-gradient(circle, rgba(233,179,255,.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+[data-testid="metric-container"]:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: var(--sh-xl), var(--glow) !important;
+  border-color: var(--border-glow) !important;
+}
+[data-testid="metric-container"] [data-testid="stMetricLabel"] p {
+  font-family: 'Manrope', sans-serif !important;
+  font-size: .66rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-muted) !important;
+}
+[data-testid="stMetricValue"],
+[data-testid="stMetricValue"] > div {
+  font-family: 'DM Mono', monospace !important;
+  font-size: 2.1rem !important;
+  font-weight: 500 !important;
+  color: var(--ink) !important;
+  letter-spacing: -.035em !important;
+  line-height: 1.1 !important;
+}
+[data-testid="stMetricDelta"] {
+  font-family: 'Manrope', sans-serif !important;
+  font-size: .78rem !important;
+  font-weight: 600 !important;
+}
 
-.main .block-container {{
-    max-width: 1320px;
-    padding-top: 1.8rem;
-    padding-bottom: 5rem;
-    animation: floatIn 400ms ease-out;
-    position: relative; z-index: 1;
-}}
-section.main > div {{ background: transparent; }}
+/* ── TABS ───────────────────────────────────────────────────── */
+.stTabs [data-baseweb="tab-list"] {
+  background: rgba(12,11,16,.85) !important;
+  backdrop-filter: var(--blur-sm) !important;
+  border: 1px solid var(--border-md) !important;
+  border-radius: var(--r-lg) !important;
+  padding: 5px !important;
+  gap: 3px !important;
+  box-shadow: var(--sh-sm) !important;
+}
+.stTabs [data-baseweb="tab"] {
+  border-radius: var(--r-md) !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: .80rem !important;
+  color: var(--ink-muted) !important;
+  padding: 9px 22px !important;
+  background: transparent !important;
+  border: none !important;
+  letter-spacing: .01em !important;
+  transition: all .20s ease !important;
+}
+.stTabs [data-baseweb="tab"]:hover {
+  background: rgba(255,255,255,.06) !important;
+  color: var(--ink-soft) !important;
+}
+.stTabs [aria-selected="true"] {
+  background: linear-gradient(135deg, rgba(233,179,255,.22) 0%, rgba(200,99,251,.18) 100%) !important;
+  color: var(--accent) !important;
+  border: 1px solid rgba(233,179,255,.28) !important;
+  box-shadow: 0 2px 12px rgba(233,179,255,.22), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+.stTabs [data-baseweb="tab-panel"] {
+  background: transparent !important;
+  padding-top: 2rem !important;
+}
+.stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 
-/* ── Sidebar: brick wall style ── */
-[data-testid="stSidebar"] {{
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 15px,
-            rgba(0,0,0,0.12) 15px,
-            rgba(0,0,0,0.12) 16px
-        ),
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 31px,
-            rgba(0,0,0,0.10) 31px,
-            rgba(0,0,0,0.10) 32px
-        ),
-        linear-gradient(180deg, #d9534f 0%, #c0392b 100%) !important;
-    border-right: 4px solid #8B0000 !important;
-    box-shadow: 4px 0 0 #8B0000 !important;
-}}
-[data-testid="stSidebar"] * {{ color: #"#7f768b" !important; }}
-[data-testid="stSidebar"] label {{ color: #ffe066 !important; }}
+/* ── HEADINGS ───────────────────────────────────────────────── */
+h1,h2,h3,h4 {
+  font-family: 'Space Grotesk', sans-serif !important;
+  color: var(--ink) !important;
+  letter-spacing: -.02em !important;
+  font-weight: 600 !important;
+}
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li {
+  color: var(--ink-soft) !important;
+  line-height: 1.70 !important;
+  font-size: .90rem !important;
+}
 
-.sidebar-brand {{
-    font-family: 'Inter', sans-serif;
-    font-size: 0.60rem; font-weight: 400;
-    color: #ffe066;
-    padding: 0.5rem 0 1rem 0;
-    border-bottom: 3px solid rgba(255,255,255,0.25);
-    margin-bottom: 1rem;
-    line-height: 1.8;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
-    letter-spacing: 0.05em;
-}}
-.sidebar-brand span {{ color: #fff8e7; }}
+/* ── INPUTS ─────────────────────────────────────────────────── */
+.stSelectbox label,.stNumberInput label,
+.stSlider label,.stRadio label,.stCheckbox label,.stTextInput label {
+  color: var(--ink-soft) !important; font-weight: 600 !important;
+  font-size: .78rem !important; letter-spacing: .06em !important;
+  text-transform: uppercase !important; font-family: 'Manrope', sans-serif !important;
+}
+.stSelectbox [data-baseweb="select"] div,
+.stTextInput input, .stNumberInput input {
+  color: var(--ink) !important;
+  background: rgba(18,16,24,.85) !important;
+  border: 1px solid var(--border-md) !important;
+  border-radius: var(--r-sm) !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: .88rem !important;
+  transition: border-color .18s ease, box-shadow .18s ease !important;
+}
+.stSelectbox [data-baseweb="select"] div:focus-within,
+.stTextInput input:focus, .stNumberInput input:focus {
+  border-color: var(--accent-mid) !important;
+  box-shadow: 0 0 0 3px rgba(200,99,251,.20), 0 0 18px rgba(200,99,251,.14) !important;
+}
 
-/* ── Headings: pixel font ── */
-h1,h2,h3,h4 {{
-    font-family: 'Inter', sans-serif !important;
-    color: {INK} !important;
-    font-weight: 400 !important;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.15) !important;
-    text-transform: none !important;
-    letter-spacing: 0.03em !important;
-}}
+/* ── DATAFRAME ──────────────────────────────────────────────── */
+[data-testid="stDataFrame"] {
+  border-radius: var(--r-lg) !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border-md) !important;
+  box-shadow: var(--sh-md) !important;
+  background: rgba(14,12,20,.85) !important;
+  backdrop-filter: var(--blur-md) !important;
+}
 
-/* ── Hero: pixel game card ── */
-.hero {{
-    position: relative; overflow: hidden;
-    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    border-radius: 0 !important;
-    padding: 1.6rem 2rem; margin-bottom: 1.4rem;
-    background: #fff9e6;
-    border: 4px solid {INK};
-    box-shadow: var(--px-shadow-lg);
-    image-rendering: pixelated;
-}}
+/* ── EXPANDER ───────────────────────────────────────────────── */
+[data-testid="stExpander"] {
+  border: 1px solid var(--border-md) !important;
+  border-radius: var(--r-lg) !important;
+  background: rgba(16,14,22,.85) !important;
+  backdrop-filter: var(--blur-sm) !important;
+  box-shadow: var(--sh-sm) !important;
+  overflow: hidden !important;
+  margin-top: 16px !important;
+  transition: box-shadow .30s ease !important;
+}
+[data-testid="stExpander"]:hover {
+  box-shadow: var(--sh-md) !important;
+}
+[data-testid="stExpander"] summary p {
+  color: var(--ink) !important;
+  font-weight: 600 !important;
+  font-size: .88rem !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+}
 
-/* Pixel border decoration top */
-.hero::before {{
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 8px;
-    background: repeating-linear-gradient(
-        90deg,
-        {ACCENT} 0px, {ACCENT} 16px,
-        {CHART_EXPAND} 16px, {CHART_EXPAND} 32px,
-        {ACCENT_2} 32px, {ACCENT_2} 48px,
-        {CHART_OPTIMIZE} 48px, {CHART_OPTIMIZE} 64px
-    );
-}}
-/* Pixel border bottom */
-.hero::after {{
-    content: "";
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 8px;
-    background: repeating-linear-gradient(
-        90deg,
-        {CHART_OPTIMIZE} 0px, {CHART_OPTIMIZE} 16px,
-        {ACCENT_2} 16px, {ACCENT_2} 32px,
-        {CHART_EXPAND} 32px, {CHART_EXPAND} 48px,
-        {ACCENT} 48px, {ACCENT} 64px
-    );
-}}
+/* ── FORM ───────────────────────────────────────────────────── */
+[data-testid="stForm"] {
+  background: linear-gradient(145deg, rgba(38,34,52,.92) 0%, rgba(18,16,26,.90) 100%) !important;
+  backdrop-filter: var(--blur-lg) !important;
+  -webkit-backdrop-filter: var(--blur-lg) !important;
+  border: 1px solid var(--border-md) !important;
+  border-top: 1px solid rgba(255,255,255,.18) !important;
+  border-radius: var(--r-2xl) !important;
+  padding: 40px 44px !important;
+  box-shadow: var(--sh-xl) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin-top: 8px !important;
+}
+[data-testid="stForm"]::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(233,179,255,.45) 40%, rgba(208,2,66,.32) 70%, transparent 100%);
+}
 
-.hero-star {{ display: none; }}
-.hero-left,.hero-badge,.hero-glyph {{ position:relative; z-index:1; }}
-.hero-left {{ flex:1; min-width:0; padding-top: 8px; }}
-.hero-eyebrow {{
-    font-family: 'Inter', sans-serif;
-    font-size: 0.48rem; letter-spacing: 0.18em;
-    color: {ACCENT};
-    margin-bottom: 0.7rem;
-    text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
-}}
-.hero h1 {{
-    margin: 0 0 0.5rem 0 !important;
-    font-size: 1.1rem !important;
-    line-height: 1.5 !important;
-    color: {INK} !important;
-    text-shadow: 3px 3px 0px rgba(0,0,0,0.18) !important;
-    -webkit-text-fill-color: {INK} !important;
-}}
-.hero p {{
-    margin: 0; color: {INK_SOFT} !important;
-    font-size: 0.82rem !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 1.1rem !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-    font-weight: 400 !important;
-}}
+/* ── SUBMIT BUTTON ──────────────────────────────────────────── */
+[data-testid="stFormSubmitButton"] > button {
+  background: linear-gradient(135deg, var(--accent-mid) 0%, var(--accent-dk) 100%) !important;
+  border: none !important;
+  border-radius: var(--r-md) !important;
+  color: #1a0028 !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: .88rem !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+  padding: 14px 36px !important;
+  width: 100% !important;
+  transition: all .25s cubic-bezier(.22,1,.36,1) !important;
+  box-shadow: 0 6px 24px rgba(200,99,251,.42), 0 2px 8px rgba(200,99,251,.32) !important;
+}
+[data-testid="stFormSubmitButton"] > button:hover {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-mid) 100%) !important;
+  box-shadow: 0 10px 36px rgba(233,179,255,.58), 0 4px 16px rgba(233,179,255,.38) !important;
+  transform: translateY(-3px) !important;
+}
 
-.hero-badge {{
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    padding: 0.55rem 1rem;
-    border: 3px solid {INK};
-    background: {CHART_OPTIMIZE};
-    color: {INK};
-    font-family: 'Inter', sans-serif;
-    font-size: 0.45rem;
-    letter-spacing: 0.06em;
-    box-shadow: 3px 3px 0px rgba(0,0,0,0.35);
-    white-space: nowrap;
-    animation: bobUp 2s ease-in-out infinite;
-    border-radius: 0 !important;
-    text-transform: none;
-}}
+/* ── BUTTONS ────────────────────────────────────────────────── */
+.stButton > button {
+  background: rgba(30,26,40,.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--border-md) !important;
+  border-radius: var(--r-md) !important;
+  color: var(--ink) !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+  transition: all .25s cubic-bezier(.22,1,.36,1) !important;
+  box-shadow: var(--sh-sm) !important;
+}
+.stButton > button:hover {
+  background: rgba(48,42,66,.90) !important;
+  border-color: var(--border-glow) !important;
+  box-shadow: var(--sh-md), 0 0 24px rgba(233,179,255,.14) !important;
+  transform: translateY(-3px) !important;
+}
 
-.hero-glyph {{
-    font-size: 2.8rem; opacity: 0.13; color: {INK};
-    animation: coinFloat 4s ease-in-out infinite;
-}}
+/* ── ALERTS ─────────────────────────────────────────────────── */
+[data-testid="stAlert"] {
+  border-radius: var(--r-lg) !important;
+  border: 1px solid var(--border-md) !important;
+  backdrop-filter: var(--blur-sm) !important;
+  background: rgba(16,14,22,.85) !important;
+}
 
-/* ── Pixel airplane in hero (canvas) ── */
-#pixel-plane-canvas {{
-    position: absolute;
-    top: 50%; left: 0;
-    transform: translateY(-50%);
-    width: 100%; height: 100%;
-    pointer-events: none; z-index: 0;
-    image-rendering: pixelated;
-}}
+/* ── HR ─────────────────────────────────────────────────────── */
+hr {
+  border: none !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, var(--border-hi), transparent) !important;
+  margin: 2rem 0 !important;
+}
 
-/* ── Metric cards: pixel block style ── */
-[data-testid="metric-container"] {{
-    background: #ffffff !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-    padding: 1rem 1.1rem !important;
-    transition: transform 150ms ease, box-shadow 150ms ease !important;
-    position: relative; overflow: hidden;
-}}
-[data-testid="metric-container"]::before {{
-    content: "";
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 5px;
-    background: repeating-linear-gradient(
-        90deg,
-        {ACCENT} 0px, {ACCENT} 8px,
-        {ACCENT_2} 8px, {ACCENT_2} 16px
-    );
-}}
-[data-testid="metric-container"]:hover {{
-    transform: translate(-2px, -2px) !important;
-    box-shadow: 6px 6px 0px {INK} !important;
-}}
-[data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
-    font-family: 'Inter', sans-serif !important;
-    font-size: 0.45rem !important;
-    font-weight: 400 !important;
-    text-transform: none !important;
-    letter-spacing: 0.08em !important;
-    color: {INK_SOFT} !important;
-}}
-[data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
-    color: {INK} !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 1.3rem !important;
-    font-weight: 400 !important;
-    letter-spacing: -0.01em !important;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.12) !important;
-}}
+/* ── SCROLL ANIMATION ENGINE ────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(32px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes scaleUp {
+  from { opacity:0; transform:scale(.96) translateY(20px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
 
-/* ── Tabs: pixel style ── */
-.stTabs [data-baseweb="tab-list"] {{
-    gap: 0.18rem;
-    background: rgba(255,255,255,0.85);
-    border: 3px solid {INK};
-    border-radius: 0 !important;
-    padding: 0.25rem;
-    box-shadow: 3px 3px 0px {INK};
-}}
-.stTabs [data-baseweb="tab"] {{
-    height: 38px; padding: 0 0.9rem !important;
-    border-radius: 0 !important;
-    color: {INK_MUTED} !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 0.42rem !important;
-    font-weight: 400 !important;
-    background: transparent !important;
-    letter-spacing: 0.03em !important;
-    transition: background 120ms, color 120ms !important;
-    border: 2px solid transparent !important;
-}}
-.stTabs [data-baseweb="tab"]:hover {{
-    background: {CHART_OPTIMIZE}44 !important;
-    color: {INK} !important;
-    border: 2px solid {INK} !important;
-}}
-.stTabs [aria-selected="true"] {{
-    background: {ACCENT} !important;
-    color: #fff8e7 !important;
-    border: 2px solid {INK} !important;
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.3) !important;
-}}
-.stTabs [data-baseweb="tab-panel"] {{ padding-top: 1.4rem; }}
+/* ── CUSTOM COMPONENTS ──────────────────────────────────────── */
+.hero {
+  background: linear-gradient(145deg, rgba(52,42,72,.94) 0%, rgba(22,18,34,.92) 60%, rgba(14,10,24,.96) 100%);
+  backdrop-filter: var(--blur-xl);
+  -webkit-backdrop-filter: var(--blur-xl);
+  border: 1px solid var(--border-md);
+  border-top: 1px solid rgba(255,255,255,.22);
+  border-radius: var(--r-2xl);
+  padding: 64px 80px;
+  margin-bottom: 56px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--sh-xl), var(--glow);
+  animation: scaleUp .75s cubic-bezier(.22,1,.36,1) both;
+}
+.hero::before {
+  content:"";
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgba(233,179,255,.65) 35%,rgba(208,2,66,.44) 65%,transparent 100%);
+}
+.hero::after {
+  content:"";
+  position:absolute; top:-130px; right:-90px;
+  width:520px; height:520px;
+  background:radial-gradient(circle,rgba(233,179,255,.13) 0%,transparent 65%);
+  pointer-events:none;
+}
+.hero-eyebrow {
+  font-family:'Manrope',sans-serif;
+  font-size:.66rem; font-weight:700; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--ink-muted);
+  margin-bottom:16px; display:flex; align-items:center; gap:12px;
+}
+.hero-eyebrow::before {
+  content:""; width:28px; height:1px;
+  background:var(--accent); opacity:.7;
+}
+.hero h1 {
+  font-family:'Space Grotesk',sans-serif !important;
+  font-size:3.4rem !important; font-weight:700 !important;
+  margin:0 0 18px 0 !important; letter-spacing:-.035em !important;
+  line-height:1.08 !important;
+  background:linear-gradient(135deg,#f2eaff 0%,var(--accent) 50%,var(--pink) 100%);
+  -webkit-background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  background-clip:text !important;
+}
+.hero p {
+  color:var(--ink-soft) !important;
+  font-family:'Manrope',sans-serif !important;
+  font-size:1.02rem !important; line-height:1.75 !important;
+  margin:0 !important; max-width:580px;
+}
+.hero-glyph {
+  position:absolute; right:80px; top:50%;
+  transform:translateY(-50%);
+  font-size:10rem; opacity:.055;
+  color:var(--accent); line-height:1;
+  pointer-events:none; user-select:none; filter:blur(3px);
+}
 
-/* ── Section headings ── */
-.section-hd {{
-    font-family: 'Inter', sans-serif;
-    font-size: 0.60rem;
-    font-weight: 400;
-    color: {INK};
-    margin: 0 0 0.3rem 0;
-    letter-spacing: 0.04em;
-    text-shadow: 1px 1px 0px rgba(0,0,0,0.12);
-}}
-.section-sub {{
-    font-family: 'Inter', sans-serif;
-    font-size: 1.05rem;
-    color: {INK_MUTED};
-    margin: 0 0 1rem 0;
-    line-height: 1.55;
-    font-weight: 400;
-    text-transform: none;
-    letter-spacing: 0;
-}}
+.sidebar-brand {
+  font-family:'Space Grotesk',sans-serif;
+  font-size:1.45rem; font-weight:700; color:var(--ink);
+  padding:6px 0 22px; border-bottom:1px solid var(--border-md);
+  margin-bottom:22px; letter-spacing:-.025em;
+}
+.sidebar-brand span {
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
 
-/* ── Divider label: coin style ── */
-.divider-label {{
-    display: flex; align-items: center; gap: 0.7rem;
-    margin: 1.5rem 0 1rem 0;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.42rem;
-    font-weight: 400;
-    letter-spacing: 0.16em;
-    color: {INK};
-}}
-.divider-label::before, .divider-label::after {{
-    content: ""; flex: 1; height: 3px;
-    background: repeating-linear-gradient(
-        90deg,
-        {INK} 0px, {INK} 8px,
-        transparent 8px, transparent 12px
-    );
-}}
+.section-hd {
+  font-family:'Space Grotesk',sans-serif !important;
+  font-size:1.10rem !important; font-weight:600 !important;
+  color:var(--ink) !important; letter-spacing:-.015em !important;
+  margin:0 0 6px 0 !important;
+}
+.section-sub {
+  font-family:'Manrope',sans-serif !important;
+  font-size:.88rem !important; color:var(--ink-muted) !important;
+  margin:0 0 24px 0 !important; line-height:1.65 !important;
+}
 
-/* ── Info box: speech bubble pixel style ── */
-.info-box {{
-    background: #fff9e6;
-    border: 3px solid {INK};
-    border-radius: 0 !important;
-    padding: 1rem 1.1rem;
-    color: {INK_SOFT};
-    line-height: 1.75;
-    box-shadow: 4px 4px 0px {INK};
-    font-family: 'Inter', sans-serif;
-    font-size: 1.1rem;
-    transition: transform 150ms, box-shadow 150ms;
-    position: relative;
-}}
-.info-box:hover {{
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px {INK};
-}}
+.info-box {
+  background:linear-gradient(145deg,rgba(32,28,44,.92) 0%,rgba(18,16,26,.88) 100%) !important;
+  backdrop-filter:var(--blur-md) !important;
+  border:1px solid var(--border-md) !important;
+  border-top:1px solid rgba(255,255,255,.15) !important;
+  border-radius:var(--r-lg) !important;
+  padding:22px 28px !important;
+  font-size:.875rem !important; color:var(--ink-soft) !important;
+  margin-bottom:20px !important; line-height:1.80 !important;
+  box-shadow:var(--sh-md) !important;
+  position:relative; overflow:hidden;
+  transition:box-shadow .30s ease, transform .30s ease !important;
+}
+.info-box:hover {
+  box-shadow:var(--sh-lg) !important;
+  transform:translateY(-2px) !important;
+}
+.info-box::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(233,179,255,.32),transparent);
+}
+.info-box strong { color:var(--ink) !important; font-weight:700 !important; }
 
-/* ── Pills: pixel badge style ── */
-.pill {{
-    display: inline-block;
-    padding: 0.22rem 0.60rem;
-    border-radius: 0 !important;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.40rem;
-    font-weight: 400;
-    letter-spacing: 0.06em;
-    text-transform: none;
-    border: 2px solid {INK};
-    transition: transform 120ms;
-    cursor: default;
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
-}}
-.pill:hover {{ transform: translate(-1px, -1px); box-shadow: 3px 3px 0px rgba(0,0,0,0.3); }}
-.pill-expand   {{ background: #b7e4c7; color: #1b4332; border-color: #1b4332; }}
-.pill-maintain {{ background: #bde0fe; color: #023e8a; border-color: #023e8a; }}
-.pill-optimize {{ background: #ffe066; color: #7c4b00; border-color: #7c4b00; }}
-.pill-drop     {{ background: #ffb3ba; color: #7d0000; border-color: #7d0000; }}
+.pill {
+  display:inline-block; padding:3px 12px; border-radius:99px;
+  font-size:.66rem; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; border:1px solid transparent;
+  font-family:'Manrope',sans-serif;
+}
+.pill-expand   {background:rgba(74,222,128,.15);color:#4ade80;border-color:rgba(74,222,128,.38);}
+.pill-maintain {background:rgba(250,204,21,.15);color:#facc15;border-color:rgba(250,204,21,.38);}
+.pill-optimize {background:rgba(251,146,60,.15);color:#fb923c;border-color:rgba(251,146,60,.38);}
+.pill-drop     {background:rgba(251,113,133,.15);color:#fb7185;border-color:rgba(251,113,133,.38);}
 
-/* ── Result card ── */
-.result-card {{
-    border-radius: 0 !important;
-    padding: 1.4rem 1.5rem; margin: 1.1rem 0;
-    border: 4px solid {INK};
-    box-shadow: 6px 6px 0px {INK};
-    animation: floatIn 300ms ease-out;
-    transition: transform 200ms, box-shadow 200ms;
-}}
-.result-card:hover {{
-    transform: translate(-3px, -3px);
-    box-shadow: 9px 9px 0px {INK};
-}}
-.result-expand   {{ background: #b7e4c7; border-left: 8px solid {CHART_EXPAND}; }}
-.result-maintain {{ background: #bde0fe; border-left: 8px solid {CHART_MAINTAIN}; }}
-.result-optimize {{ background: #ffe066; border-left: 8px solid {CHART_OPTIMIZE}; }}
-.result-drop     {{ background: #ffb3ba; border-left: 8px solid {CHART_DROP}; }}
+.result-card {
+  background:linear-gradient(145deg,rgba(38,34,52,.94) 0%,rgba(18,16,28,.92) 100%) !important;
+  backdrop-filter:var(--blur-lg) !important;
+  border:1px solid var(--border-md) !important;
+  border-radius:var(--r-2xl) !important;
+  padding:44px 48px !important;
+  margin:36px 0 !important;
+  box-shadow:var(--sh-xl) !important;
+  position:relative; overflow:hidden;
+  animation:scaleUp .55s cubic-bezier(.22,1,.36,1) both;
+  transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease !important;
+}
+.result-card::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+}
+.result-card:hover {
+  transform:translateY(-6px) !important;
+  box-shadow:var(--sh-xl),0 0 70px rgba(233,179,255,.12) !important;
+}
+.result-expand   {border-left:3px solid #4ade80 !important;}
+.result-maintain {border-left:3px solid #facc15 !important;}
+.result-optimize {border-left:3px solid #fb923c !important;}
+.result-drop     {border-left:3px solid #fb7185 !important;}
+.result-expand::after   {content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(74,222,128,.12) 0%,transparent 70%);pointer-events:none;}
+.result-maintain::after {content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(250,204,21,.12) 0%,transparent 70%);pointer-events:none;}
+.result-optimize::after {content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(251,146,60,.12) 0%,transparent 70%);pointer-events:none;}
+.result-drop::after     {content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(251,113,133,.12) 0%,transparent 70%);pointer-events:none;}
 
-/* ── Form inputs: pixel style ── */
-.stSelectbox label,.stNumberInput label,.stSlider label,
-.stRadio label,.stCheckbox label,.stTextInput label {{
-    font-family: 'Inter', sans-serif !important;
-    color: {INK_SOFT} !important;
-    font-weight: 400 !important;
-    font-size: 0.44rem !important;
-    letter-spacing: 0.05em !important;
-    text-transform: none !important;
-}}
-.stSelectbox [data-baseweb="select"] > div,
-.stTextInput input, .stNumberInput input {{
-    background: #ffffff !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    color: {INK} !important;
-    min-height: 42px !important;
-    box-shadow: 3px 3px 0px {INK} !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 1.1rem !important;
-    transition: box-shadow 120ms !important;
-}}
-.stSelectbox [data-baseweb="select"] > div:hover,
-.stTextInput input:hover, .stNumberInput input:hover {{
-    box-shadow: 4px 4px 0px {INK} !important;
-}}
-[data-baseweb="menu"] {{
-    background: #fff9e6 !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-}}
-[data-baseweb="menu"] li {{ color: {INK} !important; font-family: 'Inter', sans-serif !important; font-size: 1.1rem !important; }}
-[data-baseweb="menu"] li:hover {{ background: {CHART_OPTIMIZE}88 !important; }}
+.divider-label {
+  display:flex; align-items:center; gap:16px;
+  margin:44px 0 24px; color:var(--ink-muted);
+  font-size:.68rem; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; font-family:'Manrope',sans-serif;
+}
+.divider-label::before { content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--border-hi)); }
+.divider-label::after  { content:""; flex:1; height:1px; background:linear-gradient(90deg,var(--border-hi),transparent); }
 
-/* ── Form card ── */
-[data-testid="stForm"] {{
-    background: rgba(255, 255, 255, 0.92) !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    padding: 1.4rem 1.5rem 1.7rem !important;
-    box-shadow: 6px 6px 0px {INK} !important;
-}}
+/* ── iframes (SVG charts) — glass wrapper ───────────────────── */
+iframe {
+  border-radius: var(--r-xl) !important;
+  border: none !important;
+  display: block !important;
+}
 
-/* ── Buttons: pixel press style ── */
-[data-testid="stFormSubmitButton"] > button, .stButton > button {{
-    border-radius: 0 !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 400 !important;
-    font-size: 0.50rem !important;
-    letter-spacing: 0.06em !important;
-    text-transform: none !important;
-    transition: transform 80ms, box-shadow 80ms !important;
-    position: relative; overflow: hidden;
-    border: 3px solid {INK} !important;
-}}
-[data-testid="stFormSubmitButton"] > button {{
-    width: 100% !important;
-    background: {ACCENT} !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-    color: white !important;
-    padding: 0.7rem 0 !important;
-}}
-[data-testid="stFormSubmitButton"] > button:hover {{
-    transform: translate(-2px, -2px) !important;
-    box-shadow: 6px 6px 0px {INK} !important;
-}}
-[data-testid="stFormSubmitButton"] > button:active {{
-    transform: translate(2px, 2px) !important;
-    box-shadow: 1px 1px 0px {INK} !important;
-}}
-.stButton > button {{
-    background: #ffffff !important;
-    color: {INK} !important;
-    box-shadow: 3px 3px 0px {INK} !important;
-}}
-.stButton > button:hover {{
-    background: {CHART_OPTIMIZE} !important;
-    transform: translate(-1px, -1px) !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-}}
+/* ── scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--ink-ghost); border-radius:5px; }
+::-webkit-scrollbar-thumb:hover { background:var(--ink-muted); }
 
-/* ── DataFrames ── */
-[data-testid="stDataFrame"] {{
-    background: rgba(255, 255, 255, 0.90) !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    overflow: hidden !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-    transition: transform 200ms, box-shadow 200ms !important;
-}}
-[data-testid="stDataFrame"]:hover {{
-    transform: translate(-2px, -2px) !important;
-    box-shadow: 6px 6px 0px {INK} !important;
-}}
-[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{ color: {INK_SOFT} !important; }}
-[data-testid="stDataFrame"] [role="columnheader"] {{
-    background: {INK} !important;
-    color: #ffe066 !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 400 !important;
-    font-size: 0.44rem !important;
-    letter-spacing: 0.08em !important;
-    text-transform: none !important;
-    border-bottom: 2px solid {INK} !important;
-}}
-[data-testid="stDataFrame"] [role="gridcell"] {{
-    border-bottom: 1px solid rgba(26, 26, 46, 0.12) !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 1rem !important;
-}}
+/* ── vertical rhythm ────────────────────────────────────────── */
+[data-testid="stHorizontalBlock"] { gap:20px !important; }
 
-/* ── Expander ── */
-[data-testid="stExpander"] {{
-    background: rgba(255, 255, 255, 0.88) !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    box-shadow: 3px 3px 0px {INK} !important;
-    transition: transform 150ms, box-shadow 150ms !important;
-}}
-[data-testid="stExpander"]:hover {{
-    transform: translate(-1px, -1px) !important;
-    box-shadow: 4px 4px 0px {INK} !important;
-}}
-[data-testid="stExpander"] summary p {{
-    color: {INK} !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 0.50rem !important;
-    font-weight: 400 !important;
-}}
+/* ─────────────────────────────────────────────────────────────
+   PROFESSIONAL 3D MOTION UPGRADE — CSS ONLY, LOGIC UNCHANGED
+   Adds depth, glass, glow, scroll motion, hover lift, and SVG polish.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --glass-bg: linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.035) 42%, rgba(255,255,255,.055));
+  --glass-stroke: rgba(255,255,255,.16);
+  --glass-stroke-strong: rgba(255,255,255,.28);
+  --violet-glow: rgba(184,92,255,.28);
+  --rose-glow: rgba(255,124,182,.20);
+  --cyan-glow: rgba(100,210,255,.16);
+  --card-depth: 0 22px 65px rgba(0,0,0,.48), 0 8px 24px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.16);
+  --card-depth-hover: 0 34px 90px rgba(0,0,0,.56), 0 14px 36px rgba(184,92,255,.16), inset 0 1px 0 rgba(255,255,255,.22);
+  --motion-ease: cubic-bezier(.19,1,.22,1);
+}
 
-/* ── Charts ── */
-[data-testid="stPyplot"] {{
-    background: rgba(255, 255, 255, 0.88);
-    border: 3px solid {INK};
-    border-radius: 0;
-    padding: 0.8rem;
-    box-shadow: 4px 4px 0px {INK};
-    transition: transform 200ms, box-shadow 200ms;
-}}
-[data-testid="stPyplot"]:hover {{
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px {INK};
-}}
+html { scroll-behavior: smooth; }
+.stApp {
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(154,92,255,.24), transparent 34%),
+    radial-gradient(circle at 80% 18%, rgba(255,104,180,.13), transparent 30%),
+    radial-gradient(circle at 50% 90%, rgba(67,200,255,.10), transparent 38%),
+    linear-gradient(135deg, #07070b 0%, #0c0a14 45%, #070810 100%) !important;
+}
+.stApp::before {
+  background:
+    radial-gradient(circle at 32% 30%, rgba(233,179,255,.14), transparent 48%),
+    radial-gradient(circle at 70% 70%, rgba(100,210,255,.08), transparent 42%) !important;
+  mix-blend-mode: screen;
+}
+.stApp::after {
+  background:
+    linear-gradient(rgba(255,255,255,.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,.09) 1px, transparent 1.5px) !important;
+  background-size: 48px 48px, 48px 48px, 120px 120px !important;
+  background-position: center !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  opacity: .42;
+  filter: none !important;
+  animation: gridDrift 28s linear infinite !important;
+  z-index: 0;
+}
+@keyframes gridDrift {
+  from { transform: translate3d(0,0,0); }
+  to { transform: translate3d(-48px,-48px,0); }
+}
 
-/* ── Alerts ── */
-[data-testid="stAlert"] {{
-    border-radius: 0 !important;
-    background: rgba(255, 255, 255, 0.90) !important;
-    border: 3px solid {INK} !important;
-    box-shadow: 3px 3px 0px {INK} !important;
-    color: {INK} !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 1.1rem !important;
-}}
+.main .block-container {
+  position: relative;
+  z-index: 1;
+  perspective: 1400px;
+}
 
-hr {{ border: none !important; height: 3px !important;
-      background: repeating-linear-gradient(
-        90deg, {INK} 0px, {INK} 8px, transparent 8px, transparent 12px
-      ) !important; margin: 1.2rem 0 !important; }}
+/* hero/title treatment */
+h1, h2, h3 {
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif !important;
+  letter-spacing: -.04em !important;
+}
+h1 {
+  font-size: clamp(2.7rem, 6vw, 6.25rem) !important;
+  line-height: .92 !important;
+  background: linear-gradient(110deg, #ffffff 0%, #f1d7ff 34%, #b85cff 62%, #7dd7ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  text-shadow: 0 0 48px rgba(184,92,255,.18);
+  animation: heroFloat 7s var(--motion-ease) infinite alternate;
+}
+@keyframes heroFloat {
+  from { transform: translate3d(0,0,0) rotateX(0deg); filter: drop-shadow(0 0 0 rgba(184,92,255,0)); }
+  to { transform: translate3d(0,-8px,0) rotateX(2deg); filter: drop-shadow(0 18px 32px rgba(184,92,255,.12)); }
+}
 
-.col-label {{
-    font-family: 'Inter', sans-serif;
-    font-size: 0.44rem;
-    font-weight: 400;
-    color: {ACCENT};
-    letter-spacing: 0.10em;
-    text-transform: none;
-    margin-bottom: 0.8rem;
-    display: flex; align-items: center; gap: 0.5rem;
-}}
-.col-label::after {{
-    content: ""; flex: 1; height: 3px;
-    background: repeating-linear-gradient(
-        90deg, {ACCENT} 0px, {ACCENT} 6px, transparent 6px, transparent 9px
-    );
-}}
+[data-testid="stMarkdownContainer"] p {
+  text-wrap: pretty;
+}
 
-/* Slider: pixel thumb */
-[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
-    background: {ACCENT} !important;
-    border: 3px solid {INK} !important;
-    border-radius: 0 !important;
-    box-shadow: 2px 2px 0px {INK} !important;
-    width: 20px !important; height: 20px !important;
-}}
-[data-testid="stSlider"] [data-baseweb="slider"] [data-testid="stSliderTrackFill"] {{
-    background: {ACCENT} !important;
-    height: 6px !important;
-}}
-[data-testid="stSlider"] [data-baseweb="slider"] > div:first-child {{
-    height: 6px !important;
-    background: rgba(26,26,46,0.2) !important;
-    border-radius: 0 !important;
-}}
+/* universal premium glass surfaces */
+[data-testid="metric-container"],
+[data-testid="stExpander"],
+[data-testid="stDataFrame"],
+[data-testid="stTable"],
+.stAlert,
+.info-box,
+.result-card,
+div[data-testid="stForm"],
+div[data-baseweb="select"] > div,
+div[data-baseweb="input"] > div,
+div[data-baseweb="textarea"] > div {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-stroke) !important;
+  border-top-color: var(--glass-stroke-strong) !important;
+  box-shadow: var(--card-depth) !important;
+  backdrop-filter: blur(28px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
+  transform-style: preserve-3d;
+}
 
-/* Scrollbar: chunky pixel */
-::-webkit-scrollbar {{ width: 10px; height: 10px; }}
-::-webkit-scrollbar-track {{ background: #c8f0d0; border: 2px solid {INK}; }}
-::-webkit-scrollbar-thumb {{ background: {ACCENT}; border: 2px solid {INK}; border-radius: 0; }}
-::-webkit-scrollbar-thumb:hover {{ background: {ACCENT_DK}; }}
-::selection {{ background: {CHART_OPTIMIZE}; color: {INK}; }}
+[data-testid="metric-container"],
+[data-testid="stExpander"],
+[data-testid="stDataFrame"],
+.info-box,
+.result-card {
+  transition:
+    transform .55s var(--motion-ease),
+    box-shadow .55s var(--motion-ease),
+    border-color .55s var(--motion-ease),
+    filter .55s var(--motion-ease) !important;
+  will-change: transform, box-shadow;
+}
+[data-testid="metric-container"]:hover,
+[data-testid="stExpander"]:hover,
+[data-testid="stDataFrame"]:hover,
+.info-box:hover,
+.result-card:hover {
+  transform: translate3d(0,-10px,42px) rotateX(2deg) rotateY(-1deg) !important;
+  border-color: rgba(233,179,255,.36) !important;
+  box-shadow: var(--card-depth-hover), 0 0 64px rgba(184,92,255,.13) !important;
+  filter: saturate(1.08);
+}
 
-/* ── Airplane cursor canvas ── */
-#airplane-canvas {{
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    pointer-events: none; z-index: 999999;
-    image-rendering: pixelated;
-}}
+/* animated border sheen */
+[data-testid="metric-container"]::before,
+.info-box::before,
+.result-card::before {
+  height: 2px !important;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), rgba(184,92,255,.55), transparent) !important;
+  transform: translateX(-120%);
+  animation: borderSheen 5.5s ease-in-out infinite;
+}
+@keyframes borderSheen {
+  0%, 42% { transform: translateX(-120%); opacity: 0; }
+  52% { opacity: 1; }
+  72%,100% { transform: translateX(120%); opacity: 0; }
+}
+
+/* buttons feel like buoyant 3D controls */
+.stButton > button,
+.stDownloadButton > button,
+button[kind="primary"],
+button[data-testid="baseButton-primary"] {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.20) !important;
+  background:
+    radial-gradient(circle at 30% 0%, rgba(255,255,255,.30), transparent 30%),
+    linear-gradient(135deg, rgba(184,92,255,.95), rgba(255,124,182,.74)) !important;
+  box-shadow: 0 16px 36px rgba(184,92,255,.26), inset 0 1px 0 rgba(255,255,255,.30) !important;
+  transition: transform .32s var(--motion-ease), box-shadow .32s var(--motion-ease), filter .32s var(--motion-ease) !important;
+}
+.stButton > button:hover,
+.stDownloadButton > button:hover,
+button[kind="primary"]:hover,
+button[data-testid="baseButton-primary"]:hover {
+  transform: translateY(-4px) scale(1.015) !important;
+  box-shadow: 0 26px 55px rgba(184,92,255,.36), 0 0 48px rgba(255,124,182,.16), inset 0 1px 0 rgba(255,255,255,.34) !important;
+  filter: brightness(1.08);
+}
+.stButton > button::after,
+.stDownloadButton > button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.35) 45%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform .7s var(--motion-ease);
+}
+.stButton > button:hover::after,
+.stDownloadButton > button:hover::after { transform: translateX(120%); }
+
+/* tabs as pill navigation */
+.stTabs [data-baseweb="tab-list"] {
+  position: sticky;
+  top: .75rem;
+  z-index: 6;
+  background: rgba(10,9,15,.58) !important;
+  border-color: rgba(255,255,255,.14) !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+.stTabs [aria-selected="true"] {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.17), rgba(184,92,255,.20)) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 8px 24px rgba(184,92,255,.16) !important;
+}
+
+/* sidebar depth */
+[data-testid="stSidebar"] {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(184,92,255,.20), transparent 34%),
+    rgba(7,7,12,.72) !important;
+}
+.sidebar-brand {
+  filter: drop-shadow(0 12px 24px rgba(184,92,255,.18));
+}
+
+/* dataframes/table polish */
+[data-testid="stDataFrame"] {
+  border-radius: 24px !important;
+  overflow: hidden !important;
+}
+[data-testid="stDataFrame"] div {
+  scrollbar-width: thin;
+}
+
+/* scroll-driven reveal, CSS-only with graceful fallback */
+@supports (animation-timeline: view()) {
+  [data-testid="metric-container"],
+  [data-testid="stExpander"],
+  [data-testid="stDataFrame"],
+  .info-box,
+  .result-card,
+  iframe,
+  h1, h2, h3 {
+    animation: reveal3d both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
+  @keyframes reveal3d {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 36px, -80px) rotateX(8deg);
+      filter: blur(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotateX(0);
+      filter: blur(0);
+    }
+  }
+}
+
+/* accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 </style>
+
+<script>
+/* ── SCROLL-REVEAL ENGINE ──────────────────────────────────── */
+(function() {
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.style.opacity = "1";
+        e.target.style.transform = "translateY(0)";
+        io.unobserve(e.target);
+      }
+    });
+  },{ threshold:0.06, rootMargin:"0px 0px -30px 0px" });
+
+  function attach(){
+    var els = document.querySelectorAll(
+      "[data-testid='metric-container'], [data-testid='stDataFrame'], " +
+      "[data-testid='stExpander'], .element-container"
+    );
+    els.forEach(function(el, i){
+      if(!el.dataset.sr){
+        el.dataset.sr = "1";
+        el.style.opacity = "0";
+        el.style.transform = "translateY(28px)";
+        el.style.transition = "opacity .6s cubic-bezier(.22,1,.36,1) " + (i%5)*0.06 + "s, transform .6s cubic-bezier(.22,1,.36,1) " + (i%5)*0.06 + "s";
+        io.observe(el);
+      }
+    });
+  }
+  setTimeout(attach, 200);
+  new MutationObserver(function(){ setTimeout(attach, 100); })
+    .observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
-#  GLASSMORPHISM + MOTION WEBSITE OVERRIDE
+#  SVG CHART RENDERER HELPERS
+#  Each function receives already-computed Python data and
+#  returns an st.components.v1.html call with a self-contained
+#  glass-panel SVG chart.  No matplotlib anywhere.
 # ─────────────────────────────────────────────────────────────
-st.markdown(f"""
+
+CHART_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-:root {{
-    --bg-0: #07111f;
-    --bg-1: #0b1730;
-    --glass: rgba(255,255,255,0.105);
-    --glass-strong: rgba(255,255,255,0.16);
-    --glass-border: rgba(255,255,255,0.26);
-    --text: #f7fbff;
-    --muted: rgba(226,236,255,0.72);
-    --cyan: #67e8f9;
-    --blue: #60a5fa;
-    --violet: #a78bfa;
-    --pink: #f0abfc;
-    --green: #86efac;
-    --warning: #fde68a;
-    --danger: #fca5a5;
-    --radius-xl: 28px;
-    --radius-lg: 22px;
-    --shadow-soft: 0 24px 80px rgba(0,0,0,.38);
-}}
-
-html {{
-    scroll-behavior: smooth;
-}}
-
-body, .stApp {{
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
-    color: var(--text) !important;
-    background:
-        radial-gradient(circle at 12% 16%, rgba(103,232,249,.30), transparent 28%),
-        radial-gradient(circle at 84% 4%, rgba(167,139,250,.32), transparent 30%),
-        radial-gradient(circle at 74% 86%, rgba(240,171,252,.22), transparent 30%),
-        linear-gradient(135deg, var(--bg-0) 0%, var(--bg-1) 52%, #111827 100%) !important;
-    background-attachment: fixed !important;
-}}
-
-.stApp::before {{
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: transparent;
+    font-family: 'Space Grotesk', sans-serif;
+    overflow: hidden;
+  }
+  .card {
+    background: linear-gradient(145deg, rgba(34,30,48,.96) 0%, rgba(16,14,24,.94) 100%);
+    border: 1px solid rgba(255,255,255,.12);
+    border-top: 1px solid rgba(255,255,255,.20);
+    border-radius: 20px;
+    padding: 22px 24px 18px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.70), 0 4px 16px rgba(0,0,0,.55),
+                0 0 0 1px rgba(255,255,255,.06),
+                0 -1px 0 rgba(255,255,255,.06) inset;
+    position: relative;
+    overflow: hidden;
+    transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+    cursor: default;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 64px rgba(0,0,0,.75), 0 8px 24px rgba(233,179,255,.10),
+                0 0 0 1px rgba(255,255,255,.09),
+                0 0 60px rgba(233,179,255,.08);
+  }
+  .card::before {
     content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.30), transparent);
+    pointer-events: none;
+  }
+  .card::after {
+    content: "";
+    position: absolute; top: -60px; right: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(233,179,255,.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .chart-title {
+    font-size: 13px; font-weight: 600; color: #e5e1e4;
+    letter-spacing: -.01em; margin-bottom: 14px;
+  }
+  svg { display: block; }
+  .axis-label { font-size: 9px; fill: #9b8c9e; font-family: 'Space Grotesk', sans-serif; }
+  .value-label { font-size: 9.5px; fill: #c4bfc6; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .grid-line { stroke: rgba(255,255,255,.045); stroke-width: .8; stroke-dasharray: 5,4; }
+  .bar-rect { transition: opacity .2s; cursor: pointer; }
+  .bar-rect:hover { opacity: .82; filter: brightness(1.15); }
+
+  /* bar entrance animation */
+  @keyframes barGrow {
+    from { transform: scaleY(0); transform-origin: bottom; }
+    to   { transform: scaleY(1); transform-origin: bottom; }
+  }
+  @keyframes barGrowH {
+    from { transform: scaleX(0); transform-origin: left; }
+    to   { transform: scaleX(1); transform-origin: left; }
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .bar-anim { animation: barGrow .65s cubic-bezier(.22,1,.36,1) both; }
+  .bar-anim-h { animation: barGrowH .65s cubic-bezier(.22,1,.36,1) both; }
+  .fade-in { animation: fadeIn .50s ease both; }
+
+  /* pie slice pulse on hover */
+  .pie-slice { transition: opacity .2s, filter .2s; cursor: pointer; }
+  .pie-slice:hover { opacity: .85; filter: brightness(1.18) drop-shadow(0 0 8px currentColor); }
+
+  /* Premium SVG chart depth / motion upgrade */
+  body::before {
+    content:"";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 0;
     background:
-        linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
-    background-size: 52px 52px;
-    mask-image: radial-gradient(circle at 50% 15%, black, transparent 72%);
-}}
-
-.stApp::after {{
-    content: "";
-    position: fixed;
-    width: 42rem;
-    height: 42rem;
-    right: -16rem;
-    top: 12rem;
-    border-radius: 999px;
-    pointer-events: none;
-    z-index: 0;
-    background: radial-gradient(circle, rgba(96,165,250,.20), transparent 63%);
-    filter: blur(12px);
-    animation: orbDrift 14s ease-in-out infinite alternate;
-}}
-
-@keyframes orbDrift {{
-    from {{ transform: translate3d(0,0,0) scale(1); }}
-    to {{ transform: translate3d(-8vw,7vh,0) scale(1.12); }}
-}}
-@keyframes floatUp {{
-    from {{ opacity: 0; transform: translateY(24px) scale(.98); filter: blur(8px); }}
-    to {{ opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }}
-}}
-@keyframes softGlow {{
-    0%,100% {{ box-shadow: 0 24px 80px rgba(0,0,0,.34), 0 0 0 1px rgba(255,255,255,.20) inset; }}
-    50% {{ box-shadow: 0 28px 100px rgba(96,165,250,.25), 0 0 0 1px rgba(255,255,255,.30) inset; }}
-}}
-@keyframes gradientShift {{
-    0% {{ background-position: 0% 50%; }}
-    50% {{ background-position: 100% 50%; }}
-    100% {{ background-position: 0% 50%; }}
-}}
-@keyframes shimmerLine {{
-    from {{ transform: translateX(-130%); }}
-    to {{ transform: translateX(130%); }}
-}}
-
-.block-container {{
-    max-width: 1320px !important;
-    padding-top: 2.2rem !important;
-    position: relative;
-    z-index: 1;
-}}
-
-h1,h2,h3,h4,p,span,div,label {{
-    font-family: 'Inter', system-ui, sans-serif !important;
-    text-shadow: none !important;
-}}
-
-h1,h2,h3,h4, .section-hd {{
-    color: #ffffff !important;
-    letter-spacing: -0.035em !important;
-    font-weight: 800 !important;
-}}
-
-p, .section-sub, .stMarkdown, [data-testid="stMetricDelta"], [data-testid="stMetricValue"] {{
-    color: var(--muted) !important;
-}}
-
-.hero {{
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.4rem;
-    margin-bottom: 1.6rem;
-    padding: clamp(1.7rem, 4vw, 3.2rem) !important;
-    border-radius: 34px !important;
-    border: 1px solid rgba(255,255,255,.24) !important;
+      radial-gradient(circle at 22% 10%, rgba(233,179,255,.10), transparent 34%),
+      radial-gradient(circle at 88% 82%, rgba(100,210,255,.06), transparent 30%);
+    opacity: .9;
+  }
+  .card {
+    transform-style: preserve-3d;
+    backdrop-filter: blur(30px) saturate(155%);
+    -webkit-backdrop-filter: blur(30px) saturate(155%);
     background:
-        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.07)),
-        radial-gradient(circle at 20% 10%, rgba(103,232,249,.30), transparent 34%),
-        radial-gradient(circle at 84% 18%, rgba(240,171,252,.22), transparent 38%) !important;
-    backdrop-filter: blur(24px) saturate(170%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(170%) !important;
-    box-shadow: var(--shadow-soft) !important;
-    animation: floatUp .9s ease both, softGlow 6s ease-in-out infinite !important;
-}}
-.hero canvas {{ display: none !important; }}
-.hero::before {{
-    content: "";
-    position: absolute;
-    inset: -2px;
-    background: linear-gradient(115deg, transparent 18%, rgba(255,255,255,.34), transparent 42%);
-    transform: translateX(-130%);
-    animation: shimmerLine 5.8s ease-in-out infinite;
-}}
-.hero::after {{
-    content: "";
-    position: absolute;
-    right: -8rem;
-    top: -8rem;
-    width: 22rem;
-    height: 22rem;
-    border-radius: 999px;
-    background: radial-gradient(circle, rgba(103,232,249,.30), transparent 60%);
-    filter: blur(4px);
-}}
-.hero h1 {{
-    font-size: clamp(2.4rem, 6vw, 5.9rem) !important;
-    line-height: .9 !important;
-    margin: 0 0 1rem !important;
-    background: linear-gradient(90deg, #fff, #c7f9ff, #d8b4fe, #fff);
-    background-size: 240% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent !important;
-    animation: gradientShift 8s ease infinite;
-}}
-.hero p {{
-    font-size: 1rem !important;
-    color: rgba(240,247,255,.76) !important;
-    max-width: 680px;
-}}
-.hero-eyebrow, .hero-badge {{
+      radial-gradient(circle at 18% 0%, rgba(255,255,255,.12), transparent 28%),
+      linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.035) 48%, rgba(184,92,255,.065)) !important;
+    border-color: rgba(255,255,255,.16) !important;
+  }
+  .card:hover {
+    transform: translateY(-8px) rotateX(2deg) rotateY(-1deg);
+    border-color: rgba(233,179,255,.34) !important;
+  }
+  .card::before {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), rgba(233,179,255,.62), transparent);
+    animation: chartSheen 5s ease-in-out infinite;
+  }
+  @keyframes chartSheen {
+    0%, 42% { transform: translateX(-120%); opacity: 0; }
+    55% { opacity: 1; }
+    78%, 100% { transform: translateX(120%); opacity: 0; }
+  }
+  .chart-title {
     display: inline-flex;
     align-items: center;
-    gap: .5rem;
-    width: fit-content;
-    border-radius: 999px !important;
-    padding: .55rem .85rem !important;
-    font-size: .72rem !important;
-    font-weight: 800 !important;
-    letter-spacing: .11em !important;
-    color: #e0faff !important;
-    border: 1px solid rgba(255,255,255,.28) !important;
-    background: rgba(255,255,255,.11) !important;
-    backdrop-filter: blur(16px) !important;
-    box-shadow: none !important;
-}}
-.hero-glyph {{
-    font-size: clamp(3.2rem, 10vw, 8rem) !important;
-    color: rgba(255,255,255,.52) !important;
-    animation: orbDrift 7s ease-in-out infinite alternate;
-}}
-
-[data-testid="stSidebar"] {{
-    background: rgba(5,12,24,.58) !important;
-    border-right: 1px solid rgba(255,255,255,.16) !important;
-    backdrop-filter: blur(24px) saturate(170%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(170%) !important;
-    box-shadow: 20px 0 60px rgba(0,0,0,.22) !important;
-}}
-[data-testid="stSidebar"] * {{
-    color: rgba(245,250,255,.88) !important;
-}}
-.sidebar-brand {{
-    color: #fff !important;
-    border-bottom: 1px solid rgba(255,255,255,.14) !important;
-    font-weight: 900 !important;
-    letter-spacing: -.01em !important;
-}}
-
-div[data-testid="stVerticalBlock"] > div,
-.info-box, .result-card,
-.gi-chart, .gi-hchart, .gi-pie-card, .gi-classic-card {{
-    border-radius: var(--radius-lg) !important;
-}}
-
-.info-box, .result-card,
-[data-testid="stMetric"],
-.gi-chart, .gi-hchart, .gi-pie-card, .gi-classic-card,
-.stDataFrame, div[data-testid="stExpander"] {{
-    background: linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.065)) !important;
-    border: 1px solid rgba(255,255,255,.20) !important;
-    box-shadow: 0 18px 60px rgba(0,0,0,.22) !important;
-    backdrop-filter: blur(20px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
-    animation: floatUp .75s ease both;
-}}
-
-.section-hd {{
-    font-size: clamp(1.2rem, 2.2vw, 2rem) !important;
-    margin-top: .4rem !important;
-}}
-.section-sub {{
-    font-size: .98rem !important;
-    line-height: 1.7 !important;
-}}
-
-.divider-label {{
-    color: rgba(255,255,255,.85) !important;
-    letter-spacing: .14em !important;
-    font-size: .72rem !important;
-    margin: 1.8rem 0 1rem !important;
-}}
-.divider-label::before, .divider-label::after {{
-    height: 1px !important;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.38), transparent) !important;
-}}
-
-.stTabs [data-baseweb="tab-list"] {{
-    gap: .65rem !important;
-    padding: .45rem !important;
-    border-radius: 999px !important;
-    background: rgba(255,255,255,.08) !important;
-    border: 1px solid rgba(255,255,255,.16) !important;
-    backdrop-filter: blur(18px) !important;
-}}
-.stTabs [data-baseweb="tab"] {{
-    border-radius: 999px !important;
-    border: 1px solid transparent !important;
-    color: rgba(245,250,255,.72) !important;
-    font-weight: 800 !important;
-    transition: transform .25s ease, background .25s ease, color .25s ease !important;
-}}
-.stTabs [data-baseweb="tab"]:hover {{
+    gap: 8px;
+    letter-spacing: -.025em;
+  }
+  .chart-title::before {
+    content:"";
+    width: 8px; height: 8px; border-radius: 999px;
+    background: #e9b3ff;
+    box-shadow: 0 0 18px rgba(233,179,255,.75);
+  }
+  .bar-rect, .pie-slice {
+    transition: opacity .24s ease, filter .24s ease, transform .24s cubic-bezier(.19,1,.22,1);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .bar-rect:hover {
+    opacity: .94;
+    filter: brightness(1.22) drop-shadow(0 0 16px currentColor);
     transform: translateY(-2px);
-    background: rgba(255,255,255,.12) !important;
-    color: #fff !important;
-}}
-.stTabs [aria-selected="true"] {{
-    color: #07111f !important;
-    background: linear-gradient(135deg, #67e8f9, #c084fc) !important;
-    border: 1px solid rgba(255,255,255,.45) !important;
-}}
-
-.stButton > button, .stDownloadButton > button {{
-    border: 0 !important;
-    border-radius: 999px !important;
-    color: #07111f !important;
-    font-weight: 900 !important;
-    background: linear-gradient(135deg, #67e8f9, #a78bfa, #f0abfc) !important;
-    background-size: 220% 220% !important;
-    box-shadow: 0 18px 40px rgba(103,232,249,.18) !important;
-    transition: transform .25s ease, box-shadow .25s ease !important;
-    animation: gradientShift 7s ease infinite;
-}}
-.stButton > button:hover, .stDownloadButton > button:hover {{
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: 0 24px 60px rgba(167,139,250,.28) !important;
-}}
-
-.stSelectbox div[data-baseweb="select"] > div,
-.stNumberInput input, .stTextInput input, .stSlider, textarea {{
-    border-radius: 16px !important;
-    background: rgba(255,255,255,.10) !important;
-    border-color: rgba(255,255,255,.20) !important;
-    color: #fff !important;
-}}
-
-.pill {{
-    border-radius: 999px !important;
-    border: 1px solid rgba(255,255,255,.24) !important;
-    box-shadow: none !important;
-    color: #07111f !important;
-    font-weight: 900 !important;
-}}
-.pill-expand {{ background: linear-gradient(135deg, #86efac, #67e8f9) !important; }}
-.pill-maintain {{ background: linear-gradient(135deg, #93c5fd, #a78bfa) !important; }}
-.pill-optimize {{ background: linear-gradient(135deg, #fde68a, #f0abfc) !important; }}
-.pill-drop {{ background: linear-gradient(135deg, #fca5a5, #f0abfc) !important; }}
-
-.result-card {{
-    border-left: 1px solid rgba(255,255,255,.20) !important;
-}}
-.result-expand, .result-maintain, .result-optimize, .result-drop {{
-    background: linear-gradient(135deg, rgba(255,255,255,.17), rgba(255,255,255,.07)) !important;
-}}
-
-.gi-chart-title, .gi-hchart-title, .gi-pie-title, .gi-classic-title,
-.gi-value, .gi-hvalue, .gi-classic-value, .gi-xlabel, .gi-hlabel, .gi-pie-pct {{
-    color: rgba(255,255,255,.88) !important;
-}}
-.gi-bar, .gi-hbar, .gi-classic-bar {{
-    border-radius: 999px !important;
-    box-shadow: 0 0 34px rgba(103,232,249,.18) !important;
-}}
-
-[data-testid="stDataFrame"] {{
-    border-radius: 20px !important;
-    overflow: hidden !important;
-}}
-
-footer, header {{ visibility: hidden; }}
-#MainMenu {{ visibility: hidden; }}
-
-@media (max-width: 760px) {{
-    .hero {{
-        flex-direction: column;
-        align-items: flex-start;
-    }}
-    .hero-glyph {{
-        position: absolute;
-        right: 1rem;
-        bottom: 1rem;
-        opacity: .28;
-    }}
-}}
+  }
+  .pie-slice:hover {
+    opacity: .95;
+    transform: scale(1.025);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+    }
+  }
 </style>
-""", unsafe_allow_html=True)
+"""
+
+def _fmt_money(v):
+    if abs(v) >= 1_000_000:
+        return f"${v/1_000_000:.1f}M"
+    if abs(v) >= 1_000:
+        return f"${v/1_000:.0f}K"
+    return f"${v:.0f}"
+
+def _grid_lines(ax_x, ax_y, w, h, n=5):
+    """Return SVG horizontal grid line strings."""
+    lines = []
+    for i in range(1, n + 1):
+        y = ax_y + h - (h * i / n)
+        lines.append(f'<line class="grid-line" x1="{ax_x}" y1="{y:.1f}" x2="{ax_x+w}" y2="{y:.1f}"/>')
+    return "\n".join(lines)
+
+def _grid_lines_v(ax_x, ax_y, w, h, n=4):
+    """Return SVG vertical grid line strings (for horizontal bar charts)."""
+    lines = []
+    for i in range(1, n + 1):
+        x = ax_x + (w * i / n)
+        lines.append(f'<line class="grid-line" x1="{x:.1f}" y1="{ax_y}" x2="{x:.1f}" y2="{ax_y+h}"/>')
+    return "\n".join(lines)
 
 
+def render_vbar_chart(title, labels, values, colors, height=340,
+                      fmt_fn=None, y_label="", uid="chart"):
+    """Vertical bar chart — pure SVG inside a glass card."""
+    if fmt_fn is None:
+        fmt_fn = lambda v: f"{v:,.0f}"
+    n = len(labels)
+    W, H = 560, height
+    pad_l, pad_r, pad_t, pad_b = 54, 20, 28, 44
+    ax_w = W - pad_l - pad_r
+    ax_h = H - pad_t - pad_b
+    bar_w = ax_w / n * 0.52
+    bar_gap = ax_w / n
 
-# ─────────────────────────────────────────────────────────────
-#  MOTION BACKDROP NOTE
-#  Cursor canvas removed for a cleaner motion-site experience.
-#  The glassmorphism / animation layer below handles visual motion.
-# ─────────────────────────────────────────────────────────────
+    vmax = max(abs(v) for v in values) if values else 1
+    vmin = min(values) if values else 0
+    has_neg = vmin < 0
+
+    def to_y(v):
+        if has_neg:
+            total = vmax - vmin
+            return pad_t + ax_h - ((v - vmin) / total) * ax_h
+        else:
+            return pad_t + ax_h - (v / vmax) * ax_h
+
+    zero_y = to_y(0) if has_neg else pad_t + ax_h
+
+    bars_svg = []
+    labels_svg = []
+    val_labels = []
+
+    for i, (lbl, v, col) in enumerate(zip(labels, values, colors)):
+        cx = pad_l + bar_gap * i + bar_gap / 2
+        bx = cx - bar_w / 2
+        by = to_y(v)
+        bh = abs(zero_y - by)
+        delay = i * 0.08
+
+        # gradient def id
+        gid = f"{uid}_g{i}"
+        bars_svg.append(f"""
+<defs>
+  <linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="{col}" stop-opacity=".95"/>
+    <stop offset="100%" stop-color="{col}" stop-opacity=".55"/>
+  </linearGradient>
+</defs>
+<rect class="bar-rect bar-anim" rx="5" ry="5"
+  x="{bx:.1f}" y="{min(by, zero_y):.1f}" width="{bar_w:.1f}" height="{bh:.1f}"
+  fill="url(#{gid})"
+  style="filter:drop-shadow(0 4px 12px {col}44);animation-delay:{delay:.2f}s"/>""")
+
+        # x-axis label
+        labels_svg.append(
+            f'<text class="axis-label" x="{cx:.1f}" y="{pad_t+ax_h+18}" text-anchor="middle">{lbl}</text>'
+        )
+        # value label above bar
+        label_y = min(by, zero_y) - 6
+        if label_y < pad_t + 6:
+            label_y = min(by, zero_y) + bh + 14
+        val_labels.append(
+            f'<text class="value-label fade-in" x="{cx:.1f}" y="{label_y:.1f}" text-anchor="middle"'
+            f' style="animation-delay:{delay+0.3:.2f}s">{fmt_fn(v)}</text>'
+        )
+
+    # y-axis tick labels
+    y_ticks = []
+    for i in range(6):
+        val = vmin + (vmax - vmin) * i / 5 if has_neg else vmax * i / 5
+        y = to_y(val)
+        y_ticks.append(
+            f'<text class="axis-label" x="{pad_l-8}" y="{y+3:.1f}" text-anchor="end">{fmt_fn(val)}</text>'
+        )
+
+    html = f"""<!DOCTYPE html><html><head>{CHART_CSS}</head><body>
+<div class="card">
+  <div class="chart-title">{title}</div>
+  <svg viewBox="0 0 {W} {H}" width="100%" style="max-height:{H}px">
+    <!-- grid -->
+    {_grid_lines(pad_l, pad_t, ax_w, ax_h)}
+    <!-- zero line -->
+    <line x1="{pad_l}" y1="{zero_y:.1f}" x2="{pad_l+ax_w}" y2="{zero_y:.1f}"
+          stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+    <!-- bars -->
+    {''.join(bars_svg)}
+    <!-- axis labels -->
+    {''.join(labels_svg)}
+    {''.join(val_labels)}
+    {''.join(y_ticks)}
+    <!-- y-axis label -->
+    <text class="axis-label" x="12" y="{pad_t + ax_h//2}" text-anchor="middle"
+          transform="rotate(-90,12,{pad_t + ax_h//2})">{y_label}</text>
+  </svg>
+</div>
+</body></html>"""
+    return html
+
+
+def render_hbar_chart(title, labels, values, colors, height=None, fmt_fn=None, x_label="", uid="hchart"):
+    """Horizontal bar chart — pure SVG inside a glass card."""
+    if fmt_fn is None:
+        fmt_fn = _fmt_money
+    n = len(labels)
+    W = 560
+    H = height or max(260, 42 * n + 80)
+    pad_l, pad_r, pad_t, pad_b = 110, 80, 28, 32
+    ax_w = W - pad_l - pad_r
+    ax_h = H - pad_t - pad_b
+    bar_h = ax_h / n * 0.58
+    bar_gap = ax_h / n
+
+    vmax = max(values) if values else 1
+
+    bars_svg = []
+    for i, (lbl, v, col) in enumerate(zip(labels, values, colors)):
+        cy = pad_t + bar_gap * i + bar_gap / 2
+        by = cy - bar_h / 2
+        bw = (v / vmax) * ax_w
+        delay = i * 0.07
+        gid = f"{uid}_g{i}"
+
+        bars_svg.append(f"""
+<defs>
+  <linearGradient id="{gid}" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="{col}" stop-opacity=".90"/>
+    <stop offset="100%" stop-color="{col}" stop-opacity=".50"/>
+  </linearGradient>
+</defs>
+<rect class="bar-rect bar-anim-h" rx="4" ry="4"
+  x="{pad_l}" y="{by:.1f}" width="{bw:.1f}" height="{bar_h:.1f}"
+  fill="url(#{gid})"
+  style="filter:drop-shadow(0 3px 10px {col}44);animation-delay:{delay:.2f}s"/>
+<text class="axis-label" x="{pad_l-8}" y="{cy+3.5:.1f}" text-anchor="end" font-size="9">{lbl}</text>
+<text class="value-label fade-in" x="{pad_l+bw+6:.1f}" y="{cy+3.5:.1f}"
+  style="animation-delay:{delay+0.25:.2f}s">{fmt_fn(v)}</text>""")
+
+    html = f"""<!DOCTYPE html><html><head>{CHART_CSS}</head><body>
+<div class="card">
+  <div class="chart-title">{title}</div>
+  <svg viewBox="0 0 {W} {H}" width="100%" style="max-height:{H}px">
+    {_grid_lines_v(pad_l, pad_t, ax_w, ax_h)}
+    <line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{pad_t+ax_h}"
+          stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+    {''.join(bars_svg)}
+    <text class="axis-label" x="{pad_l + ax_w//2}" y="{H-6}" text-anchor="middle">{x_label}</text>
+  </svg>
+</div>
+</body></html>"""
+    return html
+
+
+def render_pie_chart(title, labels, values, colors, height=320, uid="pie"):
+    """Donut / pie chart — pure SVG inside a glass card."""
+    total = sum(values)
+    if total == 0:
+        return ""
+    W, H = 480, height
+    cx, cy, r_outer, r_inner = W // 2, H // 2 - 10, min(W, H) // 2 - 50, 55
+
+    slices = []
+    legend = []
+    angle = -90.0  # start at top
+
+    for i, (lbl, v, col) in enumerate(zip(labels, values, colors)):
+        frac = v / total
+        sweep = frac * 360
+        start_rad = angle * 3.14159265 / 180
+        end_rad = (angle + sweep) * 3.14159265 / 180
+
+        x1 = cx + r_outer * __import__('math').cos(start_rad)
+        y1 = cy + r_outer * __import__('math').sin(start_rad)
+        x2 = cx + r_outer * __import__('math').cos(end_rad)
+        y2 = cy + r_outer * __import__('math').sin(end_rad)
+        xi1 = cx + r_inner * __import__('math').cos(end_rad)
+        yi1 = cy + r_inner * __import__('math').sin(end_rad)
+        xi2 = cx + r_inner * __import__('math').cos(start_rad)
+        yi2 = cy + r_inner * __import__('math').sin(start_rad)
+        large = 1 if sweep > 180 else 0
+
+        # label position
+        mid_rad = (angle + sweep / 2) * 3.14159265 / 180
+        lx = cx + (r_outer * 0.72) * __import__('math').cos(mid_rad)
+        ly = cy + (r_outer * 0.72) * __import__('math').sin(mid_rad)
+
+        d = (f"M {x1:.2f} {y1:.2f} "
+             f"A {r_outer} {r_outer} 0 {large} 1 {x2:.2f} {y2:.2f} "
+             f"L {xi1:.2f} {yi1:.2f} "
+             f"A {r_inner} {r_inner} 0 {large} 0 {xi2:.2f} {yi2:.2f} Z")
+
+        delay = i * 0.10
+        gid = f"{uid}_pg{i}"
+        slices.append(f"""
+<defs>
+  <radialGradient id="{gid}" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="{col}" stop-opacity=".95"/>
+    <stop offset="100%" stop-color="{col}" stop-opacity=".65"/>
+  </radialGradient>
+</defs>
+<path class="pie-slice fade-in" d="{d}" fill="url(#{gid})"
+  stroke="rgba(11,11,13,1)" stroke-width="2.5"
+  style="filter:drop-shadow(0 4px 14px {col}55);animation-delay:{delay:.2f}s">
+  <title>{lbl}: {frac:.1%}</title>
+</path>
+<text class="value-label fade-in" x="{lx:.1f}" y="{ly+4:.1f}"
+  text-anchor="middle" font-size="10"
+  style="animation-delay:{delay+0.25:.2f}s">{frac:.0%}</text>""")
+
+        # legend row
+        lrow_y = H - 60 + i * 0 + 0  # will compute below
+        legend.append((col, lbl, frac))
+        angle += sweep
+
+    # legend below chart
+    legend_svg = []
+    lx0 = 20
+    ly0 = H - 36
+    for i, (col, lbl, frac) in enumerate(legend):
+        ox = lx0 + i * (W // len(legend))
+        legend_svg.append(
+            f'<rect x="{ox}" y="{ly0}" width="10" height="10" rx="3" fill="{col}" opacity=".85"/>'
+            f'<text class="axis-label" x="{ox+14}" y="{ly0+9}">{lbl} {frac:.1%}</text>'
+        )
+
+    html = f"""<!DOCTYPE html><html><head>{CHART_CSS}</head><body>
+<div class="card">
+  <div class="chart-title">{title}</div>
+  <svg viewBox="0 0 {W} {H}" width="100%" style="max-height:{H}px">
+    {''.join(slices)}
+    {''.join(legend_svg)}
+  </svg>
+</div>
+</body></html>"""
+    return html
+
+
+def render_grouped_bar_chart(title, group_labels, series, colors, height=300, uid="grp"):
+    """Grouped bar chart for model comparison."""
+    n_groups = len(group_labels)
+    n_series = len(series)
+    W, H = 640, height
+    pad_l, pad_r, pad_t, pad_b = 50, 20, 36, 56
+    ax_w = W - pad_l - pad_r
+    ax_h = H - pad_t - pad_b
+    group_w = ax_w / n_groups
+    bar_w = group_w * 0.35
+    bar_offsets = [-(n_series - 1) * bar_w / 2 + i * bar_w for i in range(n_series)]
+
+    all_vals = [v for s in series for v in s["values"]]
+    vmax = max(all_vals) * 1.15
+
+    def to_y(v):
+        return pad_t + ax_h - (v / vmax) * ax_h
+
+    bars_svg = []
+    legend_svg = []
+
+    for si, s in enumerate(series):
+        col = colors[si]
+        gid_base = f"{uid}_s{si}"
+        for gi, (lbl, v) in enumerate(zip(group_labels, s["values"])):
+            cx = pad_l + group_w * gi + group_w / 2 + bar_offsets[si]
+            by = to_y(v)
+            bh = pad_t + ax_h - by
+            delay = (gi * n_series + si) * 0.06
+            gid = f"{gid_base}g{gi}"
+            bars_svg.append(f"""
+<defs>
+  <linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="{col}" stop-opacity=".95"/>
+    <stop offset="100%" stop-color="{col}" stop-opacity=".50"/>
+  </linearGradient>
+</defs>
+<rect class="bar-rect bar-anim" rx="4"
+  x="{cx - bar_w/2:.1f}" y="{by:.1f}" width="{bar_w:.1f}" height="{bh:.1f}"
+  fill="url(#{gid})" style="filter:drop-shadow(0 3px 10px {col}44);animation-delay:{delay:.2f}s"/>
+<text class="value-label fade-in" x="{cx:.1f}" y="{by-5:.1f}" text-anchor="middle" font-size="8.5"
+  style="animation-delay:{delay+0.25:.2f}s">{v:.0%}</text>""")
+
+        # legend
+        lx = pad_l + si * 110
+        legend_svg.append(
+            f'<rect x="{lx}" y="{H-20}" width="10" height="10" rx="3" fill="{col}" opacity=".85"/>'
+            f'<text class="axis-label" x="{lx+14}" y="{H-11}">{s["label"]}</text>'
+        )
+
+    # x-axis group labels
+    x_labels = []
+    for gi, lbl in enumerate(group_labels):
+        cx = pad_l + group_w * gi + group_w / 2
+        # wrap long labels
+        words = lbl.split()
+        if len(words) > 2:
+            line1 = " ".join(words[:2])
+            line2 = " ".join(words[2:])
+            x_labels.append(
+                f'<text class="axis-label" x="{cx:.1f}" y="{pad_t+ax_h+14}" text-anchor="middle">{line1}</text>'
+                f'<text class="axis-label" x="{cx:.1f}" y="{pad_t+ax_h+25}" text-anchor="middle">{line2}</text>'
+            )
+        else:
+            x_labels.append(
+                f'<text class="axis-label" x="{cx:.1f}" y="{pad_t+ax_h+14}" text-anchor="middle">{lbl}</text>'
+            )
+
+    y_ticks = []
+    for i in range(6):
+        val = vmax * i / 5
+        y = to_y(val)
+        y_ticks.append(
+            f'<text class="axis-label" x="{pad_l-8}" y="{y+3:.1f}" text-anchor="end">{val:.0%}</text>'
+        )
+
+    html = f"""<!DOCTYPE html><html><head>{CHART_CSS}</head><body>
+<div class="card">
+  <div class="chart-title">{title}</div>
+  <svg viewBox="0 0 {W} {H}" width="100%" style="max-height:{H}px">
+    {_grid_lines(pad_l, pad_t, ax_w, ax_h)}
+    <line x1="{pad_l}" y1="{pad_t+ax_h}" x2="{pad_l+ax_w}" y2="{pad_t+ax_h}"
+          stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+    {''.join(bars_svg)}
+    {''.join(x_labels)}
+    {''.join(y_ticks)}
+    {''.join(legend_svg)}
+  </svg>
+</div>
+</body></html>"""
+    return html
+
+
+def svg_chart(html_str, height):
+    """Render the chart HTML in a transparent iframe."""
+    components.html(html_str, height=height, scrolling=False)
+
 
 # ─────────────────────────────────────────────────────────────
 #  PATHS
@@ -1052,9 +1357,8 @@ X1_COLS_PATH = os.path.join(BASE_DIR, "x1_columns.pkl")
 X2_COLS_PATH = os.path.join(BASE_DIR, "x2_columns.pkl")
 X3_COLS_PATH = os.path.join(BASE_DIR, "x3_columns.pkl")
 
-
 # ─────────────────────────────────────────────────────────────
-#  DATA & MODEL LOADING
+#  DATA & MODEL LOADING  (logic unchanged)
 # ─────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
@@ -1082,7 +1386,6 @@ def load_data():
     df["Route_Decision"] = df.apply(classify, axis=1)
     return df
 
-
 @st.cache_resource
 def load_artifacts():
     return (
@@ -1090,451 +1393,9 @@ def load_artifacts():
         joblib.load(X1_COLS_PATH), joblib.load(X2_COLS_PATH), joblib.load(X3_COLS_PATH)
     )
 
-
 def prepare_input(input_df, training_columns):
     enc = pd.get_dummies(input_df, drop_first=True)
     return enc.reindex(columns=training_columns, fill_value=0)
-
-
-# ─────────────────────────────────────────────────────────────
-#  CHART HELPERS
-# ─────────────────────────────────────────────────────────────
-def clean_fig(figsize=(8, 4)):
-    fig, ax = plt.subplots(figsize=figsize)
-    fig.patch.set_facecolor("#ffffff")
-    fig.patch.set_alpha(0.0)
-    ax.set_facecolor("none")
-    for spine in ["top", "right", "left", "bottom"]:
-        ax.spines[spine].set_visible(False)
-    ax.tick_params(colors=INK_MUTED, labelsize=8.5, length=0)
-    ax.xaxis.label.set_color(INK_SOFT)
-    ax.yaxis.label.set_color(INK_SOFT)
-    ax.title.set_color(INK)
-    ax.title.set_fontsize(11)
-    ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color="#cccccc", linewidth=1.0, linestyle="--", alpha=0.70)
-    ax.set_axisbelow(True)
-    for label in ax.get_xticklabels() + ax.get_yticklabels():
-        label.set_color(INK_MUTED)
-    return fig, ax
-
-
-def col_seq(labels):
-    return [DECISION_COLORS.get(l, ACCENT) for l in labels]
-
-
-def add_bar_shimmer(bars, ax, alpha=0.92):
-    for bar in bars:
-        bar.set_alpha(alpha)
-        bar.set_linewidth(0)
-    return bars
-
-
-# ─────────────────────────────────────────────────────────────
-#  PIXEL HTML CHART HELPERS
-# ─────────────────────────────────────────────────────────────
-def _fmt_chart_value(v, value_format="number"):
-    if value_format == "percent":
-        return f"{v:.0%}"
-    if value_format == "money":
-        return f"${v:,.0f}"
-    return f"{v:,.0f}"
-
-
-def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_format="number", height=430):
-    labels = [str(x) for x in labels]
-    clean_series = []
-    all_values = []
-
-    for s in series:
-        vals = [float(x) if pd.notna(x) else 0.0 for x in s.get("values", [])]
-        all_values.extend(vals)
-        clean_series.append({
-            "name": str(s.get("name", "Value")),
-            "values": vals,
-            "color": s.get("color", ACCENT),
-            "colors": s.get("colors", None),
-        })
-
-    if not all_values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if max_value is None:
-        max_value = max(all_values) if max(all_values) != 0 else 1
-    max_value = float(max_value) if max_value else 1.0
-
-    chart = {
-        "title": title,
-        "labels": labels,
-        "series": clean_series,
-        "max_value": max_value,
-        "value_format": value_format,
-    }
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-chart-root"></div>
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-    .gi-chart {{
-        width:100%; min-height:{height}px; box-sizing:border-box;
-        padding:22px 24px 20px;
-        background:#fff9e6;
-        border:3px solid #1a1a2e;
-        box-shadow:5px 5px 0px #1a1a2e;
-        font-family:'VT323',monospace; color:#1a1a2e; overflow:hidden; position:relative;
-    }}
-    .gi-chart::before {{
-        content:""; position:absolute; top:0; left:0; right:0; height:7px;
-        background:repeating-linear-gradient(90deg,{ACCENT} 0px,{ACCENT} 14px,{CHART_EXPAND} 14px,{CHART_EXPAND} 28px,{ACCENT_2} 28px,{ACCENT_2} 42px,{CHART_OPTIMIZE} 42px,{CHART_OPTIMIZE} 56px);
-    }}
-    .gi-chart-title {{
-        font-family:'Press Start 2P',monospace;
-        text-align:center; font-size:12px; line-height:1.4; color:#1a1a2e;
-        margin-bottom:16px; margin-top:10px; letter-spacing:0.03em;
-    }}
-    .gi-legend {{ display:flex; justify-content:center; gap:18px; margin-bottom:18px; flex-wrap:wrap; }}
-    .gi-legend-item {{ display:flex; align-items:center; gap:7px; color:#2c3e50; font-size:16px; }}
-    .gi-legend-color {{ width:18px; height:12px; border:2px solid #1a1a2e; image-rendering:pixelated; }}
-    .gi-plot {{
-        display:grid;
-        grid-template-columns:repeat({max(len(labels),1)}, minmax(0,1fr));
-        gap:24px; align-items:end;
-        height:{max(height-175,190)}px;
-        border-bottom:3px solid #1a1a2e;
-        background-image:repeating-linear-gradient(to top, rgba(26,26,46,0.10) 1px, transparent 1px);
-        background-size:100% 25%;
-        padding:0 14px; position:relative; z-index:1;
-    }}
-    .gi-group {{ height:100%; display:flex; align-items:end; justify-content:center; gap:8px; position:relative; }}
-    .gi-bar-wrap {{ height:100%; width:min(44px,28%); min-width:22px; display:flex; align-items:end; justify-content:center; position:relative; }}
-    .gi-bar {{
-        width:100%; height:var(--bar-height); min-height:3px;
-        border:2px solid #1a1a2e;
-        position:relative; overflow:hidden;
-        box-shadow:3px 3px 0px #1a1a2e;
-        animation:pixGrow 700ms steps(14,end) both;
-        image-rendering:pixelated;
-    }}
-    .gi-bar::after {{
-        content:""; position:absolute; top:0; left:0; right:0;
-        height:6px; background:rgba(255,255,255,0.45);
-    }}
-    .gi-value {{
-        position:absolute; bottom:calc(var(--bar-height) + 8px);
-        font-size:15px; font-weight:bold; color:#1a1a2e; white-space:nowrap;
-    }}
-    .gi-xlabels {{
-        display:grid;
-        grid-template-columns:repeat({max(len(labels),1)}, minmax(0,1fr));
-        gap:24px; padding:10px 14px 0; text-align:center; position:relative; z-index:1;
-    }}
-    .gi-xlabel {{ color:#2c3e50; font-family:'Press Start 2P',monospace; font-size:8px; line-height:1.4; }}
-    @keyframes pixGrow {{
-        from {{ height:0%; }} to {{ height:var(--bar-height); }}
-    }}
-    </style>
-    <script>
-    const chart = {chart_json};
-    function formatValue(v) {{
-        if (chart.value_format==="percent") return Math.round(v*100)+"%";
-        if (chart.value_format==="money") return "$"+Math.round(v).toLocaleString();
-        return Math.round(v).toLocaleString();
-    }}
-    const root = document.getElementById("gi-chart-root");
-    const legendHtml = chart.series.map(s=>`
-        <div class="gi-legend-item">
-            <span class="gi-legend-color" style="background:${{s.color}}"></span>
-            ${{s.name}}
-        </div>`).join("");
-    const groupsHtml = chart.labels.map((label,i)=>`
-        <div class="gi-group">
-            ${{chart.series.map((s,j)=>{{
-                const value=Number(s.values[i]||0);
-                const pct=Math.max(2,Math.min(100,value/chart.max_value*100));
-                const color=s.colors?s.colors[i]:s.color;
-                return `<div class="gi-bar-wrap">
-                    <div class="gi-value" style="--bar-height:${{pct}}%">${{formatValue(value)}}</div>
-                    <div class="gi-bar" style="--bar-height:${{pct}}%;background:${{color}};animation-delay:${{(i+j)*80}}ms;"></div>
-                </div>`;
-            }}).join("")}}
-        </div>`).join("");
-    const xLabelsHtml = chart.labels.map(label=>`<div class="gi-xlabel">${{label}}</div>`).join("");
-    root.innerHTML=`<div class="gi-chart">
-        <div class="gi-chart-title">${{chart.title}}</div>
-        <div class="gi-legend">${{legendHtml}}</div>
-        <div class="gi-plot">${{groupsHtml}}</div>
-        <div class="gi-xlabels">${{xLabelsHtml}}</div>
-    </div>`;
-    </script>
-    """, height=height + 40, scrolling=False)
-
-
-def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_format="number", height=430):
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    if not values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if colors is None:
-        colors = [ACCENT for _ in values]
-    elif isinstance(colors, str):
-        colors = [colors for _ in values]
-    else:
-        colors = list(colors)
-
-    max_abs = max(abs(v) for v in values) or 1.0
-    rows = []
-    for label, value, color in zip(labels, values, colors):
-        rows.append({
-            "label": label,
-            "value": value,
-            "display": _fmt_chart_value(value, value_format),
-            "width": max(2, min(100, abs(value) / max_abs * 100)),
-            "color": color,
-        })
-
-    chart = {"title": title, "rows": rows}
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-hbar-root"></div>
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-    .gi-hchart {{
-        width:100%; min-height:{height}px; box-sizing:border-box;
-        padding:22px 24px;
-        background:#fff9e6;
-        border:3px solid #1a1a2e;
-        box-shadow:5px 5px 0px #1a1a2e;
-        font-family:'VT323',monospace; color:#1a1a2e; overflow:hidden; position:relative;
-    }}
-    .gi-hchart::before {{
-        content:""; position:absolute; top:0; left:0; right:0; height:7px;
-        background:repeating-linear-gradient(90deg,{CHART_OPTIMIZE} 0px,{CHART_OPTIMIZE} 14px,{ACCENT_2} 14px,{ACCENT_2} 28px,{CHART_EXPAND} 28px,{CHART_EXPAND} 42px,{ACCENT} 42px,{ACCENT} 56px);
-    }}
-    .gi-hchart-title {{
-        font-family:'Press Start 2P',monospace;
-        text-align:center; font-size:12px; line-height:1.4; color:#1a1a2e;
-        margin-bottom:18px; margin-top:10px;
-    }}
-    .gi-hrows {{ display:flex; flex-direction:column; gap:11px; position:relative; z-index:1; }}
-    .gi-hrow {{ display:grid; grid-template-columns:minmax(80px,155px) 1fr minmax(65px,95px); align-items:center; gap:10px; }}
-    .gi-hlabel {{ color:#2c3e50; font-size:15px; font-weight:bold; line-height:1.1; text-align:right; }}
-    .gi-htrack {{ height:20px; background:rgba(26,26,46,0.09); border:2px solid #1a1a2e; overflow:hidden; position:relative; }}
-    .gi-hbar {{
-        height:100%; width:var(--bar-width);
-        position:relative; overflow:hidden;
-        border-right:2px solid #1a1a2e;
-        box-shadow:inset 0 4px 0 rgba(255,255,255,0.40);
-        animation:pixHGrow 700ms steps(14,end) both;
-        animation-delay:var(--delay);
-        image-rendering:pixelated;
-    }}
-    .gi-hvalue {{ color:#1a1a2e; font-weight:bold; font-size:15px; white-space:nowrap; }}
-    @keyframes pixHGrow {{ from {{ width:0%; }} to {{ width:var(--bar-width); }} }}
-    </style>
-    <script>
-    const chart = {chart_json};
-    const root = document.getElementById("gi-hbar-root");
-    const rowsHtml = chart.rows.map((r,i)=>`
-        <div class="gi-hrow">
-            <div class="gi-hlabel">${{r.label}}</div>
-            <div class="gi-htrack">
-                <div class="gi-hbar" style="--bar-width:${{r.width}}%;--delay:${{i*90}}ms;background:${{r.color}};"></div>
-            </div>
-            <div class="gi-hvalue">${{r.display}}</div>
-        </div>`).join("");
-    root.innerHTML=`<div class="gi-hchart">
-        <div class="gi-hchart-title">${{chart.title}}</div>
-        <div class="gi-hrows">${{rowsHtml}}</div>
-    </div>`;
-    </script>
-    """, height=height + 35, scrolling=False)
-
-
-def shimmer_pie_chart(title, labels, values, colors=None, height=430):
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    total = sum(values)
-    if not values or total <= 0:
-        st.info("No chart data available for the current filter.")
-        return
-
-    if colors is None:
-        colors = [ACCENT for _ in values]
-    else:
-        colors = list(colors)
-
-    rows = []
-    start = 0.0
-    stops = []
-    for label, value, color in zip(labels, values, colors):
-        pct = value / total * 100
-        end = start + pct
-        stops.append(f"{color} {start:.4f}% {end:.4f}%")
-        rows.append({
-            "label": label,
-            "value": value,
-            "pct": pct,
-            "display": f"{pct:.1f}%",
-            "color": color,
-        })
-        start = end
-
-    chart = {
-        "title": title,
-        "gradient": ", ".join(stops),
-        "rows": rows,
-        "total": total,
-    }
-    chart_json = json.dumps(chart)
-
-    components.html(f"""
-    <div id="gi-pie-root"></div>
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-    .gi-pie-card {{
-        width:100%; min-height:{height}px; box-sizing:border-box;
-        padding:22px 24px;
-        background:#fff9e6;
-        border:3px solid #1a1a2e;
-        box-shadow:5px 5px 0px #1a1a2e;
-        font-family:'VT323',monospace; color:#1a1a2e; overflow:hidden; position:relative;
-    }}
-    .gi-pie-card::before {{
-        content:""; position:absolute; top:0; left:0; right:0; height:7px;
-        background:repeating-linear-gradient(90deg,{ACCENT} 0px,{ACCENT} 14px,{CHART_EXPAND} 14px,{CHART_EXPAND} 28px,{ACCENT_2} 28px,{ACCENT_2} 42px,{CHART_OPTIMIZE} 42px,{CHART_OPTIMIZE} 56px);
-    }}
-    .gi-pie-title {{
-        font-family:'Press Start 2P',monospace;
-        text-align:center; font-size:12px; line-height:1.4; color:#1a1a2e;
-        margin-bottom:16px; margin-top:10px;
-    }}
-    .gi-pie-layout {{
-        display:grid; grid-template-columns:minmax(200px,0.9fr) minmax(180px,1fr);
-        gap:22px; align-items:center; position:relative; z-index:1;
-    }}
-    .gi-donut-wrap {{ display:flex; align-items:center; justify-content:center; }}
-    .gi-donut {{
-        width:min(210px,75vw); aspect-ratio:1; border-radius:0 !important;
-        background:conic-gradient(var(--pie-gradient));
-        position:relative;
-        border:4px solid #1a1a2e;
-        box-shadow:5px 5px 0px #1a1a2e;
-        image-rendering:pixelated;
-        animation:pixDonut 800ms steps(16,end) both;
-    }}
-    .gi-donut::after {{
-        content:""; position:relative; inset:25%;
-        background:#fff9e6;
-        border:3px solid #1a1a2e;
-    }}
-    .gi-pie-legend {{ display:flex; flex-direction:column; gap:10px; }}
-    .gi-pie-row {{
-        display:grid; grid-template-columns:16px 1fr auto;
-        align-items:center; gap:9px; color:#2c3e50; font-size:16px;
-    }}
-    .gi-pie-dot {{ width:14px; height:14px; border:2px solid #1a1a2e; image-rendering:pixelated; }}
-    .gi-pie-pct {{ color:#1a1a2e; font-weight:bold; white-space:nowrap; }}
-    @keyframes pixDonut {{ from {{ transform:scale(0.5); opacity:0; }} to {{ transform:scale(1); opacity:1; }} }}
-    </style>
-    <script>
-    const pieChart = {chart_json};
-    const root = document.getElementById("gi-pie-root");
-    const rowsHtml = pieChart.rows.map(r=>`
-        <div class="gi-pie-row">
-            <span class="gi-pie-dot" style="background:${{r.color}}"></span>
-            <span>${{r.label}}</span>
-            <span class="gi-pie-pct">${{r.display}}</span>
-        </div>`).join("");
-    root.innerHTML=`<div class="gi-pie-card">
-        <div class="gi-pie-title">${{pieChart.title}}</div>
-        <div class="gi-pie-layout">
-            <div class="gi-donut-wrap">
-                <div class="gi-donut" style="--pie-gradient:${{pieChart.gradient}}"></div>
-            </div>
-            <div class="gi-pie-legend">${{rowsHtml}}</div>
-        </div>
-    </div>`;
-    </script>
-    """, height=height + 35, scrolling=False)
-
-
-def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, value_format="money", height=460):
-    labels = [str(x) for x in labels]
-    values = [float(x) if pd.notna(x) else 0.0 for x in values]
-    if not values:
-        st.info("No chart data available for the current filter.")
-        return
-
-    max_abs = max(abs(v) for v in values) or 1.0
-    rows = [{
-        "label": lab,
-        "value": val,
-        "display": _fmt_chart_value(val, value_format),
-        "width": max(2, min(100, abs(val) / max_abs * 100)),
-    } for lab, val in zip(labels, values)]
-
-    chart_json = json.dumps({"title": title, "rows": rows, "color": color})
-
-    components.html(f"""
-    <div id="gi-classic-hbar-root"></div>
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-    .gi-classic-card {{
-        width:100%; min-height:{height}px; box-sizing:border-box;
-        padding:22px 24px 20px;
-        background:transparent;
-        font-family:'VT323',monospace; color:#1a1a2e; overflow:hidden; position:relative;
-    }}
-    .gi-classic-title {{
-        font-family:'Press Start 2P',monospace;
-        text-align:center; font-size:12px; line-height:1.4; color:#1a1a2e;
-        margin-bottom:16px;
-    }}
-    .gi-classic-rows {{ display:flex; flex-direction:column; gap:10px; }}
-    .gi-classic-row {{ display:grid; grid-template-columns:minmax(80px,145px) 1fr minmax(80px,105px); align-items:center; gap:10px; }}
-    .gi-classic-label {{ color:#2c3e50; font-size:15px; font-weight:bold; line-height:1.1; text-align:right; }}
-    .gi-classic-axis {{
-        height:20px; position:relative;
-        border-bottom:2px solid #1a1a2e;
-        background-image:repeating-linear-gradient(to right,rgba(26,26,46,0.10) 1px,transparent 1px);
-        background-size:25% 100%;
-    }}
-    .gi-classic-bar {{
-        height:20px; width:var(--bar-width);
-        border:2px solid #1a1a2e;
-        position:relative; overflow:hidden;
-        background:var(--bar-color);
-        box-shadow:2px 2px 0px #1a1a2e, inset 0 3px 0 rgba(255,255,255,0.40);
-        animation:pixClassicGrow 700ms steps(14,end) both;
-        animation-delay:var(--delay);
-        image-rendering:pixelated;
-    }}
-    .gi-classic-value {{ color:#1a1a2e; font-weight:bold; font-size:15px; white-space:nowrap; }}
-    @keyframes pixClassicGrow {{ from {{ width:0%; }} to {{ width:var(--bar-width); }} }}
-    </style>
-    <script>
-    const classicChart = {chart_json};
-    const root = document.getElementById("gi-classic-hbar-root");
-    const rowsHtml = classicChart.rows.map((r,i)=>`
-        <div class="gi-classic-row">
-            <div class="gi-classic-label">${{r.label}}</div>
-            <div class="gi-classic-axis">
-                <div class="gi-classic-bar" style="--bar-width:${{r.width}}%;--bar-color:${{classicChart.color}};--delay:${{i*90}}ms;"></div>
-            </div>
-            <div class="gi-classic-value">${{r.display}}</div>
-        </div>`).join("");
-    root.innerHTML=`<div class="gi-classic-card">
-        <div class="gi-classic-title">${{classicChart.title}}</div>
-        <div class="gi-classic-rows">${{rowsHtml}}</div>
-    </div>`;
-    </script>
-    """, height=height + 30, scrolling=False)
-
 
 # ─────────────────────────────────────────────────────────────
 #  LOAD
@@ -1542,9 +1403,8 @@ def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, va
 df = load_data()
 model1, model2, model3, X1_columns, X2_columns, X3_columns = load_artifacts()
 
-
 # ─────────────────────────────────────────────────────────────
-#  PRE-COMPUTED
+#  PRE-COMPUTED DATA
 # ─────────────────────────────────────────────────────────────
 comparison = pd.DataFrame({
     "Model":    ["With revenue variables", "Without revenue variables", "Only pre-operational features"],
@@ -1569,50 +1429,40 @@ route_variability = (
 if "pred_result" not in st.session_state:
     st.session_state.pred_result = None
 
-
 # ─────────────────────────────────────────────────────────────
 #  SIDEBAR
 # ─────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown('<div class="sidebar-brand">✈ AIRLINE<br>ROUTE<br>INTEL</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-brand">Sky<span>Lens</span></div>', unsafe_allow_html=True)
     st.markdown(
-        f"<p style='font-family:Inter, sans-serif;font-size:0.44rem;color:#ffe066;"
-        "margin-bottom:14px;letter-spacing:0.12em;'>FILTER</p>",
-        unsafe_allow_html=True,
+        "<p style='font-size:.74rem;color:#9b8c9e;margin-bottom:18px;font-weight:600;"
+        "letter-spacing:.06em;text-transform:uppercase'>Filter view</p>",
+        unsafe_allow_html=True
     )
     route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
     aircraft_opts = ["All"] + sorted(df["Aircraft_Type"].dropna().unique().tolist())
     season_opts   = ["All"] + sorted(df["Season"].dropna().unique().tolist())
     decision_opts = ["All"] + sorted(df["Route_Decision"].dropna().unique().tolist())
 
-    sel_route    = st.selectbox("✈  Route",         route_opts)
-    sel_aircraft = st.selectbox("🛩  Aircraft Type", aircraft_opts)
-    sel_season   = st.selectbox("🌤  Season",        season_opts)
-    sel_decision = st.selectbox("🏷  Decision",      decision_opts)
+    sel_route    = st.selectbox("Route",         route_opts)
+    sel_aircraft = st.selectbox("Aircraft Type", aircraft_opts)
+    sel_season   = st.selectbox("Season",        season_opts)
+    sel_decision = st.selectbox("Decision",      decision_opts)
 
     st.markdown("---")
-    st.markdown(f"""
-    <p style='font-family:Inter, sans-serif;font-size:0.42rem;color:#ffe066;
-    margin-bottom:10px;letter-spacing:0.12em;'>LEGEND</p>
-    <div style='display:flex;flex-direction:column;gap:8px;font-family:Inter, sans-serif;font-size:1rem;color:#fff8e7;'>
-      <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-expand'>EXPAND</span>High profit &amp; demand
-      </div>
-      <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-maintain'>MAINTAIN</span>Stable performer
-      </div>
-      <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-optimize'>OPTIMIZE</span>Room to improve
-      </div>
-      <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-drop'>DROP</span>Losing money
-      </div>
+    st.markdown("""
+    <p style='font-size:.70rem;color:#9b8c9e;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;margin-bottom:12px'>Decision Labels</p>
+    <div style='display:flex;flex-direction:column;gap:10px;font-size:.82rem;color:#c4bfc6'>
+      <div><span class='pill pill-expand'>Expand</span>&nbsp;&nbsp;High profit &amp; demand</div>
+      <div><span class='pill pill-maintain'>Maintain</span>&nbsp;&nbsp;Stable performer</div>
+      <div><span class='pill pill-optimize'>Optimize</span>&nbsp;&nbsp;Room to improve</div>
+      <div><span class='pill pill-drop'>Drop</span>&nbsp;&nbsp;Losing money</div>
     </div>
     """, unsafe_allow_html=True)
 
-
 # ─────────────────────────────────────────────────────────────
-#  FILTER
+#  FILTERING
 # ─────────────────────────────────────────────────────────────
 fdf = df.copy()
 if sel_route    != "All": fdf = fdf[fdf["Route"]          == sel_route]
@@ -1620,107 +1470,35 @@ if sel_aircraft != "All": fdf = fdf[fdf["Aircraft_Type"]  == sel_aircraft]
 if sel_season   != "All": fdf = fdf[fdf["Season"]         == sel_season]
 if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 
-
 # ─────────────────────────────────────────────────────────────
-#  HERO — pixel airplane animates across
+#  HERO HEADER
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <canvas id="pixel-plane-canvas" width="900" height="90" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;image-rendering:pixelated;"></canvas>
-  <div class="hero-left" style="position:relative;z-index:2;">
-    <div class="hero-eyebrow">★ ROUTE INTELLIGENCE PLATFORM ★</div>
-    <h1>AIRLINE<br>PROFITABILITY<br>SYSTEM</h1>
-    <p>Sample airline dataset · for analysis &amp; demonstration only</p>
-  </div>
-  <div class="hero-badge" style="position:relative;z-index:2;">⚡ ML-POWERED</div>
-  <div class="hero-glyph" style="position:relative;z-index:2;">✈</div>
+  <div class="hero-eyebrow">Route Intelligence Platform</div>
+  <h1>SkyLens Dashboard</h1>
+  <p>Built on a sample airline dataset for analysis and demonstration purposes only.
+     Does not reflect real-time airline operations or current flight decisions.</p>
+  <div class="hero-glyph">&#9992;</div>
 </div>
-
-<script>
-(function() {
-    const canvas = document.getElementById('pixel-plane-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-
-    let planeX = -60;
-    const planeY = canvas.height / 2;
-
-    // Coin-yellow color trail blocks
-    const trailColors = ['#e9c46a','#f4a261','#e63946','#2d6a4f','#1d6a96'];
-    const trail = [];
-
-    function drawPixelPlane(x, y) {
-        const S = 4;
-        const pixels = [
-            [0,-5,'#ffffff'],[0,-4,'#ffffff'],[0,-3,'#a8d8f0'],[0,-2,'#ffffff'],
-            [0,-1,'#ffffff'],[0,0,'#ffffff'],[0,1,'#ffffff'],
-            [-1,-4,'#1a1a2e'],[-1,-3,'#1a1a2e'],[-1,-2,'#1a1a2e'],[-1,-1,'#1a1a2e'],[-1,0,'#1a1a2e'],
-            [1,-4,'#1a1a2e'],[1,-3,'#1a1a2e'],[1,-2,'#1a1a2e'],[1,-1,'#1a1a2e'],[1,0,'#1a1a2e'],
-            [0,-6,'#e0e0e0'],
-            [-4,0,'#1d6a96'],[-3,0,'#1d6a96'],[-2,0,'#1d6a96'],
-            [2,0,'#1d6a96'],[3,0,'#1d6a96'],[4,0,'#1d6a96'],
-            [-4,-1,'#1d6a96'],[-3,-1,'#1d6a96'],
-            [3,-1,'#1d6a96'],[4,-1,'#1d6a96'],
-            [-5,0,'#1a1a2e'],[5,0,'#1a1a2e'],
-            [-4,1,'#1a1a2e'],[-3,1,'#1a1a2e'],[3,1,'#1a1a2e'],[4,1,'#1a1a2e'],
-            [-1,2,'#e63946'],[1,2,'#e63946'],
-            [-1,3,'#1a1a2e'],[1,3,'#1a1a2e'],
-        ];
-        pixels.forEach(([col, row, color]) => {
-            ctx.fillStyle = color;
-            ctx.fillRect(Math.round(x + col*S - S/2), Math.round(y + row*S - S/2), S, S);
-        });
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Trail blocks
-        trail.push({x: planeX, y: planeY + (Math.sin(planeX * 0.04) * 8), color: trailColors[Math.floor(planeX/12) % trailColors.length]});
-        if (trail.length > 18) trail.shift();
-
-        trail.forEach((t, i) => {
-            const alpha = i / trail.length;
-            ctx.globalAlpha = alpha * 0.7;
-            ctx.fillStyle = t.color;
-            const sz = Math.round(3 + alpha * 5);
-            ctx.fillRect(Math.round(t.x) - sz/2, Math.round(t.y) - sz/2, sz, sz);
-        });
-        ctx.globalAlpha = 1;
-
-        // Subtle sine wave path for the plane
-        const bobY = planeY + Math.sin(planeX * 0.04) * 8;
-        drawPixelPlane(Math.round(planeX), Math.round(bobY));
-
-        planeX += 1.8;
-        if (planeX > canvas.width + 80) planeX = -80;
-
-        requestAnimationFrame(animate);
-    }
-    animate();
-})();
-</script>
 """, unsafe_allow_html=True)
-
 
 # ─────────────────────────────────────────────────────────────
 #  TABS
 # ─────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📊  Overview",
-    "🔍  Performance Drivers",
-    "🗺  Route Actions",
-    "📈  Route Stability",
-    "🤖  Prediction Tool",
+    "Overview",
+    "Performance Drivers",
+    "Route Actions",
+    "Route Stability",
+    "Prediction Tool",
 ])
-
 
 # ── TAB 1 · OVERVIEW ─────────────────────────────────────────
 with tab1:
     n          = len(fdf)
-    avg_profit = fdf["Profit"].mean()
-    avg_load   = fdf["Load_Factor"].mean()
+    avg_profit = fdf["Profit"].mean() if n else 0
+    avg_load   = fdf["Load_Factor"].mean() if n else 0
     n_routes   = fdf["Route"].nunique()
 
     expand_pct   = (fdf["Route_Decision"] == "Expand").mean()   * 100 if n else 0
@@ -1734,7 +1512,7 @@ with tab1:
     c3.metric("Average Profit",  f"${avg_profit:,.0f}")
     c4.metric("Avg Load Factor", f"{avg_load:.0%}")
 
-    st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
     d1, d2, d3, d4 = st.columns(4)
     d1.metric("Expand",   f"{expand_pct:.1f}%")
@@ -1742,8 +1520,8 @@ with tab1:
     d3.metric("Optimize", f"{optimize_pct:.1f}%")
     d4.metric("Drop",     f"{drop_pct:.1f}%")
 
-    st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
-    st.markdown('<div class="divider-label">★ COMPOSITION ★</div>', unsafe_allow_html=True)
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Composition</div>', unsafe_allow_html=True)
 
     left, right = st.columns([1, 1])
 
@@ -1751,20 +1529,11 @@ with tab1:
         st.markdown('<p class="section-hd">Decision mix</p>', unsafe_allow_html=True)
         dc = fdf["Route_Decision"].value_counts()
         dc = dc.reindex([x for x in ORDER if x in dc.index]).dropna()
-        wc = {
-            "Expand":   CHART_EXPAND,
-            "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_OPTIMIZE,
-            "Drop":     CHART_DROP,
-        }
-        wedge_colors = [wc[l] for l in dc.index]
-        shimmer_pie_chart(
-            title="Share of Flights by Decision",
-            labels=dc.index.tolist(),
-            values=dc.values.tolist(),
-            colors=wedge_colors,
-            height=390,
-        )
+        pie_labels = dc.index.tolist()
+        pie_values = dc.values.tolist()
+        pie_colors = [DECISION_COLORS.get(l, "#888") for l in pie_labels]
+        svg_chart(render_pie_chart("Share of Flights by Decision",
+                                   pie_labels, pie_values, pie_colors, height=300, uid="pie1"), 330)
 
     with right:
         st.markdown('<p class="section-hd">Average metrics by decision</p>', unsafe_allow_html=True)
@@ -1772,22 +1541,23 @@ with tab1:
             fdf.groupby("Route_Decision")[["Profit", "Profit_Margin", "Load_Factor"]]
             .mean()
             .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()])
-            .round(3).reset_index()
+            .round(3)
+            .reset_index()
             .rename(columns={
                 "Route_Decision": "Decision",
-                "Profit": "Avg Profit ($)",
-                "Profit_Margin": "Avg Margin",
-                "Load_Factor": "Avg Load Factor",
+                "Profit":         "Avg Profit ($)",
+                "Profit_Margin":  "Avg Margin",
+                "Load_Factor":    "Avg Load Factor",
             })
         )
         st.dataframe(summary, use_container_width=True, hide_index=True)
-        st.markdown(f"""
-        <div class="info-box">
-          <strong style="color:{ACCENT}">HOW TO READ THIS</strong><br>
+        st.markdown("""
+        <div class="info-box" style="margin-top:16px">
+          <strong>How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
-          <strong style="color:{CHART_EXPAND}">EXPAND</strong> routes should have the highest values across all three columns.
-        </div>""", unsafe_allow_html=True)
-
+          <strong>Expand</strong> routes should have the highest values across all three columns.
+        </div>
+        """, unsafe_allow_html=True)
 
 # ── TAB 2 · PERFORMANCE DRIVERS ──────────────────────────────
 with tab2:
@@ -1797,72 +1567,61 @@ with tab2:
     left, right = st.columns(2)
 
     with left:
-        apd = (fdf.groupby("Route_Decision")["Profit"].mean()
-               .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        shimmer_horizontal_bar_chart(
-            title="Average Profit by Decision",
-            labels=apd.index.tolist(),
-            values=apd.values.tolist(),
-            colors=col_seq(apd.index.tolist()),
-            value_format="money",
-            height=350,
+        apd = (
+            fdf.groupby("Route_Decision")["Profit"].mean()
+            .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()])
+            .dropna()
         )
+        svg_chart(render_vbar_chart(
+            "Average Profit by Decision",
+            apd.index.tolist(), apd.values.tolist(),
+            [DECISION_COLORS.get(l, "#888") for l in apd.index],
+            height=320, fmt_fn=_fmt_money, y_label="Avg Profit ($)", uid="tab2_profit"
+        ), 360)
 
     with right:
-        ald = (fdf.groupby("Route_Decision")["Load_Factor"].mean()
-               .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        shimmer_vertical_bar_chart(
-            title="Seat Occupancy by Decision",
-            labels=ald.index.tolist(),
-            series=[{
-                "name": "Average Seat Occupancy",
-                "values": ald.values.tolist(),
-                "color": ACCENT,
-                "colors": col_seq(ald.index.tolist()),
-            }],
-            max_value=1.0,
-            value_format="percent",
-            height=350,
+        ald = (
+            fdf.groupby("Route_Decision")["Load_Factor"].mean()
+            .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()])
+            .dropna()
         )
+        svg_chart(render_vbar_chart(
+            "Seat Occupancy by Decision",
+            ald.index.tolist(), ald.values.tolist(),
+            [DECISION_COLORS.get(l, "#888") for l in ald.index],
+            height=320, fmt_fn=lambda v: f"{v:.0%}", y_label="Avg Load Factor", uid="tab2_load"
+        ), 360)
 
-    st.markdown('<div class="divider-label">★ COST BREAKDOWN ★</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Cost breakdown</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Where is the money going?</p>', unsafe_allow_html=True)
     st.markdown('<p class="section-sub">The biggest cost components across all filtered flights.</p>', unsafe_allow_html=True)
 
     cost_cols = [
-        "Fuel_Cost", "Maintenance_Cost", "Crew_Cost", "Depreciation_Cost", "Insurance_Cost",
-        "Airport_Fees", "Catering_Cost", "Handling_Cost", "Navigation_Fees",
-        "Sales_Distribution_Cost", "Passenger_Service_Cost", "Overhead_Cost",
-        "Marketing_Cost", "IT_Systems_Cost",
+        "Fuel_Cost", "Maintenance_Cost", "Crew_Cost", "Depreciation_Cost",
+        "Insurance_Cost", "Airport_Fees", "Catering_Cost", "Handling_Cost",
+        "Navigation_Fees", "Sales_Distribution_Cost", "Passenger_Service_Cost",
+        "Overhead_Cost", "Marketing_Cost", "IT_Systems_Cost",
     ]
     avail_costs = [c for c in cost_cols if c in fdf.columns]
     cost_means  = fdf[avail_costs].mean().sort_values(ascending=True).tail(8)
-    label_map = {
-        "Fuel_Cost": "Fuel", "Maintenance_Cost": "Maintenance", "Crew_Cost": "Crew",
-        "Depreciation_Cost": "Depreciation", "Insurance_Cost": "Insurance",
-        "Airport_Fees": "Airport Fees", "Catering_Cost": "Catering", "Handling_Cost": "Handling",
-        "Navigation_Fees": "Navigation", "Sales_Distribution_Cost": "Sales & Dist.",
-        "Passenger_Service_Cost": "Pax Service", "Overhead_Cost": "Overhead",
-        "Marketing_Cost": "Marketing", "IT_Systems_Cost": "IT Systems",
+    label_map   = {
+        "Fuel_Cost":"Fuel","Maintenance_Cost":"Maintenance","Crew_Cost":"Crew",
+        "Depreciation_Cost":"Depreciation","Insurance_Cost":"Insurance",
+        "Airport_Fees":"Airport Fees","Catering_Cost":"Catering","Handling_Cost":"Handling",
+        "Navigation_Fees":"Navigation","Sales_Distribution_Cost":"Sales & Dist.",
+        "Passenger_Service_Cost":"Pax Service","Overhead_Cost":"Overhead",
+        "Marketing_Cost":"Marketing","IT_Systems_Cost":"IT Systems",
     }
-    cost_means.index = [label_map.get(i, i) for i in cost_means.index]
+    cost_labels = [label_map.get(i, i) for i in cost_means.index]
+    cost_values = cost_means.values.tolist()
+    cost_colors = C_NEUTRAL[:len(cost_labels)]
 
-    nc = len(cost_means)
-    jewel_ramp = [
-        CHART_EXPAND, ACCENT_2, ACCENT, CHART_MAINTAIN,
-        "#15803d", CHART_OPTIMIZE, CHART_DROP, "#6a4c93",
-    ]
-    neutral_cols = jewel_ramp[:nc]
-
-    shimmer_horizontal_bar_chart(
-        title="Top Cost Drivers",
-        labels=cost_means.index.tolist(),
-        values=cost_means.values.tolist(),
-        colors=neutral_cols,
-        value_format="money",
-        height=430,
-    )
-
+    svg_chart(render_hbar_chart(
+        "Top Cost Drivers",
+        cost_labels, cost_values, cost_colors,
+        height=max(280, 42 * len(cost_labels) + 80),
+        fmt_fn=_fmt_money, x_label="Average Cost per Flight ($)", uid="tab2_costs"
+    ), max(320, 42 * len(cost_labels) + 120))
 
 # ── TAB 3 · ROUTE ACTIONS ────────────────────────────────────
 with tab3:
@@ -1870,47 +1629,43 @@ with tab3:
     st.markdown('<p class="section-sub">A quick view of your best and worst performing routes.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        f"<p style='font-family:Inter, sans-serif;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-        "Top routes: EXPAND</p>", unsafe_allow_html=True)
+        "<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>"
+        "Top routes currently classified as Expand</p>", unsafe_allow_html=True,
+    )
     expand_routes = (
         fdf[fdf["Route_Decision"] == "Expand"]
         .sort_values("Profit", ascending=False)
-        [["Route", "Profit", "Profit_Margin", "Load_Factor"]].head(10)
-        .rename(columns={"Profit": "Avg Profit ($)", "Profit_Margin": "Profit Margin", "Load_Factor": "Load Factor"})
+        [["Route", "Profit", "Profit_Margin", "Load_Factor"]]
+        .head(10)
+        .rename(columns={"Profit":"Avg Profit ($)","Profit_Margin":"Profit Margin","Load_Factor":"Load Factor"})
     )
     st.dataframe(expand_routes, use_container_width=True, hide_index=True)
 
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
     left, right = st.columns(2)
 
     with left:
-        st.markdown(
-            f"<p style='font-family:Inter, sans-serif;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Top 10 routes · total profit</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
-        shimmer_classic_horizontal_bar_chart(
-            title="Top 10 Routes",
-            labels=top.index.tolist(),
-            values=top.values.tolist(),
-            color=CHART_EXPAND,
-            value_format="money",
-            height=430,
-        )
+        svg_chart(render_hbar_chart(
+            "Top 10 Routes",
+            top.index.tolist(), top.values.tolist(),
+            [C_EXPAND] * len(top),
+            height=max(260, 42 * len(top) + 80),
+            fmt_fn=_fmt_money, x_label="Total Profit ($)", uid="tab3_top"
+        ), max(300, 42 * len(top) + 120))
 
     with right:
-        st.markdown(
-            f"<p style='font-family:Inter, sans-serif;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Bottom 10 routes · total profit</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
-        shimmer_classic_horizontal_bar_chart(
-            title="Bottom 10 Routes",
-            labels=worst.index.tolist(),
-            values=worst.values.tolist(),
-            color=CHART_DROP,
-            value_format="money",
-            height=430,
-        )
-
+        worst_abs = worst.abs()
+        svg_chart(render_hbar_chart(
+            "Bottom 10 Routes",
+            worst.index.tolist(), worst_abs.values.tolist(),
+            [C_DROP] * len(worst),
+            height=max(260, 42 * len(worst) + 80),
+            fmt_fn=lambda v: f"−{_fmt_money(v)}", x_label="Loss Magnitude ($)", uid="tab3_bot"
+        ), max(300, 42 * len(worst) + 120))
 
 # ── TAB 4 · ROUTE STABILITY ──────────────────────────────────
 with tab4:
@@ -1919,81 +1674,54 @@ with tab4:
 
     left, right = st.columns(2)
     with left:
-        st.markdown(
-            f"<p style='font-family:Inter, sans-serif;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Most decision changes</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Routes with most decision changes</p>", unsafe_allow_html=True)
         st.dataframe(route_switches.head(10), use_container_width=True, hide_index=True)
     with right:
-        st.markdown(
-            f"<p style='font-family:Inter, sans-serif;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Most decision states</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Routes seen in the most decision states</p>", unsafe_allow_html=True)
         st.dataframe(route_variability.head(10), use_container_width=True, hide_index=True)
 
-    st.markdown('<div class="divider-label">★ DISTRIBUTION ★</div>', unsafe_allow_html=True)
-    st.markdown(
-        f"<p style='font-family:Inter, sans-serif;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-        "Unique routes per category</p>", unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Distribution</div>', unsafe_allow_html=True)
+    st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>How many unique routes appear in each category?</p>", unsafe_allow_html=True)
 
     urbd = (
         df.groupby("Route_Decision")["Route"].nunique().reset_index()
         .rename(columns={"Route": "Unique Routes"})
-        .set_index("Route_Decision").reindex(ORDER).dropna()
+        .set_index("Route_Decision")
+        .reindex(ORDER).dropna()
     )
-    bc_map = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-              "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-    bc = [bc_map.get(i, ACCENT) for i in urbd.index]
-
-    vals4 = urbd["Unique Routes"].values.tolist()
-    shimmer_vertical_bar_chart(
-        title="Unique Routes per Decision Category",
-        labels=urbd.index.tolist(),
-        series=[{
-            "name": "Unique Routes",
-            "values": vals4,
-            "color": ACCENT,
-            "colors": bc,
-        }],
-        max_value=max(vals4) if vals4 else 1,
-        value_format="number",
-        height=390,
-    )
-
+    svg_chart(render_vbar_chart(
+        "Unique Routes per Decision Category",
+        urbd.index.tolist(),
+        urbd["Unique Routes"].tolist(),
+        [DECISION_COLORS.get(d, "#888") for d in urbd.index],
+        height=300, fmt_fn=lambda v: str(int(v)),
+        y_label="Unique Routes", uid="tab4_urbd"
+    ), 340)
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
 with tab5:
     st.markdown('<p class="section-hd">Simulate a route scenario</p>', unsafe_allow_html=True)
     st.markdown('<p class="section-sub">Enter route characteristics and our model will suggest the best decision.</p>', unsafe_allow_html=True)
 
-    st.markdown(
-        f"<p style='font-family:Inter, sans-serif;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-        "How accurate are the models?</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>How accurate are the models?</p>", unsafe_allow_html=True)
 
-    shimmer_vertical_bar_chart(
-        title="Model Accuracy & F1 Comparison",
-        labels=comparison["Model"].tolist(),
-        series=[
-            {
-                "name": "Accuracy",
-                "values": comparison["Accuracy"].tolist(),
-                "color": ACCENT,
-            },
-            {
-                "name": "Macro F1",
-                "values": comparison["Macro F1"].tolist(),
-                "color": ACCENT_2,
-            },
+    svg_chart(render_grouped_bar_chart(
+        "Model Accuracy & F1 Comparison",
+        comparison["Model"].tolist(),
+        [
+            {"label": "Accuracy", "values": comparison["Accuracy"].tolist()},
+            {"label": "Macro F1", "values": comparison["Macro F1"].tolist()},
         ],
-        max_value=1.0,
-        value_format="percent",
-        height=430,
-    )
+        [C_NEUTRAL[0], C_NEUTRAL[2]],
+        height=280, uid="tab5_models"
+    ), 320)
 
-    st.markdown('<div class="divider-label">★ CONFIGURATION ★</div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
-    st.markdown(f"""<div class="info-box">
-    <span class='pill pill-maintain'>WITH REVENUE</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
-    <span class='pill pill-optimize'>COST-ONLY</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
-    <span class='pill pill-expand'>PRE-LAUNCH</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
+    st.markdown("""<div class="info-box">
+    <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
+    <span class='pill pill-optimize'>Cost-only</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
+    <span class='pill pill-expand'>Pre-launch</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
     </div>""", unsafe_allow_html=True)
 
     model_choice = st.selectbox(
@@ -2006,14 +1734,14 @@ with tab5:
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown('<p class="col-label">✈ FLIGHT BASICS</p>', unsafe_allow_html=True)
+            st.markdown("<p style='font-size:.74rem;font-weight:700;color:#9b8c9e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px'>Flight basics</p>", unsafe_allow_html=True)
             aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
             aircraft_capacity = st.number_input("Aircraft Capacity", min_value=50,  max_value=600, value=250)
             passengers        = st.number_input("Passengers",        min_value=0,   max_value=600, value=200)
             load_factor       = st.slider("Load Factor (seat occupancy)", min_value=0.0, max_value=1.0, value=0.80, step=0.01)
 
         with col2:
-            st.markdown('<p class="col-label">🌍 ROUTE CONTEXT</p>', unsafe_allow_html=True)
+            st.markdown("<p style='font-size:.74rem;font-weight:700;color:#9b8c9e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px'>Route context</p>", unsafe_allow_html=True)
             flight_hours   = st.number_input("Flight Hours",   min_value=0.5, max_value=20.0, value=6.0, step=0.1)
             season_val     = st.selectbox("Season",            sorted(df["Season"].dropna().unique()))
             route_category = st.selectbox("Route Category",    sorted(df["Route_Category"].dropna().unique()))
@@ -2021,31 +1749,31 @@ with tab5:
 
         if model_choice == "With Revenue Variables":
             with col3:
-                st.markdown('<p class="col-label">💰 REVENUE</p>', unsafe_allow_html=True)
+                st.markdown("<p style='font-size:.74rem;font-weight:700;color:#9b8c9e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px'>Revenue</p>", unsafe_allow_html=True)
                 ticket_revenue    = st.number_input("Ticket Revenue ($)",    min_value=0.0, value=120000.0, step=1000.0)
                 ancillary_revenue = st.number_input("Ancillary Revenue ($)", min_value=0.0, value=10000.0,  step=500.0)
 
         elif model_choice == "Without Revenue Variables":
             with col3:
-                st.markdown('<p class="col-label">💸 COST BREAKDOWN</p>', unsafe_allow_html=True)
-                fuel_cost               = st.number_input("Fuel Cost ($)",                  min_value=0.0, value=40000.0,  step=1000.0)
-                maintenance_cost        = st.number_input("Maintenance Cost ($)",           min_value=0.0, value=15000.0,  step=500.0)
-                crew_cost               = st.number_input("Crew Cost ($)",                  min_value=0.0, value=8000.0,   step=500.0)
-                depreciation_cost       = st.number_input("Depreciation Cost ($)",          min_value=0.0, value=20000.0,  step=500.0)
-                insurance_cost          = st.number_input("Insurance Cost ($)",             min_value=0.0, value=4000.0,   step=250.0)
-                airport_fees            = st.number_input("Airport Fees ($)",               min_value=0.0, value=5000.0,   step=250.0)
-                catering_cost           = st.number_input("Catering Cost ($)",              min_value=0.0, value=5000.0,   step=250.0)
-                handling_cost           = st.number_input("Handling Cost ($)",              min_value=0.0, value=4000.0,   step=250.0)
-                navigation_fees         = st.number_input("Navigation Fees ($)",            min_value=0.0, value=3500.0,   step=250.0)
-                sales_distribution_cost = st.number_input("Sales & Distribution Cost ($)",  min_value=0.0, value=35000.0,  step=500.0)
-                passenger_service_cost  = st.number_input("Passenger Service Cost ($)",     min_value=0.0, value=5000.0,   step=250.0)
-                overhead_cost           = st.number_input("Overhead Cost ($)",              min_value=0.0, value=25000.0,  step=500.0)
-                marketing_cost          = st.number_input("Marketing Cost ($)",             min_value=0.0, value=12000.0,  step=500.0)
-                it_systems_cost         = st.number_input("IT Systems Cost ($)",            min_value=0.0, value=3000.0,   step=250.0)
+                st.markdown("<p style='font-size:.74rem;font-weight:700;color:#9b8c9e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px'>Cost breakdown</p>", unsafe_allow_html=True)
+                fuel_cost               = st.number_input("Fuel Cost ($)",                 min_value=0.0, value=40000.0,  step=1000.0)
+                maintenance_cost        = st.number_input("Maintenance Cost ($)",          min_value=0.0, value=15000.0,  step=500.0)
+                crew_cost               = st.number_input("Crew Cost ($)",                 min_value=0.0, value=8000.0,   step=500.0)
+                depreciation_cost       = st.number_input("Depreciation Cost ($)",         min_value=0.0, value=20000.0,  step=500.0)
+                insurance_cost          = st.number_input("Insurance Cost ($)",            min_value=0.0, value=4000.0,   step=250.0)
+                airport_fees            = st.number_input("Airport Fees ($)",              min_value=0.0, value=5000.0,   step=250.0)
+                catering_cost           = st.number_input("Catering Cost ($)",             min_value=0.0, value=5000.0,   step=250.0)
+                handling_cost           = st.number_input("Handling Cost ($)",             min_value=0.0, value=4000.0,   step=250.0)
+                navigation_fees         = st.number_input("Navigation Fees ($)",           min_value=0.0, value=3500.0,   step=250.0)
+                sales_distribution_cost = st.number_input("Sales & Distribution Cost ($)", min_value=0.0, value=35000.0,  step=500.0)
+                passenger_service_cost  = st.number_input("Passenger Service Cost ($)",    min_value=0.0, value=5000.0,   step=250.0)
+                overhead_cost           = st.number_input("Overhead Cost ($)",             min_value=0.0, value=25000.0,  step=500.0)
+                marketing_cost          = st.number_input("Marketing Cost ($)",            min_value=0.0, value=12000.0,  step=500.0)
+                it_systems_cost         = st.number_input("IT Systems Cost ($)",           min_value=0.0, value=3000.0,   step=250.0)
 
-        submitted = st.form_submit_button("✈  GET ROUTE DECISION")
+        submitted = st.form_submit_button("Get Route Decision →")
 
-    # ── PREDICTION LOGIC ────────────────────────────────────
+    # ── PREDICTION LOGIC ─────────────────────────────────────
     if submitted:
         if model_choice == "With Revenue Variables":
             row = {
@@ -2055,8 +1783,10 @@ with tab5:
                 "Route_Category": route_category, "Demand_Level": demand_level,
                 "Ticket_Revenue": ticket_revenue, "Ancillary_Revenue": ancillary_revenue,
             }
-            inp = prepare_input(pd.DataFrame([row]), X1_columns)
-            pred = model1.predict(inp)[0]; prob = model1.predict_proba(inp)[0]; cls = model1.classes_
+            inp  = prepare_input(pd.DataFrame([row]), X1_columns)
+            pred = model1.predict(inp)[0]
+            prob = model1.predict_proba(inp)[0]
+            cls  = model1.classes_
         elif model_choice == "Without Revenue Variables":
             row = {
                 "Aircraft_Type": aircraft_type, "Aircraft_Capacity": aircraft_capacity,
@@ -2071,8 +1801,10 @@ with tab5:
                 "Passenger_Service_Cost": passenger_service_cost, "Overhead_Cost": overhead_cost,
                 "Marketing_Cost": marketing_cost, "IT_Systems_Cost": it_systems_cost,
             }
-            inp = prepare_input(pd.DataFrame([row]), X2_columns)
-            pred = model2.predict(inp)[0]; prob = model2.predict_proba(inp)[0]; cls = model2.classes_
+            inp  = prepare_input(pd.DataFrame([row]), X2_columns)
+            pred = model2.predict(inp)[0]
+            prob = model2.predict_proba(inp)[0]
+            cls  = model2.classes_
         else:
             row = {
                 "Aircraft_Type": aircraft_type, "Aircraft_Capacity": aircraft_capacity,
@@ -2080,22 +1812,23 @@ with tab5:
                 "Flight_Hours": flight_hours, "Season": season_val,
                 "Route_Category": route_category, "Demand_Level": demand_level,
             }
-            inp = prepare_input(pd.DataFrame([row]), X3_columns)
-            pred = model3.predict(inp)[0]; prob = model3.predict_proba(inp)[0]; cls = model3.classes_
+            inp  = prepare_input(pd.DataFrame([row]), X3_columns)
+            pred = model3.predict(inp)[0]
+            prob = model3.predict_proba(inp)[0]
+            cls  = model3.classes_
 
         st.session_state.pred_result = {"prediction": pred, "probabilities": prob, "classes": cls}
 
-    # ── RESULT ──────────────────────────────────────────────
+    # ── RESULT DISPLAY ────────────────────────────────────────
     if st.session_state.pred_result is not None:
         res  = st.session_state.pred_result
-        pred = res["prediction"]; prob = res["probabilities"]; cls = res["classes"]
+        pred = res["prediction"]
+        prob = res["probabilities"]
+        cls  = res["classes"]
 
-        pill_cls   = {"Expand": "pill-expand", "Maintain": "pill-maintain",
-                      "Optimize": "pill-optimize", "Drop": "pill-drop"}
-        result_cls = {"Expand": "result-expand", "Maintain": "result-maintain",
-                      "Optimize": "result-optimize", "Drop": "result-drop"}
-        text_col   = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-                      "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
+        pill_cls   = {"Expand":"pill-expand","Maintain":"pill-maintain","Optimize":"pill-optimize","Drop":"pill-drop"}
+        result_cls = {"Expand":"result-expand","Maintain":"result-maintain","Optimize":"result-optimize","Drop":"result-drop"}
+        text_col   = {"Expand":C_EXPAND,"Maintain":C_MAINTAIN,"Optimize":C_OPTIMIZE,"Drop":C_DROP}
         explanations = {
             "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
             "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
@@ -2105,71 +1838,51 @@ with tab5:
 
         st.markdown(f"""
         <div class='result-card {result_cls.get(pred, "result-expand")}'>
-          <div style='margin-bottom:10px'>
-            <span class='pill {pill_cls.get(pred, "")}'>{pred.upper()}</span>
+          <div style='margin-bottom:12px'>
+            <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
           </div>
-          <div style='font-family:Inter, sans-serif;font-size:0.85rem;font-weight:400;
-                      color:{text_col.get(pred, INK)};margin-bottom:12px;letter-spacing:0.03em;
-                      text-shadow:2px 2px 0px rgba(0,0,0,0.15);line-height:1.5'>
-            DECISION: {pred.upper()}
+          <div style='font-family:"Space Grotesk",sans-serif;font-size:1.80rem;font-weight:700;
+                      color:{text_col.get(pred, "#e5e1e4")};margin-bottom:12px;letter-spacing:-.025em'>
+            Suggested Decision: {pred}
           </div>
-          <p style='color:{INK_SOFT};margin:0;font-family:Inter, sans-serif;font-size:1.15rem;line-height:1.75;'>
+          <p style='color:#c4bfc6;margin:0;font-size:.92rem;line-height:1.75;font-family:"Manrope",sans-serif'>
             {explanations.get(pred, "")}
           </p>
-        </div>""", unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.markdown(
-            f"<p style='font-family:Inter, sans-serif;font-size:0.50rem;color:{INK};margin-bottom:7px;'>"
-            "Confidence by decision option</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:.80rem;font-weight:700;color:#e5e1e4;margin-bottom:8px'>Confidence by decision option</p>", unsafe_allow_html=True)
 
-        prob_df = (pd.DataFrame({"Decision": cls, "Probability": prob})
-                   .sort_values("Probability", ascending=False))
-        bar_cp  = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-                   "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-
-        bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
-        probs = prob_df["Probability"].tolist()
-        shimmer_vertical_bar_chart(
-            title="Model Confidence per Decision",
-            labels=prob_df["Decision"].tolist(),
-            series=[{
-                "name": "Probability",
-                "values": probs,
-                "color": ACCENT,
-                "colors": bar_colors,
-            }],
-            max_value=1.0,
-            value_format="percent",
-            height=390,
+        prob_df = (
+            pd.DataFrame({"Decision": cls, "Probability": prob})
+            .sort_values("Probability", ascending=False)
         )
+        svg_chart(render_vbar_chart(
+            "Model Confidence per Decision",
+            prob_df["Decision"].tolist(),
+            prob_df["Probability"].tolist(),
+            [DECISION_COLORS.get(d, "#888") for d in prob_df["Decision"]],
+            height=280, fmt_fn=lambda v: f"{v:.0%}", y_label="Probability", uid="tab5_conf"
+        ), 320)
 
         st.dataframe(
             prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
-            use_container_width=True, hide_index=True)
-
+            use_container_width=True, hide_index=True,
+        )
 
 # ─────────────────────────────────────────────────────────────
 #  FILTERED DATA EXPANDER
 # ─────────────────────────────────────────────────────────────
-with st.expander("🗂  Show filtered data"):
+with st.expander("Show filtered data"):
     st.dataframe(fdf, use_container_width=True)
-
 
 # ─────────────────────────────────────────────────────────────
 #  FOOTER
 # ─────────────────────────────────────────────────────────────
-st.markdown(f"""
-<div style='text-align:center;padding:40px 0 28px'>
-  <div style='display:inline-block;
-              background:#fff9e6;
-              border:3px solid {INK};
-              box-shadow:4px 4px 0px {INK};
-              padding:0.6rem 1.6rem;
-              font-family:Inter, sans-serif;
-              font-size:0.42rem;
-              color:{INK_MUTED};
-              letter-spacing:0.10em;'>
-    ★ AIRLINE PROFITABILITY SYSTEM ★ BUILT WITH STREAMLIT ★
-  </div>
+st.markdown("""
+<div style='text-align:center;color:#4f4352;font-size:.74rem;
+            padding:48px 0 20px;font-family:"Manrope",sans-serif;
+            letter-spacing:.08em;text-transform:uppercase'>
+  SkyLens Route Intelligence &nbsp;·&nbsp; Built with Streamlit
 </div>
 """, unsafe_allow_html=True)
