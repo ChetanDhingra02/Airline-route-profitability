@@ -74,7 +74,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
   margin: -85px auto 10px !important;
   padding: 1px 72px !important;
   display: block !important;
-  text-align: center;
+  text-align: left;
   position: relative;
   overflow: hidden;
   border-radius: 28px !important;
