@@ -1897,6 +1897,8 @@ with tab5:
 
         submitted = st.form_submit_button("✈  Get Route Decision")
 
+        render_prediction_result()
+
     # ── PREDICTION LOGIC ────────────────────────────────────
     if submitted:
         if model_choice == "With Revenue Variables":
