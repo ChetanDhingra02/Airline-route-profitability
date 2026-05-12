@@ -141,6 +141,9 @@ def _fmt_money(v):
         return f"${v/1_000:.0f}K"
     return f"${v:.0f}"
 
+def col_seq(labels):
+    return [DECISION_COLORS.get(str(label), CYAN) for label in labels]
+
 
 def _format_value(v, value_format="number", fmt_fn=None):
     if fmt_fn:
