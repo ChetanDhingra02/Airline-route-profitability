@@ -14,872 +14,468 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────
-#  COLOUR TOKENS  (chart palette — unchanged logic)
+#  THEME SYSTEM  (change these variables to restyle the whole app)
 # ─────────────────────────────────────────────────────────────
-CHART_EXPAND   = "#34C759"
-CHART_MAINTAIN = "#FFD60A"
-CHART_OPTIMIZE = "#FF6B35"
-CHART_DROP     = "#FF375F"
-CHART_ORANGE   = "#FF6B35"
-CHART_NEUTRAL  = ["#6E9FDC","#9AC8CD","#B5CDA3","#E8C47A","#E8A97A","#E88A9A","#C4B8E8","#A8D8CF"]
+# Palette
+#
+# Updated palette for a sleek, dark dashboard inspired by the provided mock‑ups.  
+# These colours drive the overall theme without touching any of the underlying logic.  
+COLOR_BG          = "#0E1018"          # deep charcoal page canvas
+COLOR_SURFACE     = "#1A1E2E"          # container surface with subtle contrast
+COLOR_BORDER      = "rgba(255,255,255,0.08)"  # soft light border
+COLOR_BORDER_MD   = "rgba(255,255,255,0.16)"
 
-COLOR_GREEN    = "#34C759"
-COLOR_YELLOW   = "#FFD60A"
-COLOR_ORANGE   = "#FF6B35"
-COLOR_PINK     = "#FF375F"
+COLOR_INK         = "#F5F7FA"          # high contrast text
+COLOR_INK_SOFT    = "#CBD1E6"          # secondary text tone
+COLOR_INK_MUTED   = "#7E83A3"          # helper / label text
 
-# ─────────────────────────────────────────────────────────────
-#  AURORA GLASSMORPHISM CSS
-# ─────────────────────────────────────────────────────────────
-st.markdown("""
+COLOR_ACCENT      = "#A855F7"          # vibrant purple accent
+COLOR_ACCENT_DARK = "#7E22CE"          # deeper accent shade
+
+# Status colours updated to mirror the dark UI:  
+COLOR_GREEN       = "#3BB273"          # Expand
+COLOR_YELLOW      = "#EAB308"          # Maintain
+COLOR_ORANGE      = "#F97316"          # Optimize
+COLOR_PINK        = "#EC4899"          # Drop
+
+# Chart palette (harmonious, never rainbow)
+# Chart palette tuned for the dark theme.  
+CHART_EXPAND   = "#22C55E"   # green
+CHART_MAINTAIN = "#EAB308"   # yellow
+CHART_OPTIMIZE = "#F97316"   # orange
+CHART_DROP     = "#EF476F"   # pink/red
+CHART_NEUTRAL  = [
+    "#6366F1", "#8B5CF6", "#A855F7", "#D946EF",
+    "#EC4899", "#F472B6", "#FB7185", "#FCA5A5"
+]
+
+# Alias for backward compatibility – various parts of the app refer to CHART_ORANGE for the optimize category
+CHART_ORANGE = CHART_OPTIMIZE
+
+st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
 
-/* ── KEYFRAMES ──────────────────────────────────────────────── */
-@keyframes aurora1 {
-  0%   { transform: translate(0%, 0%)    scale(1);    opacity: 0.55; }
-  33%  { transform: translate(8%, -12%)  scale(1.08); opacity: 0.65; }
-  66%  { transform: translate(-6%, 10%)  scale(0.95); opacity: 0.50; }
-  100% { transform: translate(0%, 0%)    scale(1);    opacity: 0.55; }
-}
-@keyframes aurora2 {
-  0%   { transform: translate(0%, 0%)    scale(1);    opacity: 0.45; }
-  40%  { transform: translate(-10%, 8%)  scale(1.12); opacity: 0.60; }
-  70%  { transform: translate(7%, -6%)   scale(0.92); opacity: 0.40; }
-  100% { transform: translate(0%, 0%)    scale(1);    opacity: 0.45; }
-}
-@keyframes aurora3 {
-  0%   { transform: translate(0%, 0%)    scale(1);    opacity: 0.35; }
-  50%  { transform: translate(5%, 14%)   scale(1.06); opacity: 0.50; }
-  80%  { transform: translate(-8%, -4%)  scale(0.98); opacity: 0.30; }
-  100% { transform: translate(0%, 0%)    scale(1);    opacity: 0.35; }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
-}
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(99,179,237,0.18), 0 8px 32px rgba(0,0,0,0.45); }
-  50%       { box-shadow: 0 0 40px rgba(99,179,237,0.32), 0 8px 32px rgba(0,0,0,0.45); }
-}
-@keyframes planeFloat {
-  0%, 100% { transform: translateY(0px) rotate(-2deg); }
-  50%       { transform: translateY(-8px) rotate(2deg); }
-}
-@keyframes spinSlow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
+/* ── CSS VARIABLES ─────────────────────────────────────────── */
+:root {{
+    --bg:          {COLOR_BG};
+    --surface:     {COLOR_SURFACE};
+    --border:      {COLOR_BORDER};
+    --border-md:   {COLOR_BORDER_MD};
+    --ink:         {COLOR_INK};
+    --ink-soft:    {COLOR_INK_SOFT};
+    --ink-muted:   {COLOR_INK_MUTED};
+    --accent:      {COLOR_ACCENT};
+    --accent-dk:   {COLOR_ACCENT_DARK};
+    --green:       {COLOR_GREEN};
+    --yellow:      {COLOR_YELLOW};
+    --orange:      {COLOR_ORANGE};
+    --pink:        {COLOR_PINK};
+    --radius-sm:   8px;
+    --radius-md:   14px;
+    --radius-lg:   20px;
+    --shadow-sm:   0 2px 4px rgba(0,0,0,0.40), 0 1px 2px rgba(0,0,0,0.30);
+    --shadow-md:   0 4px 12px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.35);
+    --shadow-lg:   0 8px 24px rgba(0,0,0,0.50), 0 4px 12px rgba(0,0,0,0.40);
+}}
 
-/* ── ROOT ───────────────────────────────────────────────────── */
-:root {
-  --sky-deep:     #050d1a;
-  --sky-mid:      #091628;
-  --glass-bg:     rgba(12, 28, 52, 0.55);
-  --glass-border: rgba(120, 180, 255, 0.18);
-  --glass-hover:  rgba(12, 28, 52, 0.75);
-  --aurora-teal:  #00c9a7;
-  --aurora-blue:  #4fc3f7;
-  --aurora-violet:#a78bfa;
-  --aurora-green: #34d399;
-  --ink:          rgba(255,255,255,0.92);
-  --ink-soft:     rgba(255,255,255,0.65);
-  --ink-muted:    rgba(255,255,255,0.38);
-  --accent:       #63b3ed;
-  --green:        #34C759;
-  --yellow:       #FFD60A;
-  --orange:       #FF6B35;
-  --pink:         #FF375F;
-  --radius-sm:    10px;
-  --radius-md:    16px;
-  --radius-lg:    24px;
-  --radius-xl:    32px;
-  --blur:         blur(18px) saturate(180%);
-  --shadow-glass: 0 8px 32px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.08);
-}
+/* ── BASE ───────────────────────────────────────────────────── */
+html, body, [class*="css"] {{
+    font-family: 'Poppins', system-ui, sans-serif !important;
+    color: var(--ink) !important;
+    scroll-behavior: smooth;
+}}
 
-/* ── DEEP SKY BACKGROUND ────────────────────────────────────── */
-html, body, .stApp {
-  background: var(--sky-deep) !important;
-  font-family: 'Outfit', system-ui, sans-serif !important;
-  color: var(--ink) !important;
-}
+.stApp {{
+    /* Apply a subtle radial gradient to the app background for depth */
+    background: radial-gradient(circle at 50% 0%, rgba(36,45,86,0.65) 0%, var(--bg) 60%) !important;
+    min-height: 100vh;
+}}
 
-/* Aurora blob divs injected via st.markdown */
-.aurora-blob {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  mix-blend-mode: screen;
-}
-.aurora-blob-1 {
-  width: 70vw; height: 55vw;
-  top: -15%; left: -20%;
-  background: radial-gradient(ellipse,
-    rgba(0,180,160,0.42) 0%,
-    rgba(78,166,255,0.28) 40%,
-    transparent 70%);
-  filter: blur(90px);
-  animation: aurora1 22s ease-in-out infinite;
-}
-.aurora-blob-2 {
-  width: 60vw; height: 50vw;
-  bottom: -10%; right: -15%;
-  background: radial-gradient(ellipse,
-    rgba(139,92,246,0.38) 0%,
-    rgba(52,211,153,0.22) 40%,
-    transparent 70%);
-  filter: blur(90px);
-  animation: aurora2 28s ease-in-out infinite;
-}
-.aurora-blob-3 {
-  width: 40vw; height: 40vw;
-  top: 40%; left: 35%;
-  background: radial-gradient(ellipse,
-    rgba(78,166,255,0.22) 0%,
-    rgba(0,200,180,0.15) 50%,
-    transparent 70%);
-  filter: blur(100px);
-  animation: aurora3 34s ease-in-out infinite;
-}
-
-/* ── CONTENT LAYERING ───────────────────────────────────────── */
-.main .block-container {
-  position: relative;
-  z-index: 1;
-  padding-top: 2rem;
-  padding-bottom: 4rem;
-  max-width: 1320px;
-}
+/* Remove Streamlit default header padding */
+.main .block-container {{
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    max-width: 1280px;
+}}
 
 /* ── SIDEBAR ────────────────────────────────────────────────── */
-[data-testid="stSidebar"] {
-  background: rgba(5, 15, 32, 0.82) !important;
-  border-right: 1px solid var(--glass-border) !important;
-  backdrop-filter: var(--blur) !important;
-  -webkit-backdrop-filter: var(--blur) !important;
-}
+[data-testid="stSidebar"] {{
+    background: var(--surface) !important;
+    border-right: 1px solid var(--border-md) !important;
+    box-shadow: 2px 0 12px rgba(168,85,247,0.12) !important;
+}}
+
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,
 [data-testid="stSidebar"] label,
 [data-testid="stSidebar"] div,
-[data-testid="stSidebar"] small {
-  color: var(--ink-soft) !important;
-  font-family: 'Outfit', sans-serif !important;
-}
-
-/* ── GLASS CARD BASE ────────────────────────────────────────── */
-.glass-card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  box-shadow: var(--shadow-glass);
-  padding: 24px 28px;
-  margin-bottom: 16px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-  animation: fadeUp 0.5s ease both;
-}
-.glass-card:hover {
-  transform: translateY(-3px);
-  background: var(--glass-hover);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12);
-}
+[data-testid="stSidebar"] small {{
+    color: var(--ink-soft) !important;
+    font-family: 'Poppins', sans-serif !important;
+}}
 
 /* ── METRIC CARDS ───────────────────────────────────────────── */
-[data-testid="metric-container"] {
-  background: var(--glass-bg) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-md) !important;
-  backdrop-filter: var(--blur) !important;
-  -webkit-backdrop-filter: var(--blur) !important;
-  box-shadow: var(--shadow-glass) !important;
-  padding: 20px 24px !important;
-  transition: transform 0.22s ease, box-shadow 0.22s ease !important;
-  animation: fadeUp 0.45s ease both;
-}
-[data-testid="metric-container"]:hover {
-  transform: translateY(-3px) !important;
-  animation: pulseGlow 2.5s ease infinite !important;
-}
-[data-testid="metric-container"] [data-testid="stMetricLabel"] p {
-  font-size: 0.62rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.14em !important;
-  text-transform: uppercase !important;
-  color: var(--ink-muted) !important;
-}
+[data-testid="metric-container"] {{
+    background: var(--surface);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+}}
+[data-testid="metric-container"]:hover {{
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}}
+[data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.10em !important;
+    text-transform: uppercase !important;
+    color: var(--ink-muted) !important;
+}}
 [data-testid="stMetricValue"],
-[data-testid="stMetricValue"] > div {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 1.70rem !important;
-  font-weight: 500 !important;
-  color: var(--ink) !important;
-  letter-spacing: -0.02em !important;
-}
+[data-testid="stMetricValue"] > div {{
+    font-family: 'DM Mono', monospace !important;
+    font-size: 1.75rem !important;
+    font-weight: 500 !important;
+    color: var(--ink) !important;
+    letter-spacing: -0.02em !important;
+}}
 
 /* ── TABS ───────────────────────────────────────────────────── */
-.stTabs [data-baseweb="tab-list"] {
-  background: rgba(5,15,32,0.70);
-  border-radius: var(--radius-md);
-  padding: 4px;
-  gap: 2px;
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-glass);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-}
-.stTabs [data-baseweb="tab"] {
-  border-radius: var(--radius-sm);
-  font-family: 'Outfit', sans-serif !important;
-  font-weight: 600;
-  font-size: 0.80rem;
-  color: var(--ink-muted) !important;
-  padding: 8px 18px;
-  background: transparent;
-  border: none !important;
-  transition: all 0.18s ease;
-  letter-spacing: 0.02em;
-}
-.stTabs [data-baseweb="tab"]:hover {
-  background: rgba(255,255,255,0.06) !important;
-  color: var(--ink-soft) !important;
-}
-.stTabs [aria-selected="true"] {
-  background: linear-gradient(135deg, rgba(99,179,237,0.25), rgba(0,201,167,0.20)) !important;
-  color: var(--ink) !important;
-  border: 1px solid rgba(99,179,237,0.35) !important;
-  box-shadow: 0 2px 12px rgba(99,179,237,0.20) !important;
-}
-.stTabs [data-baseweb="tab-panel"] {
-  background: transparent;
-  padding-top: 1.5rem;
-}
+.stTabs [data-baseweb="tab-list"] {{
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    gap: 2px;
+    border: 1px solid var(--border-md);
+    box-shadow: var(--shadow-sm);
+}}
+.stTabs [data-baseweb="tab"] {{
+    border-radius: var(--radius-sm);
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600;
+    font-size: 0.80rem;
+    color: var(--ink-muted) !important;
+    padding: 7px 16px;
+    background: transparent;
+    border: none !important;
+    transition: all 0.14s ease;
+    letter-spacing: 0.01em;
+}}
+.stTabs [data-baseweb="tab"]:hover {{
+    background: var(--bg) !important;
+    color: var(--ink-soft) !important;
+}}
+.stTabs [aria-selected="true"] {{
+    background: var(--ink) !important;
+    color: #fff !important;
+    box-shadow: var(--shadow-sm) !important;
+}}
+.stTabs [data-baseweb="tab-panel"] {{
+    background: transparent;
+    padding-top: 1.5rem;
+}}
 
 /* ── HEADINGS ───────────────────────────────────────────────── */
-h1, h2, h3, h4 {
-  font-family: 'Outfit', sans-serif !important;
-  color: var(--ink) !important;
-  letter-spacing: -0.02em;
-  font-weight: 700 !important;
-}
+h1, h2, h3, h4 {{
+    font-family: 'Poppins', sans-serif !important;
+    color: var(--ink) !important;
+    letter-spacing: -0.02em;
+    font-weight: 700 !important;
+}}
 
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] li,
-.stMarkdown p, .stMarkdown li {
-  color: var(--ink-soft);
-  line-height: 1.65;
-  font-size: 0.90rem;
-}
+.stMarkdown p, .stMarkdown li {{
+    color: var(--ink-soft);
+    line-height: 1.65;
+    font-size: 0.90rem;
+}}
 
 /* ── WIDGET LABELS ──────────────────────────────────────────── */
 .stSelectbox label, .stNumberInput label,
 .stSlider label, .stRadio label,
-.stCheckbox label, .stTextInput label {
-  color: var(--ink-soft) !important;
-  font-weight: 600 !important;
-  font-size: 0.78rem !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
-}
+.stCheckbox label, .stTextInput label {{
+    color: var(--ink) !important;
+    font-weight: 600 !important;
+    font-size: 0.80rem !important;
+    letter-spacing: 0.02em !important;
+    text-transform: uppercase !important;
+}}
 
 /* ── INPUTS ─────────────────────────────────────────────────── */
 .stSelectbox [data-baseweb="select"] div,
 .stTextInput input,
-.stNumberInput input {
-  color: var(--ink) !important;
-  background: rgba(10,24,48,0.80) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-sm) !important;
-  font-family: 'Outfit', sans-serif !important;
-  font-size: 0.88rem !important;
-  box-shadow: none !important;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
-}
+.stNumberInput input {{
+    color: var(--ink) !important;
+    background: var(--surface) !important;
+    border: 1px solid var(--border-md) !important;
+    border-radius: var(--radius-sm) !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.88rem !important;
+    box-shadow: none !important;
+    transition: border-color 0.14s ease !important;
+}}
 .stSelectbox [data-baseweb="select"] div:focus-within,
 .stTextInput input:focus,
-.stNumberInput input:focus {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(99,179,237,0.18) !important;
-}
-
-/* ── SLIDER ─────────────────────────────────────────────────── */
-.stSlider [data-baseweb="slider"] [role="slider"] {
-  background: var(--aurora-blue) !important;
-  box-shadow: 0 0 10px rgba(79,195,247,0.60) !important;
-}
+.stNumberInput input:focus {{
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(168,85,247,0.30) !important;
+}}
 
 /* ── DATAFRAME ──────────────────────────────────────────────── */
-[data-testid="stDataFrame"] {
-  border-radius: var(--radius-md) !important;
-  overflow: hidden;
-  border: 1px solid var(--glass-border) !important;
-  box-shadow: var(--shadow-glass) !important;
-  background: rgba(5,15,32,0.65) !important;
-}
+[data-testid="stDataFrame"] {{
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-md);
+    box-shadow: var(--shadow-sm);
+    background: var(--surface);
+}}
 
 /* ── EXPANDER ───────────────────────────────────────────────── */
-[data-testid="stExpander"] {
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-md) !important;
-  background: var(--glass-bg) !important;
-  box-shadow: var(--shadow-glass) !important;
-  backdrop-filter: var(--blur) !important;
-  -webkit-backdrop-filter: var(--blur) !important;
-  overflow: hidden;
-}
-[data-testid="stExpander"] summary p {
-  color: var(--ink-soft) !important;
-  font-weight: 600 !important;
-  font-size: 0.88rem !important;
-}
+[data-testid="stExpander"] {{
+    border: 1px solid var(--border-md) !important;
+    border-radius: var(--radius-md) !important;
+    background: var(--surface) !important;
+    box-shadow: var(--shadow-sm) !important;
+    overflow: hidden;
+}}
+[data-testid="stExpander"] summary p {{
+    color: var(--ink) !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+}}
 
 /* ── FORM ───────────────────────────────────────────────────── */
-[data-testid="stForm"] {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
-  padding: 28px 32px 32px;
-  box-shadow: var(--shadow-glass);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-}
+[data-testid="stForm"] {{
+    background: var(--surface);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px 28px;
+    box-shadow: var(--shadow-md);
+}}
 
 /* ── SUBMIT BUTTON ──────────────────────────────────────────── */
-[data-testid="stFormSubmitButton"] > button {
-  background: linear-gradient(135deg, rgba(99,179,237,0.25) 0%, rgba(0,201,167,0.22) 100%) !important;
-  border: 1px solid rgba(99,179,237,0.45) !important;
-  border-radius: var(--radius-md) !important;
-  color: var(--ink) !important;
-  font-family: 'Outfit', sans-serif !important;
-  font-weight: 700 !important;
-  font-size: 0.88rem !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
-  padding: 13px 32px !important;
-  width: 100% !important;
-  transition: all 0.22s ease !important;
-  box-shadow: 0 4px 20px rgba(99,179,237,0.18), inset 0 1px 0 rgba(255,255,255,0.10) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-}
-[data-testid="stFormSubmitButton"] > button:hover {
-  background: linear-gradient(135deg, rgba(99,179,237,0.40) 0%, rgba(0,201,167,0.35) 100%) !important;
-  border-color: rgba(99,179,237,0.70) !important;
-  box-shadow: 0 6px 30px rgba(99,179,237,0.38), inset 0 1px 0 rgba(255,255,255,0.18) !important;
-  transform: translateY(-2px) !important;
-}
-[data-testid="stFormSubmitButton"] > button:active {
-  transform: translateY(0) !important;
-}
+[data-testid="stFormSubmitButton"] > button {{
+    /* Form submit button uses the same gradient styling as other buttons */
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dk) 100%) !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    color: #FFFFFF !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+    padding: 12px 32px !important;
+    width: 100% !important;
+    transition: all 0.18s ease !important;
+    box-shadow: 0 6px 16px rgba(168,85,247,0.40) !important;
+}}
+[data-testid="stFormSubmitButton"] > button:hover {{
+    background: linear-gradient(90deg, var(--accent-dk) 0%, var(--accent) 100%) !important;
+    box-shadow: 0 8px 20px rgba(168,85,247,0.55) !important;
+    transform: translateY(-2px) !important;
+}}
+[data-testid="stFormSubmitButton"] > button:active {{
+    transform: translateY(0) !important;
+    box-shadow: none !important;
+}}
 
 /* ── REGULAR BUTTONS ────────────────────────────────────────── */
-.stButton > button {
-  background: var(--glass-bg) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--radius-sm) !important;
-  color: var(--ink-soft) !important;
-  font-family: 'Outfit', sans-serif !important;
-  font-weight: 600 !important;
-  font-size: 0.85rem !important;
-  padding: 9px 22px !important;
-  transition: all 0.18s ease !important;
-  box-shadow: var(--shadow-glass) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-}
-.stButton > button:hover {
-  background: rgba(99,179,237,0.12) !important;
-  border-color: rgba(99,179,237,0.40) !important;
-  color: var(--ink) !important;
-  box-shadow: 0 4px 20px rgba(99,179,237,0.20) !important;
-  transform: translateY(-2px) !important;
-}
+.stButton > button {{
+    /* Stylish gradient button reminiscent of the mock‑up */
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dk) 100%) !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    color: #FFFFFF !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    padding: 9px 22px !important;
+    transition: all 0.16s ease !important;
+    box-shadow: 0 4px 12px rgba(168,85,247,0.3) !important;
+}}
+.stButton > button:hover {{
+    background: linear-gradient(90deg, var(--accent-dk) 0%, var(--accent) 100%) !important;
+    box-shadow: 0 6px 16px rgba(168,85,247,0.5) !important;
+    transform: translateY(-2px) !important;
+}}
 
 /* ── ALERT ──────────────────────────────────────────────────── */
-[data-testid="stAlert"] {
-  border-radius: var(--radius-md) !important;
-  border: 1px solid var(--glass-border) !important;
-  background: var(--glass-bg) !important;
-  backdrop-filter: var(--blur) !important;
-  -webkit-backdrop-filter: var(--blur) !important;
-}
-[data-testid="stAlert"] p { color: var(--ink-soft) !important; }
+[data-testid="stAlert"] {{
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--border-md) !important;
+}}
+[data-testid="stAlert"] p {{ color: inherit !important; }}
 
-hr {
-  border: none !important;
-  border-top: 1px solid var(--glass-border) !important;
-  margin: 1.5rem 0 !important;
-}
+hr {{
+    border: none !important;
+    border-top: 1px solid var(--border-md) !important;
+    margin: 1.5rem 0 !important;
+}}
 
-/* ── HERO ───────────────────────────────────────────────────── */
-.hero {
-  position: relative;
-  border-radius: var(--radius-xl);
-  padding: 48px 56px;
-  margin-bottom: 32px;
-  overflow: hidden;
-  background: linear-gradient(135deg,
-    rgba(5,20,45,0.85) 0%,
-    rgba(8,28,58,0.75) 50%,
-    rgba(3,15,35,0.90) 100%);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  box-shadow:
-    0 24px 64px rgba(0,0,0,0.60),
-    inset 0 1px 0 rgba(255,255,255,0.10),
-    inset 0 -1px 0 rgba(0,0,0,0.20);
-  animation: fadeUp 0.6s ease both;
-}
+/* ── CUSTOM COMPONENTS ──────────────────────────────────────── */
 
-/* Aurora shimmer band inside hero */
-.hero::before {
-  content: "";
-  position: absolute;
-  top: -40%; left: -10%;
-  width: 120%; height: 180%;
-  background: conic-gradient(
-    from 200deg at 60% 40%,
-    rgba(0,201,167,0.18) 0deg,
-    rgba(99,179,237,0.22) 90deg,
-    rgba(167,139,250,0.14) 180deg,
-    rgba(52,211,153,0.10) 270deg,
-    rgba(0,201,167,0.18) 360deg
-  );
-  filter: blur(50px);
-  pointer-events: none;
-  animation: aurora1 18s ease-in-out infinite;
-}
+/* Hero banner */
+.hero {{
+    /* Use a vibrant gradient for the hero card reminiscent of the provided design */
+    background: linear-gradient(135deg, var(--accent), #3a1d69);
+    border-radius: var(--radius-lg);
+    padding: 40px 48px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+}}
+.hero::before {{
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.15) 0%, transparent 60%);
+    pointer-events: none;
+}}
+.hero-eyebrow {{
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 10px;
+}}
+.hero h1 {{
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 2.6rem !important;
+    font-weight: 700 !important;
+    color: #F5F7FA !important;
+    margin: 0 0 12px 0 !important;
+    letter-spacing: -0.03em !important;
+    line-height: 1.15 !important;
+}}
+.hero p {{
+    color: rgba(255,255,255,0.75) !important;
+    font-size: 0.92rem;
+    margin: 0;
+    max-width: 540px;
+    line-height: 1.65;
+    font-weight: 400;
+}}
+.hero-glyph {{
+    position: absolute;
+    right: 48px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8rem;
+    opacity: 0.08;
+    color: rgba(255,255,255,0.4);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+}}
 
-/* Subtle light streak */
-.hero::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(99,179,237,0.50) 40%,
-    rgba(0,201,167,0.40) 60%,
-    transparent 100%
-  );
-  background-size: 200% auto;
-  animation: shimmer 4s linear infinite;
-}
+/* Sidebar brand */
+.sidebar-brand {{
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--ink);
+    padding: 4px 0 16px 0;
+    border-bottom: 1px solid var(--border-md);
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+}}
+.sidebar-brand span {{ color: var(--accent); }}
 
-.hero-eyebrow {
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.20em;
-  text-transform: uppercase;
-  color: var(--aurora-teal);
-  margin-bottom: 14px;
-  opacity: 0.85;
-}
-.hero h1 {
-  font-family: 'Outfit', sans-serif !important;
-  font-size: 2.80rem !important;
-  font-weight: 800 !important;
-  color: var(--ink) !important;
-  margin: 0 0 14px 0 !important;
-  letter-spacing: -0.03em !important;
-  line-height: 1.12 !important;
-  background: linear-gradient(135deg, #ffffff 30%, rgba(99,179,237,0.90) 70%, rgba(0,201,167,0.80) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.hero p {
-  color: var(--ink-muted) !important;
-  font-size: 0.90rem;
-  margin: 0;
-  max-width: 520px;
-  line-height: 1.70;
-  font-weight: 400;
-  position: relative;
-  z-index: 1;
-}
-.hero-glyph {
-  position: absolute;
-  right: 56px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 7rem;
-  opacity: 0.08;
-  color: #fff;
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
-  animation: planeFloat 6s ease-in-out infinite;
-}
+/* Section header */
+.section-hd {{
+    margin: 0 0 4px 0;
+    font-size: 1.0rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+}}
+.section-sub {{
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    margin: 0 0 20px 0;
+    font-weight: 400;
+}}
 
-/* ── SIDEBAR BRAND ──────────────────────────────────────────── */
-.sidebar-brand {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.40rem;
-  font-weight: 800;
-  color: var(--ink);
-  padding: 4px 0 18px 0;
-  border-bottom: 1px solid var(--glass-border);
-  margin-bottom: 18px;
-  letter-spacing: -0.02em;
-}
-.sidebar-brand span {
-  background: linear-gradient(135deg, var(--aurora-blue), var(--aurora-teal));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* Info box */
+.info-box {{
+    background: var(--bg);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 0.84rem;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    line-height: 1.75;
+}}
 
-/* ── SECTION HEADERS ────────────────────────────────────────── */
-.section-hd {
-  margin: 0 0 4px 0;
-  font-size: 1.0rem;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
-.section-sub {
-  font-size: 0.82rem;
-  color: var(--ink-muted);
-  margin: 0 0 20px 0;
-  font-weight: 400;
-}
+/* Decision pills */
+.pill {{
+    display: inline-block;
+    padding: 2px 11px;
+    border-radius: 99px;
+    font-size: 0.70rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+}}
+.pill-expand   {{ background: rgba(34,197,94,0.15); color: #22C55E; border-color: rgba(34,197,94,0.40); }}
+.pill-maintain {{ background: rgba(234,179,8,0.15); color: #EAB308; border-color: rgba(234,179,8,0.40); }}
+.pill-optimize {{ background: rgba(249,115,22,0.15); color: #F97316; border-color: rgba(249,115,22,0.40); }}
+.pill-drop     {{ background: rgba(239,71,111,0.15); color: #EF476F; border-color: rgba(239,71,111,0.40); }}
 
-/* ── INFO BOX ───────────────────────────────────────────────── */
-.info-box {
-  background: rgba(99,179,237,0.06);
-  border: 1px solid rgba(99,179,237,0.20);
-  border-radius: var(--radius-sm);
-  padding: 16px 20px;
-  font-size: 0.84rem;
-  color: var(--ink-soft);
-  margin-bottom: 16px;
-  line-height: 1.80;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
+/* Result card */
+.result-card {{
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin: 20px 0;
+    box-shadow: var(--shadow-md);
+}}
+.result-expand   {{ background: rgba(34,197,94,0.10); border-left: 4px solid {CHART_EXPAND}; }}
+.result-maintain {{ background: rgba(234,179,8,0.10); border-left: 4px solid {CHART_MAINTAIN}; }}
+.result-optimize {{ background: rgba(249,115,22,0.10); border-left: 4px solid {CHART_OPTIMIZE}; }}
+.result-drop     {{ background: rgba(239,71,111,0.10); border-left: 4px solid {CHART_DROP}; }}
 
-/* ── DECISION PILLS ─────────────────────────────────────────── */
-.pill {
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 99px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border: 1px solid transparent;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-.pill-expand   { background: rgba(52,199,89,0.15);  color: #5de887; border-color: rgba(52,199,89,0.35);  }
-.pill-maintain { background: rgba(255,214,10,0.12);  color: #ffd600; border-color: rgba(255,214,10,0.30);  }
-.pill-optimize { background: rgba(255,107,53,0.12);  color: #ff8a60; border-color: rgba(255,107,53,0.30);  }
-.pill-drop     { background: rgba(255,55,95,0.12);   color: #ff6b8a; border-color: rgba(255,55,95,0.28);   }
+/* Elevation animations for cards and hero */
+.result-card, [data-testid="metric-container"], .hero {{
+    transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.35s;
+}}
+.result-card:hover, [data-testid="metric-container"]:hover, .hero:hover {{
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}}
 
-/* ── RESULT CARD ────────────────────────────────────────────── */
-.result-card {
-  border-radius: var(--radius-lg);
-  padding: 30px 36px;
-  margin: 20px 0;
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  box-shadow: var(--shadow-glass);
-  animation: fadeUp 0.4s ease both;
-  position: relative;
-  overflow: hidden;
-}
-.result-card::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-}
-.result-expand   {
-  background: rgba(52,199,89,0.10);
-  border: 1px solid rgba(52,199,89,0.30);
-  border-left: 4px solid #34C759;
-}
-.result-maintain {
-  background: rgba(255,214,10,0.08);
-  border: 1px solid rgba(255,214,10,0.28);
-  border-left: 4px solid #FFD60A;
-}
-.result-optimize {
-  background: rgba(255,107,53,0.10);
-  border: 1px solid rgba(255,107,53,0.28);
-  border-left: 4px solid #FF6B35;
-}
-.result-drop {
-  background: rgba(255,55,95,0.10);
-  border: 1px solid rgba(255,55,95,0.28);
-  border-left: 4px solid #FF375F;
-}
-
-/* ── DIVIDER LABEL ──────────────────────────────────────────── */
-.divider-label {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 28px 0 18px;
-  color: var(--ink-muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-.divider-label::before,
-.divider-label::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--glass-border);
-}
-
-/* ── SCROLLBAR ──────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: rgba(99,179,237,0.25);
-  border-radius: 99px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(99,179,237,0.45);
-}
-
-/* ── SMOOTH SCROLL ──────────────────────────────────────────── */
-html { scroll-behavior: smooth; }
-section.main, .main { scroll-behavior: smooth; }
-
-/* ── REVEAL ON SCROLL (JS adds .revealed) ───────────────────── */
-.reveal-on-scroll {
-  opacity: 0;
-  transform: translateY(28px) scale(0.985);
-  transition: opacity 0.70s cubic-bezier(0.22,1,0.36,1),
-              transform 0.70s cubic-bezier(0.22,1,0.36,1);
-}
-.reveal-on-scroll.revealed {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-/* ── CHART SHIMMER WRAPPER ──────────────────────────────────── */
-@keyframes chartShimmer {
-  0%   { transform: translateX(-120%) skewX(-15deg); opacity: 0;   }
-  35%  { opacity: 0.7; }
-  100% { transform: translateX(220%)  skewX(-15deg); opacity: 0;   }
-}
-@keyframes chartPulse {
-  0%, 100% { box-shadow: 0 8px 32px rgba(0,0,0,0.50),
-                          0 0  0px rgba(99,179,237,0);
-             border-color: rgba(120,180,255,0.18); }
-  50%      { box-shadow: 0 12px 48px rgba(0,0,0,0.55),
-                          0 0 32px rgba(99,179,237,0.18),
-                          0 0 60px rgba(0,201,167,0.08);
-             border-color: rgba(99,179,237,0.38); }
-}
-.chart-wrap {
-  position: relative;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(120,180,255,0.18);
-  padding: 18px 14px 14px;
-  background: rgba(6,18,42,0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  overflow: hidden;
-  animation: chartPulse 5s ease-in-out infinite;
-  transition: transform 0.40s cubic-bezier(0.22,1,0.36,1),
-              box-shadow 0.40s ease;
-  margin-bottom: 4px;
-}
-.chart-wrap:hover {
-  transform: translateY(-5px) scale(1.006);
-  box-shadow: 0 24px 64px rgba(0,0,0,0.60),
-              0 0 48px rgba(99,179,237,0.16);
-}
-/* sweeping shimmer streak */
-.chart-wrap::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 55%; height: 100%;
-  background: linear-gradient(
-    108deg,
-    transparent 25%,
-    rgba(255,255,255,0.055) 50%,
-    transparent 75%
-  );
-  animation: chartShimmer 4.5s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 2;
-}
-/* top edge light line */
-.chart-wrap::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 8%; right: 8%;
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(99,179,237,0.60) 38%,
-    rgba(0,201,167,0.50) 62%,
-    transparent
-  );
-  background-size: 200% auto;
-  animation: shimmer 3.5s linear infinite;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* ── 3D TILT on metric cards (JS drives --rx/--ry) ──────────── */
-[data-testid="metric-container"] {
-  transform-style: preserve-3d;
-  transform: perspective(600px)
-             rotateX(var(--rx, 0deg))
-             rotateY(var(--ry, 0deg));
-  will-change: transform;
-  transition: transform 0.10s linear !important;
-}
-
-/* ── PARALLAX HERO (JS sets --parallax-y) ───────────────────── */
-.hero {
-  transform: translateY(var(--parallax-y, 0px));
-  will-change: transform;
-}
-
-/* ── CURSOR GLOW ────────────────────────────────────────────── */
-#cursor-glow {
-  position: fixed;
-  width: 340px; height: 340px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  background: radial-gradient(circle,
-    rgba(99,179,237,0.09) 0%,
-    rgba(0,201,167,0.05) 40%,
-    transparent 70%);
-  transform: translate(-50%, -50%);
-  mix-blend-mode: screen;
-  left: -999px; top: -999px;
-}
-
+/* Divider with label */
+.divider-label {{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0 16px;
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+}}
+.divider-label::before, .divider-label::after {{
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border-md);
+}}
 </style>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
-#  MOTION ENGINE  (cursor glow, parallax, reveal, 3D tilt, chart wrap)
-# ─────────────────────────────────────────────────────────────
-st.markdown("""
-<div id="cursor-glow"></div>
-<script>
-(function() {
-  function init() {
-    var scrollEl = document.querySelector('section.main') ||
-                   document.querySelector('.main') ||
-                   document.documentElement;
-
-    /* 1. CURSOR GLOW */
-    var glow = document.getElementById('cursor-glow');
-    var cx = window.innerWidth/2, cy = window.innerHeight/2;
-    var tx = cx, ty = cy;
-    document.addEventListener('mousemove', function(e){ tx=e.clientX; ty=e.clientY; });
-    (function loop(){
-      cx += (tx-cx)*0.10; cy += (ty-cy)*0.10;
-      if(glow){ glow.style.left=cx+'px'; glow.style.top=cy+'px'; }
-      requestAnimationFrame(loop);
-    })();
-
-    /* 2. PARALLAX HERO */
-    var hero = document.querySelector('.hero');
-    function doParallax(){
-      if(!hero) return;
-      var sy = scrollEl.scrollTop || window.scrollY || 0;
-      hero.style.setProperty('--parallax-y', Math.min(sy*0.28, 70)+'px');
-    }
-    scrollEl.addEventListener('scroll', doParallax, {passive:true});
-    window.addEventListener('scroll', doParallax, {passive:true});
-
-    /* 3. INTERSECTION OBSERVER — reveal on scroll */
-    var sel = [
-      '[data-testid="metric-container"]',
-      '[data-testid="stDataFrame"]',
-      '.section-hd', '.section-sub',
-      '.divider-label', '.info-box',
-      '.result-card',
-      '[data-testid="stExpander"]',
-      '[data-testid="stForm"]'
-    ].join(',');
-    var els = document.querySelectorAll(sel);
-    els.forEach(function(el){ el.classList.add('reveal-on-scroll'); });
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry, i){
-        if(entry.isIntersecting){
-          setTimeout(function(){ entry.target.classList.add('revealed'); }, i*60);
-          io.unobserve(entry.target);
-        }
-      });
-    }, {threshold:0.07, rootMargin:'0px 0px -30px 0px'});
-    els.forEach(function(el){ io.observe(el); });
-
-    /* 4. 3D TILT on metric cards */
-    function addTilt(card){
-      if(card.dataset.tilt) return;
-      card.dataset.tilt = '1';
-      card.addEventListener('mousemove', function(e){
-        var r = card.getBoundingClientRect();
-        var x = (e.clientX-r.left)/r.width  - 0.5;
-        var y = (e.clientY-r.top) /r.height - 0.5;
-        card.style.setProperty('--ry',  (x*13)+'deg');
-        card.style.setProperty('--rx', (-y*13)+'deg');
-      });
-      card.addEventListener('mouseleave', function(){
-        card.style.setProperty('--ry','0deg');
-        card.style.setProperty('--rx','0deg');
-      });
-    }
-    document.querySelectorAll('[data-testid="metric-container"]').forEach(addTilt);
-
-    /* 5. WRAP matplotlib charts in .chart-wrap */
-    function wrapCharts(){
-      document.querySelectorAll('[data-testid="stImage"] img').forEach(function(img){
-        if(img.closest('.chart-wrap')) return;
-        var wrap = document.createElement('div');
-        wrap.className = 'chart-wrap reveal-on-scroll';
-        img.parentNode.insertBefore(wrap, img);
-        wrap.appendChild(img);
-        io.observe(wrap);
-      });
-    }
-    wrapCharts();
-
-    /* 6. MutationObserver for Streamlit re-renders */
-    new MutationObserver(function(){
-      document.querySelectorAll('[data-testid="metric-container"]').forEach(addTilt);
-      wrapCharts();
-    }).observe(document.body, {childList:true, subtree:true});
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    setTimeout(init, 200);
-  }
-})();
-</script>
-""", unsafe_allow_html=True)
-
-# ─────────────────────────────────────────────────────────────
-#  DECISION CONFIG  (unchanged)
+#  DECISION CONFIG  (unchanged from original)
 # ─────────────────────────────────────────────────────────────
 DECISION_COLORS = {
     "Expand":   CHART_EXPAND,
@@ -890,32 +486,27 @@ DECISION_COLORS = {
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
 # ─────────────────────────────────────────────────────────────
-#  CHART HELPER  (restyled for dark theme, same data logic)
+#  CHART HELPER  (restyled, same data logic)
 # ─────────────────────────────────────────────────────────────
 def clean_fig(figsize=(8, 4)):
-    """Return a figure/ax pair styled for the aurora dark theme."""
-    # All colours are matplotlib-compatible (R,G,B,A) tuples with values 0-1
-    SPINE_COLOR  = (0.47, 0.71, 1.00, 0.18)   # soft blue, very translucent
-    TICK_COLOR   = (1.00, 1.00, 1.00, 0.45)   # white 45% opacity
-    LABEL_COLOR  = (1.00, 1.00, 1.00, 0.45)
-    TITLE_COLOR  = (1.00, 1.00, 1.00, 0.85)
-    GRID_COLOR   = (0.47, 0.71, 1.00, 0.08)
-
+    """Return a figure/ax pair styled to match the dashboard theme."""
     fig, ax = plt.subplots(figsize=figsize)
     fig.patch.set_facecolor("none")
     fig.patch.set_alpha(0)
     ax.set_facecolor("none")
     for spine in ["top", "right"]:
         ax.spines[spine].set_visible(False)
-    ax.spines["left"].set_color(SPINE_COLOR)
-    ax.spines["bottom"].set_color(SPINE_COLOR)
-    ax.tick_params(colors=TICK_COLOR, labelsize=8.5)
-    ax.xaxis.label.set_color(LABEL_COLOR)
-    ax.yaxis.label.set_color(LABEL_COLOR)
-    ax.title.set_color(TITLE_COLOR)
+    # Dark theme colours for chart elements
+    ax.spines["left"].set_color("#2D3651")
+    ax.spines["bottom"].set_color("#2D3651")
+    ax.tick_params(colors="#A0AEC0", labelsize=8.5)
+    ax.xaxis.label.set_color("#7E83A3")
+    ax.yaxis.label.set_color("#7E83A3")
+    ax.title.set_color("#F5F7FA")
     ax.title.set_fontsize(11)
     ax.title.set_fontweight("bold")
-    ax.grid(axis="y", color=GRID_COLOR, linewidth=0.8, linestyle="--")
+    ax.title.set_fontfamily("Poppins")
+    ax.grid(axis="y", color="#2D3651", linewidth=0.8, linestyle="--")
     ax.set_axisbelow(True)
     return fig, ax
 
@@ -1012,8 +603,8 @@ if "pred_result" not in st.session_state:
 with st.sidebar:
     st.markdown('<div class="sidebar-brand">Sky<span>Lens</span></div>', unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.68rem;color:rgba(255,255,255,0.35);margin-bottom:18px;"
-        "font-weight:600;letter-spacing:0.12em;text-transform:uppercase'>Filter view</p>",
+        "<p style='font-size:0.75rem;color:#888;margin-bottom:18px;font-weight:500;"
+        "letter-spacing:0.05em;text-transform:uppercase'>Filter view</p>",
         unsafe_allow_html=True
     )
     route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
@@ -1028,10 +619,9 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("""
-    <p style='font-size:0.66rem;color:rgba(255,255,255,0.35);font-weight:700;
-    letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px'>Decision Labels</p>
-    <div style='display:flex;flex-direction:column;gap:10px;font-size:0.82rem;
-    color:rgba(255,255,255,0.60)'>
+    <p style='font-size:0.72rem;color:#888;font-weight:700;letter-spacing:0.10em;
+    text-transform:uppercase;margin-bottom:10px'>Decision Labels</p>
+    <div style='display:flex;flex-direction:column;gap:8px;font-size:0.82rem;color:#3D3D3D'>
       <div><span class='pill pill-expand'>Expand</span>&nbsp;&nbsp;High profit &amp; demand</div>
       <div><span class='pill pill-maintain'>Maintain</span>&nbsp;&nbsp;Stable performer</div>
       <div><span class='pill pill-optimize'>Optimize</span>&nbsp;&nbsp;Room to improve</div>
@@ -1049,20 +639,11 @@ if sel_season   != "All": fdf = fdf[fdf["Season"]         == sel_season]
 if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 
 # ─────────────────────────────────────────────────────────────
-#  AURORA BLOBS  (real DOM elements — CSS ::before won't work in Streamlit)
-# ─────────────────────────────────────────────────────────────
-st.markdown("""
-<div class="aurora-blob aurora-blob-1"></div>
-<div class="aurora-blob aurora-blob-2"></div>
-<div class="aurora-blob aurora-blob-3"></div>
-""", unsafe_allow_html=True)
-
-# ─────────────────────────────────────────────────────────────
 #  HERO HEADER
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <div class="hero-eyebrow">✦ Route Intelligence Platform</div>
+  <div class="hero-eyebrow">Route Intelligence Platform</div>
   <h1>SkyLens Dashboard</h1>
   <p>
     Built on a sample airline dataset for analysis and demonstration purposes only.
@@ -1076,11 +657,11 @@ st.markdown("""
 #  TABS
 # ─────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "✦  Overview",
-    "◈  Performance Drivers",
-    "◉  Route Actions",
-    "◐  Route Stability",
-    "⬡  Prediction Tool",
+    "Overview",
+    "Performance Drivers",
+    "Route Actions",
+    "Route Stability",
+    "Prediction Tool",
 ])
 
 # ── TAB 1 · OVERVIEW ─────────────────────────────────────────
@@ -1133,13 +714,13 @@ with tab1:
             autopct="%1.1f%%",
             colors=[wc[l] for l in dc.index],
             startangle=90,
-            wedgeprops={"linewidth": 3, "edgecolor": "#050d1a"},
-            textprops={"color": (1,1,1,0.75), "fontsize": 9.5},
+            wedgeprops={"linewidth": 3, "edgecolor": "#F5F4F0"},
+            textprops={"color": "#F5F7FA", "fontsize": 9.5, "fontfamily": "Poppins"},
             pctdistance=0.78,
         )
         for at in autotexts:
             at.set_fontsize(8.5)
-            at.set_color((1,1,1,0.90))
+            at.set_color("#111111")
             at.set_fontweight("bold")
         ax.set_title("Share of Flights by Decision", pad=14)
         st.pyplot(fig)
@@ -1162,10 +743,9 @@ with tab1:
         st.dataframe(summary, use_container_width=True, hide_index=True)
         st.markdown("""
         <div class="info-box">
-          <strong style="color:rgba(255,255,255,0.85)">How to read this</strong><br>
+          <strong>How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
-          <strong style="color:rgba(255,255,255,0.75)">Expand</strong> routes should have
-          the highest values across all three columns.
+          <strong>Expand</strong> routes should have the highest values across all three columns.
         </div>
         """, unsafe_allow_html=True)
 
@@ -1187,7 +767,7 @@ with tab2:
             apd.index, apd.values,
             color=col_seq(apd.index.tolist()),
             width=0.5,
-            edgecolor="#050d1a",
+            edgecolor="#F5F4F0",
             linewidth=2,
         )
         for b in bars:
@@ -1197,7 +777,7 @@ with tab2:
                 h + abs(apd.values).max() * 0.025,
                 f"${h:,.0f}",
                 ha="center", va="bottom",
-                fontsize=8, color=(1,1,1,0.65), fontweight="700",
+                fontsize=8, color="#555555", fontweight="700",
             )
         ax.set_ylabel("Average Profit ($)")
         ax.set_title("Average Profit by Decision")
@@ -1214,7 +794,7 @@ with tab2:
             ald.index, ald.values,
             color=col_seq(ald.index.tolist()),
             width=0.5,
-            edgecolor="#050d1a",
+            edgecolor="#F5F4F0",
             linewidth=2,
         )
         for b in bars:
@@ -1224,7 +804,7 @@ with tab2:
                 h + 0.006,
                 f"{h:.0%}",
                 ha="center", va="bottom",
-                fontsize=8, color=(1,1,1,0.65), fontweight="700",
+                fontsize=8, color="#555555", fontweight="700",
             )
         ax.set_ylabel("Average Seat Occupancy")
         ax.set_title("Seat Occupancy by Decision")
@@ -1263,7 +843,7 @@ with tab2:
     bars = ax.barh(
         cost_means.index, cost_means.values,
         color=CHART_NEUTRAL[:len(cost_means)],
-        edgecolor="#050d1a",
+        edgecolor="#F5F4F0",
         linewidth=2,
         height=0.55,
     )
@@ -1274,7 +854,7 @@ with tab2:
             w + mx * 0.012,
             b.get_y() + b.get_height() / 2,
             f"${w:,.0f}",
-            va="center", fontsize=8, color=(1,1,1,0.65), fontweight="700",
+            va="center", fontsize=8, color="#555555", fontweight="700",
         )
     ax.set_xlabel("Average Cost per Flight ($)")
     ax.set_title("Top Cost Drivers")
@@ -1286,7 +866,7 @@ with tab3:
     st.markdown('<p class="section-sub">A quick view of your best and worst performing routes.</p>', unsafe_allow_html=True)
 
     st.markdown(
-        "<p style='font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:8px'>"
+        "<p style='font-size:0.80rem;font-weight:700;color:#111;margin-bottom:8px'>"
         "Top routes currently classified as Expand</p>",
         unsafe_allow_html=True,
     )
@@ -1308,26 +888,26 @@ with tab3:
 
     with left:
         st.markdown(
-            "<p style='font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:8px'>"
+            "<p style='font-size:0.80rem;font-weight:700;color:#111;margin-bottom:8px'>"
             "Top 10 routes by total profit</p>",
             unsafe_allow_html=True,
         )
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
         fig, ax = clean_fig((7, 5))
-        ax.barh(top.index, top.values, color=CHART_EXPAND, edgecolor="#050d1a", linewidth=2, height=0.55)
+        ax.barh(top.index, top.values, color=CHART_EXPAND, edgecolor="#F5F4F0", linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)")
         ax.set_title("Top 10 Routes")
         st.pyplot(fig)
 
     with right:
         st.markdown(
-            "<p style='font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:8px'>"
+            "<p style='font-size:0.80rem;font-weight:700;color:#111;margin-bottom:8px'>"
             "Bottom 10 routes by total profit</p>",
             unsafe_allow_html=True,
         )
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
         fig, ax = clean_fig((7, 5))
-        ax.barh(worst.index, worst.values, color=CHART_DROP, edgecolor="#050d1a", linewidth=2, height=0.55)
+        ax.barh(worst.index, worst.values, color=CHART_DROP, edgecolor="#F5F4F0", linewidth=2, height=0.55)
         ax.set_xlabel("Total Profit ($)")
         ax.set_title("Bottom 10 Routes")
         st.pyplot(fig)
@@ -1340,14 +920,14 @@ with tab4:
     left, right = st.columns(2)
     with left:
         st.markdown(
-            "<p style='font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:8px'>"
+            "<p style='font-size:0.80rem;font-weight:700;color:#111;margin-bottom:8px'>"
             "Routes with most decision changes</p>",
             unsafe_allow_html=True,
         )
         st.dataframe(route_switches.head(10), use_container_width=True, hide_index=True)
     with right:
         st.markdown(
-            "<p style='font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:8px'>"
+            "<p style='font-size:0.80rem;font-weight:700;color:#111;margin-bottom:8px'>"
             "Routes seen in the most decision states</p>",
             unsafe_allow_html=True,
         )
@@ -1355,7 +935,7 @@ with tab4:
 
     st.markdown('<div class="divider-label">Distribution</div>', unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:8px'>"
+        "<p style='font-size:0.80rem;font-weight:700;color:#111;margin-bottom:8px'>"
         "How many unique routes appear in each category?</p>",
         unsafe_allow_html=True,
     )
@@ -1378,7 +958,7 @@ with tab4:
     bars = ax.bar(
         urbd.index, urbd["Unique Routes"],
         color=bc, width=0.5,
-        edgecolor="#050d1a", linewidth=2,
+        edgecolor="#F5F4F0", linewidth=2,
     )
     for b in bars:
         h = b.get_height()
@@ -1386,7 +966,7 @@ with tab4:
             b.get_x() + b.get_width() / 2,
             h + 0.3,
             f"{int(h)}",
-            ha="center", fontsize=9, color=(1,1,1,0.65), fontweight="700",
+            ha="center", fontsize=9, color="#555555", fontweight="700",
         )
     ax.set_ylabel("Number of Unique Routes")
     ax.set_title("Unique Routes per Decision Category")
@@ -1397,7 +977,7 @@ with tab4:
     fig2.patch.set_alpha(0)
     ax2.axis("off")
     ax2.legend(handles=patches, loc="center", frameon=False, ncol=4,
-               prop={"size": 9}, labelcolor=(1,1,1,0.65))
+               prop={"size": 9}, labelcolor="#111111")
     st.pyplot(fig2)
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
@@ -1407,7 +987,7 @@ with tab5:
 
     # Model accuracy chart
     st.markdown(
-        "<p style='font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:8px'>"
+        "<p style='font-size:0.80rem;font-weight:700;color:#111;margin-bottom:8px'>"
         "How accurate are the models?</p>",
         unsafe_allow_html=True,
     )
@@ -1415,19 +995,19 @@ with tab5:
     x = np.arange(len(comparison))
     w = 0.30
     b1 = ax.bar(x - w / 2, comparison["Accuracy"], w, label="Accuracy",
-                color="#4fc3f7", edgecolor="#050d1a", linewidth=2)
+                color="#6E9FDC", edgecolor="#F5F4F0", linewidth=2)
     b2 = ax.bar(x + w / 2, comparison["Macro F1"], w, label="Macro F1",
-                color="#34d399", edgecolor="#050d1a", linewidth=2)
+                color="#B5CDA3", edgecolor="#F5F4F0", linewidth=2)
     for b in list(b1) + list(b2):
         h = b.get_height()
         ax.text(b.get_x() + b.get_width() / 2, h + 0.006, f"{h:.0%}",
-                ha="center", fontsize=7.5, color=(1,1,1,0.65), fontweight="700")
+                ha="center", fontsize=7.5, color="#555555", fontweight="700")
     ax.set_xticks(x)
     ax.set_xticklabels(comparison["Model"], fontsize=8.5)
     ax.set_ylim(0, 1.15)
     ax.set_ylabel("Score")
     ax.set_title("Model Accuracy & F1 Comparison")
-    ax.legend(frameon=False, fontsize=9, labelcolor=(1,1,1,0.65))
+    ax.legend(frameon=False, fontsize=9)
     plt.xticks(rotation=10)
     st.pyplot(fig)
 
@@ -1451,8 +1031,8 @@ with tab5:
 
         with col1:
             st.markdown(
-                "<p style='font-size:0.68rem;font-weight:700;color:rgba(99,179,237,0.70);"
-                "letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px'>Flight basics</p>",
+                "<p style='font-size:0.75rem;font-weight:700;color:#888;letter-spacing:0.08em;"
+                "text-transform:uppercase;margin-bottom:12px'>Flight basics</p>",
                 unsafe_allow_html=True,
             )
             aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
@@ -1462,8 +1042,8 @@ with tab5:
 
         with col2:
             st.markdown(
-                "<p style='font-size:0.68rem;font-weight:700;color:rgba(99,179,237,0.70);"
-                "letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px'>Route context</p>",
+                "<p style='font-size:0.75rem;font-weight:700;color:#888;letter-spacing:0.08em;"
+                "text-transform:uppercase;margin-bottom:12px'>Route context</p>",
                 unsafe_allow_html=True,
             )
             flight_hours   = st.number_input("Flight Hours",   min_value=0.5, max_value=20.0, value=6.0, step=0.1)
@@ -1474,8 +1054,8 @@ with tab5:
         if model_choice == "With Revenue Variables":
             with col3:
                 st.markdown(
-                    "<p style='font-size:0.68rem;font-weight:700;color:rgba(99,179,237,0.70);"
-                    "letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px'>Revenue</p>",
+                    "<p style='font-size:0.75rem;font-weight:700;color:#888;letter-spacing:0.08em;"
+                    "text-transform:uppercase;margin-bottom:12px'>Revenue</p>",
                     unsafe_allow_html=True,
                 )
                 ticket_revenue    = st.number_input("Ticket Revenue ($)",    min_value=0.0, value=120000.0, step=1000.0)
@@ -1484,8 +1064,8 @@ with tab5:
         elif model_choice == "Without Revenue Variables":
             with col3:
                 st.markdown(
-                    "<p style='font-size:0.68rem;font-weight:700;color:rgba(99,179,237,0.70);"
-                    "letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px'>Cost breakdown</p>",
+                    "<p style='font-size:0.75rem;font-weight:700;color:#888;letter-spacing:0.08em;"
+                    "text-transform:uppercase;margin-bottom:12px'>Cost breakdown</p>",
                     unsafe_allow_html=True,
                 )
                 fuel_cost               = st.number_input("Fuel Cost ($)",                 min_value=0.0, value=40000.0,  step=1000.0)
@@ -1503,7 +1083,7 @@ with tab5:
                 marketing_cost          = st.number_input("Marketing Cost ($)",            min_value=0.0, value=12000.0,  step=500.0)
                 it_systems_cost         = st.number_input("IT Systems Cost ($)",           min_value=0.0, value=3000.0,   step=250.0)
 
-        submitted = st.form_submit_button("⬡  Get Route Decision")
+        submitted = st.form_submit_button("Get Route Decision →")
 
     # ── PREDICTION LOGIC (unchanged) ─────────────────────────
     if submitted:
@@ -1588,19 +1168,18 @@ with tab5:
           <div style='margin-bottom:10px'>
             <span class='pill {pill_cls.get(pred, "")}' style='font-size:0.68rem'>{pred}</span>
           </div>
-          <div style='font-family:"Outfit",sans-serif;font-size:1.65rem;font-weight:800;
-                      color:{text_col.get(pred, "rgba(255,255,255,0.90)")};margin-bottom:10px;
-                      letter-spacing:-0.02em'>
+          <div style='font-family:"Poppins",sans-serif;font-size:1.65rem;font-weight:700;
+                      color:{text_col.get(pred, "#F5F7FA")};margin-bottom:10px;letter-spacing:-0.02em'>
             Suggested Decision: {pred}
           </div>
-          <p style='color:rgba(255,255,255,0.60);margin:0;font-size:0.90rem;line-height:1.70'>
+          <p style='color:#555;margin:0;font-size:0.90rem;line-height:1.70'>
             {explanations.get(pred, "")}
           </p>
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown(
-            "<p style='font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:8px'>"
+            "<p style='font-size:0.80rem;font-weight:700;color:#111;margin-bottom:8px'>"
             "Confidence by decision option</p>",
             unsafe_allow_html=True,
         )
@@ -1619,7 +1198,7 @@ with tab5:
         bars = ax.bar(
             prob_df["Decision"], prob_df["Probability"],
             color=[bar_cp.get(d, "#CCCCCC") for d in prob_df["Decision"]],
-            width=0.45, edgecolor="#050d1a", linewidth=2,
+            width=0.45, edgecolor="#F5F4F0", linewidth=2,
         )
         for b in bars:
             h = b.get_height()
@@ -1627,7 +1206,7 @@ with tab5:
                 b.get_x() + b.get_width() / 2,
                 h + 0.013,
                 f"{h:.0%}",
-                ha="center", fontsize=9, color=(1,1,1,0.65), fontweight="700",
+                ha="center", fontsize=9, color="#555555", fontweight="700",
             )
         ax.set_ylim(0, 1.18)
         ax.set_ylabel("Probability")
@@ -1650,9 +1229,23 @@ with st.expander("Show filtered data"):
 #  FOOTER
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
-<div style='text-align:center;color:rgba(255,255,255,0.20);font-size:0.70rem;
-            padding:40px 0 16px;font-family:"Outfit",sans-serif;
-            letter-spacing:0.10em'>
+<div style='text-align:center;color:#7E83A3;font-size:0.75rem;
+            padding:36px 0 16px;font-family:"Poppins",sans-serif;
+            letter-spacing:0.04em'>
   SKYLENS ROUTE INTELLIGENCE &nbsp;·&nbsp; Built with Streamlit
 </div>
 """, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────
+#  HOW TO TWEAK THE THEME
+# ─────────────────────────────────────────────────────────────
+# All visual tokens live at the top of this file under "THEME SYSTEM".
+# To switch to a dark mode: change COLOR_BG to #0E0E0E, COLOR_SURFACE to
+# #1A1A1A, COLOR_INK to #FFFFFF, COLOR_INK_SOFT to #CCCCCC, and update
+# --bg / --surface / --ink in the CSS :root block accordingly.
+#
+# To change the accent color (buttons, focus rings): update COLOR_ACCENT
+# and --accent in :root.
+#
+# Chart colors are controlled by CHART_EXPAND / CHART_MAINTAIN /
+# CHART_ORANGE / CHART_DROP and CHART_NEUTRAL at the top of the file.
