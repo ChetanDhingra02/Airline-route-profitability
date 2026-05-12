@@ -44,6 +44,24 @@ DECISION_COLORS = {
 
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
+ACCENT = "#38BDF8"
+ACCENT_2 = "#A78BFA"
+
+INK = "#F5F7FB"
+INK_SOFT = "#C9D2E3"
+INK_MUTED = "#7F8AA3"
+
+TEXT = "#F5F7FB"
+TEXT_SOFT = "#C9D2E3"
+TEXT_MUTED = "#7F8AA3"
+
+CYAN = "#38BDF8"
+
+CHART_EXPAND   = "#22C55E"
+CHART_MAINTAIN = "#FACC15"
+CHART_OPTIMIZE = "#FB923C"
+CHART_DROP     = "#FB7185"
+
 # ============================================
 # NEW COSMOS GLASS UI
 # ============================================
