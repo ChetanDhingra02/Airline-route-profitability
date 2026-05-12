@@ -1802,9 +1802,6 @@ with tab5:
     st.markdown('<p class="section-hd">Simulate a route scenario</p>', unsafe_allow_html=True)
     st.markdown('<p class="section-sub">Enter route characteristics and our model will suggest the best decision.</p>', unsafe_allow_html=True)
 
-    # Show results near the top of the Prediction Tool page, not below the full form.
-    # This prevents the app from feeling like it jumps to the bottom after clicking Predict.
-    render_prediction_result()
 
     st.markdown(
         f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
