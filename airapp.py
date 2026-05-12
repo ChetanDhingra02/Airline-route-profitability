@@ -45,91 +45,92 @@ INK_MUTED = TEXT_MUTED
 
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root {{
-  --bg:#080B12; --panel:#121722; --panel2:#171E2B; --ink:#F5F7FB; --soft:#C9D2E3; --muted:#7F8AA3;
-  --cyan:#38BDF8; --blue:#2563EB; --green:#22C55E; --amber:#F59E0B; --red:#F43F5E; --violet:#A78BFA;
-  --radius:30px; --border:rgba(255,255,255,.14);
+  --bg:#050505; --panel:rgba(18,18,22,.78); --panel2:rgba(24,24,30,.72);
+  --ink:#F7F7F8; --soft:#B9BBC6; --muted:#737684;
+  --blue:#5E6AD2; --violet:#8B5CF6; --green:#34D399; --yellow:#FBBF24; --orange:#FB923C; --red:#FB7185;
+  --border:rgba(255,255,255,.10); --border2:rgba(255,255,255,.16);
 }}
-html, body, [class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; color:var(--ink)!important; -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }}
+html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; color:var(--ink)!important; -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }}
 .stApp {{
-  min-height:100vh; overflow-x:hidden; position:relative;
+  min-height:100vh!important; overflow-x:hidden!important; position:relative!important;
   background:
-    radial-gradient(circle at 14% 18%, rgba(56,189,248,.16), transparent 28%),
-    radial-gradient(circle at 80% 8%, rgba(167,139,250,.14), transparent 24%),
-    radial-gradient(circle at 72% 84%, rgba(34,197,94,.08), transparent 28%),
-    linear-gradient(180deg,#080B12 0%,#0A1020 52%,#06080E 100%)!important;
+    radial-gradient(circle at 50% -10%, rgba(94,106,210,.18), transparent 32%),
+    radial-gradient(circle at 82% 20%, rgba(139,92,246,.10), transparent 28%),
+    radial-gradient(circle at 22% 76%, rgba(56,189,248,.055), transparent 26%),
+    linear-gradient(180deg,#050505 0%,#08080A 54%,#050505 100%)!important;
 }}
 .stApp:before {{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.38;
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.14;
   background-image:
-    linear-gradient(rgba(56,189,248,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56,189,248,.06) 1px, transparent 1px);
-  background-size:54px 54px;
-  transform:perspective(900px) rotateX(62deg) translateY(260px) scale(1.7);
-  transform-origin:center bottom;
-  mask-image:linear-gradient(to bottom,transparent 0%,black 35%,transparent 100%);
+    radial-gradient(circle, rgba(255,255,255,.55) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(160,170,255,.38) 0 1px, transparent 1.3px);
+  background-size:180px 180px,260px 260px; background-position:20px 30px,120px 90px;
 }}
 .stApp:after {{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.25;
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.045;
   background:
-    radial-gradient(circle, rgba(255,255,255,.55) 0 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(56,189,248,.35) 0 1px, transparent 1.6px);
-  background-size:180px 180px, 280px 280px; background-position:0 0, 70px 90px;
-  animation:skyDrift 60s linear infinite;
+    linear-gradient(115deg, transparent 0 22%, rgba(255,255,255,.8) 22.1%, transparent 22.28%),
+    linear-gradient(35deg, transparent 0 54%, rgba(255,255,255,.8) 54.1%, transparent 54.24%),
+    linear-gradient(150deg, transparent 0 72%, rgba(255,255,255,.8) 72.1%, transparent 72.24%);
 }}
-@keyframes skyDrift {{ to {{ background-position:260px 160px,-160px 260px; }} }}
-.command-bg {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
-.route-arc {{ position:absolute; width:520px; height:220px; border:1px solid rgba(56,189,248,.16); border-bottom:none; border-radius:520px 520px 0 0; transform:rotate(-12deg); animation:arcFloat 16s ease-in-out infinite; }}
-.route-arc.a1 {{ left:8%; top:18%; }} .route-arc.a2 {{ right:4%; top:42%; transform:rotate(16deg); animation-delay:3s; }}
-.radar {{ position:absolute; right:8%; top:12%; width:220px; height:220px; border-radius:50%; border:1px solid rgba(56,189,248,.18); background:radial-gradient(circle,rgba(56,189,248,.10),transparent 60%); opacity:.38; }}
-.radar:before {{ content:""; position:absolute; inset:50% 50% 0 50%; width:50%; height:1px; background:linear-gradient(90deg,rgba(56,189,248,.8),transparent); transform-origin:left center; animation:radarSweep 5s linear infinite; }}
-.plane-trace {{ position:absolute; left:-80px; top:34%; font-size:30px; opacity:.25; filter:drop-shadow(0 0 16px rgba(56,189,248,.6)); animation:planeCruise 24s linear infinite; }}
-@keyframes planeCruise {{ to {{ transform:translateX(calc(100vw + 180px)) translateY(-80px); }} }}
-@keyframes radarSweep {{ to {{ transform:rotate(360deg); }} }}
-@keyframes arcFloat {{ 50% {{ transform:translateY(-14px) rotate(-8deg); opacity:.55; }} }}
-.main .block-container {{ max-width:1360px!important; padding-top:1.5rem!important; padding-bottom:4rem!important; position:relative; z-index:3; }}
-[data-testid="stSidebar"] {{ background:rgba(9,13,23,.78)!important; border-right:1px solid rgba(255,255,255,.12)!important; backdrop-filter:blur(28px) saturate(1.4)!important; box-shadow:16px 0 60px rgba(0,0,0,.35)!important; }}
+.linear-bg {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
+.constellation {{ position:absolute; width:420px; height:220px; opacity:.16; }}
+.constellation.one {{ left:9%; top:13%; }} .constellation.two {{ right:8%; top:32%; transform:scale(.85) rotate(14deg); opacity:.10; }}
+.constellation:before {{ content:""; position:absolute; inset:0; background:linear-gradient(25deg,transparent 0 35%,rgba(255,255,255,.45) 35.1%,transparent 35.5%),linear-gradient(145deg,transparent 0 58%,rgba(255,255,255,.35) 58.1%,transparent 58.5%); }}
+.orb {{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.22; }} .orb.one {{ width:460px;height:460px;left:42%;top:-190px;background:#5E6AD2; }} .orb.two {{ width:320px;height:320px;right:-120px;bottom:10%;background:#8B5CF6;opacity:.12; }}
+.main .block-container {{ max-width:1240px!important; padding-top:2rem!important; padding-bottom:4rem!important; position:relative!important; z-index:3!important; }}
+[data-testid="stSidebar"] {{ background:rgba(8,8,10,.72)!important; border-right:1px solid var(--border)!important; backdrop-filter:blur(24px) saturate(140%)!important; box-shadow:16px 0 60px rgba(0,0,0,.32)!important; }}
 [data-testid="stSidebar"] * {{ color:var(--soft)!important; }}
-.sidebar-brand {{ font-family:'Space Grotesk',sans-serif; font-size:1.25rem; font-weight:800; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:-.03em; }}
-.sidebar-brand span {{ background:linear-gradient(135deg,var(--cyan),var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }}
-.hero {{ position:relative; overflow:hidden; border-radius:38px; padding:34px 38px; margin-bottom:26px; isolation:isolate; background:linear-gradient(#111722,#0E1420) padding-box, linear-gradient(137deg,#38BDF8 0%,#A78BFA 45%,#22C55E 100%) border-box; border:1px solid transparent; box-shadow:0 28px 80px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.08); }}
-.hero:before {{ content:""; position:absolute; inset:4px; border-radius:38px; background:linear-gradient(137deg,#38BDF8,#A78BFA,#22C55E); filter:blur(45px); opacity:.22; z-index:-2; }}
-.hero h1 {{ font-family:'Space Grotesk',sans-serif!important; font-size:clamp(2.1rem,4vw,4.2rem)!important; letter-spacing:-.06em!important; line-height:.95!important; margin:0!important; color:white!important; text-transform:none!important; }}
-.hero p {{ color:var(--soft)!important; max-width:720px; font-size:1rem!important; line-height:1.6!important; margin:.8rem 0 0!important; }}
-.hero-eyebrow {{ color:var(--cyan); font-size:.72rem; font-weight:800; letter-spacing:.22em; text-transform:uppercase; margin-bottom:12px; }}
-.hero-badge {{ display:inline-flex; margin-top:22px; padding:10px 16px; border:1px solid rgba(56,189,248,.3); border-radius:999px; color:#DFF7FF; background:rgba(56,189,248,.10); font-size:.74rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }}
-.feature-grid {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:8px 0 26px; }}
-.feature-card {{ position:relative; border-radius:36px; isolation:isolate; transition:transform .3s ease; }} .feature-card:hover {{ transform:translateY(-8px); }}
-.feature-card:before {{ content:""; position:absolute; inset:6px; border-radius:36px; background:var(--card-gradient); filter:blur(42px); opacity:.30; z-index:-1; }}
-.feature-inner {{ min-height:190px; border-radius:36px; border:6px solid transparent; background:linear-gradient(#151B27,#101620) padding-box, var(--card-gradient) border-box; padding:24px; box-shadow:0 22px 62px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08); }}
-.feature-icon {{ font-size:30px; margin-bottom:36px; }} .feature-inner h3 {{ font-family:'Space Grotesk',sans-serif!important; color:white!important; font-size:1.18rem!important; margin:0 0 8px!important; text-transform:none!important; letter-spacing:-.03em!important; }} .feature-inner p {{ color:rgba(201,210,227,.78)!important; font-size:.88rem!important; line-height:1.6!important; margin:0!important; }}
-[data-testid="metric-container"], [data-testid="stForm"], [data-testid="stDataFrame"], [data-testid="stExpander"], .info-box, .result-card {{ background:rgba(17,23,34,.78)!important; border:1px solid rgba(255,255,255,.13)!important; border-radius:28px!important; backdrop-filter:blur(24px) saturate(1.35)!important; box-shadow:0 22px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.08)!important; }}
-[data-testid="metric-container"] {{ padding:24px!important; transition:transform .25s ease, border-color .25s ease!important; }} [data-testid="metric-container"]:hover {{ transform:translateY(-6px)!important; border-color:rgba(56,189,248,.38)!important; }}
-[data-testid="stMetricLabel"] p {{ color:var(--muted)!important; font-size:.68rem!important; letter-spacing:.14em!important; text-transform:uppercase!important; font-weight:800!important; }}
-[data-testid="stMetricValue"], [data-testid="stMetricValue"]>div {{ color:white!important; font-size:2.1rem!important; font-weight:800!important; letter-spacing:-.05em!important; font-family:'Space Grotesk',sans-serif!important; }}
-.stTabs [data-baseweb="tab-list"] {{ gap:6px; padding:6px; border-radius:24px; background:rgba(17,23,34,.72); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(20px); }}
-.stTabs [data-baseweb="tab"] {{ border-radius:18px!important; color:var(--muted)!important; font-weight:800!important; padding:10px 18px!important; }}
-.stTabs [aria-selected="true"] {{ background:linear-gradient(135deg,rgba(56,189,248,.20),rgba(167,139,250,.16))!important; color:white!important; border:1px solid rgba(56,189,248,.25)!important; }} .stTabs [data-baseweb="tab-highlight"] {{ display:none!important; }}
-.section-hd {{ font-family:'Space Grotesk',sans-serif!important; font-size:1.15rem!important; color:white!important; font-weight:800!important; letter-spacing:-.03em!important; margin:0 0 6px!important; }}
+.sidebar-brand {{ font-size:1.18rem; font-weight:800; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid var(--border); letter-spacing:-.04em; color:white!important; }}
+.sidebar-brand span {{ color:#A8B1FF!important; -webkit-text-fill-color:unset!important; background:none!important; }}
+.hero,.feature-inner,[data-testid="metric-container"],[data-testid="stForm"],[data-testid="stDataFrame"],[data-testid="stExpander"],.info-box,.result-card,.plotly-card {{
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025)),rgba(18,18,22,.82)!important;
+  border:1px solid var(--border)!important; border-radius:24px!important;
+  box-shadow:0 24px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06)!important;
+  backdrop-filter:blur(20px) saturate(140%)!important; -webkit-backdrop-filter:blur(20px) saturate(140%)!important;
+}}
+.hero {{ padding:44px 46px!important; margin-bottom:22px!important; overflow:hidden; position:relative; }}
+.hero:before {{ content:""; position:absolute; width:420px; height:420px; right:-180px; top:-210px; background:radial-gradient(circle,rgba(94,106,210,.20),transparent 68%); pointer-events:none; }}
+.hero h1 {{ font-family:'Inter',system-ui,sans-serif!important; font-size:clamp(2.25rem,5vw,4.8rem)!important; line-height:.95!important; letter-spacing:-.085em!important; color:white!important; margin:0!important; text-transform:none!important; }}
+.hero p {{ color:var(--soft)!important; max-width:680px; font-size:1rem!important; line-height:1.65!important; margin:.9rem 0 0!important; }}
+.hero-eyebrow {{ color:#A8B1FF; font-size:.72rem; font-weight:800; letter-spacing:.18em; text-transform:uppercase; margin-bottom:14px; }}
+.hero-badge {{ display:inline-flex; margin-top:22px; padding:9px 14px; border:1px solid rgba(255,255,255,.12); border-radius:999px; color:#E9EAFF; background:rgba(94,106,210,.12); font-size:.72rem; font-weight:700; letter-spacing:.04em; }}
+.hero-glyph,.hero-star {{ display:none!important; }}
+.feature-grid {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:8px 0 26px; }}
+.feature-card {{ position:relative; transition:transform .25s ease; }} .feature-card:hover {{ transform:translateY(-3px); }}
+.feature-card:before {{ content:""; position:absolute; inset:18px; background:var(--card-gradient); filter:blur(42px); opacity:.12; z-index:-1; }}
+.feature-inner {{ min-height:170px!important; padding:22px!important; border-radius:24px!important; border:1px solid var(--border)!important; }}
+.feature-icon {{ font-size:24px; margin-bottom:28px; opacity:.9; }}
+.feature-inner h3 {{ font-family:'Inter',system-ui,sans-serif!important; color:white!important; font-size:1.05rem!important; margin:0 0 8px!important; text-transform:none!important; letter-spacing:-.04em!important; }}
+.feature-inner p {{ color:rgba(185,187,198,.78)!important; font-size:.86rem!important; line-height:1.58!important; margin:0!important; }}
+[data-testid="metric-container"] {{ padding:22px!important; transition:transform .22s ease,border-color .22s ease!important; }}
+[data-testid="metric-container"]:hover,.plotly-card:hover,.feature-card:hover {{ border-color:var(--border2)!important; box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 38px rgba(94,106,210,.10),inset 0 1px 0 rgba(255,255,255,.08)!important; }}
+[data-testid="metric-container"]:hover {{ transform:translateY(-3px)!important; }}
+[data-testid="stMetricLabel"] p {{ color:var(--muted)!important; font-size:.66rem!important; letter-spacing:.12em!important; text-transform:uppercase!important; font-weight:700!important; }}
+[data-testid="stMetricValue"],[data-testid="stMetricValue"]>div {{ color:white!important; font-size:2rem!important; font-weight:800!important; letter-spacing:-.06em!important; }}
+.stTabs [data-baseweb="tab-list"] {{ gap:4px; padding:5px; border-radius:18px; background:rgba(18,18,22,.70); border:1px solid var(--border); backdrop-filter:blur(20px); }}
+.stTabs [data-baseweb="tab"] {{ border-radius:13px!important; color:var(--muted)!important; font-weight:700!important; padding:9px 14px!important; }}
+.stTabs [aria-selected="true"] {{ background:rgba(255,255,255,.07)!important; color:white!important; border:1px solid rgba(255,255,255,.09)!important; }} .stTabs [data-baseweb="tab-highlight"] {{ display:none!important; }}
+.section-hd {{ font-family:'Inter',system-ui,sans-serif!important; font-size:1.05rem!important; color:white!important; font-weight:750!important; letter-spacing:-.04em!important; margin:0 0 6px!important; }}
 .section-sub {{ color:var(--muted)!important; margin:0 0 18px!important; line-height:1.65!important; }}
-.divider-label {{ display:flex; gap:14px; align-items:center; margin:28px 0 18px; color:var(--cyan); font-size:.68rem; font-weight:900; letter-spacing:.18em; text-transform:uppercase; }} .divider-label:before,.divider-label:after {{ content:""; height:1px; flex:1; background:linear-gradient(90deg,transparent,rgba(56,189,248,.28),transparent); }}
-.info-box {{ padding:20px 24px!important; color:var(--soft)!important; line-height:1.7; }} .info-box strong {{ color:white!important; }}
-.pill {{ display:inline-block; padding:5px 11px; border-radius:999px; font-size:.64rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; border:1px solid transparent; }}
-.pill-expand{{background:rgba(34,197,94,.12);color:#86EFAC;border-color:rgba(34,197,94,.32)}} .pill-maintain{{background:rgba(250,204,21,.12);color:#FDE68A;border-color:rgba(250,204,21,.32)}} .pill-optimize{{background:rgba(251,146,60,.12);color:#FDBA74;border-color:rgba(251,146,60,.32)}} .pill-drop{{background:rgba(251,113,133,.12);color:#FDA4AF;border-color:rgba(251,113,133,.32)}}
-.result-card {{ padding:28px 30px!important; margin:24px 0!important; }} .result-expand{{border-left:4px solid #22C55E!important}}.result-maintain{{border-left:4px solid #FACC15!important}}.result-optimize{{border-left:4px solid #FB923C!important}}.result-drop{{border-left:4px solid #FB7185!important}}
-.stSelectbox label,.stNumberInput label,.stSlider label,.stRadio label,.stCheckbox label,.stTextInput label {{ color:var(--soft)!important; font-weight:800!important; font-size:.72rem!important; letter-spacing:.08em!important; text-transform:uppercase!important; }}
-.stSelectbox [data-baseweb="select"]>div,.stTextInput input,.stNumberInput input {{ background:rgba(8,11,18,.72)!important; border:1px solid rgba(255,255,255,.13)!important; border-radius:16px!important; color:white!important; min-height:42px!important; }}
-[data-testid="stForm"] {{ padding:26px 28px 30px!important; }} [data-testid="stFormSubmitButton"]>button,.stButton>button {{ border-radius:999px!important; font-weight:900!important; border:1px solid rgba(255,255,255,.14)!important; background:linear-gradient(135deg,#38BDF8,#2563EB)!important; color:white!important; box-shadow:0 12px 34px rgba(37,99,235,.28)!important; transition:transform .22s ease!important; }} [data-testid="stFormSubmitButton"]>button:hover,.stButton>button:hover {{ transform:translateY(-3px)!important; }}
+.divider-label {{ display:flex; gap:14px; align-items:center; margin:28px 0 18px; color:#A8B1FF; font-size:.66rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }} .divider-label:before,.divider-label:after {{ content:""; height:1px; flex:1; background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent); }}
+.info-box {{ padding:18px 20px!important; color:var(--soft)!important; line-height:1.7; }} .info-box strong {{ color:white!important; }}
+.pill {{ display:inline-block; padding:5px 10px; border-radius:999px; font-size:.62rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border:1px solid transparent; }}
+.pill-expand{{background:rgba(52,211,153,.10);color:#A7F3D0;border-color:rgba(52,211,153,.25)}} .pill-maintain{{background:rgba(251,191,36,.10);color:#FDE68A;border-color:rgba(251,191,36,.24)}} .pill-optimize{{background:rgba(251,146,60,.10);color:#FDBA74;border-color:rgba(251,146,60,.24)}} .pill-drop{{background:rgba(251,113,133,.10);color:#FDA4AF;border-color:rgba(251,113,133,.24)}}
+.result-card {{ padding:26px 28px!important; margin:24px 0!important; }} .result-expand{{border-left:3px solid #34D399!important}}.result-maintain{{border-left:3px solid #FBBF24!important}}.result-optimize{{border-left:3px solid #FB923C!important}}.result-drop{{border-left:3px solid #FB7185!important}}
+.stSelectbox label,.stNumberInput label,.stSlider label,.stRadio label,.stCheckbox label,.stTextInput label {{ color:var(--soft)!important; font-weight:700!important; font-size:.70rem!important; letter-spacing:.07em!important; text-transform:uppercase!important; }}
+.stSelectbox [data-baseweb="select"]>div,.stTextInput input,.stNumberInput input {{ background:rgba(5,5,5,.55)!important; border:1px solid var(--border)!important; border-radius:12px!important; color:white!important; min-height:40px!important; }}
+[data-testid="stForm"] {{ padding:24px 26px 28px!important; }} [data-testid="stFormSubmitButton"]>button,.stButton>button {{ border-radius:999px!important; font-weight:800!important; border:1px solid rgba(255,255,255,.14)!important; background:#5E6AD2!important; color:white!important; box-shadow:0 12px 34px rgba(94,106,210,.22)!important; transition:transform .2s ease!important; }} [data-testid="stFormSubmitButton"]>button:hover,.stButton>button:hover {{ transform:translateY(-2px)!important; background:#6F7BE8!important; }}
 [data-testid="stDataFrame"] div,[data-testid="stDataFrame"] span {{ color:var(--soft)!important; }}
-.plotly-card {{ border-radius:30px; padding:18px 18px 8px; background:rgba(17,23,34,.78); border:1px solid rgba(255,255,255,.13); box-shadow:0 22px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter:blur(24px); margin-bottom:18px; }}
-.plotly-card-title {{ font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:800; color:white; letter-spacing:-.03em; margin:4px 6px 10px; }}
-hr {{ border:none!important; border-top:1px solid rgba(255,255,255,.10)!important; }} ::selection {{ background:rgba(56,189,248,.25); }}
+.plotly-card {{ border-radius:24px; padding:16px 16px 6px; margin-bottom:18px; }}
+.plotly-card-title {{ font-size:1.02rem; font-weight:750; color:white; letter-spacing:-.04em; margin:4px 6px 10px; }}
+hr {{ border:none!important; border-top:1px solid rgba(255,255,255,.10)!important; }} ::selection {{ background:rgba(94,106,210,.28); }}
 @media(max-width:900px) {{ .feature-grid {{ grid-template-columns:1fr; }} }}
 </style>
-<div class="command-bg"><div class="route-arc a1"></div><div class="route-arc a2"></div><div class="radar"></div><div class="plane-trace">✈</div></div>
+<div class="linear-bg"><div class="orb one"></div><div class="orb two"></div><div class="constellation one"></div><div class="constellation two"></div></div>
 """, unsafe_allow_html=True)
-
 
 # ─────────────────────────────────────────────────────────────
 #  FINAL CLEAN PLOTLY HELPERS — single source of truth
@@ -140,9 +141,6 @@ def _fmt_money(v):
     if abs(v) >= 1_000:
         return f"${v/1_000:.0f}K"
     return f"${v:.0f}"
-
-def col_seq(labels):
-    return [DECISION_COLORS.get(str(label), CYAN) for label in labels]
 
 
 def _format_value(v, value_format="number", fmt_fn=None):
@@ -928,12 +926,12 @@ with tab5:
 st.markdown(f"""
 <div style='text-align:center;padding:40px 0 18px'>
   <div style='display:inline-flex;align-items:center;gap:12px;
-              background:rgba(255,252,248,0.85);
-              border:1px solid rgba(124,58,237,0.22);
+              background:rgba(18,18,22,0.82);
+              border:1px solid rgba(255,255,255,0.10);
               border-radius:999px;
               padding:0.55rem 1.4rem;
               backdrop-filter:blur(14px);
-              box-shadow:0 4px 18px rgba(124,58,237,0.10);
+              box-shadow:0 20px 60px rgba(0,0,0,0.35);
               font-family:"DM Sans",sans-serif;
               font-size:0.67rem;
               font-weight:600;
