@@ -915,12 +915,12 @@ with tab1:
             colors=[wc[l] for l in dc.index],
             startangle=90,
             wedgeprops={"linewidth": 3, "edgecolor": "#050d1a"},
-            textprops={"color": "rgba(255,255,255,0.75)", "fontsize": 9.5},
+            textprops={"color": (1,1,1,0.75), "fontsize": 9.5},
             pctdistance=0.78,
         )
         for at in autotexts:
             at.set_fontsize(8.5)
-            at.set_color("rgba(255,255,255,0.90)")
+            at.set_color((1,1,1,0.90))
             at.set_fontweight("bold")
         ax.set_title("Share of Flights by Decision", pad=14)
         st.pyplot(fig)
@@ -978,7 +978,7 @@ with tab2:
                 h + abs(apd.values).max() * 0.025,
                 f"${h:,.0f}",
                 ha="center", va="bottom",
-                fontsize=8, color="rgba(255,255,255,0.65)", fontweight="700",
+                fontsize=8, color=(1,1,1,0.65), fontweight="700",
             )
         ax.set_ylabel("Average Profit ($)")
         ax.set_title("Average Profit by Decision")
@@ -1005,7 +1005,7 @@ with tab2:
                 h + 0.006,
                 f"{h:.0%}",
                 ha="center", va="bottom",
-                fontsize=8, color="rgba(255,255,255,0.65)", fontweight="700",
+                fontsize=8, color=(1,1,1,0.65), fontweight="700",
             )
         ax.set_ylabel("Average Seat Occupancy")
         ax.set_title("Seat Occupancy by Decision")
@@ -1055,7 +1055,7 @@ with tab2:
             w + mx * 0.012,
             b.get_y() + b.get_height() / 2,
             f"${w:,.0f}",
-            va="center", fontsize=8, color="rgba(255,255,255,0.65)", fontweight="700",
+            va="center", fontsize=8, color=(1,1,1,0.65), fontweight="700",
         )
     ax.set_xlabel("Average Cost per Flight ($)")
     ax.set_title("Top Cost Drivers")
@@ -1167,7 +1167,7 @@ with tab4:
             b.get_x() + b.get_width() / 2,
             h + 0.3,
             f"{int(h)}",
-            ha="center", fontsize=9, color="rgba(255,255,255,0.65)", fontweight="700",
+            ha="center", fontsize=9, color=(1,1,1,0.65), fontweight="700",
         )
     ax.set_ylabel("Number of Unique Routes")
     ax.set_title("Unique Routes per Decision Category")
@@ -1178,7 +1178,7 @@ with tab4:
     fig2.patch.set_alpha(0)
     ax2.axis("off")
     ax2.legend(handles=patches, loc="center", frameon=False, ncol=4,
-               prop={"size": 9}, labelcolor="rgba(255,255,255,0.65)")
+               prop={"size": 9}, labelcolor=(1,1,1,0.65))
     st.pyplot(fig2)
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
@@ -1202,13 +1202,13 @@ with tab5:
     for b in list(b1) + list(b2):
         h = b.get_height()
         ax.text(b.get_x() + b.get_width() / 2, h + 0.006, f"{h:.0%}",
-                ha="center", fontsize=7.5, color="rgba(255,255,255,0.65)", fontweight="700")
+                ha="center", fontsize=7.5, color=(1,1,1,0.65), fontweight="700")
     ax.set_xticks(x)
     ax.set_xticklabels(comparison["Model"], fontsize=8.5)
     ax.set_ylim(0, 1.15)
     ax.set_ylabel("Score")
     ax.set_title("Model Accuracy & F1 Comparison")
-    ax.legend(frameon=False, fontsize=9, labelcolor="rgba(255,255,255,0.65)")
+    ax.legend(frameon=False, fontsize=9, labelcolor=(1,1,1,0.65))
     plt.xticks(rotation=10)
     st.pyplot(fig)
 
@@ -1408,7 +1408,7 @@ with tab5:
                 b.get_x() + b.get_width() / 2,
                 h + 0.013,
                 f"{h:.0%}",
-                ha="center", fontsize=9, color="rgba(255,255,255,0.65)", fontweight="700",
+                ha="center", fontsize=9, color=(1,1,1,0.65), fontweight="700",
             )
         ax.set_ylim(0, 1.18)
         ax.set_ylabel("Probability")
