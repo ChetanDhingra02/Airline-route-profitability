@@ -1169,6 +1169,195 @@ div[data-testid="stVerticalBlock"] > div:has(iframe):hover{
   -webkit-backdrop-filter:blur(30px) saturate(180%) !important;
 }
 
+
+/* ========================================================================
+   V5 PROFESSIONAL LIQUID-GLASS FIXES — CSS/HTML ONLY
+   Removes hero clutter, softens outlines, upgrades tables/sidebar/tabs.
+   ======================================================================== */
+
+:root{
+  --v5-bg:#03050c;
+  --v5-glass:rgba(255,255,255,.058);
+  --v5-glass-hi:rgba(255,255,255,.112);
+  --v5-line:rgba(255,255,255,.085);
+  --v5-line-hi:rgba(255,255,255,.20);
+  --v5-cyan:rgba(111,232,255,.20);
+  --v5-violet:rgba(154,108,255,.24);
+  --v5-shadow:0 34px 90px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.20), inset 0 -1px 0 rgba(255,255,255,.055);
+}
+
+/* deeper, quieter atmosphere so glass floats above it */
+.stApp{
+  background:
+    radial-gradient(ellipse 760px 420px at 18% -8%, rgba(113,87,255,.16), transparent 68%),
+    radial-gradient(ellipse 620px 380px at 88% 12%, rgba(75,219,255,.075), transparent 68%),
+    radial-gradient(ellipse 900px 520px at 48% 118%, rgba(255,92,184,.055), transparent 72%),
+    linear-gradient(180deg,#02040a 0%,#060815 45%,#02040a 100%) !important;
+}
+.stApp:before{
+  opacity:.105 !important;
+  filter:blur(1.25px) !important;
+  background-size:86px 86px,86px 86px,100% 100%,100% 100% !important;
+}
+.stApp:after{opacity:.10 !important; filter:blur(.6px) !important;}
+
+/* name-only hero */
+.motion-hero.liquid-hero.hero-name-only{
+  min-height:0 !important;
+  padding:18px 24px !important;
+  margin:0 0 18px !important;
+  border-radius:22px !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.026) 52%, rgba(255,255,255,.060)),
+    radial-gradient(circle at 18% 0%, rgba(111,232,255,.12), transparent 38%),
+    radial-gradient(circle at 86% 22%, rgba(154,108,255,.14), transparent 42%) !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-top-color:rgba(255,255,255,.24) !important;
+  box-shadow:0 18px 56px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.18) !important;
+  backdrop-filter:blur(28px) saturate(175%) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(175%) !important;
+  animation:heroEnter .55s var(--motion-ease) both !important;
+}
+.motion-hero.liquid-hero.hero-name-only:after{display:none !important;}
+.motion-hero.liquid-hero.hero-name-only h1{
+  margin:0 !important;
+  font-size:clamp(1.65rem,3.2vw,3.15rem) !important;
+  line-height:1 !important;
+  letter-spacing:-.055em !important;
+}
+.motion-kicker,.motion-hero p,.motion-hero-actions,.motion-chip{display:none !important;}
+
+/* soften all old outlines and create floating polished surfaces */
+[data-testid="metric-container"],
+[data-testid="stExpander"],
+[data-testid="stDataFrame"],
+[data-testid="stTable"],
+.info-box,
+.result-card,
+div[data-testid="stForm"],
+div[data-testid="stVerticalBlock"] > div:has(iframe){
+  background:
+    linear-gradient(145deg, var(--v5-glass-hi), rgba(255,255,255,.028) 48%, var(--v5-glass)),
+    radial-gradient(circle at 18% 0%, var(--v5-cyan), transparent 34%),
+    radial-gradient(circle at 90% 8%, var(--v5-violet), transparent 38%) !important;
+  border:1px solid var(--v5-line) !important;
+  border-top-color:var(--v5-line-hi) !important;
+  box-shadow:var(--v5-shadow) !important;
+  backdrop-filter:blur(36px) saturate(190%) contrast(108%) !important;
+  -webkit-backdrop-filter:blur(36px) saturate(190%) contrast(108%) !important;
+}
+[data-testid="metric-container"]:hover,
+[data-testid="stExpander"]:hover,
+.info-box:hover,
+.result-card:hover,
+div[data-testid="stVerticalBlock"] > div:has(iframe):hover{
+  transform:translateY(-6px) rotateX(1.2deg) rotateY(-.45deg) translateZ(18px) !important;
+  border-color:rgba(255,255,255,.18) !important;
+  box-shadow:0 42px 105px rgba(0,0,0,.54), 0 0 62px rgba(111,232,255,.095), inset 0 1px 0 rgba(255,255,255,.24) !important;
+}
+
+/* Streamlit tables/dataframes: reduce default admin-dashboard feel */
+[data-testid="stDataFrame"],
+[data-testid="stTable"]{
+  border-radius:22px !important;
+  overflow:hidden !important;
+  background:rgba(5,7,14,.46) !important;
+  border-color:rgba(255,255,255,.075) !important;
+}
+[data-testid="stDataFrame"] * ,
+[data-testid="stTable"] *{
+  border-color:rgba(255,255,255,.055) !important;
+}
+[data-testid="stDataFrame"] [role="grid"],
+[data-testid="stDataFrame"] canvas,
+[data-testid="stTable"] table{
+  background:transparent !important;
+}
+[data-testid="stDataFrame"] [role="columnheader"],
+[data-testid="stDataFrame"] [role="gridcell"],
+[data-testid="stTable"] th,
+[data-testid="stTable"] td{
+  background:rgba(255,255,255,.018) !important;
+  border-color:rgba(255,255,255,.045) !important;
+}
+[data-testid="stDataFrame"]:hover,
+[data-testid="stTable"]:hover{
+  transform:none !important;
+  box-shadow:0 30px 76px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+
+/* charts: add motion feeling to embedded SVG without changing chart code */
+iframe{
+  border-radius:22px !important;
+  background:transparent !important;
+}
+div[data-testid="stVerticalBlock"] > div:has(iframe){
+  padding:10px !important;
+}
+svg path, svg rect{
+  animation:chartSettle .9s cubic-bezier(.16,1,.3,1) both;
+}
+svg circle{
+  animation:pulsePoint 2.8s ease-in-out infinite;
+}
+@keyframes chartSettle{
+  from{opacity:.25; transform:scaleX(.92);}
+  to{opacity:1; transform:scaleX(1);}
+}
+@keyframes pulsePoint{
+  0%,100%{filter:none; opacity:.86;}
+  50%{filter:drop-shadow(0 0 12px rgba(111,232,255,.34)); opacity:1;}
+}
+
+/* lighter floating tabs */
+.stTabs [data-baseweb="tab-list"]{
+  padding:7px !important;
+  gap:8px !important;
+  border-radius:24px !important;
+  background:rgba(5,7,16,.46) !important;
+  border:1px solid rgba(255,255,255,.095) !important;
+  box-shadow:0 24px 70px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+.stTabs [data-baseweb="tab"]{
+  min-height:40px !important;
+  padding:8px 18px !important;
+  border-radius:18px !important;
+}
+.stTabs [aria-selected="true"]{
+  background:linear-gradient(135deg, rgba(154,108,255,.32), rgba(111,232,255,.12)) !important;
+  box-shadow:0 12px 34px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+/* sidebar command panel + smaller, softer controls */
+[data-testid="stSidebar"]{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(154,108,255,.18), transparent 34%),
+    linear-gradient(180deg, rgba(5,7,16,.84), rgba(4,5,11,.76)) !important;
+  border-right:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:20px 0 80px rgba(0,0,0,.44), inset -1px 0 0 rgba(255,255,255,.045) !important;
+}
+[data-testid="stSidebar"] label{
+  letter-spacing:.12em !important;
+  font-size:.72rem !important;
+  color:rgba(235,230,255,.66) !important;
+}
+div[data-baseweb="select"] > div,
+div[data-baseweb="input"] > div,
+div[data-baseweb="textarea"] > div{
+  border-radius:14px !important;
+  background:rgba(255,255,255,.045) !important;
+  border-color:rgba(255,255,255,.085) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+/* more breathing room and weaker dividers */
+[data-testid="stHorizontalBlock"]{gap:24px !important;}
+.divider-label{margin:48px 0 28px !important; color:rgba(235,230,255,.52) !important;}
+.divider-label::before,.divider-label::after{opacity:.45 !important;}
+
+/* hide Streamlit chrome/footer bits when present */
+footer, #MainMenu, header[data-testid="stHeader"]{visibility:hidden !important;}
+
 </style>
 
 <script>
@@ -1793,12 +1982,8 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 #  HERO HEADER
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
-<section class="motion-hero liquid-hero">
-  <div class="motion-kicker"><span></span> SkyLens Intelligence</div>
-  <h1>Route Intelligence,<br/>Refracted in Motion.</h1>
-  <p>
-    Explore airline performance, confidence signals, and route decisions through a polished liquid-glass command surface.
-  </p>
+<section class="motion-hero liquid-hero hero-name-only">
+  <h1>SkyLens Route Intelligence</h1>
 </section>
 """, unsafe_allow_html=True)
 
@@ -2189,13 +2374,3 @@ with tab5:
             use_container_width=True, hide_index=True,
         )
 
-# ─────────────────────────────────────────────────────────────
-#  FOOTER
-# ─────────────────────────────────────────────────────────────
-st.markdown("""
-<div style='text-align:center;color:#4f4352;font-size:.74rem;
-            padding:48px 0 20px;font-family:"Manrope",sans-serif;
-            letter-spacing:.08em;text-transform:uppercase'>
-  SkyLens Route Intelligence &nbsp;·&nbsp; Built with Streamlit
-</div>
-""", unsafe_allow_html=True)
