@@ -47,21 +47,21 @@ INK_MUTED = TEXT_MUTED
 st.markdown("""
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cinzel:wght@400;600;700;900&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root{
-    --bg:#05070f;
+    --bg:#060816;
     --text:#F8F6F2;
     --muted:#A8B0C0;
 
-    --glass:rgba(255,255,255,0.07);
-    --glass2:rgba(255,255,255,0.11);
+    --glass:rgba(255,255,255,0.08);
+    --glass2:rgba(255,255,255,0.12);
 
-    --border:rgba(255,255,255,0.09);
+    --border:rgba(255,255,255,0.10);
 
     --shadow:
-        0 10px 50px rgba(0,0,0,.55),
-        inset 0 1px 1px rgba(255,255,255,.14);
+        0 10px 50px rgba(0,0,0,.45),
+        inset 0 1px 1px rgba(255,255,255,.18);
 }
 
 /* ------------------------------------------------ */
@@ -74,30 +74,16 @@ html, body, [class*="css"]{
     -webkit-font-smoothing:antialiased;
 }
 
-/* BASE APP -- nebula directly on stApp, background-attachment keeps it fixed */
-.stApp {
+.stApp{
     background:
-        radial-gradient(ellipse 80% 55% at 50% 0%,   rgba(80,50,170,.22),  transparent 55%),
-        radial-gradient(ellipse 55% 65% at 0%   45%,  rgba(25,90,200,.13),  transparent 55%),
-        radial-gradient(ellipse 60% 55% at 100% 55%,  rgba(190,90,35,.10),  transparent 55%),
-        radial-gradient(ellipse 90% 75% at 50% 55%,   rgba(55,25,115,.14),  transparent 70%),
-        #05070f !important;
-    background-attachment: fixed !important;
-    overflow-x: hidden;
-}
-
-/* Star field on the html element (sits behind everything, truly fixed) */
-html {
-    background:
-        radial-gradient(circle, rgba(255,255,255,.9)  0 0.7px, transparent 0.9px),
-        radial-gradient(circle, rgba(200,220,255,.55) 0 0.5px, transparent 0.7px),
+        radial-gradient(ellipse 80% 55% at 50% 0%, rgba(80,50,170,.22), transparent 55%),
+        radial-gradient(ellipse 55% 65% at 0% 45%, rgba(25,90,200,.13), transparent 55%),
+        radial-gradient(ellipse 60% 55% at 100% 55%, rgba(190,90,35,.10), transparent 55%),
+        radial-gradient(ellipse 90% 75% at 50% 55%, rgba(55,25,115,.14), transparent 70%),
         #05070f;
-    background-size: 150px 150px, 80px 80px;
-    background-position: 0 0, 40px 40px;
+    background-attachment:fixed;
+    overflow-x:hidden;
 }
-
-/* Streamlit layers sit above */
-.stApp > * { position: relative; z-index: 1; }
 
 /* ------------------------------------------------ */
 /* SIDEBAR */
@@ -125,11 +111,68 @@ html {
 }
 
 /* ------------------------------------------------ */
-/* HERO -- defined in second style block below */
+/* HERO */
 /* ------------------------------------------------ */
 
+.hero{
+    position:relative;
+    padding:80px!important;
+    border-radius:34px!important;
+    overflow:hidden;
+    margin-bottom:40px!important;
+    background:linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.05))!important;
+    border:1px solid rgba(255,255,255,.25)!important;
+    border-top:1px solid rgba(255,255,255,.38)!important;
+    backdrop-filter:blur(36px) saturate(200%)!important;
+    -webkit-backdrop-filter:blur(36px) saturate(200%)!important;
+    box-shadow:0 20px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+.hero::before{
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0;
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.5) 30%, rgba(255,255,255,.5) 70%, transparent);
+    pointer-events:none;
+}
+
+.hero h1{
+    font-size:clamp(3rem,7vw,6rem)!important;
+    line-height:.9!important;
+    letter-spacing:.08em!important;
+    text-transform:uppercase!important;
+    font-weight:900!important;
+    color:#FFFDF8!important;
+}
+
+.hero p{
+    color:rgba(255,255,255,.70)!important;
+    font-size:1.05rem!important;
+    line-height:1.7!important;
+    max-width:700px;
+}
+
+.hero-eyebrow{
+    color:rgba(255,255,255,.55)!important;
+    font-size:.75rem!important;
+    letter-spacing:.3em!important;
+    text-transform:uppercase!important;
+}
+
+.hero-badge{
+    display:inline-flex;
+    margin-top:28px;
+    padding:12px 22px;
+    border-radius:999px;
+    background:linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+    border:1px solid rgba(255,255,255,.18);
+    backdrop-filter:blur(20px);
+    color:#fff;
+}
+
 /* ------------------------------------------------ */
-/* GLASS CARDS -- frosted white glass */
+/* GLASS CARDS */
 /* ------------------------------------------------ */
 
 [data-testid="metric-container"],
@@ -140,26 +183,17 @@ html {
 .info-box{
 
     background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.18) 0%,
-            rgba(255,255,255,.08) 60%,
-            rgba(255,255,255,.04) 100%
-        )!important;
+        linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.05))!important;
 
-    border:1px solid rgba(255,255,255,.22)!important;
-    border-top:1px solid rgba(255,255,255,.35)!important;
-    border-left:1px solid rgba(255,255,255,.28)!important;
+    border:1px solid rgba(255,255,255,.25)!important;
+    border-top:1px solid rgba(255,255,255,.38)!important;
 
     border-radius:28px!important;
 
-    backdrop-filter:blur(32px) saturate(200%) brightness(1.04)!important;
-    -webkit-backdrop-filter:blur(32px) saturate(200%) brightness(1.04)!important;
+    backdrop-filter:blur(32px) saturate(200%)!important;
+    -webkit-backdrop-filter:blur(32px) saturate(200%)!important;
 
-    box-shadow:
-        0 12px 60px rgba(0,0,0,.55),
-        0 2px 0px rgba(255,255,255,.12) inset,
-        0 0 0 0.5px rgba(255,255,255,.08) inset!important;
+    box-shadow:0 12px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.18)!important;
 }
 
 /* ------------------------------------------------ */
@@ -296,114 +330,6 @@ html {
 }
 
 /* ------------------------------------------------ */
-/* SIDEBAR BRAND */
-/* ------------------------------------------------ */
-
-.sidebar-brand{
-    font-family:'Cinzel',serif;
-    font-size:1.05rem;
-    font-weight:700;
-    letter-spacing:.12em;
-    color:#FFFDF8;
-    text-transform:uppercase;
-    margin-bottom:18px;
-    display:block;
-}
-.sidebar-brand span{
-    color:#38BDF8;
-}
-
-/* ------------------------------------------------ */
-/* PILLS */
-/* ------------------------------------------------ */
-
-.pill{
-    display:inline-block;
-    padding:3px 12px;
-    border-radius:999px;
-    font-size:.70rem;
-    font-weight:700;
-    letter-spacing:.07em;
-    font-family:'DM Sans',sans-serif;
-}
-.pill-expand  { background:rgba(34,197,94,.20);  color:#22C55E; border:1px solid rgba(34,197,94,.35); }
-.pill-maintain{ background:rgba(250,204,21,.18);  color:#FACC15; border:1px solid rgba(250,204,21,.30); }
-.pill-optimize{ background:rgba(251,146,60,.18);  color:#FB923C; border:1px solid rgba(251,146,60,.30); }
-.pill-drop    { background:rgba(251,113,133,.18); color:#FB7185; border:1px solid rgba(251,113,133,.30); }
-
-/* ------------------------------------------------ */
-/* SECTION LABELS */
-/* ------------------------------------------------ */
-
-.section-hd{
-    font-family:'DM Sans',sans-serif;
-    font-size:.78rem;
-    font-weight:700;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:rgba(255,255,255,.45);
-    margin-bottom:14px;
-}
-
-.divider-label{
-    font-family:'DM Sans',sans-serif;
-    font-size:.68rem;
-    font-weight:700;
-    letter-spacing:.22em;
-    text-transform:uppercase;
-    color:rgba(255,255,255,.30);
-    text-align:center;
-    margin:24px 0 18px 0;
-    position:relative;
-}
-.divider-label::before,.divider-label::after{
-    content:"";
-    position:absolute;
-    top:50%;
-    width:38%;
-    height:1px;
-    background:rgba(255,255,255,.08);
-}
-.divider-label::before{ left:0; }
-.divider-label::after { right:0; }
-
-.col-label{
-    font-family:'DM Sans',sans-serif;
-    font-size:.72rem;
-    font-weight:700;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:#38BDF8;
-    margin-bottom:10px;
-}
-
-/* ------------------------------------------------ */
-/* RESULT CARDS */
-/* ------------------------------------------------ */
-
-.result-card{
-    padding:28px!important;
-    margin-bottom:20px;
-}
-.result-expand  { border-left:4px solid #22C55E!important; }
-.result-maintain{ border-left:4px solid #FACC15!important; }
-.result-optimize{ border-left:4px solid #FB923C!important; }
-.result-drop    { border-left:4px solid #FB7185!important; }
-
-/* ------------------------------------------------ */
-/* INFO BOX */
-/* ------------------------------------------------ */
-
-.info-box{
-    padding:16px 20px!important;
-    font-family:'DM Sans',sans-serif;
-    font-size:.84rem;
-    color:rgba(255,255,255,.70);
-    line-height:1.65;
-    margin:10px 0;
-}
-
-/* ------------------------------------------------ */
 /* CLEANUP */
 /* ------------------------------------------------ */
 
@@ -416,7 +342,7 @@ html {
 </style>
 """, unsafe_allow_html=True)
 # ─────────────────────────────────────────────────────────────
-#  FINAL CLEAN PLOTLY HELPERS -- single source of truth
+#  FINAL CLEAN PLOTLY HELPERS — single source of truth
 # ─────────────────────────────────────────────────────────────
 def _fmt_money(v):
     if abs(v) >= 1_000_000:
@@ -729,102 +655,13 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 #  HERO
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
-<style>
-/* ── SINGLE HERO ── */
-.hero {
-    position: relative;
-    padding: 72px 80px !important;
-    border-radius: 32px !important;
-    overflow: hidden;
-    margin-bottom: 40px !important;
-
-    /* frosted glass -- same treatment as metric cards */
-    background: linear-gradient(
-        145deg,
-        rgba(255,255,255,.18) 0%,
-        rgba(255,255,255,.08) 60%,
-        rgba(255,255,255,.03) 100%
-    ) !important;
-
-    border: 1px solid rgba(255,255,255,.22) !important;
-    border-top: 1px solid rgba(255,255,255,.35) !important;
-    border-left: 1px solid rgba(255,255,255,.28) !important;
-
-    backdrop-filter: blur(36px) saturate(200%) brightness(1.05) !important;
-    -webkit-backdrop-filter: blur(36px) saturate(200%) brightness(1.05) !important;
-
-    box-shadow:
-        0 20px 80px rgba(0,0,0,.55),
-        0 2px 0px rgba(255,255,255,.14) inset,
-        0 0 0 0.5px rgba(255,255,255,.08) inset;
-}
-
-/* subtle highlight sweep across top of hero */
-.hero::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba(255,255,255,.50) 30%,
-        rgba(255,255,255,.50) 70%,
-        transparent);
-    pointer-events: none;
-}
-
-.hero-eyebrow {
-    font-family: 'DM Sans', sans-serif;
-    font-size: .72rem !important;
-    letter-spacing: .32em !important;
-    text-transform: uppercase !important;
-    color: rgba(255,255,255,.50) !important;
-    margin-bottom: 18px;
-}
-
-.hero h1 {
-    font-family: 'Cinzel', serif !important;
-    font-size: clamp(3.2rem, 7vw, 6rem) !important;
-    line-height: .9 !important;
-    letter-spacing: .10em !important;
-    text-transform: uppercase !important;
-    font-weight: 900 !important;
-    color: #FFFDF8 !important;
-    margin-bottom: 22px;
-}
-
-.hero p {
-    font-family: 'DM Sans', sans-serif;
-    color: rgba(255,255,255,.65) !important;
-    font-size: 1.02rem !important;
-    line-height: 1.75 !important;
-    max-width: 620px;
-    margin-bottom: 32px;
-}
-
-.hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 11px 26px;
-    border-radius: 999px;
-    background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
-    border: 1px solid rgba(255,255,255,.20);
-    backdrop-filter: blur(20px);
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: .80rem;
-    font-weight: 700;
-    letter-spacing: .10em;
-}
-</style>
-
-<!-- SINGLE HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">✦ &nbsp; Airline Route Intelligence &nbsp; ✦</div>
-  <h1>SKYLENS<br>DASHBOARD</h1>
-  <p>Analyze route profitability, operational signals, and model-backed decisions &mdash; all in one polished command view.</p>
-  <div class="hero-badge">✦ &nbsp; Explore dashboard below</div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">AIRLINE ROUTE INTELLIGENCE</div>
+    <h1>SKYLENS<br>DASHBOARD</h1>
+    <p>Analyze route profitability, operational signals, and model-backed decisions in one polished command view.</p>
+  </div>
+  <div class="hero-badge">Explore dashboard below</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1117,7 +954,7 @@ with tab5:
     st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
     st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
     st.markdown(f"""<div class="info-box">
-    <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate &mdash; use when you have ticket &amp; ancillary revenue data.<br><br>
+    <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
     <span class='pill pill-optimize'>Cost-only</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
     <span class='pill pill-expand'>Pre-launch</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
     </div>""", unsafe_allow_html=True)
@@ -1233,9 +1070,9 @@ with tab5:
         text_col   = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
                       "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
         explanations = {
-            "Expand":   "This route shows strong performance signals &mdash; high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
-            "Maintain": "This route is working well and performing steadily. No urgent changes needed &mdash; keep monitoring.",
-            "Optimize": "This route has potential but something is holding it back &mdash; efficiency or demand may need attention before investing more.",
+            "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
+            "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
+            "Optimize": "This route has potential but something is holding it back — efficiency or demand may need attention before investing more.",
             "Drop":     "This route is losing money. A deeper review is recommended to determine whether it can be restructured or should be discontinued.",
         }
 
