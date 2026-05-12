@@ -895,6 +895,112 @@ svg rect:hover, svg path:hover, svg circle:hover{
   *,*:before,*:after{animation:none !important;transition:none !important;scroll-behavior:auto !important;}
 }
 
+
+/* ========================================================================
+   V3 REFINEMENT — compact hero, cleaner chart glow, stronger AI-glass cards
+   ======================================================================== */
+
+/* Compact hero: premium but no longer dominating the page */
+.motion-hero{
+  min-height:260px !important;
+  padding:32px 36px !important;
+  margin:6px 0 24px !important;
+  border-radius:30px !important;
+  box-shadow:
+    0 24px 72px rgba(0,0,0,.46),
+    0 0 52px rgba(139,92,246,.10),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+.motion-hero h1{
+  margin:16px 0 10px !important;
+  max-width:760px !important;
+  font-size:clamp(2.45rem,4.9vw,4.85rem) !important;
+  line-height:.96 !important;
+  letter-spacing:-.055em !important;
+}
+.motion-hero p{
+  max-width:620px !important;
+  font-size:.98rem !important;
+  line-height:1.62 !important;
+}
+.motion-kicker{ padding:7px 12px !important; font-size:.68rem !important; }
+.motion-hero-actions{ margin-top:18px !important; gap:10px !important; }
+.motion-chip{ padding:9px 12px !important; font-size:.76rem !important; }
+.motion-hero:after{
+  right:24px !important;
+  bottom:-28px !important;
+  font-size:150px !important;
+  filter:drop-shadow(0 0 30px rgba(125,215,255,.14)) !important;
+}
+@media (max-width: 780px){
+  .motion-hero{min-height:unset !important;padding:26px 22px !important;}
+  .motion-hero:after{display:none !important;}
+}
+
+/* AI glass glow belongs on cards and metrics, not chart marks */
+[data-testid="metric-container"],
+[data-testid="stExpander"],
+.info-box,
+.result-card,
+div[data-testid="stForm"]{
+  border-color:rgba(255,255,255,.20) !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(125,215,255,.12), transparent 34%),
+    radial-gradient(circle at 82% 16%, rgba(196,99,251,.13), transparent 34%),
+    linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.045) 46%, rgba(255,255,255,.072)) !important;
+  box-shadow:
+    0 22px 60px rgba(0,0,0,.36),
+    0 0 34px rgba(125,215,255,.10),
+    0 0 58px rgba(196,99,251,.08),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+[data-testid="metric-container"]:after,
+.info-box:after,
+.result-card:after,
+div[data-testid="stForm"]:after{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  pointer-events:none;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,.24), transparent 24%, transparent 70%, rgba(125,215,255,.16)),
+    radial-gradient(circle at 18% 4%, rgba(125,215,255,.22), transparent 28%),
+    radial-gradient(circle at 90% 0%, rgba(196,99,251,.20), transparent 30%);
+  opacity:.50;
+  mix-blend-mode:screen;
+}
+[data-testid="metric-container"]:hover,
+[data-testid="stExpander"]:hover,
+.info-box:hover,
+.result-card:hover,
+div[data-testid="stForm"]:hover{
+  transform:translateY(-6px) rotateX(1deg) translateZ(18px) !important;
+  box-shadow:
+    0 30px 76px rgba(0,0,0,.42),
+    0 0 46px rgba(125,215,255,.18),
+    0 0 76px rgba(196,99,251,.13),
+    inset 0 1px 0 rgba(255,255,255,.24) !important;
+}
+
+/* Data frames should stay readable and quiet */
+[data-testid="stDataFrame"],
+[data-testid="stTable"]{
+  box-shadow:0 18px 44px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+[data-testid="stDataFrame"]:hover,
+[data-testid="stTable"]:hover{
+  transform:none !important;
+  box-shadow:0 20px 50px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+
+/* Remove heavy global SVG glow so chart cards feel crisp */
+svg{filter:none !important;overflow:visible !important;}
+svg rect:hover, svg path:hover, svg circle:hover{
+  filter:brightness(1.08) !important;
+  opacity:.96 !important;
+}
+
 </style>
 
 <script>
@@ -949,50 +1055,73 @@ CHART_CSS = """
     overflow: hidden;
   }
   .card {
-    background: linear-gradient(145deg, rgba(34,30,48,.96) 0%, rgba(16,14,24,.94) 100%);
-    border: 1px solid rgba(255,255,255,.12);
-    border-top: 1px solid rgba(255,255,255,.20);
+    width: 100%;
+    min-height: 100%;
+    background:
+      radial-gradient(circle at 14% 0%, rgba(125,215,255,.10), transparent 34%),
+      radial-gradient(circle at 86% 6%, rgba(196,99,251,.10), transparent 32%),
+      linear-gradient(145deg, rgba(34,30,48,.91) 0%, rgba(15,14,24,.92) 100%);
+    border: 1px solid rgba(255,255,255,.16);
+    border-top: 1px solid rgba(255,255,255,.26);
     border-radius: 20px;
-    padding: 22px 24px 18px;
-    box-shadow: 0 16px 48px rgba(0,0,0,.70), 0 4px 16px rgba(0,0,0,.55),
-                0 0 0 1px rgba(255,255,255,.06),
-                0 -1px 0 rgba(255,255,255,.06) inset;
+    padding: 16px 18px 14px;
+    box-shadow:
+      0 16px 42px rgba(0,0,0,.46),
+      0 0 22px rgba(125,215,255,.055),
+      inset 0 1px 0 rgba(255,255,255,.13);
     position: relative;
     overflow: hidden;
-    transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+    transition: transform .32s cubic-bezier(.22,1,.36,1), box-shadow .32s ease, border-color .32s ease;
     cursor: default;
   }
   .card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 24px 64px rgba(0,0,0,.75), 0 8px 24px rgba(233,179,255,.10),
-                0 0 0 1px rgba(255,255,255,.09),
-                0 0 60px rgba(233,179,255,.08);
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,.22);
+    box-shadow:
+      0 20px 48px rgba(0,0,0,.50),
+      0 0 28px rgba(125,215,255,.075),
+      inset 0 1px 0 rgba(255,255,255,.18);
   }
   .card::before {
     content: "";
     position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.30), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.36), transparent);
     pointer-events: none;
   }
   .card::after {
     content: "";
-    position: absolute; top: -60px; right: -40px;
+    position: absolute; top: -70px; right: -60px;
     width: 180px; height: 180px;
-    background: radial-gradient(circle, rgba(233,179,255,.07) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(125,215,255,.055) 0%, transparent 68%);
     pointer-events: none;
   }
   .chart-title {
-    font-size: 13px; font-weight: 600; color: #e5e1e4;
-    letter-spacing: -.01em; margin-bottom: 14px;
+    font-size: 14px; font-weight: 700; color: #f1edf5;
+    letter-spacing: -.015em; margin-bottom: 10px;
   }
-  svg { display: block; }
-  .axis-label { font-size: 9px; fill: #9b8c9e; font-family: 'Space Grotesk', sans-serif; }
-  .value-label { font-size: 9.5px; fill: #c4bfc6; font-weight: 700; font-family: 'DM Mono', monospace; }
-  .grid-line { stroke: rgba(255,255,255,.045); stroke-width: .8; stroke-dasharray: 5,4; }
-  .bar-rect { transition: opacity .2s; cursor: pointer; }
-  .bar-rect:hover { opacity: .82; filter: brightness(1.15); }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    filter: none;
+  }
+  .axis-label {
+    font-size: 11px;
+    fill: #b8acbd;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+  }
+  .value-label {
+    font-size: 11.5px;
+    fill: #eee8f2;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+  }
+  .grid-line { stroke: rgba(255,255,255,.07); stroke-width: .8; stroke-dasharray: 5,4; }
+  .bar-rect { transition: opacity .2s, filter .2s; cursor: pointer; }
+  .bar-rect:hover { opacity: .9; filter: brightness(1.08); }
 
-  /* bar entrance animation */
   @keyframes barGrow {
     from { transform: scaleY(0); transform-origin: bottom; }
     to   { transform: scaleY(1); transform-origin: bottom; }
@@ -1006,9 +1135,8 @@ CHART_CSS = """
   .bar-anim-h { animation: barGrowH .65s cubic-bezier(.22,1,.36,1) both; }
   .fade-in { animation: fadeIn .50s ease both; }
 
-  /* pie slice pulse on hover */
   .pie-slice { transition: opacity .2s, filter .2s; cursor: pointer; }
-  .pie-slice:hover { opacity: .85; filter: brightness(1.18) drop-shadow(0 0 8px currentColor); }
+  .pie-slice:hover { opacity: .9; filter: brightness(1.08); }
 </style>
 """
 
@@ -1085,7 +1213,7 @@ def render_vbar_chart(title, labels, values, colors, height=340,
 <rect class="bar-rect bar-anim" rx="5" ry="5"
   x="{bx:.1f}" y="{min(by, zero_y):.1f}" width="{bar_w:.1f}" height="{bh:.1f}"
   fill="url(#{gid})"
-  style="filter:drop-shadow(0 4px 12px {col}44);animation-delay:{delay:.2f}s"/>""")
+  style="animation-delay:{delay:.2f}s"/>""")
 
         # x-axis label
         labels_svg.append(
@@ -1166,8 +1294,8 @@ def render_hbar_chart(title, labels, values, colors, height=None, fmt_fn=None, x
 <rect class="bar-rect bar-anim-h" rx="4" ry="4"
   x="{pad_l}" y="{by:.1f}" width="{bw:.1f}" height="{bar_h:.1f}"
   fill="url(#{gid})"
-  style="filter:drop-shadow(0 3px 10px {col}44);animation-delay:{delay:.2f}s"/>
-<text class="axis-label" x="{pad_l-8}" y="{cy+3.5:.1f}" text-anchor="end" font-size="9">{lbl}</text>
+  style="animation-delay:{delay:.2f}s"/>
+<text class="axis-label" x="{pad_l-8}" y="{cy+3.5:.1f}" text-anchor="end" font-size="10.5">{lbl}</text>
 <text class="value-label fade-in" x="{pad_l+bw+6:.1f}" y="{cy+3.5:.1f}"
   style="animation-delay:{delay+0.25:.2f}s">{fmt_fn(v)}</text>""")
 
@@ -1235,11 +1363,11 @@ def render_pie_chart(title, labels, values, colors, height=320, uid="pie"):
 </defs>
 <path class="pie-slice fade-in" d="{d}" fill="url(#{gid})"
   stroke="rgba(11,11,13,1)" stroke-width="2.5"
-  style="filter:drop-shadow(0 4px 14px {col}55);animation-delay:{delay:.2f}s">
+  style="animation-delay:{delay:.2f}s">
   <title>{lbl}: {frac:.1%}</title>
 </path>
 <text class="value-label fade-in" x="{lx:.1f}" y="{ly+4:.1f}"
-  text-anchor="middle" font-size="10"
+  text-anchor="middle" font-size="11"
   style="animation-delay:{delay+0.25:.2f}s">{frac:.0%}</text>""")
 
         # legend row
@@ -1309,8 +1437,8 @@ def render_grouped_bar_chart(title, group_labels, series, colors, height=300, ui
 </defs>
 <rect class="bar-rect bar-anim" rx="4"
   x="{cx - bar_w/2:.1f}" y="{by:.1f}" width="{bar_w:.1f}" height="{bh:.1f}"
-  fill="url(#{gid})" style="filter:drop-shadow(0 3px 10px {col}44);animation-delay:{delay:.2f}s"/>
-<text class="value-label fade-in" x="{cx:.1f}" y="{by-5:.1f}" text-anchor="middle" font-size="8.5"
+  fill="url(#{gid})" style="animation-delay:{delay:.2f}s"/>
+<text class="value-label fade-in" x="{cx:.1f}" y="{by-5:.1f}" text-anchor="middle" font-size="11"
   style="animation-delay:{delay+0.25:.2f}s">{v:.0%}</text>""")
 
         # legend
@@ -1365,7 +1493,7 @@ def render_grouped_bar_chart(title, group_labels, series, colors, height=300, ui
 
 def svg_chart(html_str, height):
     """Render the chart HTML in a transparent iframe."""
-    components.html(html_str, height=height, scrolling=False)
+    components.html(html_str, height=height + 34, scrolling=False)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1899,12 +2027,6 @@ with tab5:
             prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
             use_container_width=True, hide_index=True,
         )
-
-# ─────────────────────────────────────────────────────────────
-#  FILTERED DATA EXPANDER
-# ─────────────────────────────────────────────────────────────
-with st.expander("Show filtered data"):
-    st.dataframe(fdf, use_container_width=True)
 
 # ─────────────────────────────────────────────────────────────
 #  FOOTER
