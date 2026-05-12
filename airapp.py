@@ -145,14 +145,14 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
   margin-top: 30px;
   padding: 10px 20px;
   border: 1px solid rgba(255,255,255,.30);
-  border-radius: 999px;
+  border-radius: 99px;
   color: #fff;
   background: linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04));
   box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 0 24px rgba(255,255,255,.10);
   font-size: .82rem;
   font-weight: 700;
   position:relative;
-  z-index:2;
+  z-index:5;
 }}
 .hero-glyph,.hero-star {{ display:none!important; }}
 .feature-grid,.feature-card,.feature-inner,.feature-icon,.cosmos-mini,.cosmos-cta {{ display:none!important; }}
