@@ -477,16 +477,6 @@ CSS = """
     box-shadow: 0 0 22px rgba(122,166,255,.18) !important;
   }
 
-
-  /* Keep native Streamlit tabs fast, but visually show the tabs in the original order.
-     In Python, Prediction Tool is still the first tab internally so prediction results
-     do not jump away after submit; CSS only moves that tab button to the far right. */
-  .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(1) { order: 5 !important; }
-  .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(2) { order: 1 !important; }
-  .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(3) { order: 2 !important; }
-  .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(4) { order: 3 !important; }
-  .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-of-type(5) { order: 4 !important; }
-
   [data-testid="stForm"] { padding: 1.45rem 1.55rem 1.65rem !important; }
   [data-testid="stPyplot"], [data-testid="stPlotlyChart"] {
     padding: 1.25rem !important;
@@ -1468,16 +1458,32 @@ st.markdown("""
 # ─────────────────────────────────────────────────────────────
 #  TABS
 # ─────────────────────────────────────────────────────────────
-# Native st.tabs has instant client-side tab switching.
-# Streamlit reruns after prediction submit and reopens the first tab,
-# so Prediction Tool is intentionally assigned as the first tab to avoid jumping away from results.
-tab5, tab1, tab2, tab3, tab4 = st.tabs([
-    "🤖  Prediction Tool",
-    "📊  Overview",
+# Native st.tabs keeps tab switching instant and clean.
+# Keep the visual/order exactly like the original dashboard.
+OVERVIEW_TAB_LABEL = "📊  Overview"
+PREDICTION_TAB_LABEL = "🤖  Prediction Tool"
+if "active_tab_label" not in st.session_state:
+    st.session_state.active_tab_label = OVERVIEW_TAB_LABEL
+
+tab_labels = [
+    OVERVIEW_TAB_LABEL,
     "🔍  Performance Drivers",
     "🗺  Route Actions",
     "📈  Route Stability",
-])
+    PREDICTION_TAB_LABEL,
+]
+
+# Newer Streamlit versions support a default selected tab.
+# The fallback keeps the app compatible if your deployed version is older.
+try:
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        tab_labels,
+        default=st.session_state.active_tab_label,
+    )
+    TABS_DEFAULT_SUPPORTED = True
+except TypeError:
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(tab_labels)
+    TABS_DEFAULT_SUPPORTED = False
 
 
 # ── TAB 1 · OVERVIEW ─────────────────────────────────────────
@@ -1724,10 +1730,81 @@ with tab4:
     )
 
 
+
+
+def render_prediction_result():
+    # ── RESULT ──────────────────────────────────────────────
+    if st.session_state.pred_result is not None:
+        res  = st.session_state.pred_result
+        pred = res["prediction"]; prob = res["probabilities"]; cls = res["classes"]
+    
+        pill_cls   = {"Expand": "pill-expand", "Maintain": "pill-maintain",
+                      "Optimize": "pill-optimize", "Drop": "pill-drop"}
+        result_cls = {"Expand": "result-expand", "Maintain": "result-maintain",
+                      "Optimize": "result-optimize", "Drop": "result-drop"}
+        text_col   = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
+                      "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
+        explanations = {
+            "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
+            "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
+            "Optimize": "This route has potential but something is holding it back — efficiency or demand may need attention before investing more.",
+            "Drop":     "This route is losing money. A deeper review is recommended to determine whether it can be restructured or should be discontinued.",
+        }
+    
+        st.markdown(f"""
+        <div class='result-card {result_cls.get(pred, "result-expand")}'>
+          <div style='margin-bottom:10px'>
+            <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
+          </div>
+          <div style='font-family:"Cinzel",serif;font-size:1.55rem;font-weight:600;
+                      color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.04em;
+                      text-transform:uppercase'>
+            Suggested Decision: {pred}
+          </div>
+          <p style='color:{INK_SOFT};margin:0;font-size:0.88rem;line-height:1.75;
+                    font-family:"DM Sans",sans-serif'>
+            {explanations.get(pred, "")}
+          </p>
+        </div>""", unsafe_allow_html=True)
+    
+        st.markdown(
+            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
+            "Confidence by decision option</p>", unsafe_allow_html=True)
+    
+        prob_df = (pd.DataFrame({"Decision": cls, "Probability": prob})
+                   .sort_values("Probability", ascending=False))
+        bar_cp  = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
+                   "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
+    
+        bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
+        probs = prob_df["Probability"].tolist()
+        shimmer_vertical_bar_chart(
+            title="Model Confidence per Decision",
+            labels=prob_df["Decision"].tolist(),
+            series=[{
+                "name": "Probability",
+                "values": probs,
+                "color": ACCENT,
+                "colors": bar_colors,
+            }],
+            max_value=1.0,
+            value_format="percent",
+            height=390,
+        )
+    
+        st.dataframe(
+            prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
+            use_container_width=True, hide_index=True)
+
+
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
 with tab5:
     st.markdown('<p class="section-hd">Simulate a route scenario</p>', unsafe_allow_html=True)
     st.markdown('<p class="section-sub">Enter route characteristics and our model will suggest the best decision.</p>', unsafe_allow_html=True)
+
+    # Show results near the top of the Prediction Tool page, not below the full form.
+    # This prevents the app from feeling like it jumps to the bottom after clicking Predict.
+    render_prediction_result()
 
     st.markdown(
         f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
@@ -1859,66 +1936,9 @@ with tab5:
             pred = model3.predict(inp)[0]; prob = model3.predict_proba(inp)[0]; cls = model3.classes_
 
         st.session_state.pred_result = {"prediction": pred, "probabilities": prob, "classes": cls}
+        st.session_state.active_tab_label = PREDICTION_TAB_LABEL
 
-    # ── RESULT ──────────────────────────────────────────────
-    if st.session_state.pred_result is not None:
-        res  = st.session_state.pred_result
-        pred = res["prediction"]; prob = res["probabilities"]; cls = res["classes"]
+        # Re-render with Prediction Tool selected, then show the result near the top.
+        if TABS_DEFAULT_SUPPORTED:
+            st.rerun()
 
-        pill_cls   = {"Expand": "pill-expand", "Maintain": "pill-maintain",
-                      "Optimize": "pill-optimize", "Drop": "pill-drop"}
-        result_cls = {"Expand": "result-expand", "Maintain": "result-maintain",
-                      "Optimize": "result-optimize", "Drop": "result-drop"}
-        text_col   = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-                      "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-        explanations = {
-            "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
-            "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
-            "Optimize": "This route has potential but something is holding it back — efficiency or demand may need attention before investing more.",
-            "Drop":     "This route is losing money. A deeper review is recommended to determine whether it can be restructured or should be discontinued.",
-        }
-
-        st.markdown(f"""
-        <div class='result-card {result_cls.get(pred, "result-expand")}'>
-          <div style='margin-bottom:10px'>
-            <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
-          </div>
-          <div style='font-family:"Cinzel",serif;font-size:1.55rem;font-weight:600;
-                      color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.04em;
-                      text-transform:uppercase'>
-            Suggested Decision: {pred}
-          </div>
-          <p style='color:{INK_SOFT};margin:0;font-size:0.88rem;line-height:1.75;
-                    font-family:"DM Sans",sans-serif'>
-            {explanations.get(pred, "")}
-          </p>
-        </div>""", unsafe_allow_html=True)
-
-        st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-            "Confidence by decision option</p>", unsafe_allow_html=True)
-
-        prob_df = (pd.DataFrame({"Decision": cls, "Probability": prob})
-                   .sort_values("Probability", ascending=False))
-        bar_cp  = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-                   "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-
-        bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
-        probs = prob_df["Probability"].tolist()
-        shimmer_vertical_bar_chart(
-            title="Model Confidence per Decision",
-            labels=prob_df["Decision"].tolist(),
-            series=[{
-                "name": "Probability",
-                "values": probs,
-                "color": ACCENT,
-                "colors": bar_colors,
-            }],
-            max_value=1.0,
-            value_format="percent",
-            height=390,
-        )
-
-        st.dataframe(
-            prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
-            use_container_width=True, hide_index=True)
