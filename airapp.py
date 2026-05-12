@@ -154,17 +154,306 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
   position:relative;
   z-index:5;
 }}
-.hero-glyph,.hero-star {{ display:none!important; }}
-.feature-grid,.feature-card,.feature-inner,.feature-icon,.cosmos-mini,.cosmos-cta {{ display:none!important; }}
-[data-testid="metric-container"],[data-testid="stForm"],[data-testid="stDataFrame"],[data-testid="stExpander"],.info-box,.result-card,.plotly-card {{ background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.026)),rgba(25,25,25,.70)!important; border:2px solid rgba(255,255,255,.14)!important; border-radius:20px!important; box-shadow:0 24px 70px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.10)!important; backdrop-filter:blur(18px)!important; }}
-[data-testid="metric-container"] {{ padding: 80px 90px!important; margin-bottom: 20px!important }} [data-testid="stMetricLabel"] p {{ color:rgba(245,241,232,.55)!important; font-size:.64rem!important; letter-spacing:.12em!important; text-transform:uppercase!important; }} [data-testid="stMetricValue"],[data-testid="stMetricValue"]>div {{ color:#f7f3ea!important; font-size:1.8rem!important; font-weight:850!important; }}
-.stTabs [data-baseweb="tab-list"] {{ gap:4px; padding:5px; border-radius:25px; background:rgba(18,18,18,.72); border:1px solid rgba(255,255,255,.12); }} .stTabs [data-baseweb="tab"] {{ color:rgba(245,241,232,.50)!important; font-weight:700!important; border-radius:13px!important; }} .stTabs [aria-selected="true"] {{ background:rgba(255,255,255,.08)!important; color:#fff!important; }} .stTabs [data-baseweb="tab-highlight"] {{ display:none!important; }}
-.section-hd {{ color:#f7f3ea!important; font-weight:850!important; letter-spacing:-.03em!important; }} .section-sub {{ color:rgba(245,241,232,.50)!important; }} .divider-label {{ display:flex; gap:14px; align-items:center; margin:30px 0 18px; color:rgba(245,241,232,.72); font-size:.66rem; font-weight:900; letter-spacing:.16em; text-transform:uppercase; }} .divider-label:before,.divider-label:after {{ content:""; height:1px; flex:1; background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent); }}
-.pill {{ display:inline-block; padding:5px 10px; border-radius:999px; font-size:.62rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border:1px solid transparent; }} .pill-expand{{background:rgba(52,211,153,.10);color:#A7F3D0;border-color:rgba(52,211,153,.25)}} .pill-maintain{{background:rgba(251,191,36,.10);color:#FDE68A;border-color:rgba(251,191,36,.24)}} .pill-optimize{{background:rgba(251,146,60,.10);color:#FDBA74;border-color:rgba(251,146,60,.24)}} .pill-drop{{background:rgba(251,113,133,.10);color:#FDA4AF;border-color:rgba(251,113,133,.24)}} .result-expand{{border-left:3px solid #34D399!important}}.result-maintain{{border-left:3px solid #FBBF24!important}}.result-optimize{{border-left:3px solid #FB923C!important}}.result-drop{{border-left:3px solid #FB7185!important}}
-.stSelectbox label,.stNumberInput label,.stSlider label {{ color:rgba(245,241,232,.70)!important; font-weight:700!important; }} .stSelectbox [data-baseweb="select"]>div,.stTextInput input,.stNumberInput input {{ background:rgba(5,5,5,.58)!important; border:1px solid rgba(255,255,255,.14)!important; border-radius:13px!important; color:white!important; }} [data-testid="stFormSubmitButton"]>button,.stButton>button {{ border-radius:999px!important; border:1px solid rgba(255,255,255,.30)!important; background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.05))!important; color:#fff!important; box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 24px rgba(255,255,255,.10)!important; }}
-.plotly-card {{ padding:16px 16px 6px; margin-bottom:18px; }} .plotly-card-title {{ color:#f7f3ea; font-weight:850; letter-spacing:-.03em; margin:4px 6px 10px; }}
-@media(max-width:900px) {{ .cosmos-nav{{margin-bottom:40px}} .cosmos-links{{display:none}} .feature-grid{{grid-template-columns:1fr;margin-top:-20px}} }}
-</style>
+.hero-glyph,
+.hero-star {
+    display:none!important;
+}
+
+.feature-grid,
+.feature-card,
+.feature-inner,
+.feature-icon,
+.cosmos-mini,
+.cosmos-cta {
+    display:none!important;
+}
+
+/* =========================
+   GLASS CARDS / BIGGER BOXES
+========================= */
+
+[data-testid="metric-container"],
+[data-testid="stForm"],
+[data-testid="stDataFrame"],
+[data-testid="stExpander"],
+.info-box,
+.result-card,
+.plotly-card {
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.075),
+            rgba(255,255,255,.026)
+        ),
+        rgba(25,25,25,.70)!important;
+
+    border:3px solid rgba(255,255,255,.14)!important;
+
+    border-radius:40px!important;
+
+    box-shadow:
+        0 24px 70px rgba(0,0,0,.46),
+        inset 0 1px 0 rgba(255,255,255,.10)!important;
+
+    backdrop-filter:blur(18px)!important;
+
+    /* NEW — MAKES BOX BIGGER */
+    padding:36px 42px!important;
+    min-height:160px!important;
+    width:100%!important;
+}
+
+/* TEXT SPACING INSIDE BOXES */
+
+.info-box p,
+.result-card p,
+.plotly-card p {
+    line-height:1.8!important;
+    font-size:1.02rem!important;
+    color:rgba(245,241,232,.92)!important;
+}
+
+/* TITLES INSIDE BOXES */
+
+.info-box h1,
+.info-box h2,
+.info-box h3,
+.result-card h1,
+.result-card h2,
+.result-card h3 {
+    font-size:1.35rem!important;
+    margin-bottom:14px!important;
+    color:#f7f3ea!important;
+    font-weight:850!important;
+    letter-spacing:-0.03em!important;
+}
+
+/* =========================
+   METRICS
+========================= */
+
+[data-testid="metric-container"] {
+    padding:40px 50px!important;
+}
+
+[data-testid="stMetricLabel"] p {
+    color:rgba(245,241,232,.55)!important;
+    font-size:.64rem!important;
+    letter-spacing:.12em!important;
+    text-transform:uppercase!important;
+}
+
+[data-testid="stMetricValue"],
+[data-testid="stMetricValue"]>div {
+    color:#f7f3ea!important;
+    font-size:1.8rem!important;
+    font-weight:850!important;
+}
+
+/* =========================
+   TABS
+========================= */
+
+.stTabs [data-baseweb="tab-list"] {
+    gap:4px;
+    padding:5px;
+    border-radius:25px;
+    background:rgba(18,18,18,.72);
+    border:1px solid rgba(255,255,255,.12);
+}
+
+.stTabs [data-baseweb="tab"] {
+    color:rgba(245,241,232,.50)!important;
+    font-weight:700!important;
+    border-radius:13px!important;
+}
+
+.stTabs [aria-selected="true"] {
+    background:rgba(255,255,255,.08)!important;
+    color:#fff!important;
+}
+
+.stTabs [data-baseweb="tab-highlight"] {
+    display:none!important;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+
+.section-hd {
+    color:#f7f3ea!important;
+    font-weight:850!important;
+    letter-spacing:-.03em!important;
+}
+
+.section-sub {
+    color:rgba(245,241,232,.50)!important;
+}
+
+.divider-label {
+    display:flex;
+    gap:14px;
+    align-items:center;
+    margin:30px 0 18px;
+    color:rgba(245,241,232,.72);
+    font-size:.66rem;
+    font-weight:900;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+}
+
+.divider-label:before,
+.divider-label:after {
+    content:"";
+    height:1px;
+    flex:1;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.18),
+        transparent
+    );
+}
+
+/* =========================
+   PILLS
+========================= */
+
+.pill {
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:.62rem;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    border:1px solid transparent;
+}
+
+.pill-expand {
+    background:rgba(52,211,153,.10);
+    color:#A7F3D0;
+    border-color:rgba(52,211,153,.25)
+}
+
+.pill-maintain {
+    background:rgba(251,191,36,.10);
+    color:#FDE68A;
+    border-color:rgba(251,191,36,.24)
+}
+
+.pill-optimize {
+    background:rgba(251,146,60,.10);
+    color:#FDBA74;
+    border-color:rgba(251,146,60,.24)
+}
+
+.pill-drop {
+    background:rgba(251,113,133,.10);
+    color:#FDA4AF;
+    border-color:rgba(251,113,133,.24)
+}
+
+.result-expand {
+    border-left:3px solid #34D399!important
+}
+
+.result-maintain {
+    border-left:3px solid #FBBF24!important
+}
+
+.result-optimize {
+    border-left:3px solid #FB923C!important
+}
+
+.result-drop {
+    border-left:3px solid #FB7185!important
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.stSelectbox label,
+.stNumberInput label,
+.stSlider label {
+    color:rgba(245,241,232,.70)!important;
+    font-weight:700!important;
+}
+
+.stSelectbox [data-baseweb="select"]>div,
+.stTextInput input,
+.stNumberInput input {
+    background:rgba(5,5,5,.58)!important;
+    border:1px solid rgba(255,255,255,.14)!important;
+    border-radius:13px!important;
+    color:white!important;
+}
+
+[data-testid="stFormSubmitButton"]>button,
+.stButton>button {
+    border-radius:999px!important;
+    border:1px solid rgba(255,255,255,.30)!important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.18),
+            rgba(255,255,255,.05)
+        )!important;
+
+    color:#fff!important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.22),
+        0 0 24px rgba(255,255,255,.10)!important;
+}
+
+/* =========================
+   PLOTLY
+========================= */
+
+.plotly-card {
+    padding:24px 24px 14px!important;
+    margin-bottom:22px!important;
+}
+
+.plotly-card-title {
+    color:#f7f3ea;
+    font-weight:850;
+    letter-spacing:-.03em;
+    margin:4px 6px 14px;
+    font-size:1.18rem;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:900px) {
+
+    .cosmos-nav {
+        margin-bottom:40px
+    }
+
+    .cosmos-links {
+        display:none
+    }
+
+    .feature-grid {
+        grid-template-columns:1fr;
+        margin-top:-20px
+    }
+
+    .info-box,
+    .result-card,
+    .plotly-card {
+        padding:24px!important;
+        min-height:auto!important;
+    }
+}
 <div class="twinkle-layer"><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span></div>
 <div class="cosmos-bg">
   <div class="constellation c1"><svg viewBox="0 0 200 140"><line x1="20" y1="20" x2="45" y2="70"/><line x1="45" y1="70" x2="78" y2="62"/><line x1="78" y1="62" x2="105" y2="95"/><line x1="45" y1="70" x2="55" y2="115"/><circle cx="20" cy="20" r="2"/><circle cx="45" cy="70" r="3"/><circle cx="78" cy="62" r="2"/><circle cx="105" cy="95" r="3"/><circle cx="55" cy="115" r="2"/></svg></div>
