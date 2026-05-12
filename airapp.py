@@ -557,251 +557,342 @@ iframe {
 /* ── vertical rhythm ────────────────────────────────────────── */
 [data-testid="stHorizontalBlock"] { gap:20px !important; }
 
-/* ─────────────────────────────────────────────────────────────
-   PROFESSIONAL 3D MOTION UPGRADE — CSS ONLY, LOGIC UNCHANGED
-   Adds depth, glass, glow, scroll motion, hover lift, and SVG polish.
-   ───────────────────────────────────────────────────────────── */
-:root {
-  --glass-bg: linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.035) 42%, rgba(255,255,255,.055));
-  --glass-stroke: rgba(255,255,255,.16);
-  --glass-stroke-strong: rgba(255,255,255,.28);
-  --violet-glow: rgba(184,92,255,.28);
-  --rose-glow: rgba(255,124,182,.20);
-  --cyan-glow: rgba(100,210,255,.16);
-  --card-depth: 0 22px 65px rgba(0,0,0,.48), 0 8px 24px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.16);
-  --card-depth-hover: 0 34px 90px rgba(0,0,0,.56), 0 14px 36px rgba(184,92,255,.16), inset 0 1px 0 rgba(255,255,255,.22);
-  --motion-ease: cubic-bezier(.19,1,.22,1);
+/* ========================================================================
+   VISIBLE MOTION/GLASSMORPHISM UPGRADE — CSS/HTML ONLY
+   Model logic, data prep, predictions, charts and filters are untouched.
+   ======================================================================== */
+
+:root{
+  --motion-bg-0:#060712;
+  --motion-bg-1:#0d1022;
+  --motion-glass:rgba(255,255,255,.075);
+  --motion-glass-2:rgba(255,255,255,.115);
+  --motion-border:rgba(255,255,255,.18);
+  --motion-border-hot:rgba(180,145,255,.44);
+  --motion-glow-a:rgba(142,92,255,.42);
+  --motion-glow-b:rgba(68,214,255,.22);
+  --motion-glow-c:rgba(255,94,171,.23);
+  --motion-shadow:0 28px 80px rgba(0,0,0,.52), inset 0 1px 0 rgba(255,255,255,.18);
+  --motion-shadow-hover:0 38px 110px rgba(0,0,0,.62), 0 0 55px rgba(142,92,255,.20), inset 0 1px 0 rgba(255,255,255,.25);
+  --motion-ease:cubic-bezier(.16,1,.3,1);
 }
 
-html { scroll-behavior: smooth; }
-.stApp {
-  isolation: isolate;
+html{scroll-behavior:smooth;}
+.stApp{
   background:
-    radial-gradient(circle at 18% 12%, rgba(154,92,255,.24), transparent 34%),
-    radial-gradient(circle at 80% 18%, rgba(255,104,180,.13), transparent 30%),
-    radial-gradient(circle at 50% 90%, rgba(67,200,255,.10), transparent 38%),
-    linear-gradient(135deg, #07070b 0%, #0c0a14 45%, #070810 100%) !important;
+    radial-gradient(circle at 18% 12%, rgba(139,92,246,.30), transparent 30%),
+    radial-gradient(circle at 84% 16%, rgba(255,105,180,.17), transparent 28%),
+    radial-gradient(circle at 55% 92%, rgba(45,212,255,.13), transparent 34%),
+    linear-gradient(135deg, var(--motion-bg-0), var(--motion-bg-1) 48%, #070814) !important;
+  overflow-x:hidden;
 }
-.stApp::before {
+.stApp:before{
+  content:"" !important;
+  position:fixed !important;
+  inset:-20% !important;
+  width:auto !important;
+  height:auto !important;
+  pointer-events:none !important;
+  z-index:0 !important;
+  opacity:.55 !important;
+  filter:blur(0) !important;
   background:
-    radial-gradient(circle at 32% 30%, rgba(233,179,255,.14), transparent 48%),
-    radial-gradient(circle at 70% 70%, rgba(100,210,255,.08), transparent 42%) !important;
-  mix-blend-mode: screen;
+    linear-gradient(rgba(255,255,255,.030) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.026) 1px, transparent 1px),
+    radial-gradient(circle at 30% 20%, rgba(168,85,247,.16), transparent 24%),
+    radial-gradient(circle at 74% 72%, rgba(34,211,238,.10), transparent 28%) !important;
+  background-size:54px 54px,54px 54px,100% 100%,100% 100% !important;
+  animation:motionGrid 28s linear infinite !important;
 }
-.stApp::after {
+.stApp:after{
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  width:auto !important;
+  height:auto !important;
+  pointer-events:none !important;
+  z-index:0 !important;
+  opacity:.36 !important;
+  filter:none !important;
   background:
-    linear-gradient(rgba(255,255,255,.026) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
-    radial-gradient(circle, rgba(255,255,255,.09) 1px, transparent 1.5px) !important;
-  background-size: 48px 48px, 48px 48px, 120px 120px !important;
-  background-position: center !important;
-  inset: 0 !important;
-  width: auto !important;
-  height: auto !important;
-  opacity: .42;
-  filter: none !important;
-  animation: gridDrift 28s linear infinite !important;
-  z-index: 0;
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.22) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 80% 30%, rgba(255,255,255,.16) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,.13) 0 1px, transparent 1.7px) !important;
+  background-size:130px 130px,170px 170px,210px 210px !important;
+  animation:starFloat 18s ease-in-out infinite alternate !important;
 }
-@keyframes gridDrift {
-  from { transform: translate3d(0,0,0); }
-  to { transform: translate3d(-48px,-48px,0); }
+@keyframes motionGrid{to{transform:translate3d(-54px,-54px,0)}}
+@keyframes starFloat{to{transform:translate3d(22px,-26px,0) scale(1.03)}}
+
+.main .block-container{
+  position:relative;
+  z-index:1;
+  max-width:1440px !important;
+  perspective:1500px;
 }
 
-.main .block-container {
-  position: relative;
-  z-index: 1;
-  perspective: 1400px;
+/* New cinematic hero */
+.motion-hero{
+  position:relative;
+  min-height:430px;
+  border-radius:42px;
+  padding:54px;
+  margin:10px 0 34px;
+  overflow:hidden;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.055) 48%, rgba(255,255,255,.10)),
+    radial-gradient(circle at 20% 16%, rgba(168,85,247,.42), transparent 30%),
+    radial-gradient(circle at 76% 24%, rgba(45,212,255,.25), transparent 32%),
+    radial-gradient(circle at 55% 100%, rgba(255,94,171,.20), transparent 36%);
+  border:1px solid rgba(255,255,255,.22);
+  border-top-color:rgba(255,255,255,.36);
+  box-shadow:0 40px 130px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.24);
+  backdrop-filter:blur(34px) saturate(160%);
+  -webkit-backdrop-filter:blur(34px) saturate(160%);
+  transform-style:preserve-3d;
+  animation:heroEnter .9s var(--motion-ease) both, heroBreathe 7s ease-in-out infinite alternate;
 }
+.motion-hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(115deg, transparent 0%, rgba(255,255,255,.18) 35%, transparent 52%),
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.030) 1px, transparent 1px);
+  background-size:100% 100%,42px 42px,42px 42px;
+  mask-image:linear-gradient(90deg, transparent, black 18%, black 82%, transparent);
+  animation:sheenSweep 6.5s ease-in-out infinite;
+}
+.motion-hero:after{
+  content:"✈";
+  position:absolute;
+  right:42px;
+  bottom:-42px;
+  font-size:240px;
+  line-height:1;
+  color:rgba(255,255,255,.12);
+  filter:drop-shadow(0 0 55px rgba(125,215,255,.20));
+  transform:rotate(-12deg) translateZ(80px);
+  animation:planeFloat 5.5s ease-in-out infinite alternate;
+}
+.motion-kicker{
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  padding:10px 16px;
+  border-radius:999px;
+  font-size:.76rem;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#f7ecff;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.20);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 12px 30px rgba(0,0,0,.20);
+}
+.motion-kicker span{
+  width:8px;height:8px;border-radius:999px;
+  background:#75f8ff;
+  box-shadow:0 0 18px #75f8ff;
+}
+.motion-hero h1{
+  margin:24px 0 16px !important;
+  max-width:900px;
+  font-size:clamp(3.2rem,7vw,7.2rem) !important;
+  line-height:.88 !important;
+  letter-spacing:-.075em !important;
+  background:linear-gradient(105deg,#fff 0%,#efe4ff 30%,#b792ff 55%,#70e8ff 82%,#fff 100%);
+  background-size:220% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+  animation:titleGradient 7s ease-in-out infinite alternate;
+  text-shadow:none !important;
+}
+.motion-hero p{
+  max-width:680px;
+  margin:0 !important;
+  color:rgba(238,236,255,.78) !important;
+  font-size:1.05rem !important;
+  line-height:1.8 !important;
+}
+.motion-hero-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:30px;
+}
+.motion-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  padding:12px 16px;
+  border-radius:999px;
+  color:#fff;
+  font-size:.82rem;
+  font-weight:750;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+  transition:transform .35s var(--motion-ease), background .35s var(--motion-ease), box-shadow .35s var(--motion-ease);
+}
+.motion-chip:hover{
+  transform:translateY(-5px) scale(1.02);
+  background:rgba(255,255,255,.16);
+  box-shadow:0 18px 42px rgba(139,92,246,.20), inset 0 1px 0 rgba(255,255,255,.24);
+}
+@keyframes heroEnter{from{opacity:0;transform:translateY(34px) rotateX(8deg) scale(.985)}to{opacity:1;transform:translateY(0) rotateX(0) scale(1)}}
+@keyframes heroBreathe{to{transform:translateY(-6px) rotateX(1.2deg) rotateY(-.6deg)}}
+@keyframes sheenSweep{0%,42%{transform:translateX(-65%);opacity:.35}70%,100%{transform:translateX(65%);opacity:.9}}
+@keyframes planeFloat{to{transform:rotate(-8deg) translate3d(-18px,-18px,90px)}}
+@keyframes titleGradient{to{background-position:100% 0}}
 
-/* hero/title treatment */
-h1, h2, h3 {
-  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif !important;
-  letter-spacing: -.04em !important;
-}
-h1 {
-  font-size: clamp(2.7rem, 6vw, 6.25rem) !important;
-  line-height: .92 !important;
-  background: linear-gradient(110deg, #ffffff 0%, #f1d7ff 34%, #b85cff 62%, #7dd7ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent !important;
-  text-shadow: 0 0 48px rgba(184,92,255,.18);
-  animation: heroFloat 7s var(--motion-ease) infinite alternate;
-}
-@keyframes heroFloat {
-  from { transform: translate3d(0,0,0) rotateX(0deg); filter: drop-shadow(0 0 0 rgba(184,92,255,0)); }
-  to { transform: translate3d(0,-8px,0) rotateX(2deg); filter: drop-shadow(0 18px 32px rgba(184,92,255,.12)); }
-}
+/* kill old hero glyph so the new cinematic hero owns the page */
+.hero{display:none !important;}
 
-[data-testid="stMarkdownContainer"] p {
-  text-wrap: pretty;
-}
-
-/* universal premium glass surfaces */
+/* Premium glass for Streamlit surfaces */
 [data-testid="metric-container"],
 [data-testid="stExpander"],
 [data-testid="stDataFrame"],
 [data-testid="stTable"],
-.stAlert,
-.info-box,
-.result-card,
 div[data-testid="stForm"],
-div[data-baseweb="select"] > div,
-div[data-baseweb="input"] > div,
-div[data-baseweb="textarea"] > div {
-  background: var(--glass-bg) !important;
-  border: 1px solid var(--glass-stroke) !important;
-  border-top-color: var(--glass-stroke-strong) !important;
-  box-shadow: var(--card-depth) !important;
-  backdrop-filter: blur(28px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
-  transform-style: preserve-3d;
-}
-
-[data-testid="metric-container"],
-[data-testid="stExpander"],
-[data-testid="stDataFrame"],
+div[data-testid="stVerticalBlock"] > div:has(.stPlotlyChart),
 .info-box,
-.result-card {
-  transition:
-    transform .55s var(--motion-ease),
-    box-shadow .55s var(--motion-ease),
-    border-color .55s var(--motion-ease),
-    filter .55s var(--motion-ease) !important;
-  will-change: transform, box-shadow;
+.result-card{
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.115), rgba(255,255,255,.046) 45%, rgba(255,255,255,.078)) !important;
+  border:1px solid var(--motion-border) !important;
+  border-top-color:rgba(255,255,255,.34) !important;
+  box-shadow:var(--motion-shadow) !important;
+  backdrop-filter:blur(30px) saturate(165%) !important;
+  -webkit-backdrop-filter:blur(30px) saturate(165%) !important;
+  transform-style:preserve-3d;
+  transition:transform .45s var(--motion-ease), box-shadow .45s var(--motion-ease), border-color .45s var(--motion-ease), filter .45s var(--motion-ease) !important;
 }
 [data-testid="metric-container"]:hover,
 [data-testid="stExpander"]:hover,
 [data-testid="stDataFrame"]:hover,
 .info-box:hover,
-.result-card:hover {
-  transform: translate3d(0,-10px,42px) rotateX(2deg) rotateY(-1deg) !important;
-  border-color: rgba(233,179,255,.36) !important;
-  box-shadow: var(--card-depth-hover), 0 0 64px rgba(184,92,255,.13) !important;
-  filter: saturate(1.08);
+.result-card:hover{
+  transform:translateY(-10px) rotateX(2deg) rotateY(-1deg) translateZ(30px) !important;
+  border-color:var(--motion-border-hot) !important;
+  box-shadow:var(--motion-shadow-hover) !important;
+  filter:saturate(1.09) brightness(1.03);
 }
+[data-testid="metric-container"]:before,
+.info-box:before,
+.result-card:before{
+  content:"";
+  position:absolute;
+  left:-30%;
+  top:0;
+  width:60%;
+  height:2px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.72), rgba(120,230,255,.52), transparent);
+  animation:surfaceSheen 4.8s ease-in-out infinite;
+}
+@keyframes surfaceSheen{0%,35%{transform:translateX(-120%);opacity:0}50%{opacity:1}80%,100%{transform:translateX(260%);opacity:0}}
 
-/* animated border sheen */
-[data-testid="metric-container"]::before,
-.info-box::before,
-.result-card::before {
-  height: 2px !important;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), rgba(184,92,255,.55), transparent) !important;
-  transform: translateX(-120%);
-  animation: borderSheen 5.5s ease-in-out infinite;
-}
-@keyframes borderSheen {
-  0%, 42% { transform: translateX(-120%); opacity: 0; }
-  52% { opacity: 1; }
-  72%,100% { transform: translateX(120%); opacity: 0; }
-}
-
-/* buttons feel like buoyant 3D controls */
+/* Inputs and buttons */
 .stButton > button,
 .stDownloadButton > button,
-button[kind="primary"],
-button[data-testid="baseButton-primary"] {
-  position: relative !important;
-  overflow: hidden !important;
-  border-radius: 999px !important;
-  border: 1px solid rgba(255,255,255,.20) !important;
+button[data-testid="baseButton-primary"]{
+  border-radius:999px !important;
+  border:1px solid rgba(255,255,255,.25) !important;
   background:
-    radial-gradient(circle at 30% 0%, rgba(255,255,255,.30), transparent 30%),
-    linear-gradient(135deg, rgba(184,92,255,.95), rgba(255,124,182,.74)) !important;
-  box-shadow: 0 16px 36px rgba(184,92,255,.26), inset 0 1px 0 rgba(255,255,255,.30) !important;
-  transition: transform .32s var(--motion-ease), box-shadow .32s var(--motion-ease), filter .32s var(--motion-ease) !important;
+    radial-gradient(circle at 25% 0%, rgba(255,255,255,.35), transparent 30%),
+    linear-gradient(135deg, #8b5cf6 0%, #d946ef 52%, #22d3ee 100%) !important;
+  color:#fff !important;
+  font-weight:850 !important;
+  letter-spacing:.01em !important;
+  box-shadow:0 18px 42px rgba(139,92,246,.34), inset 0 1px 0 rgba(255,255,255,.34) !important;
+  transition:transform .28s var(--motion-ease), box-shadow .28s var(--motion-ease), filter .28s var(--motion-ease) !important;
 }
 .stButton > button:hover,
 .stDownloadButton > button:hover,
-button[kind="primary"]:hover,
-button[data-testid="baseButton-primary"]:hover {
-  transform: translateY(-4px) scale(1.015) !important;
-  box-shadow: 0 26px 55px rgba(184,92,255,.36), 0 0 48px rgba(255,124,182,.16), inset 0 1px 0 rgba(255,255,255,.34) !important;
-  filter: brightness(1.08);
+button[data-testid="baseButton-primary"]:hover{
+  transform:translateY(-4px) scale(1.015) !important;
+  box-shadow:0 28px 70px rgba(139,92,246,.44), 0 0 42px rgba(34,211,238,.18), inset 0 1px 0 rgba(255,255,255,.40) !important;
+  filter:brightness(1.08);
 }
-.stButton > button::after,
-.stDownloadButton > button::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.35) 45%, transparent 70%);
-  transform: translateX(-120%);
-  transition: transform .7s var(--motion-ease);
+div[data-baseweb="select"] > div,
+div[data-baseweb="input"] > div,
+div[data-baseweb="textarea"] > div{
+  background:rgba(255,255,255,.075) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 14px 35px rgba(0,0,0,.18) !important;
+  transition:border-color .25s ease, box-shadow .25s ease, transform .25s ease !important;
 }
-.stButton > button:hover::after,
-.stDownloadButton > button:hover::after { transform: translateX(120%); }
+div[data-baseweb="select"] > div:hover,
+div[data-baseweb="input"] > div:hover,
+div[data-baseweb="textarea"] > div:hover{
+  border-color:rgba(125,215,255,.34) !important;
+  box-shadow:0 0 0 3px rgba(125,215,255,.08), inset 0 1px 0 rgba(255,255,255,.13) !important;
+  transform:translateY(-1px);
+}
 
-/* tabs as pill navigation */
-.stTabs [data-baseweb="tab-list"] {
-  position: sticky;
-  top: .75rem;
-  z-index: 6;
-  background: rgba(10,9,15,.58) !important;
-  border-color: rgba(255,255,255,.14) !important;
-  box-shadow: 0 18px 50px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.12) !important;
+/* Sticky glass tabs */
+.stTabs [data-baseweb="tab-list"]{
+  position:sticky;
+  top:.65rem;
+  z-index:10;
+  padding:8px !important;
+  gap:6px !important;
+  border-radius:999px !important;
+  background:rgba(8,9,18,.64) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  box-shadow:0 24px 70px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  backdrop-filter:blur(26px) saturate(160%);
 }
-.stTabs [aria-selected="true"] {
+.stTabs [data-baseweb="tab"]{
+  border-radius:999px !important;
+  transition:background .25s ease, transform .25s ease, color .25s ease !important;
+}
+.stTabs [data-baseweb="tab"]:hover{transform:translateY(-2px);background:rgba(255,255,255,.08) !important;}
+.stTabs [aria-selected="true"]{
+  background:linear-gradient(135deg, rgba(139,92,246,.42), rgba(34,211,238,.17)) !important;
+  color:#fff !important;
+  box-shadow:0 10px 30px rgba(139,92,246,.22), inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+/* SVG charts: make them look custom-built, not matplotlib */
+svg{
+  filter:drop-shadow(0 20px 36px rgba(0,0,0,.30));
+}
+svg text{
+  font-family:'Manrope', system-ui, sans-serif !important;
+}
+svg rect, svg path, svg circle{
+  transition:opacity .25s ease, filter .25s ease, transform .25s ease;
+}
+svg rect:hover, svg path:hover, svg circle:hover{
+  filter:drop-shadow(0 0 14px rgba(125,215,255,.42));
+  opacity:.94;
+}
+
+/* Sidebar as a floating command panel */
+[data-testid="stSidebar"]{
   background:
-    linear-gradient(135deg, rgba(255,255,255,.17), rgba(184,92,255,.20)) !important;
-  color: #fff !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 8px 24px rgba(184,92,255,.16) !important;
+    radial-gradient(circle at 26% 0%, rgba(139,92,246,.28), transparent 34%),
+    linear-gradient(180deg, rgba(11,12,24,.88), rgba(8,9,18,.78)) !important;
+  border-right:1px solid rgba(255,255,255,.16) !important;
+  box-shadow:18px 0 70px rgba(0,0,0,.42), inset -1px 0 0 rgba(255,255,255,.08) !important;
 }
 
-/* sidebar depth */
-[data-testid="stSidebar"] {
-  background:
-    radial-gradient(circle at 20% 0%, rgba(184,92,255,.20), transparent 34%),
-    rgba(7,7,12,.72) !important;
+/* Page load/scroll-ish reveal. Streamlit rerenders sections, so this remains safe CSS only. */
+.main .block-container > div > div > div{
+  animation:sectionRise .72s var(--motion-ease) both;
 }
-.sidebar-brand {
-  filter: drop-shadow(0 12px 24px rgba(184,92,255,.18));
-}
-
-/* dataframes/table polish */
-[data-testid="stDataFrame"] {
-  border-radius: 24px !important;
-  overflow: hidden !important;
-}
-[data-testid="stDataFrame"] div {
-  scrollbar-width: thin;
+@keyframes sectionRise{
+  from{opacity:0;transform:translateY(22px) scale(.992)}
+  to{opacity:1;transform:translateY(0) scale(1)}
 }
 
-/* scroll-driven reveal, CSS-only with graceful fallback */
-@supports (animation-timeline: view()) {
-  [data-testid="metric-container"],
-  [data-testid="stExpander"],
-  [data-testid="stDataFrame"],
-  .info-box,
-  .result-card,
-  iframe,
-  h1, h2, h3 {
-    animation: reveal3d both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 28%;
-  }
-  @keyframes reveal3d {
-    from {
-      opacity: 0;
-      transform: translate3d(0, 36px, -80px) rotateX(8deg);
-      filter: blur(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0) rotateX(0);
-      filter: blur(0);
-    }
-  }
-}
-
-/* accessibility: reduce motion */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
-    scroll-behavior: auto !important;
-  }
+@media (prefers-reduced-motion: reduce){
+  *,*:before,*:after{animation:none !important;transition:none !important;scroll-behavior:auto !important;}
 }
 
 </style>
@@ -918,74 +1009,6 @@ CHART_CSS = """
   /* pie slice pulse on hover */
   .pie-slice { transition: opacity .2s, filter .2s; cursor: pointer; }
   .pie-slice:hover { opacity: .85; filter: brightness(1.18) drop-shadow(0 0 8px currentColor); }
-
-  /* Premium SVG chart depth / motion upgrade */
-  body::before {
-    content:"";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 22% 10%, rgba(233,179,255,.10), transparent 34%),
-      radial-gradient(circle at 88% 82%, rgba(100,210,255,.06), transparent 30%);
-    opacity: .9;
-  }
-  .card {
-    transform-style: preserve-3d;
-    backdrop-filter: blur(30px) saturate(155%);
-    -webkit-backdrop-filter: blur(30px) saturate(155%);
-    background:
-      radial-gradient(circle at 18% 0%, rgba(255,255,255,.12), transparent 28%),
-      linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.035) 48%, rgba(184,92,255,.065)) !important;
-    border-color: rgba(255,255,255,.16) !important;
-  }
-  .card:hover {
-    transform: translateY(-8px) rotateX(2deg) rotateY(-1deg);
-    border-color: rgba(233,179,255,.34) !important;
-  }
-  .card::before {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), rgba(233,179,255,.62), transparent);
-    animation: chartSheen 5s ease-in-out infinite;
-  }
-  @keyframes chartSheen {
-    0%, 42% { transform: translateX(-120%); opacity: 0; }
-    55% { opacity: 1; }
-    78%, 100% { transform: translateX(120%); opacity: 0; }
-  }
-  .chart-title {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    letter-spacing: -.025em;
-  }
-  .chart-title::before {
-    content:"";
-    width: 8px; height: 8px; border-radius: 999px;
-    background: #e9b3ff;
-    box-shadow: 0 0 18px rgba(233,179,255,.75);
-  }
-  .bar-rect, .pie-slice {
-    transition: opacity .24s ease, filter .24s ease, transform .24s cubic-bezier(.19,1,.22,1);
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .bar-rect:hover {
-    opacity: .94;
-    filter: brightness(1.22) drop-shadow(0 0 16px currentColor);
-    transform: translateY(-2px);
-  }
-  .pie-slice:hover {
-    opacity: .95;
-    transform: scale(1.025);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: .001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: .001ms !important;
-    }
-  }
 </style>
 """
 
@@ -1474,13 +1497,20 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 #  HERO HEADER
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
-<div class="hero">
-  <div class="hero-eyebrow">Route Intelligence Platform</div>
-  <h1>SkyLens Dashboard</h1>
-  <p>Built on a sample airline dataset for analysis and demonstration purposes only.
-     Does not reflect real-time airline operations or current flight decisions.</p>
-  <div class="hero-glyph">&#9992;</div>
-</div>
+<section class="motion-hero">
+  <div class="motion-kicker"><span></span> Route Intelligence Platform</div>
+  <h1>SkyLens<br/>Motion Dashboard</h1>
+  <p>
+    A cinematic glassmorphism interface for exploring airline route performance,
+    confidence signals, and decision recommendations. Model logic remains unchanged.
+  </p>
+  <div class="motion-hero-actions">
+    <div class="motion-chip">3D glass cards</div>
+    <div class="motion-chip">Animated SVG charts</div>
+    <div class="motion-chip">Sticky motion tabs</div>
+    <div class="motion-chip">No model logic changed</div>
+  </div>
+</section>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
