@@ -63,74 +63,140 @@ ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 st.markdown("""
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* =========================================================
+ROOT
+========================================================= */
 
 :root{
-    --bg:#060816;
-    --bg2:#0b1020;
-    --glass:rgba(255,255,255,0.08);
-    --glass-strong:rgba(255,255,255,0.12);
-    --border:rgba(255,255,255,0.16);
-    --text:#f5f7ff;
-    --muted:#b8c0d9;
-    --accent:#8fb8ff;
-    --glow:rgba(143,184,255,0.25);
+    --bg:#040816;
+    --bg2:#09101f;
 
-    --radius:24px;
-    --blur:22px;
+    --text:#f4f7ff;
+    --muted:#c5cee6;
+
+    --glass:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.10),
+            rgba(255,255,255,0.045)
+        );
+
+    --border:rgba(255,255,255,0.16);
 
     --shadow:
-        0 8px 32px rgba(0,0,0,0.35),
-        inset 0 1px 0 rgba(255,255,255,0.08);
+        0 10px 40px rgba(0,0,0,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.10);
 
-    --transition: all 0.35s ease;
+    --blueGlow:rgba(120,140,255,0.34);
+    --pinkGlow:rgba(255,140,220,0.20);
+
+    --radius:28px;
+    --blur:18px;
+
+    --transition:all 0.35s ease;
 }
 
+
+/* =========================================================
+GLOBAL
+========================================================= */
+
+html, body, [class*="css"]{
+    font-family: 'Inter', sans-serif !important;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* hide streamlit chrome */
+
+#MainMenu,
+header,
+footer{
+    visibility:hidden;
+}
 
 /* =========================================================
 BACKGROUND
 ========================================================= */
 
-html, body, [class*="css"]{
-    font-family: 'Inter', sans-serif;
-    color: var(--text);
-}
-
 .stApp{
+
     background:
-        radial-gradient(circle at 20% 20%, rgba(112,120,255,0.14), transparent 30%),
-        radial-gradient(circle at 80% 30%, rgba(180,120,255,0.10), transparent 28%),
-        radial-gradient(circle at 50% 80%, rgba(120,220,255,0.08), transparent 32%),
-        linear-gradient(180deg, #050816 0%, #070b1a 40%, #090f1f 100%);
+
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(120,90,255,0.20) 0%,
+            rgba(90,120,255,0.12) 18%,
+            rgba(0,0,0,0) 42%
+        ),
+
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(180,120,255,0.10),
+            transparent 28%
+        ),
+
+        radial-gradient(
+            circle at 80% 30%,
+            rgba(90,180,255,0.08),
+            transparent 26%
+        ),
+
+        radial-gradient(
+            circle at 60% 85%,
+            rgba(255,120,200,0.06),
+            transparent 30%
+        ),
+
+        linear-gradient(
+            180deg,
+            rgba(4,6,18,0.92),
+            rgba(7,10,24,0.96)
+        ),
+
+        url("https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=2400&q=80");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
     overflow:hidden;
+    position:relative;
 }
 
-/* animated nebula layer */
+
+/* =========================================================
+ANIMATED SWIRL
+========================================================= */
 
 .stApp::before{
+
     content:"";
     position:fixed;
-    inset:-20%;
+    inset:-25%;
     z-index:0;
     pointer-events:none;
 
     background:
         conic-gradient(
             from 0deg,
-            rgba(120,120,255,0.08),
-            rgba(180,120,255,0.06),
-            rgba(120,220,255,0.05),
-            rgba(120,120,255,0.08)
+            rgba(120,140,255,0.06),
+            rgba(200,120,255,0.05),
+            rgba(120,220,255,0.04),
+            rgba(120,140,255,0.06)
         );
 
     filter: blur(120px);
-    animation: swirl 30s linear infinite;
-    transform-origin:center;
+
+    animation: cosmicRotate 42s linear infinite;
 }
 
 /* stars */
 
 .stApp::after{
+
     content:"";
     position:fixed;
     inset:0;
@@ -138,32 +204,38 @@ html, body, [class*="css"]{
     pointer-events:none;
 
     background-image:
-        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.8), transparent),
-        radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,0.7), transparent),
-        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.5), transparent),
         radial-gradient(2px 2px at 85% 20%, rgba(255,255,255,0.7), transparent),
-        radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,0.5), transparent);
+        radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,0.4), transparent);
 
     animation: twinkle 8s ease-in-out infinite alternate;
-    opacity:0.6;
+
+    opacity:0.55;
 }
 
-@keyframes swirl{
+@keyframes cosmicRotate{
+
     0%{
-        transform:rotate(0deg) scale(1);
+        transform: rotate(0deg) scale(1);
     }
+
     50%{
-        transform:rotate(180deg) scale(1.15);
+        transform: rotate(180deg) scale(1.15);
     }
+
     100%{
-        transform:rotate(360deg) scale(1);
+        transform: rotate(360deg) scale(1);
     }
 }
 
 @keyframes twinkle{
+
     from{
-        opacity:0.35;
+        opacity:0.25;
     }
+
     to{
         opacity:0.8;
     }
@@ -175,36 +247,27 @@ LAYOUT
 ========================================================= */
 
 .main .block-container{
+
     max-width:1400px;
-    padding-top:2rem;
+
+    padding-top:1.8rem;
     padding-bottom:4rem;
+
     position:relative;
     z-index:2;
 }
 
 
 /* =========================================================
-SIDEBAR
+TYPOGRAPHY
 ========================================================= */
 
-[data-testid="stSidebar"]{
-    background: rgba(10,14,28,0.75) !important;
-    backdrop-filter: blur(30px);
-    border-right:1px solid rgba(255,255,255,0.08);
-}
+h1,h2,h3,h4,h5,h6{
 
-[data-testid="stSidebar"] *{
-    color:var(--muted) !important;
-}
-
-
-/* =========================================================
-HEADINGS
-========================================================= */
-
-h1,h2,h3,h4,h5{
     color:white !important;
-    font-weight:600 !important;
+
+    font-weight:700 !important;
+
     letter-spacing:-0.03em;
 }
 
@@ -214,46 +277,139 @@ p,label,span{
 
 
 /* =========================================================
+SIDEBAR
+========================================================= */
+
+[data-testid="stSidebar"]{
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(8,12,28,0.82),
+            rgba(8,12,28,0.72)
+        ) !important;
+
+    border-right:1px solid rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+[data-testid="stSidebar"] *{
+    color:var(--muted) !important;
+}
+
+
+/* =========================================================
 GLASS CARDS
 ========================================================= */
 
+.glass,
 [data-testid="metric-container"],
-.stTabs,
-div[data-baseweb="select"],
+.info-box,
+.result-card,
+.stTabs [data-baseweb="tab-list"],
+div[data-baseweb="select"] > div,
 .stTextInput > div > div,
 .stNumberInput > div > div,
 .stTextArea textarea,
 .stDateInput > div > div,
-.stMultiSelect > div,
-.element-container div[data-testid="stVerticalBlock"] > div:has(.info-box),
-.info-box,
-.result-card{
+.stMultiSelect > div{
+
+    position:relative;
 
     background: var(--glass) !important;
-
-    backdrop-filter: blur(var(--blur)) saturate(140%);
-    -webkit-backdrop-filter: blur(var(--blur)) saturate(140%);
 
     border:1px solid var(--border) !important;
 
     border-radius: var(--radius) !important;
 
+    backdrop-filter: blur(var(--blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--blur)) saturate(140%);
+
     box-shadow: var(--shadow);
+
+    overflow:hidden;
 
     transition: var(--transition);
 }
 
 
-/* hover lift */
+/* glowing border */
 
+.glass::before,
+[data-testid="metric-container"]::before,
+.info-box::before,
+.result-card::before{
+
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    border-radius:inherit;
+
+    padding:1px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,0.28),
+            rgba(255,255,255,0.02),
+            rgba(120,140,255,0.22)
+        );
+
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+
+    pointer-events:none;
+}
+
+
+/* hover */
+
+.glass:hover,
 [data-testid="metric-container"]:hover,
 .info-box:hover,
 .result-card:hover{
+
     transform: translateY(-4px);
-    border-color: rgba(255,255,255,0.22) !important;
+
+    border-color: rgba(255,255,255,0.24) !important;
+
     box-shadow:
-        0 12px 40px rgba(0,0,0,0.42),
-        0 0 24px rgba(143,184,255,0.12);
+        0 12px 44px rgba(0,0,0,0.55),
+        0 0 24px rgba(120,140,255,0.16);
+}
+
+
+/* =========================================================
+METRICS
+========================================================= */
+
+[data-testid="metric-container"]{
+
+    padding:1.2rem !important;
+}
+
+[data-testid="stMetricValue"]{
+
+    color:white !important;
+
+    font-size:2rem !important;
+
+    font-weight:700 !important;
+}
+
+[data-testid="stMetricLabel"]{
+
+    color:#d6def6 !important;
+
+    opacity:0.8;
 }
 
 
@@ -262,36 +418,42 @@ BUTTONS
 ========================================================= */
 
 .stButton > button{
+
+    border-radius:999px !important;
+
     background:
         linear-gradient(
             180deg,
             rgba(255,255,255,0.16),
-            rgba(255,255,255,0.08)
+            rgba(255,255,255,0.06)
         ) !important;
+
+    border:1px solid rgba(255,255,255,0.22) !important;
 
     color:white !important;
 
-    border:1px solid rgba(255,255,255,0.18) !important;
+    font-weight:600 !important;
 
-    border-radius:999px !important;
-
-    padding:0.7rem 1.4rem !important;
+    padding:0.75rem 1.6rem !important;
 
     backdrop-filter: blur(12px);
 
     box-shadow:
-        0 0 0 rgba(0,0,0,0),
-        0 0 20px rgba(143,184,255,0.15);
+        0 0 20px rgba(120,140,255,0.25),
+        inset 0 0 10px rgba(255,255,255,0.04);
 
-    transition: var(--transition);
+    transition:all 0.25s ease;
 }
 
 .stButton > button:hover{
+
     transform: translateY(-2px);
-    border-color: rgba(255,255,255,0.35) !important;
+
+    border-color: rgba(255,255,255,0.34) !important;
 
     box-shadow:
-        0 0 30px rgba(143,184,255,0.28);
+        0 0 32px rgba(120,140,255,0.42),
+        inset 0 0 12px rgba(255,255,255,0.08);
 }
 
 
@@ -299,23 +461,39 @@ BUTTONS
 INPUTS
 ========================================================= */
 
-input, textarea{
+input,
+textarea{
     color:white !important;
 }
 
 .stTextInput input,
 .stNumberInput input,
 textarea{
-    background: rgba(255,255,255,0.04) !important;
+
+    background: rgba(255,255,255,0.03) !important;
+
     border-radius:18px !important;
+
     border:1px solid rgba(255,255,255,0.10) !important;
 }
 
 .stTextInput input:focus,
 .stNumberInput input:focus,
 textarea:focus{
-    border:1px solid rgba(143,184,255,0.45) !important;
-    box-shadow:0 0 0 3px rgba(143,184,255,0.12) !important;
+
+    border:1px solid rgba(120,140,255,0.45) !important;
+
+    box-shadow:
+        0 0 0 3px rgba(120,140,255,0.10) !important;
+}
+
+
+/* =========================================================
+SELECTBOX
+========================================================= */
+
+div[data-baseweb="select"] *{
+    color:white !important;
 }
 
 
@@ -324,24 +502,36 @@ TABS
 ========================================================= */
 
 .stTabs [data-baseweb="tab-list"]{
+
     gap:0.5rem;
-    background:transparent;
+
+    padding:0.4rem;
 }
 
 .stTabs [data-baseweb="tab"]{
-    background: rgba(255,255,255,0.05);
+
     border-radius:999px;
-    color:var(--muted);
-    padding:0.5rem 1rem;
-    transition: var(--transition);
+
+    background: rgba(255,255,255,0.04);
+
+    color:#cbd5f1;
+
+    transition:all 0.25s ease;
 }
 
 .stTabs [aria-selected="true"]{
-    background: rgba(255,255,255,0.12) !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.12),
+            rgba(255,255,255,0.06)
+        ) !important;
+
     color:white !important;
 
     box-shadow:
-        0 0 20px rgba(143,184,255,0.18);
+        0 0 22px rgba(120,140,255,0.22);
 }
 
 
@@ -350,9 +540,36 @@ TABLES
 ========================================================= */
 
 [data-testid="stDataFrame"]{
+
     border-radius:24px;
+
     overflow:hidden;
+
     border:1px solid rgba(255,255,255,0.08);
+
+    background: rgba(255,255,255,0.03);
+}
+
+
+/* =========================================================
+CHARTS
+========================================================= */
+
+.js-plotly-plot,
+[data-testid="stPlotlyChart"]{
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.08),
+            rgba(255,255,255,0.03)
+        ) !important;
+
+    border-radius:24px !important;
+
+    border:1px solid rgba(255,255,255,0.08) !important;
+
+    backdrop-filter: blur(18px);
 }
 
 
@@ -369,54 +586,63 @@ SCROLLBAR
 }
 
 ::-webkit-scrollbar-thumb{
+
     background:rgba(255,255,255,0.12);
+
     border-radius:999px;
 }
 
 ::-webkit-scrollbar-thumb:hover{
+
     background:rgba(255,255,255,0.22);
 }
 
 
 /* =========================================================
-HERO SECTION OPTIONAL
+OPTIONAL HERO SECTION
 ========================================================= */
 
 .hero{
+
     position:relative;
+
     overflow:hidden;
+
+    border-radius:32px;
+
+    padding:2rem;
 
     background:
         linear-gradient(
             135deg,
             rgba(255,255,255,0.10),
-            rgba(255,255,255,0.04)
+            rgba(255,255,255,0.03)
         );
 
     border:1px solid rgba(255,255,255,0.14);
 
-    border-radius:32px;
-
     backdrop-filter: blur(24px);
 
     box-shadow:
-        0 10px 50px rgba(0,0,0,0.35);
-
-    padding:2rem;
+        0 10px 50px rgba(0,0,0,0.45);
 }
 
-.hero::before{
+.hero::after{
+
     content:"";
+
     position:absolute;
+
     width:500px;
     height:500px;
+
     top:-250px;
     right:-180px;
 
     background:
         radial-gradient(
             circle,
-            rgba(143,184,255,0.18),
+            rgba(120,140,255,0.20),
             transparent 70%
         );
 
@@ -425,15 +651,88 @@ HERO SECTION OPTIONAL
 
 
 /* =========================================================
-REMOVE STREAMLIT DEFAULTS
+PILLS
 ========================================================= */
 
-header{
-    background:transparent !important;
+.pill{
+
+    display:inline-flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:0.6rem 1.2rem;
+
+    border-radius:999px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.14),
+            rgba(255,255,255,0.05)
+        );
+
+    border:1px solid rgba(255,255,255,0.18);
+
+    color:white !important;
+
+    text-decoration:none;
+
+    box-shadow:
+        0 0 20px rgba(120,140,255,0.18);
+
+    transition:all 0.25s ease;
 }
 
-[data-testid="stToolbar"]{
-    right:1rem;
+.pill:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 28px rgba(120,140,255,0.34);
+}
+
+
+/* =========================================================
+SECTION LABELS
+========================================================= */
+
+.section-hd{
+
+    color:white;
+
+    font-size:1.15rem;
+
+    font-weight:700;
+
+    margin-bottom:0.4rem;
+}
+
+.section-sub{
+
+    color:#b9c4e0;
+
+    opacity:0.88;
+}
+
+
+/* =========================================================
+DIVIDERS
+========================================================= */
+
+hr{
+
+    border:none;
+
+    height:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.14),
+            transparent
+        );
 }
 
 </style>
