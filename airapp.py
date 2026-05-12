@@ -492,11 +492,8 @@ st.markdown("""
 <div class="hero">
   <div class="hero-left">
     <div class="hero-eyebrow">AIRLINE ROUTE INTELLIGENCE</div>
-    <h1>SKYLENS<br>DASHBOARD</h1>
     <p>Analyze route profitability, operational signals, and model-backed decisions in one polished command view.</p>
   </div>
-  <div class="hero-badge">Explore dashboard below</div>
-</div>
 """, unsafe_allow_html=True)
 
 
