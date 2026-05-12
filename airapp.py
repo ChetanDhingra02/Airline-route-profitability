@@ -72,7 +72,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .hero {{
   max-width: 1040px;
   margin: -85px auto 10px !important;
-  padding: 35px 72px !important;
+  padding: 10px 72px !important;
   display: block !important;
   text-align: center;
   position: relative;
