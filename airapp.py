@@ -656,7 +656,226 @@ hr {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(99,179,237,0.45);
 }
+
+/* ── SMOOTH SCROLL ──────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+section.main, .main { scroll-behavior: smooth; }
+
+/* ── REVEAL ON SCROLL (JS adds .revealed) ───────────────────── */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px) scale(0.985);
+  transition: opacity 0.70s cubic-bezier(0.22,1,0.36,1),
+              transform 0.70s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ── CHART SHIMMER WRAPPER ──────────────────────────────────── */
+@keyframes chartShimmer {
+  0%   { transform: translateX(-120%) skewX(-15deg); opacity: 0;   }
+  35%  { opacity: 0.7; }
+  100% { transform: translateX(220%)  skewX(-15deg); opacity: 0;   }
+}
+@keyframes chartPulse {
+  0%, 100% { box-shadow: 0 8px 32px rgba(0,0,0,0.50),
+                          0 0  0px rgba(99,179,237,0);
+             border-color: rgba(120,180,255,0.18); }
+  50%      { box-shadow: 0 12px 48px rgba(0,0,0,0.55),
+                          0 0 32px rgba(99,179,237,0.18),
+                          0 0 60px rgba(0,201,167,0.08);
+             border-color: rgba(99,179,237,0.38); }
+}
+.chart-wrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(120,180,255,0.18);
+  padding: 18px 14px 14px;
+  background: rgba(6,18,42,0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+  animation: chartPulse 5s ease-in-out infinite;
+  transition: transform 0.40s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.40s ease;
+  margin-bottom: 4px;
+}
+.chart-wrap:hover {
+  transform: translateY(-5px) scale(1.006);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.60),
+              0 0 48px rgba(99,179,237,0.16);
+}
+/* sweeping shimmer streak */
+.chart-wrap::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 55%; height: 100%;
+  background: linear-gradient(
+    108deg,
+    transparent 25%,
+    rgba(255,255,255,0.055) 50%,
+    transparent 75%
+  );
+  animation: chartShimmer 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+/* top edge light line */
+.chart-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 8%; right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(99,179,237,0.60) 38%,
+    rgba(0,201,167,0.50) 62%,
+    transparent
+  );
+  background-size: 200% auto;
+  animation: shimmer 3.5s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── 3D TILT on metric cards (JS drives --rx/--ry) ──────────── */
+[data-testid="metric-container"] {
+  transform-style: preserve-3d;
+  transform: perspective(600px)
+             rotateX(var(--rx, 0deg))
+             rotateY(var(--ry, 0deg));
+  will-change: transform;
+  transition: transform 0.10s linear !important;
+}
+
+/* ── PARALLAX HERO (JS sets --parallax-y) ───────────────────── */
+.hero {
+  transform: translateY(var(--parallax-y, 0px));
+  will-change: transform;
+}
+
+/* ── CURSOR GLOW ────────────────────────────────────────────── */
+#cursor-glow {
+  position: fixed;
+  width: 340px; height: 340px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  background: radial-gradient(circle,
+    rgba(99,179,237,0.09) 0%,
+    rgba(0,201,167,0.05) 40%,
+    transparent 70%);
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  left: -999px; top: -999px;
+}
+
 </style>
+""", unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────
+#  MOTION ENGINE  (cursor glow, parallax, reveal, 3D tilt, chart wrap)
+# ─────────────────────────────────────────────────────────────
+st.markdown("""
+<div id="cursor-glow"></div>
+<script>
+(function() {
+  function init() {
+    var scrollEl = document.querySelector('section.main') ||
+                   document.querySelector('.main') ||
+                   document.documentElement;
+
+    /* 1. CURSOR GLOW */
+    var glow = document.getElementById('cursor-glow');
+    var cx = window.innerWidth/2, cy = window.innerHeight/2;
+    var tx = cx, ty = cy;
+    document.addEventListener('mousemove', function(e){ tx=e.clientX; ty=e.clientY; });
+    (function loop(){
+      cx += (tx-cx)*0.10; cy += (ty-cy)*0.10;
+      if(glow){ glow.style.left=cx+'px'; glow.style.top=cy+'px'; }
+      requestAnimationFrame(loop);
+    })();
+
+    /* 2. PARALLAX HERO */
+    var hero = document.querySelector('.hero');
+    function doParallax(){
+      if(!hero) return;
+      var sy = scrollEl.scrollTop || window.scrollY || 0;
+      hero.style.setProperty('--parallax-y', Math.min(sy*0.28, 70)+'px');
+    }
+    scrollEl.addEventListener('scroll', doParallax, {passive:true});
+    window.addEventListener('scroll', doParallax, {passive:true});
+
+    /* 3. INTERSECTION OBSERVER — reveal on scroll */
+    var sel = [
+      '[data-testid="metric-container"]',
+      '[data-testid="stDataFrame"]',
+      '.section-hd', '.section-sub',
+      '.divider-label', '.info-box',
+      '.result-card',
+      '[data-testid="stExpander"]',
+      '[data-testid="stForm"]'
+    ].join(',');
+    var els = document.querySelectorAll(sel);
+    els.forEach(function(el){ el.classList.add('reveal-on-scroll'); });
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry, i){
+        if(entry.isIntersecting){
+          setTimeout(function(){ entry.target.classList.add('revealed'); }, i*60);
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.07, rootMargin:'0px 0px -30px 0px'});
+    els.forEach(function(el){ io.observe(el); });
+
+    /* 4. 3D TILT on metric cards */
+    function addTilt(card){
+      if(card.dataset.tilt) return;
+      card.dataset.tilt = '1';
+      card.addEventListener('mousemove', function(e){
+        var r = card.getBoundingClientRect();
+        var x = (e.clientX-r.left)/r.width  - 0.5;
+        var y = (e.clientY-r.top) /r.height - 0.5;
+        card.style.setProperty('--ry',  (x*13)+'deg');
+        card.style.setProperty('--rx', (-y*13)+'deg');
+      });
+      card.addEventListener('mouseleave', function(){
+        card.style.setProperty('--ry','0deg');
+        card.style.setProperty('--rx','0deg');
+      });
+    }
+    document.querySelectorAll('[data-testid="metric-container"]').forEach(addTilt);
+
+    /* 5. WRAP matplotlib charts in .chart-wrap */
+    function wrapCharts(){
+      document.querySelectorAll('[data-testid="stImage"] img').forEach(function(img){
+        if(img.closest('.chart-wrap')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'chart-wrap reveal-on-scroll';
+        img.parentNode.insertBefore(wrap, img);
+        wrap.appendChild(img);
+        io.observe(wrap);
+      });
+    }
+    wrapCharts();
+
+    /* 6. MutationObserver for Streamlit re-renders */
+    new MutationObserver(function(){
+      document.querySelectorAll('[data-testid="metric-container"]').forEach(addTilt);
+      wrapCharts();
+    }).observe(document.body, {childList:true, subtree:true});
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 200);
+  }
+})();
+</script>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
