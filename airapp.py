@@ -434,22 +434,150 @@ st.markdown("""
 # - CHARTS
 # BELOW THIS COMMENT
 
+# ─────────────────────────────────────────────────────────────
+#  FINAL CLEAN PLOTLY HELPERS — single source of truth
+# ─────────────────────────────────────────────────────────────
+def _fmt_money(v):
+    if abs(v) >= 1_000_000:
+        return f"${v/1_000_000:.1f}M"
+    if abs(v) >= 1_000:
+        return f"${v/1_000:.0f}K"
+    return f"${v:.0f}"
 
-# ─────────────────────────────────────────────────────────────
-#  PATHS
-# ─────────────────────────────────────────────────────────────
-BASE_DIR     = os.path.dirname(__file__)
-DATA_PATH    = os.path.join(BASE_DIR, "airline_route_profitability.csv")
-if not os.path.exists(DATA_PATH):
-    alt_data_path = os.path.join(BASE_DIR, "airline_route_profitability(1).csv")
-    if os.path.exists(alt_data_path):
-        DATA_PATH = alt_data_path
-MODEL1_PATH  = os.path.join(BASE_DIR, "model_with_revenue.pkl")
-MODEL2_PATH  = os.path.join(BASE_DIR, "model_without_revenue.pkl")
-MODEL3_PATH  = os.path.join(BASE_DIR, "model_preoperational.pkl")
-X1_COLS_PATH = os.path.join(BASE_DIR, "x1_columns.pkl")
-X2_COLS_PATH = os.path.join(BASE_DIR, "x2_columns.pkl")
-X3_COLS_PATH = os.path.join(BASE_DIR, "x3_columns.pkl")
+
+
+
+def col_seq(labels):
+    return [DECISION_COLORS.get(str(label), ACCENT) for label in labels]
+
+def _format_value(v, value_format="number", fmt_fn=None):
+    if fmt_fn:
+        return fmt_fn(v)
+    if value_format == "money":
+        return _fmt_money(v)
+    if value_format == "percent":
+        return f"{v:.0%}"
+    return f"{v:,.0f}"
+
+
+def _plotly_layout(fig, height=420, showlegend=False):
+    fig.update_layout(
+        height=height,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter", color=TEXT_SOFT, size=13),
+        showlegend=showlegend,
+        margin=dict(l=52, r=54, t=18, b=58),
+        hoverlabel=dict(
+            bgcolor="#111722",
+            bordercolor="rgba(255,255,255,.16)",
+            font_color="white",
+            font_family="Inter",
+        ),
+    )
+    fig.update_xaxes(showgrid=False, zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
+    fig.update_yaxes(gridcolor="rgba(255,255,255,.07)", zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
+    return fig
+
+
+def plotly_card(title, fig, height=420):
+    st.markdown(
+        f'<div class="plotly-card"><div class="plotly-card-title">{title}</div>',
+        unsafe_allow_html=True,
+    )
+    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False, "responsive": True})
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+def plotly_donut_chart(title, labels, values, colors=None, height=420, **kwargs):
+    labels = [str(x) for x in labels]
+    vals = [float(v) if pd.notna(v) else 0.0 for v in values]
+    if not vals or sum(vals) <= 0:
+        st.info("No chart data available for the current filter.")
+        return
+    colors = colors or [DECISION_COLORS.get(x, CYAN) for x in labels]
+    fig = go.Figure(
+        go.Pie(
+            labels=labels,
+            values=vals,
+            hole=0.58,
+            marker=dict(colors=colors, line=dict(color="#080B12", width=3)),
+            textinfo="percent",
+            textfont=dict(size=15, color="white"),
+            hovertemplate="%{label}<br>%{percent}<br>%{value}<extra></extra>",
+        )
+    )
+    _plotly_layout(fig, height=height, showlegend=True)
+    fig.update_layout(
+        legend=dict(orientation="h", y=-0.08, x=0.5, xanchor="center", font=dict(size=12, color=TEXT_SOFT)),
+        margin=dict(l=20, r=20, t=8, b=76),
+    )
+    plotly_card(title, fig, height)
+
+
+def plotly_vbar_chart(title, labels, series=None, values=None, colors=None, max_value=None, value_format="number", height=420, fmt_fn=None, y_label="", **kwargs):
+    labels = [str(x) for x in labels]
+    fig = go.Figure()
+    if series is None:
+        series = [{"name": "Value", "values": values or [], "colors": colors}]
+    for srs in series:
+        vals = [float(v) if pd.notna(v) else 0.0 for v in srs.get("values", [])]
+        marker_colors = srs.get("colors") or colors or [srs.get("color", CYAN)] * len(vals)
+        if isinstance(marker_colors, str):
+            marker_colors = [marker_colors] * len(vals)
+        text = [_format_value(v, value_format=value_format, fmt_fn=fmt_fn) for v in vals]
+        fig.add_trace(
+            go.Bar(
+                x=labels,
+                y=vals,
+                name=srs.get("name", "Value"),
+                marker=dict(color=marker_colors, line=dict(width=0)),
+                text=text,
+                textposition="outside",
+                cliponaxis=False,
+                hovertemplate="%{x}<br>%{y}<extra></extra>",
+            )
+        )
+    _plotly_layout(fig, height=height, showlegend=len(series) > 1)
+    if max_value is not None:
+        fig.update_yaxes(range=[0, max_value * 1.12])
+    fig.update_traces(width=0.52)
+    if y_label:
+        fig.update_yaxes(title_text=y_label)
+    plotly_card(title, fig, height)
+
+
+def plotly_hbar_chart(title, labels, values, colors=None, color=None, value_format="money", height=460, fmt_fn=None, **kwargs):
+    labels = [str(x) for x in labels]
+    vals = [float(v) if pd.notna(v) else 0.0 for v in values]
+    if not vals:
+        st.info("No chart data available for the current filter.")
+        return
+    if colors is None:
+        colors = [color or CYAN] * len(vals)
+    elif isinstance(colors, str):
+        colors = [colors] * len(vals)
+    else:
+        colors = list(colors)
+    if len(colors) < len(vals):
+        colors = colors + [color or CYAN] * (len(vals) - len(colors))
+    text = [_format_value(v, value_format=value_format, fmt_fn=fmt_fn) for v in vals]
+    fig = go.Figure(
+        go.Bar(
+            y=labels,
+            x=vals,
+            orientation="h",
+            marker=dict(color=colors, line=dict(width=0)),
+            text=text,
+            textposition="outside",
+            cliponaxis=False,
+            hovertemplate="%{y}<br>%{x}<extra></extra>",
+        )
+    )
+    _plotly_layout(fig, height=height, showlegend=False)
+    fig.update_layout(margin=dict(l=130, r=110, t=18, b=48))
+    fig.update_yaxes(autorange="reversed")
+    plotly_card(title, fig, height)
 
 
 # ─────────────────────────────────────────────────────────────
