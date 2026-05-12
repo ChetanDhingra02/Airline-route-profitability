@@ -51,30 +51,111 @@ st.markdown(f"""
 html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; color:var(--ink)!important; -webkit-font-smoothing:antialiased; }}
 .stApp {{ background:#030303!important; min-height:100vh!important; overflow-x:hidden!important; }}
 .stApp:before {{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.22; background-image: radial-gradient(circle,rgba(255,255,255,.95) 0 1px,transparent 1.4px), radial-gradient(circle,rgba(255,255,255,.45) 0 1px,transparent 1.3px); background-size:150px 150px,240px 240px; background-position:20px 40px,100px 20px; }}
+
+.twinkle-layer {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
+.twinkle {{ position:absolute; width:2px; height:2px; border-radius:999px; background:rgba(255,255,255,.72); box-shadow:0 0 8px rgba(255,255,255,.55); opacity:.18; animation:twinkle 4.8s ease-in-out infinite; }}
+.twinkle:nth-child(1){{left:8%;top:16%;animation-delay:.2s}} .twinkle:nth-child(2){{left:18%;top:52%;animation-delay:1.4s}} .twinkle:nth-child(3){{left:34%;top:22%;animation-delay:2.1s}} .twinkle:nth-child(4){{left:61%;top:14%;animation-delay:.9s}} .twinkle:nth-child(5){{left:86%;top:26%;animation-delay:1.9s}} .twinkle:nth-child(6){{left:76%;top:70%;animation-delay:3.2s}} .twinkle:nth-child(7){{left:41%;top:81%;animation-delay:2.7s}} .twinkle:nth-child(8){{left:12%;top:78%;animation-delay:3.8s}}
+@keyframes twinkle {{ 0%,100%{{opacity:.10;transform:scale(.72)}} 50%{{opacity:.55;transform:scale(1.35)}} }}
 .stApp:after {{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.15; background: radial-gradient(circle at 23% 44%,rgba(120,160,190,.18),transparent 18%), radial-gradient(circle at 78% 37%,rgba(160,150,185,.13),transparent 20%), radial-gradient(circle at 53% 85%,rgba(255,255,255,.06),transparent 22%); }}
 .cosmos-bg {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
 .constellation {{ position:absolute; width:210px; height:150px; opacity:.46; filter:drop-shadow(0 0 5px rgba(255,255,255,.45)); }}
 .constellation svg {{ width:100%; height:100%; }}
 .constellation line {{ stroke:rgba(255,255,255,.48); stroke-width:.7; }} .constellation circle {{ fill:rgba(255,255,255,.88); }}
 .c1{{left:3%;top:10%}} .c2{{left:49%;top:4%;transform:scale(1.25) rotate(-8deg)}} .c3{{right:6%;top:10%;transform:rotate(15deg)}} .c4{{left:4%;bottom:12%;transform:rotate(22deg)}} .c5{{right:9%;bottom:16%;transform:scale(1.4)}}
-.cosmos-nav {{ position:relative; z-index:4; display:flex; align-items:center; justify-content:space-between; margin:4px auto 108px; max-width:1260px; padding:24px 4px 0; }}
+.cosmos-nav {{ position:relative; z-index:4; display:flex; align-items:center; justify-content:space-between; margin:4px auto 92px; max-width:1260px; padding:24px 4px 0; }}
 .cosmos-brand {{ font-size:1.62rem; font-weight:900; letter-spacing:.06em; color:#f6f3ea; }}
 .cosmos-links {{ display:flex; gap:34px; margin-left:-240px; }} .cosmos-links span {{ color:rgba(244,241,232,.58); font-size:.92rem; letter-spacing:.04em; }} .cosmos-links span:first-child {{ color:#fff; border-bottom:1px solid rgba(255,255,255,.72); padding-bottom:6px; }}
 .cosmos-login,.cosmos-pill {{ border:1px solid rgba(255,255,255,.28); background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.035)); color:#f5f1e9; border-radius:999px; padding:10px 18px; box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 20px rgba(255,255,255,.10); font-size:.86rem; }}
 .main .block-container {{ max-width:1260px!important; padding-top:.2rem!important; padding-bottom:4rem!important; position:relative!important; z-index:3!important; }}
 [data-testid="stSidebar"] {{ background:rgba(5,5,5,.72)!important; border-right:1px solid rgba(255,255,255,.10)!important; backdrop-filter:blur(22px)!important; }} [data-testid="stSidebar"] * {{ color:var(--soft)!important; }}
 .sidebar-brand {{ font-size:1.12rem; font-weight:900; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:.02em; color:#f4f1e8!important; }} .sidebar-brand span {{ color:#fff!important; }}
-.hero {{ display:none!important; }}
-.feature-grid {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:40px; margin:-80px auto 30px; max-width:1030px; }}
-.feature-card {{ position:relative; min-height:356px; border-radius:20px; overflow:hidden; background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.035)),rgba(34,34,32,.54); border:1px solid rgba(255,255,255,.24); box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 0 0 1px rgba(255,255,255,.04),0 28px 80px rgba(0,0,0,.52),0 0 38px rgba(255,255,255,.10); backdrop-filter:blur(18px) saturate(125%); transition:transform .25s ease, box-shadow .25s ease; }}
-.feature-card:hover {{ transform:translateY(-6px); box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 36px 95px rgba(0,0,0,.62),0 0 48px rgba(255,255,255,.14); }}
-.feature-card:before {{ content:""; position:absolute; inset:0; opacity:.58; background:radial-gradient(circle at 50% 70%,rgba(235,225,205,.50),transparent 20%),radial-gradient(circle at 46% 68%,rgba(145,160,180,.45),transparent 28%),radial-gradient(circle at 80% 35%,rgba(120,160,180,.22),transparent 30%),linear-gradient(180deg,rgba(255,255,255,.05),transparent 40%); filter:blur(.2px); }}
-.feature-card:nth-child(2):before {{ opacity:.40; background:radial-gradient(circle at 65% 22%,rgba(255,255,255,.35),transparent 2%),radial-gradient(circle at 50% 40%,rgba(255,255,255,.18),transparent 18%),linear-gradient(140deg,transparent,rgba(255,255,255,.08),transparent); }}
-.feature-card:nth-child(3):before {{ opacity:.52; background:radial-gradient(circle at 75% 54%,rgba(120,170,190,.36),transparent 27%),radial-gradient(circle at 60% 68%,rgba(200,160,150,.22),transparent 30%),radial-gradient(circle at 28% 40%,rgba(255,255,255,.18),transparent 10%); }}
-.feature-inner {{ position:relative; z-index:2; min-height:356px!important; padding:42px 30px!important; background:transparent!important; border:none!important; box-shadow:none!important; display:flex; flex-direction:column; justify-content:space-between; }}
-.feature-icon {{ display:none; }} .feature-inner h3 {{ color:#f7f3ea!important; font-size:2.05rem!important; line-height:1.08!important; letter-spacing:.075em!important; text-transform:uppercase!important; font-weight:900!important; margin:0!important; max-width:260px; text-shadow:0 2px 18px rgba(0,0,0,.5); }} .feature-inner p {{ color:rgba(245,241,232,.72)!important; font-size:1.02rem!important; line-height:1.35!important; max-width:260px; margin:12px 0 0!important; }}
-.feature-inner:after {{ content:"Explore"; width:max-content; border:1px solid rgba(255,255,255,.34); border-radius:999px; padding:8px 18px; color:#fff; background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04)); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 0 20px rgba(255,255,255,.12); font-weight:600; font-size:.86rem; }}
-.cosmos-mini {{ display:flex; justify-content:center; gap:54px; margin:20px 0 26px; color:rgba(245,241,232,.62); text-align:center; }} .cosmos-mini div {{ font-size:.78rem; }} .cosmos-cta {{ text-align:center; margin-bottom:34px; }}
+.hero {{
+  max-width: 1040px;
+  margin: -72px auto 42px !important;
+  padding: 66px 72px !important;
+  display: block !important;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px !important;
+  background:
+    radial-gradient(circle at 50% 115%, rgba(245,241,232,.20), transparent 34%),
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,.10), transparent 28%),
+    radial-gradient(circle at 82% 24%, rgba(120,160,190,.12), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,.105), rgba(255,255,255,.032)),
+    rgba(32,32,30,.58) !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 -1px 0 rgba(255,255,255,.07),
+    0 42px 120px rgba(0,0,0,.64),
+    0 0 62px rgba(255,255,255,.10) !important;
+  backdrop-filter: blur(22px) saturate(125%) !important;
+}}
+.hero:before {{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 45% 72%, rgba(245,236,214,.20), transparent 16%),
+    radial-gradient(circle at 51% 78%, rgba(160,180,200,.16), transparent 25%),
+    linear-gradient(115deg, transparent 0 42%, rgba(255,255,255,.08) 49%, transparent 56%);
+  opacity:.72;
+}}
+.hero:after {{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:1px;
+  left:50%;
+  bottom:34px;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.46),transparent);
+  opacity:.72;
+}}
+.hero-left {{ position:relative; z-index:2; }}
+.hero h1 {{
+  font-size: clamp(3rem, 7vw, 6.2rem) !important;
+  line-height: .90 !important;
+  letter-spacing: .095em !important;
+  text-transform: uppercase !important;
+  color: #f7f3ea !important;
+  margin: 0 !important;
+  font-weight: 900 !important;
+  text-shadow: 0 4px 28px rgba(0,0,0,.58);
+}}
+.hero p {{
+  margin: 20px auto 0 !important;
+  max-width: 680px;
+  color: rgba(245,241,232,.68) !important;
+  font-size: 1.03rem !important;
+  line-height: 1.6 !important;
+}}
+.hero-eyebrow {{
+  color: rgba(245,241,232,.62);
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}}
+.hero-badge {{
+  display: inline-flex;
+  margin-top: 30px;
+  padding: 10px 20px;
+  border: 1px solid rgba(255,255,255,.30);
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 0 24px rgba(255,255,255,.10);
+  font-size: .82rem;
+  font-weight: 700;
+  position:relative;
+  z-index:2;
+}}
+.hero-glyph,.hero-star {{ display:none!important; }}
+.feature-grid,.feature-card,.feature-inner,.feature-icon,.cosmos-mini,.cosmos-cta {{ display:none!important; }}
 [data-testid="metric-container"],[data-testid="stForm"],[data-testid="stDataFrame"],[data-testid="stExpander"],.info-box,.result-card,.plotly-card {{ background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.026)),rgba(25,25,25,.70)!important; border:1px solid rgba(255,255,255,.14)!important; border-radius:20px!important; box-shadow:0 24px 70px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.10)!important; backdrop-filter:blur(18px)!important; }}
 [data-testid="metric-container"] {{ padding:20px!important; }} [data-testid="stMetricLabel"] p {{ color:rgba(245,241,232,.55)!important; font-size:.64rem!important; letter-spacing:.12em!important; text-transform:uppercase!important; }} [data-testid="stMetricValue"],[data-testid="stMetricValue"]>div {{ color:#f7f3ea!important; font-size:1.8rem!important; font-weight:850!important; }}
 .stTabs [data-baseweb="tab-list"] {{ gap:4px; padding:5px; border-radius:18px; background:rgba(18,18,18,.72); border:1px solid rgba(255,255,255,.12); }} .stTabs [data-baseweb="tab"] {{ color:rgba(245,241,232,.50)!important; font-weight:700!important; border-radius:13px!important; }} .stTabs [aria-selected="true"] {{ background:rgba(255,255,255,.08)!important; color:#fff!important; }} .stTabs [data-baseweb="tab-highlight"] {{ display:none!important; }}
@@ -84,6 +165,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .plotly-card {{ padding:16px 16px 6px; margin-bottom:18px; }} .plotly-card-title {{ color:#f7f3ea; font-weight:850; letter-spacing:-.03em; margin:4px 6px 10px; }}
 @media(max-width:900px) {{ .cosmos-nav{{margin-bottom:40px}} .cosmos-links{{display:none}} .feature-grid{{grid-template-columns:1fr;margin-top:-20px}} }}
 </style>
+<div class="twinkle-layer"><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span></div>
 <div class="cosmos-bg">
   <div class="constellation c1"><svg viewBox="0 0 200 140"><line x1="20" y1="20" x2="45" y2="70"/><line x1="45" y1="70" x2="78" y2="62"/><line x1="78" y1="62" x2="105" y2="95"/><line x1="45" y1="70" x2="55" y2="115"/><circle cx="20" cy="20" r="2"/><circle cx="45" cy="70" r="3"/><circle cx="78" cy="62" r="2"/><circle cx="105" cy="95" r="3"/><circle cx="55" cy="115" r="2"/></svg></div>
   <div class="constellation c2"><svg viewBox="0 0 240 120"><line x1="15" y1="70" x2="55" y2="45"/><line x1="55" y1="45" x2="105" y2="48"/><line x1="105" y1="48" x2="150" y2="25"/><line x1="150" y1="25" x2="205" y2="15"/><line x1="105" y1="48" x2="115" y2="90"/><line x1="115" y1="90" x2="178" y2="105"/><circle cx="15" cy="70" r="2"/><circle cx="55" cy="45" r="2.5"/><circle cx="105" cy="48" r="2"/><circle cx="150" cy="25" r="2.5"/><circle cx="205" cy="15" r="2"/><circle cx="115" cy="90" r="2"/><circle cx="178" cy="105" r="2"/></svg></div>
@@ -408,29 +490,13 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <div class="hero-star"></div><div class="hero-star"></div>
-  <div class="hero-star"></div><div class="hero-star"></div>
   <div class="hero-left">
-    <div class="hero-eyebrow">✦ Route Intelligence Platform</div>
-    <h1>Airline Profitability System</h1>
-    <p>Sample airline dataset · for analysis &amp; demonstration only</p>
+    <div class="hero-eyebrow">AIRLINE ROUTE INTELLIGENCE</div>
+    <h1>SKYLENS<br>DASHBOARD</h1>
+    <p>Analyze route profitability, operational signals, and model-backed decisions in one polished command view.</p>
   </div>
-  <div class="hero-badge">⚡ ML-Powered Decisions</div>
-  <div class="hero-glyph">✈</div>
+  <div class="hero-badge">Explore dashboard below</div>
 </div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<div class="feature-grid">
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#38BDF8 0%,#7DD3FC 45%,#2563EB 100%)"><div class="feature-inner"><div class="feature-icon">✈️</div><h3>PROJECT<br>SKYLENS</h3><p>Explore airline route profitability like never before.</p></div></div>
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#FACC15 0%,#FB923C 45%,#FB7185 100%)"><div class="feature-inner"><div class="feature-icon">📡</div><h3>COSMIC<br>ROUTE MAPS</h3><p>View interactive decisions, routes, costs and demand signals.</p></div></div>
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#22C55E 0%,#2DD4BF 45%,#A78BFA 100%)"><div class="feature-inner"><div class="feature-icon">💹</div><h3>PROFITABILITY<br>HUB</h3><p>Connect operational signals with smarter route decisions.</p></div></div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<div class="cosmos-mini"><div>◎<br>Routes</div><div>✦<br>Decisions</div><div>▤<br>Profit Signals</div></div>
-<div class="cosmos-cta"><span class="cosmos-pill">LAUNCH DASHBOARD</span></div>
 """, unsafe_allow_html=True)
 
 
