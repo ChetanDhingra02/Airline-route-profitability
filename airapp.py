@@ -2,204 +2,729 @@ import os
 import joblib
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import numpy as np
 import json
-import plotly.graph_objects as go
+import streamlit.components.v1 as components
+
 
 st.set_page_config(
-    page_title="SkyLens · Airline Profitability Command Center",
+    page_title="Airline Profitability System",
     page_icon="✈️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ─────────────────────────────────────────────────────────────
-#  PROFESSIONAL AVIATION COMMAND CENTER THEME
-# ─────────────────────────────────────────────────────────────
-BG = "#080B12"
-PANEL = "#121722"
-PANEL_2 = "#171E2B"
-TEXT = "#F5F7FB"
-TEXT_SOFT = "#C9D2E3"
-TEXT_MUTED = "#7F8AA3"
-CYAN = "#38BDF8"
-BLUE = "#2563EB"
-AMBER = "#F59E0B"
-GREEN = "#22C55E"
-RED = "#F43F5E"
-VIOLET = "#A78BFA"
 
-CHART_EXPAND   = "#22C55E"
-CHART_MAINTAIN = "#FACC15"
-CHART_OPTIMIZE = "#FB923C"
-CHART_DROP     = "#FB7185"
-CHART_NEUTRAL  = ["#38BDF8", "#A78BFA", "#F59E0B", "#22C55E", "#FB7185", "#60A5FA", "#2DD4BF", "#F472B6"]
-DECISION_COLORS = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN, "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
+# ─────────────────────────────────────────────────────────────
+#  JEWEL-TONE LIGHT PALETTE — Crystal / Genshin Impact Style
+# ─────────────────────────────────────────────────────────────
+BG_BASE        = "#fdf9f4"          # warm pearl ivory
+BG_SOFT        = "#f5eeff"          # lavender tint
+BG_COOL        = "#eef5fd"          # sky tint
+
+GLASS_BG       = "rgba(255, 252, 248, 0.72)"
+GLASS_BORDER   = "rgba(162, 106, 255, 0.28)"
+
+INK            = "#1a0f3c"          # deep indigo-black
+INK_SOFT       = "#4a3278"          # violet ink mid
+INK_MUTED      = "#8b6faa"          # muted amethyst
+
+ACCENT         = "#7c3aed"          # vivid violet
+ACCENT_DK      = "#5b21b6"
+ACCENT_LT      = "#c4b5fd"
+ACCENT_2       = "#0284c7"          # sapphire
+MAGENTA        = "#db2777"          # ruby
+
+# Jewel chart tones — maximum saturation
+CHART_EXPAND   = "#1d4ed8"          # deep sapphire
+CHART_MAINTAIN = "#047857"          # deep emerald
+CHART_OPTIMIZE = "#b45309"          # deep topaz
+CHART_ORANGE   = "#b45309"
+CHART_DROP     = "#be185d"          # deep ruby
+CHART_NEUTRAL  = [
+    "#6d28d9", "#1d4ed8", "#0e7490", "#047857",
+    "#be185d", "#b45309", "#15803d", "#71717a",
+]
+
+DECISION_COLORS = {
+    "Expand":   CHART_EXPAND,
+    "Maintain": CHART_MAINTAIN,
+    "Optimize": CHART_OPTIMIZE,
+    "Drop":     CHART_DROP,
+}
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
-ACCENT = CYAN
-INK = TEXT
-INK_SOFT = TEXT_SOFT
-INK_MUTED = TEXT_MUTED
 
+# ─────────────────────────────────────────────────────────────
+#  GLOBAL CSS
+# ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
 :root {{
-  --bg:#080B12; --panel:#121722; --panel2:#171E2B; --ink:#F5F7FB; --soft:#C9D2E3; --muted:#7F8AA3;
-  --cyan:#38BDF8; --blue:#2563EB; --green:#22C55E; --amber:#F59E0B; --red:#F43F5E; --violet:#A78BFA;
-  --radius:30px; --border:rgba(255,255,255,.14);
+    --pearl:       {BG_BASE};
+    --pearl-soft:  {BG_SOFT};
+    --pearl-cool:  {BG_COOL};
+    --ink:         {INK};
+    --ink-soft:    {INK_SOFT};
+    --ink-muted:   {INK_MUTED};
+    --accent:      {ACCENT};
+    --accent-dk:   {ACCENT_DK};
+    --accent-lt:   {ACCENT_LT};
+    --accent-2:    {ACCENT_2};
+    --magenta:     {MAGENTA};
+    --sapphire:    #1d4ed8;
+    --emerald:     #047857;
+    --topaz:       #b45309;
+    --ruby:        #be185d;
+    --amethyst:    #6d28d9;
+    --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+    --sh-sm: 0 2px 16px rgba(120,70,200,0.10), 0 1px 4px rgba(0,0,0,0.05);
+    --sh-md: 0 8px 32px rgba(120,70,200,0.16), 0 2px 8px rgba(0,0,0,0.08);
+    --sh-lg: 0 20px 56px rgba(120,70,200,0.22), 0 4px 16px rgba(0,0,0,0.10);
+    --sh-glow: 0 0 0 1px rgba(124,58,237,0.30), 0 0 28px rgba(124,58,237,0.18);
+    --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 }}
-html, body, [class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; color:var(--ink)!important; -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }}
+
+/* ── Keyframes ── */
+@keyframes floatIn    {{ from {{ opacity:0; transform:translateY(18px); }} to {{ opacity:1; transform:translateY(0); }} }}
+@keyframes fadeUp     {{ from {{ opacity:0; transform:translateY(8px);  }} to {{ opacity:1; transform:translateY(0); }} }}
+@keyframes orbDrift1  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         50% {{ transform:translate(28px,-18px) scale(1.06); }} }}
+@keyframes orbDrift2  {{ 0%,100% {{ transform:translate(0,0) scale(1); }}         40% {{ transform:translate(-22px,16px) scale(1.08); }} }}
+@keyframes orbDrift3  {{ 0%,100% {{ transform:translate(-50%,-50%) scale(1); }}   60% {{ transform:translate(-50%,-50%) scale(1.10); }} }}
+@keyframes shimmer    {{ 0% {{ left:-80%; }} 100% {{ left:160%; }} }}
+@keyframes pulseRing  {{ 0%,100% {{ box-shadow: var(--sh-sm); }} 50% {{ box-shadow: var(--sh-glow); }} }}
+@keyframes scanLine   {{ 0% {{ top:-4px; opacity:0; }} 5% {{ opacity:0.8; }} 95% {{ opacity:0.4; }} 100% {{ top:100%; opacity:0; }} }}
+@keyframes twinkle    {{ 0%,100% {{ opacity:0; transform:scale(0.4); }} 50% {{ opacity:1; transform:scale(1); }} }}
+@keyframes badgePop   {{ 0% {{ transform:scale(0.8); opacity:0; }} 60% {{ transform:scale(1.05); }} 100% {{ transform:scale(1); opacity:1; }} }}
+@keyframes borderFlow {{ 0%,100% {{ border-color:rgba(124,58,237,0.18); }} 50% {{ border-color:rgba(124,58,237,0.45); }} }}
+@keyframes crystalFloat {{ 0%,100% {{ transform:translateY(0) rotate(0deg); }} 50% {{ transform:translateY(-6px) rotate(2deg); }} }}
+@keyframes particleFly  {{ 0%   {{ opacity:0; transform:scale(0.3) translateY(0); }}
+                           30%  {{ opacity:1; }}
+                           100% {{ opacity:0; transform:scale(1.2) translateY(-20px); }} }}
+
+html, body, [class*="css"] {{
+    font-family: 'DM Sans', system-ui, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    color: {INK} !important;
+}}
+
+
+/* ── App background — warm pearl with chromatic orbs ── */
 .stApp {{
-  min-height:100vh; overflow-x:hidden; position:relative;
-  background:
-    radial-gradient(circle at 14% 18%, rgba(56,189,248,.16), transparent 28%),
-    radial-gradient(circle at 80% 8%, rgba(167,139,250,.14), transparent 24%),
-    radial-gradient(circle at 72% 84%, rgba(34,197,94,.08), transparent 28%),
-    linear-gradient(180deg,#080B12 0%,#0A1020 52%,#06080E 100%)!important;
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse at 14% 18%, rgba(162,106,255,0.16) 0, transparent 34%),
+        radial-gradient(ellipse at 84% 12%, rgba(56,189,248,0.13) 0, transparent 30%),
+        radial-gradient(ellipse at 62% 88%, rgba(219,39,119,0.09) 0, transparent 28%),
+        radial-gradient(ellipse at 32% 72%, rgba(5,150,105,0.08) 0, transparent 26%),
+        radial-gradient(ellipse at 76% 54%, rgba(180,83,9,0.06) 0, transparent 22%),
+        linear-gradient(155deg, #fdf9f4 0%, #f7f0ff 28%, #eef5fd 56%, #f0fdf8 80%, #fdf9f4 100%);
+    background-attachment: fixed;
 }}
-.stApp:before {{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.38;
-  background-image:
-    linear-gradient(rgba(56,189,248,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56,189,248,.06) 1px, transparent 1px);
-  background-size:54px 54px;
-  transform:perspective(900px) rotateX(62deg) translateY(260px) scale(1.7);
-  transform-origin:center bottom;
-  mask-image:linear-gradient(to bottom,transparent 0%,black 35%,transparent 100%);
+
+/* ── Ambient orbs ── */
+.stApp::before {{
+    content:"";
+    position:fixed; top:-120px; left:-120px;
+    width:480px; height:480px; border-radius:50%;
+    background:radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
+    animation:orbDrift1 20s ease-in-out infinite;
+    pointer-events:none; z-index:0;
 }}
-.stApp:after {{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.25;
-  background:
-    radial-gradient(circle, rgba(255,255,255,.55) 0 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(56,189,248,.35) 0 1px, transparent 1.6px);
-  background-size:180px 180px, 280px 280px; background-position:0 0, 70px 90px;
-  animation:skyDrift 60s linear infinite;
+.stApp::after {{
+    content:"";
+    position:fixed; bottom:-100px; right:-100px;
+    width:400px; height:400px; border-radius:50%;
+    background:radial-gradient(circle, rgba(2,132,199,0.12) 0%, transparent 70%);
+    animation:orbDrift2 26s ease-in-out infinite;
+    pointer-events:none; z-index:0;
 }}
-@keyframes skyDrift {{ to {{ background-position:260px 160px,-160px 260px; }} }}
-.command-bg {{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }}
-.route-arc {{ position:absolute; width:520px; height:220px; border:1px solid rgba(56,189,248,.16); border-bottom:none; border-radius:520px 520px 0 0; transform:rotate(-12deg); animation:arcFloat 16s ease-in-out infinite; }}
-.route-arc.a1 {{ left:8%; top:18%; }} .route-arc.a2 {{ right:4%; top:42%; transform:rotate(16deg); animation-delay:3s; }}
-.radar {{ position:absolute; right:8%; top:12%; width:220px; height:220px; border-radius:50%; border:1px solid rgba(56,189,248,.18); background:radial-gradient(circle,rgba(56,189,248,.10),transparent 60%); opacity:.38; }}
-.radar:before {{ content:""; position:absolute; inset:50% 50% 0 50%; width:50%; height:1px; background:linear-gradient(90deg,rgba(56,189,248,.8),transparent); transform-origin:left center; animation:radarSweep 5s linear infinite; }}
-.plane-trace {{ position:absolute; left:-80px; top:34%; font-size:30px; opacity:.25; filter:drop-shadow(0 0 16px rgba(56,189,248,.6)); animation:planeCruise 24s linear infinite; }}
-@keyframes planeCruise {{ to {{ transform:translateX(calc(100vw + 180px)) translateY(-80px); }} }}
-@keyframes radarSweep {{ to {{ transform:rotate(360deg); }} }}
-@keyframes arcFloat {{ 50% {{ transform:translateY(-14px) rotate(-8deg); opacity:.55; }} }}
-.main .block-container {{ max-width:1360px!important; padding-top:1.5rem!important; padding-bottom:4rem!important; position:relative; z-index:3; }}
-[data-testid="stSidebar"] {{ background:rgba(9,13,23,.78)!important; border-right:1px solid rgba(255,255,255,.12)!important; backdrop-filter:blur(28px) saturate(1.4)!important; box-shadow:16px 0 60px rgba(0,0,0,.35)!important; }}
-[data-testid="stSidebar"] * {{ color:var(--soft)!important; }}
-.sidebar-brand {{ font-family:'Space Grotesk',sans-serif; font-size:1.25rem; font-weight:800; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:-.03em; }}
-.sidebar-brand span {{ background:linear-gradient(135deg,var(--cyan),var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }}
-.hero {{ position:relative; overflow:hidden; border-radius:38px; padding:34px 38px; margin-bottom:26px; isolation:isolate; background:linear-gradient(#111722,#0E1420) padding-box, linear-gradient(137deg,#38BDF8 0%,#A78BFA 45%,#22C55E 100%) border-box; border:1px solid transparent; box-shadow:0 28px 80px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.08); }}
-.hero:before {{ content:""; position:absolute; inset:4px; border-radius:38px; background:linear-gradient(137deg,#38BDF8,#A78BFA,#22C55E); filter:blur(45px); opacity:.22; z-index:-2; }}
-.hero h1 {{ font-family:'Space Grotesk',sans-serif!important; font-size:clamp(2.1rem,4vw,4.2rem)!important; letter-spacing:-.06em!important; line-height:.95!important; margin:0!important; color:white!important; text-transform:none!important; }}
-.hero p {{ color:var(--soft)!important; max-width:720px; font-size:1rem!important; line-height:1.6!important; margin:.8rem 0 0!important; }}
-.hero-eyebrow {{ color:var(--cyan); font-size:.72rem; font-weight:800; letter-spacing:.22em; text-transform:uppercase; margin-bottom:12px; }}
-.hero-badge {{ display:inline-flex; margin-top:22px; padding:10px 16px; border:1px solid rgba(56,189,248,.3); border-radius:999px; color:#DFF7FF; background:rgba(56,189,248,.10); font-size:.74rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }}
-.feature-grid {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:8px 0 26px; }}
-.feature-card {{ position:relative; border-radius:36px; isolation:isolate; transition:transform .3s ease; }} .feature-card:hover {{ transform:translateY(-8px); }}
-.feature-card:before {{ content:""; position:absolute; inset:6px; border-radius:36px; background:var(--card-gradient); filter:blur(42px); opacity:.30; z-index:-1; }}
-.feature-inner {{ min-height:190px; border-radius:36px; border:6px solid transparent; background:linear-gradient(#151B27,#101620) padding-box, var(--card-gradient) border-box; padding:24px; box-shadow:0 22px 62px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08); }}
-.feature-icon {{ font-size:30px; margin-bottom:36px; }} .feature-inner h3 {{ font-family:'Space Grotesk',sans-serif!important; color:white!important; font-size:1.18rem!important; margin:0 0 8px!important; text-transform:none!important; letter-spacing:-.03em!important; }} .feature-inner p {{ color:rgba(201,210,227,.78)!important; font-size:.88rem!important; line-height:1.6!important; margin:0!important; }}
-[data-testid="metric-container"], [data-testid="stForm"], [data-testid="stDataFrame"], [data-testid="stExpander"], .info-box, .result-card {{ background:rgba(17,23,34,.78)!important; border:1px solid rgba(255,255,255,.13)!important; border-radius:28px!important; backdrop-filter:blur(24px) saturate(1.35)!important; box-shadow:0 22px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.08)!important; }}
-[data-testid="metric-container"] {{ padding:24px!important; transition:transform .25s ease, border-color .25s ease!important; }} [data-testid="metric-container"]:hover {{ transform:translateY(-6px)!important; border-color:rgba(56,189,248,.38)!important; }}
-[data-testid="stMetricLabel"] p {{ color:var(--muted)!important; font-size:.68rem!important; letter-spacing:.14em!important; text-transform:uppercase!important; font-weight:800!important; }}
-[data-testid="stMetricValue"], [data-testid="stMetricValue"]>div {{ color:white!important; font-size:2.1rem!important; font-weight:800!important; letter-spacing:-.05em!important; font-family:'Space Grotesk',sans-serif!important; }}
-.stTabs [data-baseweb="tab-list"] {{ gap:6px; padding:6px; border-radius:24px; background:rgba(17,23,34,.72); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(20px); }}
-.stTabs [data-baseweb="tab"] {{ border-radius:18px!important; color:var(--muted)!important; font-weight:800!important; padding:10px 18px!important; }}
-.stTabs [aria-selected="true"] {{ background:linear-gradient(135deg,rgba(56,189,248,.20),rgba(167,139,250,.16))!important; color:white!important; border:1px solid rgba(56,189,248,.25)!important; }} .stTabs [data-baseweb="tab-highlight"] {{ display:none!important; }}
-.section-hd {{ font-family:'Space Grotesk',sans-serif!important; font-size:1.15rem!important; color:white!important; font-weight:800!important; letter-spacing:-.03em!important; margin:0 0 6px!important; }}
-.section-sub {{ color:var(--muted)!important; margin:0 0 18px!important; line-height:1.65!important; }}
-.divider-label {{ display:flex; gap:14px; align-items:center; margin:28px 0 18px; color:var(--cyan); font-size:.68rem; font-weight:900; letter-spacing:.18em; text-transform:uppercase; }} .divider-label:before,.divider-label:after {{ content:""; height:1px; flex:1; background:linear-gradient(90deg,transparent,rgba(56,189,248,.28),transparent); }}
-.info-box {{ padding:20px 24px!important; color:var(--soft)!important; line-height:1.7; }} .info-box strong {{ color:white!important; }}
-.pill {{ display:inline-block; padding:5px 11px; border-radius:999px; font-size:.64rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; border:1px solid transparent; }}
-.pill-expand{background:rgba(34,197,94,.12);color:#86EFAC;border-color:rgba(34,197,94,.32)} .pill-maintain{background:rgba(250,204,21,.12);color:#FDE68A;border-color:rgba(250,204,21,.32)} .pill-optimize{background:rgba(251,146,60,.12);color:#FDBA74;border-color:rgba(251,146,60,.32)} .pill-drop{background:rgba(251,113,133,.12);color:#FDA4AF;border-color:rgba(251,113,133,.32)}
-.result-card {{ padding:28px 30px!important; margin:24px 0!important; }} .result-expand{border-left:4px solid #22C55E!important}.result-maintain{border-left:4px solid #FACC15!important}.result-optimize{border-left:4px solid #FB923C!important}.result-drop{border-left:4px solid #FB7185!important}
-.stSelectbox label,.stNumberInput label,.stSlider label,.stRadio label,.stCheckbox label,.stTextInput label {{ color:var(--soft)!important; font-weight:800!important; font-size:.72rem!important; letter-spacing:.08em!important; text-transform:uppercase!important; }}
-.stSelectbox [data-baseweb="select"]>div,.stTextInput input,.stNumberInput input {{ background:rgba(8,11,18,.72)!important; border:1px solid rgba(255,255,255,.13)!important; border-radius:16px!important; color:white!important; min-height:42px!important; }}
-[data-testid="stForm"] {{ padding:26px 28px 30px!important; }} [data-testid="stFormSubmitButton"]>button,.stButton>button {{ border-radius:999px!important; font-weight:900!important; border:1px solid rgba(255,255,255,.14)!important; background:linear-gradient(135deg,#38BDF8,#2563EB)!important; color:white!important; box-shadow:0 12px 34px rgba(37,99,235,.28)!important; transition:transform .22s ease!important; }} [data-testid="stFormSubmitButton"]>button:hover,.stButton>button:hover {{ transform:translateY(-3px)!important; }}
-[data-testid="stDataFrame"] div,[data-testid="stDataFrame"] span {{ color:var(--soft)!important; }}
-.plotly-card {{ border-radius:30px; padding:18px 18px 8px; background:rgba(17,23,34,.78); border:1px solid rgba(255,255,255,.13); box-shadow:0 22px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter:blur(24px); margin-bottom:18px; }}
-.plotly-card-title {{ font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:800; color:white; letter-spacing:-.03em; margin:4px 6px 10px; }}
-hr {{ border:none!important; border-top:1px solid rgba(255,255,255,.10)!important; }} ::selection {{ background:rgba(56,189,248,.25); }}
-@media(max-width:900px) {{ .feature-grid {{ grid-template-columns:1fr; }} }}
+
+.main .block-container {{
+    max-width: 1320px;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    animation: floatIn 500ms ease-out;
+    position: relative; z-index: 1;
+}}
+section.main > div {{ background: transparent; }}
+
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {{
+    background: rgba(253,249,244,0.90) !important;
+    border-right: 1px solid rgba(124,58,237,0.18) !important;
+    backdrop-filter: blur(24px) saturate(1.5) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(1.5) !important;
+    box-shadow: 4px 0 32px rgba(124,58,237,0.08) !important;
+}}
+[data-testid="stSidebar"] * {{ color: {INK_SOFT} !important; }}
+
+.sidebar-brand {{
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem; font-weight: 700;
+    color: {INK}; letter-spacing: 0.06em;
+    padding: 0.2rem 0 1rem 0;
+    border-bottom: 1px solid rgba(124,58,237,0.18);
+    margin-bottom: 1rem; text-transform: uppercase;
+}}
+.sidebar-brand span {{
+    background: linear-gradient(135deg, {ACCENT}, {ACCENT_2});
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}}
+
+/* ── Headings ── */
+h1,h2,h3,h4 {{
+    font-family: 'Cinzel', serif !important;
+    color: {INK} !important;
+    letter-spacing: 0.04em !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+}}
+
+/* ── Hero ── */
+.hero {{
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between; gap: 1.2rem;
+    border-radius: var(--r-xl);
+    padding: 2rem 2.4rem; margin-bottom: 1.4rem;
+    background: linear-gradient(140deg,
+        rgba(255,252,248,0.88) 0%,
+        rgba(245,238,255,0.80) 50%,
+        rgba(238,245,253,0.75) 100%);
+    border: 1px solid rgba(124,58,237,0.28);
+    backdrop-filter: blur(24px) saturate(1.6);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    box-shadow: var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.9);
+    animation: pulseRing 5s ease-in-out infinite;
+    transition: transform 280ms var(--ease);
+}}
+.hero:hover {{ transform: translateY(-3px); }}
+.hero::before {{
+    content:"";
+    position:absolute; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,
+        transparent 0%,
+        rgba(124,58,237,0) 10%,
+        rgba(124,58,237,0.6) 45%,
+        rgba(2,132,199,0.5) 55%,
+        rgba(124,58,237,0) 90%, transparent 100%);
+    animation: scanLine 6s linear infinite; pointer-events:none; z-index:5;
+}}
+.hero::after {{
+    content:"";
+    position:absolute; top:-60px; right:-60px;
+    width:240px; height:240px; border-radius:50%;
+    background:radial-gradient(circle, rgba(2,132,199,0.16) 0%, transparent 70%);
+    animation: orbDrift3 14s ease-in-out infinite; pointer-events:none;
+}}
+.hero-star {{ position:absolute; width:3px; height:3px; border-radius:50%; pointer-events:none; }}
+.hero-star:nth-child(1) {{ top:20%; left:46%; background:rgba(124,58,237,0.7); animation:twinkle 3.0s ease-in-out infinite; }}
+.hero-star:nth-child(2) {{ top:68%; left:63%; background:rgba(2,132,199,0.7); animation:twinkle 4.0s ease-in-out infinite 0.8s; }}
+.hero-star:nth-child(3) {{ top:38%; left:78%; background:rgba(219,39,119,0.6); animation:twinkle 2.8s ease-in-out infinite 1.5s; }}
+.hero-star:nth-child(4) {{ top:80%; left:32%; background:rgba(5,150,105,0.6); animation:twinkle 3.5s ease-in-out infinite 0.4s; width:4px; height:4px; }}
+.hero-left,.hero-badge,.hero-glyph {{ position:relative; z-index:1; }}
+.hero-left {{ flex:1; min-width:0; }}
+.hero-eyebrow {{
+    font-size:0.59rem; text-transform:uppercase; letter-spacing:0.22em;
+    color:{ACCENT}; font-weight:700; margin-bottom:0.5rem; font-family:'DM Sans',sans-serif;
+}}
+.hero h1 {{
+    margin:0 0 0.4rem 0 !important;
+    font-size:1.90rem !important; line-height:1.2 !important;
+    background: linear-gradient(135deg, {INK} 0%, {ACCENT} 60%, {ACCENT_2} 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    text-shadow:none !important;
+}}
+.hero p {{ margin:0; color:{INK_SOFT} !important; font-size:0.86rem !important;
+           font-family:'DM Sans',sans-serif !important; text-transform:none !important;
+           letter-spacing:0 !important; font-weight:400 !important; }}
+.hero-badge {{
+    display:inline-flex; align-items:center; gap:0.5rem;
+    padding:0.6rem 1.1rem; border-radius:999px;
+    border:1px solid rgba(219,39,119,0.45);
+    background:linear-gradient(135deg,rgba(219,39,119,0.10),rgba(124,58,237,0.10));
+    color:{MAGENTA}; font-size:0.70rem; font-weight:700;
+    letter-spacing:0.08em; text-transform:uppercase; font-family:'DM Sans',sans-serif;
+    box-shadow:0 4px 18px rgba(219,39,119,0.15), 0 0 0 1px rgba(219,39,119,0.15);
+    animation:badgePop 700ms ease-out 250ms both;
+    white-space:nowrap; transition:transform 180ms var(--ease), box-shadow 180ms var(--ease);
+}}
+.hero-badge:hover {{ transform:translateY(-3px) scale(1.04); box-shadow:0 8px 26px rgba(219,39,119,0.28); }}
+.hero-glyph {{
+    font-size:3rem; opacity:0.12; color:{ACCENT};
+    animation:crystalFloat 6s ease-in-out infinite;
+}}
+
+/* ── Metric cards ── */
+[data-testid="metric-container"] {{
+    background: linear-gradient(155deg,
+        rgba(255,252,248,0.85) 0%, rgba(248,244,255,0.75) 100%) !important;
+    border: 1px solid rgba(124,58,237,0.20) !important;
+    border-radius: var(--r-md) !important;
+    backdrop-filter: blur(16px) saturate(1.4) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.4) !important;
+    box-shadow: var(--sh-sm), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+    padding: 1.1rem 1.2rem !important;
+    transition: transform 200ms var(--ease), box-shadow 200ms var(--ease) !important;
+    position:relative; overflow:hidden;
+    animation: borderFlow 6s ease-in-out infinite;
+}}
+[data-testid="metric-container"]::after {{
+    content:""; position:absolute; top:0; left:-80%; width:50%; height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent);
+    transition:left 0.55s ease; pointer-events:none;
+}}
+[data-testid="metric-container"]:hover {{
+    transform:translateY(-5px) scale(1.02) !important;
+    box-shadow:var(--sh-md), 0 0 0 1px rgba(124,58,237,0.35), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}}
+[data-testid="metric-container"]:hover::after {{ left:160%; }}
+[data-testid="metric-container"] [data-testid="stMetricLabel"] p {{
+    font-size:0.60rem !important; font-weight:700 !important;
+    text-transform:uppercase !important; letter-spacing:0.16em !important;
+    color:{ACCENT} !important; font-family:'DM Sans',sans-serif !important;
+}}
+[data-testid="stMetricValue"], [data-testid="stMetricValue"] > div {{
+    color:{INK} !important; font-size:1.90rem !important; font-weight:700 !important;
+    letter-spacing:-0.02em !important; font-family:'Cinzel',serif !important;
+}}
+
+/* ── Tabs ── */
+.stTabs [data-baseweb="tab-list"] {{
+    gap:0.22rem;
+    background:rgba(255,252,248,0.80);
+    border:1px solid rgba(124,58,237,0.20);
+    border-radius:20px; padding:0.30rem;
+    backdrop-filter:blur(16px);
+    box-shadow:var(--sh-sm);
+}}
+.stTabs [data-baseweb="tab"] {{
+    height:40px; padding:0 1rem !important;
+    border-radius:14px !important;
+    color:{INK_MUTED} !important;
+    font-size:0.79rem !important; font-weight:600 !important;
+    font-family:'DM Sans',sans-serif !important;
+    background:transparent !important; letter-spacing:0.03em !important;
+    transition:background 180ms, color 180ms, transform 180ms !important;
+}}
+.stTabs [data-baseweb="tab"]:hover {{
+    background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important;
+    transform:translateY(-1px) !important;
+}}
+.stTabs [aria-selected="true"] {{
+    background:linear-gradient(135deg,rgba(124,58,237,0.14),rgba(2,132,199,0.10)) !important;
+    color:{INK} !important;
+    box-shadow:0 4px 14px rgba(124,58,237,0.14), inset 0 0 0 1px rgba(124,58,237,0.28) !important;
+}}
+.stTabs [data-baseweb="tab-panel"] {{ padding-top:1.5rem; }}
+
+/* ── Section headings ── */
+.section-hd {{
+    font-family:'Cinzel',serif; font-size:1.02rem; font-weight:600;
+    color:{INK}; margin:0 0 0.28rem 0; letter-spacing:0.05em; text-transform:uppercase;
+}}
+.section-sub {{
+    font-size:0.83rem; color:{INK_MUTED}; margin:0 0 1.1rem 0; line-height:1.65;
+    font-family:'DM Sans',sans-serif; font-weight:400; text-transform:none; letter-spacing:0;
+}}
+
+/* ── Divider label ── */
+.divider-label {{
+    display:flex; align-items:center; gap:0.7rem; margin:1.5rem 0 1rem 0;
+    font-size:0.59rem; font-weight:700; text-transform:uppercase; letter-spacing:0.20em;
+    color:{ACCENT}; font-family:'DM Sans',sans-serif;
+}}
+.divider-label::before,.divider-label::after {{
+    content:""; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(124,58,237,0.28),transparent);
+}}
+
+/* ── Info box ── */
+.info-box {{
+    background:linear-gradient(155deg,rgba(255,252,248,0.85),rgba(248,244,255,0.75));
+    border:1px solid rgba(124,58,237,0.18);
+    border-radius:var(--r-md); padding:1rem 1.1rem;
+    color:{INK_SOFT}; line-height:1.75; box-shadow:var(--sh-sm);
+    font-size:0.86rem; font-family:'DM Sans',sans-serif;
+    transition:transform 200ms, box-shadow 200ms;
+}}
+.info-box:hover {{ transform:translateY(-2px); box-shadow:var(--sh-md); }}
+
+/* ── Pills ── */
+.pill {{
+    display:inline-block; padding:0.25rem 0.72rem; border-radius:999px;
+    font-size:0.61rem; font-weight:700; letter-spacing:0.10em; text-transform:uppercase;
+    font-family:'DM Sans',sans-serif; border:1px solid transparent;
+    transition:transform 180ms; cursor:default;
+}}
+.pill:hover {{ transform:scale(1.06); }}
+.pill-expand   {{ background:rgba(29,78,216,0.10); color:#1d4ed8; border-color:rgba(29,78,216,0.30); }}
+.pill-maintain {{ background:rgba(4,120,87,0.10);  color:#047857; border-color:rgba(4,120,87,0.28); }}
+.pill-optimize {{ background:rgba(180,83,9,0.10);  color:#b45309; border-color:rgba(180,83,9,0.26); }}
+.pill-drop     {{ background:rgba(190,24,93,0.10); color:#be185d; border-color:rgba(190,24,93,0.28); }}
+
+/* ── Result card ── */
+.result-card {{
+    border-radius:var(--r-lg); padding:1.5rem 1.6rem; margin:1.2rem 0;
+    border:1px solid rgba(124,58,237,0.22); box-shadow:var(--sh-md);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    animation:fadeUp 380ms ease-out; transition:transform 280ms, box-shadow 280ms;
+}}
+.result-card:hover {{ transform:translateY(-4px); box-shadow:var(--sh-lg); }}
+.result-expand   {{ background:linear-gradient(140deg,rgba(219,234,254,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_EXPAND}; }}
+.result-maintain {{ background:linear-gradient(140deg,rgba(209,250,229,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_MAINTAIN}; }}
+.result-optimize {{ background:linear-gradient(140deg,rgba(254,243,199,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_OPTIMIZE}; }}
+.result-drop     {{ background:linear-gradient(140deg,rgba(252,231,243,0.80),rgba(255,252,248,0.85)); border-left:4px solid {CHART_DROP}; }}
+
+/* ── Form inputs ── */
+.stSelectbox label,.stNumberInput label,.stSlider label,
+.stRadio label,.stCheckbox label,.stTextInput label {{
+    color:{INK_SOFT} !important; font-weight:600 !important; font-size:0.73rem !important;
+    letter-spacing:0.06em !important; text-transform:uppercase !important;
+    font-family:'DM Sans',sans-serif !important;
+}}
+.stSelectbox [data-baseweb="select"] > div,
+.stTextInput input,.stNumberInput input {{
+    background:rgba(255,252,248,0.85) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-sm) !important; color:{INK} !important;
+    min-height:42px !important; box-shadow:none !important;
+    transition:border-color 180ms, box-shadow 180ms !important;
+    font-family:'DM Sans',sans-serif !important;
+}}
+.stSelectbox [data-baseweb="select"] > div:hover,
+.stTextInput input:hover,.stNumberInput input:hover {{
+    border-color:rgba(124,58,237,0.45) !important;
+}}
+.stSelectbox [data-baseweb="select"] > div:focus-within,
+.stTextInput input:focus,.stNumberInput input:focus {{
+    border-color:rgba(124,58,237,0.70) !important;
+    box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important;
+}}
+[data-baseweb="menu"] {{
+    background:rgba(255,252,248,0.96) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-sm) !important;
+    box-shadow:var(--sh-md) !important;
+}}
+[data-baseweb="menu"] li {{ color:{INK_SOFT} !important; }}
+[data-baseweb="menu"] li:hover {{ background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important; }}
+
+/* ── Form card ── */
+[data-testid="stForm"] {{
+    background:linear-gradient(155deg,rgba(255,252,248,0.88),rgba(248,244,255,0.80)) !important;
+    border:1px solid rgba(124,58,237,0.22) !important;
+    border-radius:var(--r-lg) !important; padding:1.5rem 1.6rem 1.8rem !important;
+    box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.90) !important;
+    backdrop-filter:blur(20px) !important;
+    animation:borderFlow 7s ease-in-out infinite !important;
+}}
+
+/* ── Buttons ── */
+[data-testid="stFormSubmitButton"] > button, .stButton > button {{
+    border-radius:var(--r-sm) !important; font-weight:700 !important; border:none !important;
+    font-family:'DM Sans',sans-serif !important; letter-spacing:0.08em !important;
+    text-transform:uppercase !important; font-size:0.81rem !important;
+    transition:transform 180ms, box-shadow 180ms !important;
+    position:relative; overflow:hidden;
+}}
+[data-testid="stFormSubmitButton"] > button {{
+    width:100% !important;
+    background:linear-gradient(135deg,{ACCENT},{ACCENT_DK}) !important;
+    box-shadow:0 8px 26px rgba(124,58,237,0.35), 0 0 0 1px rgba(124,58,237,0.30) !important;
+    color:white !important; padding:0.72rem 0 !important;
+}}
+[data-testid="stFormSubmitButton"] > button:hover {{
+    transform:translateY(-2px) !important;
+    box-shadow:0 14px 36px rgba(124,58,237,0.50) !important;
+}}
+[data-testid="stFormSubmitButton"] > button:active {{ transform:translateY(0) scale(0.98) !important; }}
+.stButton > button {{
+    background:rgba(255,252,248,0.85) !important; color:{INK_SOFT} !important;
+    border:1px solid rgba(124,58,237,0.22) !important; box-shadow:var(--sh-sm) !important;
+}}
+.stButton > button:hover {{
+    background:rgba(248,244,255,0.95) !important; color:{ACCENT} !important;
+    transform:translateY(-2px) !important; box-shadow:var(--sh-md) !important;
+}}
+
+/* ── DataFrames ── */
+[data-testid="stDataFrame"] {{
+    background:rgba(255,252,248,0.80) !important;
+    border:1px solid rgba(124,58,237,0.18) !important;
+    border-radius:var(--r-md) !important; overflow:hidden !important;
+    box-shadow:var(--sh-sm) !important; backdrop-filter:blur(14px) !important;
+    transition:transform 280ms, box-shadow 280ms !important;
+}}
+[data-testid="stDataFrame"]:hover {{
+    transform:translateY(-3px) !important; box-shadow:var(--sh-md) !important;
+}}
+[data-testid="stDataFrame"] [role="grid"] {{ background:transparent !important; }}
+[data-testid="stDataFrame"] div, [data-testid="stDataFrame"] span {{ color:{INK_SOFT} !important; }}
+[data-testid="stDataFrame"] [role="columnheader"] {{
+    background:rgba(124,58,237,0.08) !important; color:{ACCENT} !important;
+    font-weight:700 !important; font-size:0.71rem !important;
+    letter-spacing:0.10em !important; text-transform:uppercase !important;
+    border-bottom:1px solid rgba(124,58,237,0.16) !important;
+    font-family:'DM Sans',sans-serif !important;
+}}
+[data-testid="stDataFrame"] [role="gridcell"] {{
+    border-bottom:1px solid rgba(124,58,237,0.08) !important;
+}}
+
+/* ── Expander ── */
+[data-testid="stExpander"] {{
+    background:rgba(255,252,248,0.80) !important;
+    border:1px solid rgba(124,58,237,0.18) !important;
+    border-radius:var(--r-md) !important; box-shadow:var(--sh-sm) !important;
+    backdrop-filter:blur(14px) !important;
+    transition:transform 180ms, box-shadow 180ms !important;
+}}
+[data-testid="stExpander"]:hover {{ transform:translateY(-2px) !important; box-shadow:var(--sh-md) !important; }}
+[data-testid="stExpander"] summary p {{
+    color:{INK_SOFT} !important; font-weight:600 !important;
+    font-family:'DM Sans',sans-serif !important;
+}}
+
+/* ── Charts ── */
+[data-testid="stPyplot"] {{
+    background:rgba(255,252,248,0.75);
+    border:1px solid rgba(124,58,237,0.18);
+    border-radius:var(--r-lg); padding:1rem;
+    box-shadow:var(--sh-sm); backdrop-filter:blur(14px);
+    transition:transform 280ms, box-shadow 280ms;
+}}
+[data-testid="stPyplot"]:hover {{
+    transform:translateY(-4px);
+    box-shadow:var(--sh-md), 0 0 0 1px rgba(124,58,237,0.28);
+}}
+
+/* ── Alerts ── */
+[data-testid="stAlert"] {{
+    border-radius:var(--r-md) !important;
+    background:rgba(255,252,248,0.85) !important;
+    border:1px solid rgba(124,58,237,0.20) !important;
+    color:{INK_SOFT} !important;
+}}
+
+hr {{ border:none !important; border-top:1px solid rgba(124,58,237,0.14) !important; margin:1.4rem 0 !important; }}
+
+.col-label {{
+    font-size:0.63rem; font-weight:700; color:{ACCENT}; letter-spacing:0.16em;
+    text-transform:uppercase; margin-bottom:0.9rem;
+    display:flex; align-items:center; gap:0.4rem; font-family:'DM Sans',sans-serif;
+}}
+.col-label::after {{
+    content:""; flex:1; height:1px;
+    background:linear-gradient(90deg,rgba(124,58,237,0.28),transparent);
+}}
+
+/* Slider */
+[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
+    background:{ACCENT} !important; border-color:{ACCENT_LT} !important;
+    box-shadow:0 0 10px rgba(124,58,237,0.40) !important;
+}}
+[data-testid="stSlider"] [data-baseweb="slider"] [data-testid="stSliderTrackFill"] {{
+    background:linear-gradient(90deg,{ACCENT},{ACCENT_2}) !important;
+}}
+
+/* Scrollbar */
+::-webkit-scrollbar {{ width:6px; height:6px; }}
+::-webkit-scrollbar-track {{ background:rgba(245,238,255,0.60); }}
+::-webkit-scrollbar-thumb {{ background:rgba(124,58,237,0.30); border-radius:999px; }}
+::-webkit-scrollbar-thumb:hover {{ background:rgba(124,58,237,0.55); }}
+::selection {{ background:rgba(124,58,237,0.20); color:{INK}; }}
+
+/* ── Airplane cursor canvas (always on top) ── */
+#airplane-canvas {{
+    position:fixed; top:0; left:0;
+    width:100vw; height:100vh;
+    pointer-events:none; z-index:999999;
+}}
 </style>
-<div class="command-bg"><div class="route-arc a1"></div><div class="route-arc a2"></div><div class="radar"></div><div class="plane-trace">✈</div></div>
 """, unsafe_allow_html=True)
 
+
 # ─────────────────────────────────────────────────────────────
-#  PLOTLY HELPERS
+#  AIRPLANE CURSOR + TRAIL CANVAS
 # ─────────────────────────────────────────────────────────────
-def _fmt_money(v):
-    if abs(v) >= 1_000_000: return f"${v/1_000_000:.1f}M"
-    if abs(v) >= 1_000: return f"${v/1_000:.0f}K"
-    return f"${v:.0f}"
+st.markdown("""
+<canvas id="airplane-canvas"></canvas>
+<script>
+(function() {
+    const canvas = document.getElementById('airplane-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-def _plotly_layout(fig, height=420, showlegend=False):
-    fig.update_layout(
-        height=height, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT_SOFT, size=13), showlegend=showlegend,
-        margin=dict(l=40, r=28, t=24, b=48),
-        hoverlabel=dict(bgcolor="#111722", bordercolor="rgba(255,255,255,.16)", font_color="white", font_family="Inter"),
-    )
-    fig.update_xaxes(showgrid=False, zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
-    fig.update_yaxes(gridcolor="rgba(255,255,255,.07)", zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
-    return fig
+    let W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+    window.addEventListener('resize', () => {
+        W = window.innerWidth; H = window.innerHeight;
+        canvas.width = W; canvas.height = H;
+    });
 
-def plotly_card(title, fig, height=420):
-    st.markdown(f'<div class="plotly-card"><div class="plotly-card-title">{title}</div>', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False, "responsive": True})
-    st.markdown('</div>', unsafe_allow_html=True)
+    let mx = W/2, my = H/2, pmx = W/2, pmy = H/2;
+    let angle = 0, targetAngle = 0;
+    const trail = [];
+    const MAX_TRAIL = 38;
 
-def plotly_donut_chart(title, labels, values, colors=None, height=420, **kwargs):
-    colors = colors or [DECISION_COLORS.get(x, CYAN) for x in labels]
-    fig = go.Figure(go.Pie(labels=labels, values=values, hole=.58, marker=dict(colors=colors, line=dict(color="#080B12", width=3)), textinfo="percent", textfont=dict(size=15, color="white"), hovertemplate="%{label}<br>%{percent}<br>%{value}<extra></extra>"))
-    _plotly_layout(fig, height=height, showlegend=True)
-    fig.update_layout(legend=dict(orientation="h", y=-.08, x=.5, xanchor="center", font=dict(size=12, color=TEXT_SOFT)), margin=dict(l=20,r=20,t=10,b=70))
-    plotly_card(title, fig, height)
+    document.addEventListener('mousemove', e => {
+        const dx = e.clientX - mx, dy = e.clientY - my;
+        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+            targetAngle = Math.atan2(dy, dx) + Math.PI / 2;
+        }
+        pmx = mx; pmy = my;
+        mx = e.clientX; my = e.clientY;
+        trail.push({ x: mx, y: my, age: 0 });
+        if (trail.length > MAX_TRAIL) trail.shift();
+    });
 
-def plotly_vbar_chart(title, labels, series=None, values=None, colors=None, max_value=None, value_format="number", height=420, fmt_fn=None, y_label="", **kwargs):
-    fig = go.Figure()
-    if series is None:
-        series=[{"name":"Value","values": values or [], "colors": colors}]
-    for s in series:
-        vals=s.get("values", [])
-        marker_colors=s.get("colors") or colors or [s.get("color", CYAN)]*len(vals)
-        text=[]
-        for v in vals:
-            if fmt_fn:
-                text.append(fmt_fn(v))
-            else:
-                text.append(f"{v:.0%}" if value_format=="percent" else (_fmt_money(v) if value_format=="money" else f"{v:,.0f}"))
-        fig.add_trace(go.Bar(x=labels, y=vals, name=s.get("name","Value"), marker=dict(color=marker_colors, line=dict(width=0)), text=text, textposition="outside", cliponaxis=False, hovertemplate="%{x}<br>%{y}<extra></extra>"))
-    _plotly_layout(fig, height=height, showlegend=len(series)>1)
-    if max_value: fig.update_yaxes(range=[0, max_value*1.12])
-    fig.update_traces(width=.52)
-    plotly_card(title, fig, height)
+    function lerpAngle(a, b, t) {
+        let diff = b - a;
+        while (diff >  Math.PI) diff -= 2 * Math.PI;
+        while (diff < -Math.PI) diff += 2 * Math.PI;
+        return a + diff * t;
+    }
 
-def plotly_hbar_chart(title, labels, values, colors=None, value_format="money", height=460, fmt_fn=None, **kwargs):
-    vals=list(values)
-    colors = colors or [CYAN]*len(vals)
-    if fmt_fn:
-        text=[fmt_fn(v) for v in vals]
-    else:
-        text=[(_fmt_money(v) if value_format=="money" else (f"{v:.0%}" if value_format=="percent" else f"{v:,.0f}")) for v in vals]
-    fig=go.Figure(go.Bar(y=labels, x=vals, orientation="h", marker=dict(color=colors, line=dict(width=0)), text=text, textposition="outside", cliponaxis=False, hovertemplate="%{y}<br>%{x}<extra></extra>"))
-    _plotly_layout(fig, height=height, showlegend=False)
-    fig.update_layout(margin=dict(l=110,r=90,t=18,b=44))
-    fig.update_yaxes(autorange="reversed")
-    plotly_card(title, fig, height)
+    // Jewel trail colors cycling
+    const jewelColors = [
+        'rgba(124,58,237,',   // amethyst
+        'rgba(29,78,216,',    // sapphire
+        'rgba(2,132,199,',    // crystal blue
+        'rgba(4,120,87,',     // emerald
+        'rgba(180,83,9,',     // topaz
+        'rgba(219,39,119,',   // ruby
+    ];
+    let colorIdx = 0;
+    let colorT = 0;
+
+    function drawAirplane(x, y, ang, scale=1) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(ang);
+        ctx.scale(scale, scale);
+
+        // Shadow / glow beneath plane
+        ctx.shadowColor = 'rgba(124,58,237,0.45)';
+        ctx.shadowBlur  = 14;
+
+        // Fuselage
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.quadraticCurveTo(3.5, -4, 3, 6);
+        ctx.quadraticCurveTo(1.5, 10, 0, 11);
+        ctx.quadraticCurveTo(-1.5, 10, -3, 6);
+        ctx.quadraticCurveTo(-3.5, -4, 0, -14);
+        ctx.fillStyle = '#7c3aed';
+        ctx.fill();
+
+        // Wings
+        ctx.beginPath();
+        ctx.moveTo(-2, 1); ctx.lineTo(-14, 8); ctx.lineTo(-12, 10);
+        ctx.lineTo(-1.5, 5);
+        ctx.closePath();
+        ctx.fillStyle = '#1d4ed8';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(2, 1); ctx.lineTo(14, 8); ctx.lineTo(12, 10);
+        ctx.lineTo(1.5, 5);
+        ctx.closePath();
+        ctx.fillStyle = '#1d4ed8';
+        ctx.fill();
+
+        // Tail fins
+        ctx.beginPath();
+        ctx.moveTo(-1, 8); ctx.lineTo(-6, 13); ctx.lineTo(-5, 14);
+        ctx.lineTo(-0.5, 10);
+        ctx.closePath();
+        ctx.fillStyle = '#db2777';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(1, 8); ctx.lineTo(6, 13); ctx.lineTo(5, 14);
+        ctx.lineTo(0.5, 10);
+        ctx.closePath();
+        ctx.fillStyle = '#db2777';
+        ctx.fill();
+
+        // Cockpit window
+        ctx.beginPath();
+        ctx.ellipse(0, -9, 1.8, 2.5, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(196,229,255,0.90)';
+        ctx.shadowBlur = 0;
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    function frame() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Age trail points
+        for (let i = 0; i < trail.length; i++) trail[i].age++;
+
+        // Draw trail as glowing connected dots / crystals
+        for (let i = 1; i < trail.length; i++) {
+            const p = trail[i];
+            const prog = i / trail.length;          // 0 at tail, 1 at head
+            const fade = prog * (1 - p.age / 120);
+            if (fade <= 0) continue;
+
+            const ci = Math.floor(prog * jewelColors.length) % jewelColors.length;
+            const c  = jewelColors[ci];
+
+            // Streak segment
+            const prev = trail[i - 1];
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(prev.x, prev.y);
+            ctx.lineTo(p.x, p.y);
+            ctx.strokeStyle = c + (fade * 0.70).toFixed(2) + ')';
+            ctx.lineWidth   = prog * 3.5 + 0.5;
+            ctx.lineCap     = 'round';
+            ctx.shadowColor = c + '0.6)';
+            ctx.shadowBlur  = 8 * prog;
+            ctx.stroke();
+            ctx.restore();
+
+            // Tiny jewel spark every few points
+            if (i % 5 === 0 && prog > 0.15) {
+                const r = prog * 2.8;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = c + (fade * 0.55).toFixed(2) + ')';
+                ctx.shadowColor = c + '0.8)';
+                ctx.shadowBlur  = 10;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Smooth angle
+        angle = lerpAngle(angle, targetAngle, 0.18);
+
+        // Draw airplane
+        drawAirplane(mx, my, angle, 1.15);
+
+        requestAnimationFrame(frame);
+    }
+    frame();
+})();
+</script>
+""", unsafe_allow_html=True)
+
+
 # ─────────────────────────────────────────────────────────────
 #  PATHS
 # ─────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(__file__)
 DATA_PATH    = os.path.join(BASE_DIR, "airline_route_profitability.csv")
-if not os.path.exists(DATA_PATH):
-    alt_data_path = os.path.join(BASE_DIR, "airline_route_profitability(1).csv")
-    if os.path.exists(alt_data_path):
-        DATA_PATH = alt_data_path
 MODEL1_PATH  = os.path.join(BASE_DIR, "model_with_revenue.pkl")
 MODEL2_PATH  = os.path.join(BASE_DIR, "model_without_revenue.pkl")
 MODEL3_PATH  = os.path.join(BASE_DIR, "model_preoperational.pkl")
@@ -299,7 +824,7 @@ def _fmt_chart_value(v, value_format="number"):
     return f"{v:,.0f}"
 
 
-def plotly_vbar_chart(title, labels, series, max_value=None, value_format="number", height=430):
+def shimmer_vertical_bar_chart(title, labels, series, max_value=None, value_format="number", height=430):
     """
     Animated vertical grouped/single bar chart rendered in HTML/CSS.
     series example:
@@ -567,7 +1092,7 @@ def plotly_vbar_chart(title, labels, series, max_value=None, value_format="numbe
     """, height=height + 40, scrolling=False)
 
 
-def plotly_hbar_chart(title, labels, values, colors=None, value_format="number", height=430):
+def shimmer_horizontal_bar_chart(title, labels, values, colors=None, value_format="number", height=430):
     """Animated horizontal bar chart rendered in HTML/CSS."""
     labels = [str(x) for x in labels]
     values = [float(x) if pd.notna(x) else 0.0 for x in values]
@@ -754,7 +1279,7 @@ def plotly_hbar_chart(title, labels, values, colors=None, value_format="number",
     """, height=height + 35, scrolling=False)
 
 
-def plotly_donut_chart(title, labels, values, colors=None, height=430):
+def shimmer_pie_chart(title, labels, values, colors=None, height=430):
     """Animated donut/pie-style chart rendered in HTML/CSS with shimmer."""
     labels = [str(x) for x in labels]
     values = [float(x) if pd.notna(x) else 0.0 for x in values]
@@ -962,7 +1487,7 @@ def plotly_donut_chart(title, labels, values, colors=None, height=430):
     """, height=height + 35, scrolling=False)
 
 
-def plotly_hbar_chart(title, labels, values, color=ACCENT, value_format="money", height=460):
+def shimmer_classic_horizontal_bar_chart(title, labels, values, color=ACCENT, value_format="money", height=460):
     """Classic horizontal chart closer to the original Matplotlib look, with animated bar shimmer."""
     labels = [str(x) for x in labels]
     values = [float(x) if pd.notna(x) else 0.0 for x in values]
@@ -1119,35 +1644,15 @@ model1, model2, model3, X1_columns, X2_columns, X3_columns = load_artifacts()
 # ─────────────────────────────────────────────────────────────
 #  PRE-COMPUTED
 # ─────────────────────────────────────────────────────────────
-def compute_model_metrics(df, model, columns):
-    """Compute live model metrics from the loaded artifact and current labeled dataset."""
-    from sklearn.metrics import accuracy_score, f1_score
-
-    feature_df = df.drop(columns=["Route_Decision"], errors="ignore")
-    X = prepare_input(feature_df, columns)
-    y_true = df["Route_Decision"]
-    y_pred = model.predict(X)
-    return accuracy_score(y_true, y_pred), f1_score(y_true, y_pred, average="macro")
-
-try:
-    m1_acc, m1_f1 = compute_model_metrics(df, model1, X1_columns)
-    m2_acc, m2_f1 = compute_model_metrics(df, model2, X2_columns)
-    m3_acc, m3_f1 = compute_model_metrics(df, model3, X3_columns)
-except Exception:
-    # Safe fallback only if an environment/version issue prevents metric recomputation.
-    m1_acc, m1_f1 = 0.879624, 0.879616
-    m2_acc, m2_f1 = 0.837618, 0.838726
-    m3_acc, m3_f1 = 0.721003, 0.729150
-
 comparison = pd.DataFrame({
     "Model":    ["With revenue variables", "Without revenue variables", "Only pre-operational features"],
-    "Accuracy": [m1_acc, m2_acc, m3_acc],
-    "Macro F1": [m1_f1, m2_f1, m3_f1],
+    "Accuracy": [0.879624, 0.837618, 0.721003],
+    "Macro F1": [0.879616, 0.838726, 0.729150],
 })
 
 df_sorted = df.sort_values(["Route", "Flight_Date"]).copy()
 df_sorted["Prev_Decision"] = df_sorted.groupby("Route")["Route_Decision"].shift(1)
-df_sorted["Changed"] = df_sorted["Prev_Decision"].notna() & (df_sorted["Route_Decision"] != df_sorted["Prev_Decision"])
+df_sorted["Changed"] = df_sorted["Route_Decision"] != df_sorted["Prev_Decision"]
 route_switches = (
     df_sorted.groupby("Route")["Changed"].sum()
     .sort_values(ascending=False).reset_index()
@@ -1231,15 +1736,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div class="feature-grid">
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#38BDF8 0%,#7DD3FC 45%,#2563EB 100%)"><div class="feature-inner"><div class="feature-icon">✈️</div><h3>Route Intelligence</h3><p>Monitor route profitability, load factor, and network performance through a polished executive dashboard.</p></div></div>
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#FACC15 0%,#FB923C 45%,#FB7185 100%)"><div class="feature-inner"><div class="feature-icon">📡</div><h3>Decision Engine</h3><p>Classify routes into Expand, Maintain, Optimize, or Drop with model-backed confidence scores.</p></div></div>
-  <div class="feature-card" style="--card-gradient:linear-gradient(137deg,#22C55E 0%,#2DD4BF 45%,#A78BFA 100%)"><div class="feature-inner"><div class="feature-icon">💹</div><h3>Profit Signals</h3><p>Surface the costs, demand patterns, and stability issues that drive airline profitability.</p></div></div>
-</div>
-""", unsafe_allow_html=True)
-
-
 
 # ─────────────────────────────────────────────────────────────
 #  TABS
@@ -1295,7 +1791,7 @@ with tab1:
             "Drop":     CHART_DROP,
         }
         wedge_colors = [wc[l] for l in dc.index]
-        plotly_donut_chart(
+        shimmer_pie_chart(
             title="Share of Flights by Decision",
             labels=dc.index.tolist(),
             values=dc.values.tolist(),
@@ -1336,7 +1832,7 @@ with tab2:
     with left:
         apd = (fdf.groupby("Route_Decision")["Profit"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        plotly_hbar_chart(
+        shimmer_horizontal_bar_chart(
             title="Average Profit by Decision",
             labels=apd.index.tolist(),
             values=apd.values.tolist(),
@@ -1348,7 +1844,7 @@ with tab2:
     with right:
         ald = (fdf.groupby("Route_Decision")["Load_Factor"].mean()
                .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        plotly_vbar_chart(
+        shimmer_vertical_bar_chart(
             title="Seat Occupancy by Decision",
             labels=ald.index.tolist(),
             series=[{
@@ -1392,7 +1888,7 @@ with tab2:
     ]
     neutral_cols = jewel_ramp[:nc]
 
-    plotly_hbar_chart(
+    shimmer_horizontal_bar_chart(
         title="Top Cost Drivers",
         labels=cost_means.index.tolist(),
         values=cost_means.values.tolist(),
@@ -1426,7 +1922,7 @@ with tab3:
             f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Top 10 routes by total profit</p>", unsafe_allow_html=True)
         top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
-        plotly_hbar_chart(
+        shimmer_classic_horizontal_bar_chart(
             title="Top 10 Routes",
             labels=top.index.tolist(),
             values=top.values.tolist(),
@@ -1440,7 +1936,7 @@ with tab3:
             f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
             "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
         worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
-        plotly_hbar_chart(
+        shimmer_classic_horizontal_bar_chart(
             title="Bottom 10 Routes",
             labels=worst.index.tolist(),
             values=worst.values.tolist(),
@@ -1482,7 +1978,7 @@ with tab4:
     bc = [bc_map.get(i, ACCENT) for i in urbd.index]
 
     vals4 = urbd["Unique Routes"].values.tolist()
-    plotly_vbar_chart(
+    shimmer_vertical_bar_chart(
         title="Unique Routes per Decision Category",
         labels=urbd.index.tolist(),
         series=[{
@@ -1506,7 +2002,7 @@ with tab5:
         f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
         "How accurate are the models?</p>", unsafe_allow_html=True)
 
-    plotly_vbar_chart(
+    shimmer_vertical_bar_chart(
         title="Model Accuracy & F1 Comparison",
         labels=comparison["Model"].tolist(),
         series=[
@@ -1540,10 +2036,6 @@ with tab5:
         key="model_choice_select",
     )
 
-    if st.session_state.get("last_model_choice") != model_choice:
-        st.session_state.pred_result = None
-        st.session_state.last_model_choice = model_choice
-
     with st.form("prediction_form"):
         col1, col2, col3 = st.columns(3)
 
@@ -1552,13 +2044,7 @@ with tab5:
             aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
             aircraft_capacity = st.number_input("Aircraft Capacity", min_value=50,  max_value=600, value=250)
             passengers        = st.number_input("Passengers",        min_value=0,   max_value=600, value=200)
-            load_factor       = min(passengers / aircraft_capacity, 1.0) if aircraft_capacity else 0.0
-            st.markdown(
-                f"<div class='info-box'>Calculated Load Factor: <strong>{load_factor:.0%}</strong><br>Based on passengers ÷ aircraft capacity.</div>",
-                unsafe_allow_html=True,
-            )
-            if passengers > aircraft_capacity:
-                st.warning("Passengers exceed aircraft capacity. Load factor is capped at 100% for prediction.")
+            load_factor       = st.slider("Load Factor (seat occupancy)", min_value=0.0, max_value=1.0, value=0.80, step=0.01)
 
         with col2:
             st.markdown('<p class="col-label">🌍 Route context</p>', unsafe_allow_html=True)
@@ -1678,7 +2164,7 @@ with tab5:
 
         bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
         probs = prob_df["Probability"].tolist()
-        plotly_vbar_chart(
+        shimmer_vertical_bar_chart(
             title="Model Confidence per Decision",
             labels=prob_df["Decision"].tolist(),
             series=[{
@@ -1695,6 +2181,13 @@ with tab5:
         st.dataframe(
             prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
             use_container_width=True, hide_index=True)
+
+
+# ─────────────────────────────────────────────────────────────
+#  FILTERED DATA EXPANDER
+# ─────────────────────────────────────────────────────────────
+with st.expander("🗂  Show filtered data"):
+    st.dataframe(fdf, use_container_width=True)
 
 
 # ─────────────────────────────────────────────────────────────
