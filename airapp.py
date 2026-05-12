@@ -71,7 +71,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .sidebar-brand {{ font-size:1.12rem; font-weight:900; padding:.35rem 0 1rem; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.12); letter-spacing:.02em; color:#f4f1e8!important; }} .sidebar-brand span {{ color:#fff!important; }}
 .hero {{
   max-width: 1040px;
-  margin: -85px auto 10px !important;
+  margin: -100px auto 10px !important;
   padding: 30px 72px !important;
   display: block !important;
   text-align: left;
@@ -116,7 +116,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 }}
 .hero-left {{ position:relative; z-index:2; }}
 .hero h1 {{
-  font-size: clamp(3rem, 7vw, 6.2rem) !important;
+  font-size: clamp(8rem, 7vw, 6.2rem) !important;
   line-height: .90 !important;
   letter-spacing: .095em !important;
   text-transform: uppercase !important;
@@ -173,7 +173,6 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
   <div class="constellation c4"><svg viewBox="0 0 210 150"><line x1="25" y1="20" x2="60" y2="70"/><line x1="60" y1="70" x2="100" y2="55"/><line x1="100" y1="55" x2="140" y2="98"/><line x1="140" y1="98" x2="180" y2="130"/><circle cx="25" cy="20" r="2"/><circle cx="60" cy="70" r="2.5"/><circle cx="100" cy="55" r="2"/><circle cx="140" cy="98" r="2"/><circle cx="180" cy="130" r="2.5"/></svg></div>
   <div class="constellation c5"><svg viewBox="0 0 230 120"><line x1="20" y1="75" x2="70" y2="60"/><line x1="70" y1="60" x2="120" y2="72"/><line x1="120" y1="72" x2="165" y2="50"/><line x1="165" y1="50" x2="210" y2="35"/><circle cx="20" cy="75" r="2"/><circle cx="70" cy="60" r="2"/><circle cx="120" cy="72" r="2.5"/><circle cx="165" cy="50" r="2"/><circle cx="210" cy="35" r="2"/></svg></div>
 </div>
-<div class="cosmos-nav"><div class="cosmos-brand">SKYLENS</div><div class="cosmos-links"><span>Explore</span><span>Features</span><span>Routes</span><span>Predict</span></div><div class="cosmos-login">Dashboard</div></div>
 """, unsafe_allow_html=True)
 # ─────────────────────────────────────────────────────────────
 #  FINAL CLEAN PLOTLY HELPERS — single source of truth
