@@ -15,231 +15,359 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────
-#  PROFESSIONAL AVIATION COMMAND CENTER THEME
+#  COLOR PALETTE
 # ─────────────────────────────────────────────────────────────
-BG = "#080B12"
-PANEL = "#121722"
-PANEL_2 = "#171E2B"
-TEXT = "#F5F7FB"
-TEXT_SOFT = "#C9D2E3"
-TEXT_MUTED = "#7F8AA3"
-CYAN = "#38BDF8"
-BLUE = "#2563EB"
-AMBER = "#F59E0B"
-GREEN = "#22C55E"
-RED = "#F43F5E"
-VIOLET = "#A78BFA"
+BG        = "#0A0D18"
+TEXT      = "#1A1F35"
+TEXT_SOFT = "#3D4466"
+TEXT_MUTED= "#7A82A6"
+CYAN      = "#0EA5E9"
+BLUE      = "#3B82F6"
+AMBER     = "#F59E0B"
+GREEN     = "#10B981"
+RED       = "#F43F5E"
+VIOLET    = "#8B5CF6"
 
-CHART_EXPAND   = "#22C55E"
-CHART_MAINTAIN = "#FACC15"
-CHART_OPTIMIZE = "#FB923C"
-CHART_DROP     = "#FB7185"
-CHART_NEUTRAL  = ["#38BDF8", "#A78BFA", "#F59E0B", "#22C55E", "#FB7185", "#60A5FA", "#2DD4BF", "#F472B6"]
+CHART_EXPAND   = "#10B981"
+CHART_MAINTAIN = "#F59E0B"
+CHART_OPTIMIZE = "#F97316"
+CHART_DROP     = "#F43F5E"
+CHART_NEUTRAL  = [CYAN, VIOLET, AMBER, GREEN, RED, BLUE, "#2DD4BF", "#F472B6"]
 DECISION_COLORS = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN, "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
 ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
 
-ACCENT = CYAN
+ACCENT   = CYAN
 ACCENT_2 = VIOLET
-INK = TEXT
+INK      = TEXT
 INK_SOFT = TEXT_SOFT
-INK_MUTED = TEXT_MUTED
+INK_MUTED= TEXT_MUTED
 
 st.markdown("""
 <style>
-  #MainMenu, footer { visibility: hidden; }
-  .block-container { padding-top: 1rem; padding-bottom: 2rem; max-width: 1300px; }
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-  /* ?? COSMIC BACKGROUND ?? */
-  .stApp {
-    background:
-      radial-gradient(ellipse at 50% 40%, rgba(120,40,200,0.32), transparent 58%),
-      radial-gradient(ellipse at 80% 10%, rgba(40,80,200,0.18), transparent 45%),
-      radial-gradient(ellipse at 10% 80%, rgba(180,60,60,0.12), transparent 45%),
-      linear-gradient(rgba(4,2,18,0.60), rgba(4,2,18,0.88)),
-      url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2400&q=80") center/cover no-repeat fixed;
-    color: #f5f3ff;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
+#MainMenu, footer { visibility: hidden; }
 
-  /* ?? SIDEBAR ?? */
-  [data-testid="stSidebar"] {
-    background: rgba(8,4,30,0.72) !important;
-    border-right: 1px solid rgba(255,255,255,0.08) !important;
-    backdrop-filter: blur(20px) !important;
-  }
-  [data-testid="stSidebar"] * { color: #e2dcf8 !important; }
+/* ── FULL-WIDTH LAYOUT ── */
+.block-container {
+  padding-top: 0 !important;
+  padding-bottom: 2rem !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  max-width: 100% !important;
+}
 
-  /* ?? GLASS CARDS ?? */
-  [data-testid="metric-container"],
-  [data-testid="stDataFrame"],
-  [data-testid="stForm"],
-  .plotly-card,
-  .result-card,
-  .info-box {
-    background: linear-gradient(160deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03)) !important;
-    border: 1px solid rgba(255,255,255,0.18) !important;
-    border-radius: 20px !important;
-    backdrop-filter: blur(16px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16) !important;
-  }
+/* ── ANIMATED NEBULA BACKGROUND ── */
+.stApp {
+  font-family: 'DM Sans', sans-serif;
+  color: #1A1F35;
+  background-color: #0D1022;
+  overflow-x: hidden;
+}
 
-  /* ?? METRICS ?? */
-  [data-testid="metric-container"] { padding: 22px !important; }
-  [data-testid="stMetricLabel"] {
-    color: rgba(255,255,255,0.55) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.14em !important;
-    font-size: 0.72rem !important;
-  }
-  [data-testid="stMetricValue"] { color: #fff !important; font-weight: 800 !important; }
+.stApp::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 90% 60% at 20% 30%, rgba(99, 60, 180, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 80% at 80% 70%, rgba(30, 80, 160, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 10%, rgba(140, 60, 100, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at 70% 40%, rgba(40, 120, 140, 0.06) 0%, transparent 55%),
+    linear-gradient(160deg, #0B0E1F 0%, #0E1128 40%, #0C0F20 70%, #0B0D1E 100%);
+  animation: nebulaDrift 40s ease-in-out infinite alternate;
+  pointer-events: none;
+}
 
-  /* ?? BUTTONS ?? */
-  .stButton > button,
-  [data-testid="stFormSubmitButton"] button {
-    border-radius: 999px !important;
-    border: 1px solid rgba(255,255,255,0.22) !important;
-    background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)) !important;
-    color: #fff !important;
-    font-weight: 700 !important;
-    backdrop-filter: blur(12px) !important;
-    box-shadow: 0 0 20px rgba(140,120,255,0.20), inset 0 1px 0 rgba(255,255,255,0.18) !important;
-    transition: all 0.2s ease !important;
-  }
-  .stButton > button:hover,
-  [data-testid="stFormSubmitButton"] button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 0 32px rgba(140,120,255,0.35), inset 0 1px 0 rgba(255,255,255,0.22) !important;
-  }
+.stApp::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 40% 30% at 85% 20%, rgba(80, 40, 160, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 15% 75%, rgba(20, 80, 120, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 55% at 60% 85%, rgba(120, 50, 80, 0.06) 0%, transparent 50%);
+  animation: nebulaDrift2 55s ease-in-out infinite alternate;
+  pointer-events: none;
+}
 
-  /* ?? INPUTS ?? */
-  .stTextInput input,
-  .stNumberInput input,
-  .stSelectbox div[data-baseweb="select"] {
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.14) !important;
-    border-radius: 14px !important;
-    color: #fff !important;
-    backdrop-filter: blur(10px) !important;
-  }
+@keyframes nebulaDrift {
+  0%   { opacity: 0.7; transform: scale(1)    rotate(0deg); }
+  33%  { opacity: 0.9; transform: scale(1.04) rotate(0.4deg); }
+  66%  { opacity: 0.75; transform: scale(0.98) rotate(-0.3deg); }
+  100% { opacity: 0.85; transform: scale(1.02) rotate(0.5deg); }
+}
+@keyframes nebulaDrift2 {
+  0%   { opacity: 0.6; transform: scale(1)    rotate(0deg); }
+  50%  { opacity: 0.85; transform: scale(1.05) rotate(-0.5deg); }
+  100% { opacity: 0.65; transform: scale(0.97) rotate(0.3deg); }
+}
 
-  /* ?? TABS ?? */
-  .stTabs [data-baseweb="tab-list"] {
-    background: rgba(255,255,255,0.04) !important;
-    border: 1px solid rgba(255,255,255,0.10) !important;
-    border-radius: 16px !important;
-    padding: 5px !important;
-  }
-  .stTabs [data-baseweb="tab"] {
-    color: rgba(255,255,255,0.50) !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-  }
-  .stTabs [aria-selected="true"] {
-    background: rgba(255,255,255,0.10) !important;
-    color: #fff !important;
-  }
-  .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
+/* Subtle star field */
+.stApp > * { position: relative; z-index: 1; }
 
-  /* ?? PLOTLY CARD ?? */
-  .plotly-card { padding: 18px !important; }
-  .plotly-card-title { color: #fff !important; font-weight: 800 !important; margin-bottom: 12px !important; }
+/* ── SIDEBAR — FROST WHITE ── */
+[data-testid="stSidebar"] {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  box-shadow: 4px 0 32px rgba(30, 40, 120, 0.12) !important;
+}
+[data-testid="stSidebar"] * {
+  color: #1A2040 !important;
+}
+[data-testid="stSidebar"] .stSelectbox label,
+[data-testid="stSidebar"] p {
+  color: #3D4A80 !important;
+  font-weight: 600 !important;
+}
+[data-testid="stSidebar"] [data-baseweb="select"] > div {
+  background: rgba(255,255,255,0.55) !important;
+  border: 1px solid rgba(30,50,140,0.18) !important;
+  border-radius: 12px !important;
+  color: #1A2040 !important;
+}
 
-  /* ?? SIDEBAR BRAND ?? */
-  .sidebar-brand {
-    font-size: 1.05rem; font-weight: 800; letter-spacing: 0.14em;
-    color: #fff; text-transform: uppercase; margin-bottom: 18px; display: block;
-  }
-  .sidebar-brand span { color: #a78bfa; }
+/* ── FROST WHITE GLASS CARDS ── */
+[data-testid="metric-container"],
+[data-testid="stDataFrame"],
+[data-testid="stForm"],
+.plotly-card,
+.result-card,
+.info-box {
+  background: rgba(255, 255, 255, 0.62) !important;
+  border: 1px solid rgba(255, 255, 255, 0.90) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(22px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(160%) !important;
+  box-shadow:
+    0 8px 32px rgba(30, 40, 120, 0.10),
+    0 2px 8px rgba(30, 40, 120, 0.06),
+    inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}
 
-  /* ?? DECISION PILLS ?? */
-  .pill {
-    display: inline-block; padding: 3px 12px; border-radius: 999px;
-    font-size: 0.70rem; font-weight: 700; letter-spacing: 0.07em;
-  }
-  .pill-expand   { background: rgba(34,197,94,0.18);  color: #22c55e; border: 1px solid rgba(34,197,94,0.35); }
-  .pill-maintain { background: rgba(250,204,21,0.16);  color: #facc15; border: 1px solid rgba(250,204,21,0.30); }
-  .pill-optimize { background: rgba(251,146,60,0.16);  color: #fb923c; border: 1px solid rgba(251,146,60,0.30); }
-  .pill-drop     { background: rgba(251,113,133,0.16); color: #fb7185; border: 1px solid rgba(251,113,133,0.30); }
+/* ── METRIC CARDS ── */
+[data-testid="metric-container"] { padding: 22px !important; }
+[data-testid="stMetricLabel"] {
+  color: #5A6490 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.14em !important;
+  font-size: 0.70rem !important;
+  font-weight: 700 !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+[data-testid="stMetricValue"] {
+  color: #0F1530 !important;
+  font-weight: 800 !important;
+  font-family: 'Syne', sans-serif !important;
+}
+[data-testid="stMetricDelta"] { color: #10B981 !important; }
 
-  /* ?? SECTION LABELS ?? */
-  .section-hd {
-    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em;
-    text-transform: uppercase; color: rgba(255,255,255,0.42); margin-bottom: 12px;
-  }
-  .divider-label {
-    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.22em;
-    text-transform: uppercase; color: rgba(255,255,255,0.28);
-    text-align: center; margin: 22px 0 16px;
-  }
-  .col-label {
-    font-size: 0.70rem; font-weight: 700; letter-spacing: 0.16em;
-    text-transform: uppercase; color: #a78bfa; margin-bottom: 8px;
-  }
+/* ── BUTTONS ── */
+.stButton > button,
+[data-testid="stFormSubmitButton"] button {
+  border-radius: 999px !important;
+  border: 1px solid rgba(30,50,180,0.20) !important;
+  background: linear-gradient(160deg, rgba(255,255,255,0.85), rgba(240,244,255,0.70)) !important;
+  color: #1A2060 !important;
+  font-weight: 700 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 18px rgba(30,50,180,0.12), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+  transition: all 0.2s ease !important;
+}
+.stButton > button:hover,
+[data-testid="stFormSubmitButton"] button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 28px rgba(30,50,180,0.20), inset 0 1px 0 rgba(255,255,255,1) !important;
+}
 
-  /* ?? RESULT CARDS ?? */
-  .result-card { padding: 24px !important; margin-bottom: 18px; }
-  .result-expand   { border-left: 4px solid #22c55e !important; }
-  .result-maintain { border-left: 4px solid #facc15 !important; }
-  .result-optimize { border-left: 4px solid #fb923c !important; }
-  .result-drop     { border-left: 4px solid #fb7185 !important; }
+/* ── INPUTS ── */
+.stTextInput input,
+.stNumberInput input,
+.stSelectbox div[data-baseweb="select"] {
+  background: rgba(255,255,255,0.70) !important;
+  border: 1px solid rgba(30,50,180,0.18) !important;
+  border-radius: 12px !important;
+  color: #1A2040 !important;
+  backdrop-filter: blur(10px) !important;
+}
 
-  /* ?? INFO BOX ?? */
-  .info-box {
-    padding: 14px 18px !important; font-size: 0.84rem;
-    color: rgba(255,255,255,0.70); line-height: 1.65; margin: 8px 0;
-  }
+/* ── TABS ── */
+.stTabs [data-baseweb="tab-list"] {
+  background: rgba(255,255,255,0.55) !important;
+  border: 1px solid rgba(255,255,255,0.88) !important;
+  border-radius: 16px !important;
+  padding: 5px !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: 0 2px 12px rgba(30,40,120,0.08) !important;
+}
+.stTabs [data-baseweb="tab"] {
+  color: #5A6490 !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+.stTabs [aria-selected="true"] {
+  background: rgba(255,255,255,0.88) !important;
+  color: #0F1530 !important;
+  box-shadow: 0 2px 8px rgba(30,40,120,0.12) !important;
+}
+.stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 
-  /* ?? HERO ?? */
-  .hero {
-    position: relative;
-    padding: 80px !important;
-    border-radius: 28px !important;
-    overflow: hidden;
-    margin-bottom: 36px !important;
-    background: linear-gradient(160deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03)) !important;
-    border: 1px solid rgba(255,255,255,0.18) !important;
-    backdrop-filter: blur(20px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
-    box-shadow: 0 20px 80px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.16);
-  }
-  .hero h1 {
-    font-size: clamp(3rem, 7vw, 6rem) !important;
-    line-height: 0.9 !important;
-    letter-spacing: 0.06em !important;
-    font-weight: 900 !important;
-    color: #fff !important;
-    text-shadow: 0 0 60px rgba(180,140,255,0.4);
-  }
-  .hero p {
-    color: rgba(255,255,255,0.72) !important;
-    font-size: 1.05rem !important;
-    line-height: 1.7 !important;
-    max-width: 680px;
-  }
-  .hero-eyebrow {
-    color: rgba(255,255,255,0.50) !important;
-    font-size: 0.72rem !important;
-    letter-spacing: 0.30em !important;
-    text-transform: uppercase !important;
-  }
-  .hero-badge {
-    display: inline-flex;
-    margin-top: 28px;
-    padding: 11px 26px;
-    border-radius: 999px;
-    background: rgba(10,8,30,0.45);
-    border: 1px solid rgba(255,255,255,0.25);
-    backdrop-filter: blur(10px);
-    color: #fff;
-    font-weight: 600;
-    font-size: 0.85rem;
-    box-shadow: 0 0 18px rgba(140,120,255,0.30), inset 0 0 8px rgba(140,120,255,0.15);
-  }
+/* ── PLOTLY CARDS ── */
+.plotly-card { padding: 20px !important; }
+.plotly-card-title {
+  color: #0F1530 !important;
+  font-weight: 800 !important;
+  font-family: 'Syne', sans-serif !important;
+  font-size: 1rem !important;
+  margin-bottom: 12px !important;
+}
+
+/* ── SIDEBAR BRAND ── */
+.sidebar-brand {
+  font-size: 1.05rem; font-weight: 800; letter-spacing: 0.14em;
+  color: #0F1530; text-transform: uppercase; margin-bottom: 18px; display: block;
+  font-family: 'Syne', sans-serif;
+}
+.sidebar-brand span { color: #7C3AED; }
+
+/* ── DECISION PILLS ── */
+.pill {
+  display: inline-block; padding: 3px 12px; border-radius: 999px;
+  font-size: 0.70rem; font-weight: 700; letter-spacing: 0.07em;
+  font-family: 'DM Sans', sans-serif;
+}
+.pill-expand   { background: rgba(16,185,129,0.14);  color: #065f46; border: 1px solid rgba(16,185,129,0.30); }
+.pill-maintain { background: rgba(245,158,11,0.14);  color: #92400e; border: 1px solid rgba(245,158,11,0.30); }
+.pill-optimize { background: rgba(249,115,22,0.14);  color: #7c2d12; border: 1px solid rgba(249,115,22,0.30); }
+.pill-drop     { background: rgba(244,63,94,0.14);   color: #881337; border: 1px solid rgba(244,63,94,0.30); }
+
+/* ── SECTION LABELS ── */
+.section-hd {
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #7A82A6; margin-bottom: 12px;
+  font-family: 'DM Sans', sans-serif;
+}
+.section-sub {
+  font-size: 0.85rem; color: #5A6490; margin-bottom: 18px; line-height: 1.6;
+  font-family: 'DM Sans', sans-serif;
+}
+.divider-label {
+  font-size: 0.66rem; font-weight: 700; letter-spacing: 0.22em;
+  text-transform: uppercase; color: #9AA0C0;
+  text-align: center; margin: 22px 0 16px;
+  font-family: 'DM Sans', sans-serif;
+}
+.col-label {
+  font-size: 0.70rem; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #7C3AED; margin-bottom: 8px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── RESULT CARDS ── */
+.result-card { padding: 26px !important; margin-bottom: 18px; }
+.result-expand   { border-left: 4px solid #10B981 !important; }
+.result-maintain { border-left: 4px solid #F59E0B !important; }
+.result-optimize { border-left: 4px solid #F97316 !important; }
+.result-drop     { border-left: 4px solid #F43F5E !important; }
+
+/* ── INFO BOX ── */
+.info-box {
+  padding: 14px 18px !important; font-size: 0.84rem;
+  color: #3D4466; line-height: 1.65; margin: 8px 0;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  padding: 72px 80px !important;
+  border-radius: 28px !important;
+  overflow: hidden;
+  margin-bottom: 36px !important;
+  margin-top: 24px !important;
+  background: rgba(255, 255, 255, 0.58) !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(28px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+  box-shadow:
+    0 20px 80px rgba(30, 40, 120, 0.12),
+    0 4px 16px rgba(30, 40, 120, 0.08),
+    inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.hero h1 {
+  font-size: clamp(2.8rem, 6vw, 5.5rem) !important;
+  line-height: 0.92 !important;
+  letter-spacing: 0.04em !important;
+  font-weight: 900 !important;
+  color: #0A0F28 !important;
+  font-family: 'Syne', sans-serif !important;
+}
+.hero p {
+  color: #3D4A80 !important;
+  font-size: 1.0rem !important;
+  line-height: 1.7 !important;
+  max-width: 600px;
+  font-family: 'DM Sans', sans-serif;
+}
+.hero-eyebrow {
+  color: #7A82A6 !important;
+  font-size: 0.70rem !important;
+  letter-spacing: 0.30em !important;
+  text-transform: uppercase !important;
+  font-family: 'DM Sans', sans-serif !important;
+  margin-bottom: 16px !important;
+  display: block;
+}
+.hero-badge {
+  display: inline-flex;
+  margin-top: 28px;
+  padding: 10px 24px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(30,50,180,0.18);
+  backdrop-filter: blur(10px);
+  color: #1A2060;
+  font-weight: 700;
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 4px 16px rgba(30,50,180,0.10), inset 0 1px 0 rgba(255,255,255,1);
+}
+
+/* ── DATAFRAME ── */
+[data-testid="stDataFrame"] {
+  padding: 12px !important;
+}
+[data-testid="stDataFrame"] th {
+  color: #3D4466 !important;
+  font-weight: 700 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 0.78rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+}
+[data-testid="stDataFrame"] td {
+  color: #1A2040 !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+/* ── WARNING ── */
+.stAlert {
+  background: rgba(255,255,255,0.65) !important;
+  border: 1px solid rgba(255,255,255,0.90) !important;
+  border-radius: 14px !important;
+  backdrop-filter: blur(16px) !important;
+}
 </style>
 """, unsafe_allow_html=True)
+
 # ─────────────────────────────────────────────────────────────
-#  FINAL CLEAN PLOTLY HELPERS — single source of truth
+#  PLOTLY HELPERS
 # ─────────────────────────────────────────────────────────────
 def _fmt_money(v):
     if abs(v) >= 1_000_000:
@@ -247,9 +375,6 @@ def _fmt_money(v):
     if abs(v) >= 1_000:
         return f"${v/1_000:.0f}K"
     return f"${v:.0f}"
-
-
-
 
 def col_seq(labels):
     return [DECISION_COLORS.get(str(label), ACCENT) for label in labels]
@@ -263,26 +388,24 @@ def _format_value(v, value_format="number", fmt_fn=None):
         return f"{v:.0%}"
     return f"{v:,.0f}"
 
-
 def _plotly_layout(fig, height=420, showlegend=False):
     fig.update_layout(
         height=height,
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT_SOFT, size=13),
+        plot_bgcolor="rgba(255,255,255,0.02)",
+        font=dict(family="DM Sans", color="#3D4466", size=13),
         showlegend=showlegend,
         margin=dict(l=52, r=54, t=18, b=58),
         hoverlabel=dict(
-            bgcolor="#111722",
-            bordercolor="rgba(255,255,255,.16)",
-            font_color="white",
-            font_family="Inter",
+            bgcolor="rgba(255,255,255,0.92)",
+            bordercolor="rgba(30,50,180,0.20)",
+            font_color="#0F1530",
+            font_family="DM Sans",
         ),
     )
-    fig.update_xaxes(showgrid=False, zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
-    fig.update_yaxes(gridcolor="rgba(255,255,255,.07)", zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
+    fig.update_xaxes(showgrid=False, zeroline=False, color="#7A82A6", tickfont=dict(size=12))
+    fig.update_yaxes(gridcolor="rgba(30,50,180,0.07)", zeroline=False, color="#7A82A6", tickfont=dict(size=12))
     return fig
-
 
 def plotly_card(title, fig, height=420):
     st.markdown(
@@ -291,7 +414,6 @@ def plotly_card(title, fig, height=420):
     )
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False, "responsive": True})
     st.markdown('</div>', unsafe_allow_html=True)
-
 
 def plotly_donut_chart(title, labels, values, colors=None, height=420, **kwargs):
     labels = [str(x) for x in labels]
@@ -305,21 +427,22 @@ def plotly_donut_chart(title, labels, values, colors=None, height=420, **kwargs)
             labels=labels,
             values=vals,
             hole=0.58,
-            marker=dict(colors=colors, line=dict(color="#080B12", width=3)),
+            marker=dict(colors=colors, line=dict(color="rgba(255,255,255,0.9)", width=3)),
             textinfo="percent",
-            textfont=dict(size=15, color="white"),
+            textfont=dict(size=14, color="white"),
             hovertemplate="%{label}<br>%{percent}<br>%{value}<extra></extra>",
+            sort=False,
         )
     )
     _plotly_layout(fig, height=height, showlegend=True)
     fig.update_layout(
-        legend=dict(orientation="h", y=-0.08, x=0.5, xanchor="center", font=dict(size=12, color=TEXT_SOFT)),
+        legend=dict(orientation="h", y=-0.08, x=0.5, xanchor="center", font=dict(size=12, color="#3D4466")),
         margin=dict(l=20, r=20, t=8, b=76),
     )
     plotly_card(title, fig, height)
 
-
-def plotly_vbar_chart(title, labels, series=None, values=None, colors=None, max_value=None, value_format="number", height=420, fmt_fn=None, y_label="", **kwargs):
+def plotly_vbar_chart(title, labels, series=None, values=None, colors=None, max_value=None,
+                       value_format="number", height=420, fmt_fn=None, y_label="", **kwargs):
     labels = [str(x) for x in labels]
     fig = go.Figure()
     if series is None:
@@ -335,7 +458,7 @@ def plotly_vbar_chart(title, labels, series=None, values=None, colors=None, max_
                 x=labels,
                 y=vals,
                 name=srs.get("name", "Value"),
-                marker=dict(color=marker_colors, line=dict(width=0)),
+                marker=dict(color=marker_colors, line=dict(width=0), opacity=0.85),
                 text=text,
                 textposition="outside",
                 cliponaxis=False,
@@ -350,8 +473,8 @@ def plotly_vbar_chart(title, labels, series=None, values=None, colors=None, max_
         fig.update_yaxes(title_text=y_label)
     plotly_card(title, fig, height)
 
-
-def plotly_hbar_chart(title, labels, values, colors=None, color=None, value_format="money", height=460, fmt_fn=None, **kwargs):
+def plotly_hbar_chart(title, labels, values, colors=None, color=None, value_format="money",
+                       height=460, fmt_fn=None, **kwargs):
     labels = [str(x) for x in labels]
     vals = [float(v) if pd.notna(v) else 0.0 for v in values]
     if not vals:
@@ -371,7 +494,7 @@ def plotly_hbar_chart(title, labels, values, colors=None, color=None, value_form
             y=labels,
             x=vals,
             orientation="h",
-            marker=dict(color=colors, line=dict(width=0)),
+            marker=dict(color=colors, line=dict(width=0), opacity=0.82),
             text=text,
             textposition="outside",
             cliponaxis=False,
@@ -398,7 +521,6 @@ MODEL3_PATH  = os.path.join(BASE_DIR, "model_preoperational.pkl")
 X1_COLS_PATH = os.path.join(BASE_DIR, "x1_columns.pkl")
 X2_COLS_PATH = os.path.join(BASE_DIR, "x2_columns.pkl")
 X3_COLS_PATH = os.path.join(BASE_DIR, "x3_columns.pkl")
-
 
 # ─────────────────────────────────────────────────────────────
 #  DATA & MODEL LOADING
@@ -429,7 +551,6 @@ def load_data():
     df["Route_Decision"] = df.apply(classify, axis=1)
     return df
 
-
 @st.cache_resource
 def load_artifacts():
     return (
@@ -437,11 +558,9 @@ def load_artifacts():
         joblib.load(X1_COLS_PATH), joblib.load(X2_COLS_PATH), joblib.load(X3_COLS_PATH)
     )
 
-
 def prepare_input(input_df, training_columns):
     enc = pd.get_dummies(input_df, drop_first=True)
     return enc.reindex(columns=training_columns, fill_value=0)
-
 
 # ─────────────────────────────────────────────────────────────
 #  LOAD
@@ -449,14 +568,11 @@ def prepare_input(input_df, training_columns):
 df = load_data()
 model1, model2, model3, X1_columns, X2_columns, X3_columns = load_artifacts()
 
-
 # ─────────────────────────────────────────────────────────────
 #  PRE-COMPUTED
 # ─────────────────────────────────────────────────────────────
 def compute_model_metrics(df, model, columns):
-    """Compute live model metrics from the loaded artifact and current labeled dataset."""
     from sklearn.metrics import accuracy_score, f1_score
-
     feature_df = df.drop(columns=["Route_Decision"], errors="ignore")
     X = prepare_input(feature_df, columns)
     y_true = df["Route_Decision"]
@@ -468,7 +584,6 @@ try:
     m2_acc, m2_f1 = compute_model_metrics(df, model2, X2_columns)
     m3_acc, m3_f1 = compute_model_metrics(df, model3, X3_columns)
 except Exception:
-    # Safe fallback only if an environment/version issue prevents metric recomputation.
     m1_acc, m1_f1 = 0.879624, 0.879616
     m2_acc, m2_f1 = 0.837618, 0.838726
     m3_acc, m3_f1 = 0.721003, 0.729150
@@ -496,14 +611,13 @@ route_variability = (
 if "pred_result" not in st.session_state:
     st.session_state.pred_result = None
 
-
 # ─────────────────────────────────────────────────────────────
 #  SIDEBAR
 # ─────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown('<div class="sidebar-brand">Airline <span>Route</span> Intelligence ✦</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-brand">Sky<span>Lens</span> ✦</div>', unsafe_allow_html=True)
     st.markdown(
-        f"<p style='font-size:0.64rem;color:{ACCENT};margin-bottom:14px;"
+        "<p style='font-size:0.64rem;color:#7C3AED;margin-bottom:14px;"
         "font-weight:700;letter-spacing:0.16em;text-transform:uppercase;font-family:DM Sans,sans-serif'>Filter View</p>",
         unsafe_allow_html=True,
     )
@@ -518,10 +632,10 @@ with st.sidebar:
     sel_decision = st.selectbox("🏷  Decision",      decision_opts)
 
     st.markdown("---")
-    st.markdown(f"""
-    <p style='font-size:0.62rem;color:{ACCENT};font-weight:700;letter-spacing:0.16em;
+    st.markdown("""
+    <p style='font-size:0.62rem;color:#7C3AED;font-weight:700;letter-spacing:0.16em;
     text-transform:uppercase;margin-bottom:10px;font-family:DM Sans,sans-serif'>Decision Labels</p>
-    <div style='display:flex;flex-direction:column;gap:9px;font-size:0.80rem;color:{INK_SOFT};font-family:DM Sans,sans-serif'>
+    <div style='display:flex;flex-direction:column;gap:9px;font-size:0.80rem;color:#3D4466;font-family:DM Sans,sans-serif'>
       <div style='display:flex;align-items:center;gap:10px'>
         <span class='pill pill-expand'>Expand</span>High profit &amp; demand
       </div>
@@ -537,7 +651,6 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-
 # ─────────────────────────────────────────────────────────────
 #  FILTER
 # ─────────────────────────────────────────────────────────────
@@ -547,19 +660,17 @@ if sel_aircraft != "All": fdf = fdf[fdf["Aircraft_Type"]  == sel_aircraft]
 if sel_season   != "All": fdf = fdf[fdf["Season"]         == sel_season]
 if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 
-
 # ─────────────────────────────────────────────────────────────
 #  HERO
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <div class="hero-eyebrow">&#10022; &nbsp; AIRLINE ROUTE INTELLIGENCE &nbsp; &#10022;</div>
+  <span class="hero-eyebrow">✦ &nbsp; AIRLINE ROUTE INTELLIGENCE &nbsp; ✦</span>
   <h1>SKYLENS<br>DASHBOARD</h1>
   <p>Analyze route profitability, operational signals, and model-backed decisions in one polished command view.</p>
-  <div class="hero-badge">&#10022; &nbsp; Explore dashboard below</div>
+  <div class="hero-badge">✦ &nbsp; Explore dashboard below</div>
 </div>
 """, unsafe_allow_html=True)
-
 
 # ─────────────────────────────────────────────────────────────
 #  TABS
@@ -571,7 +682,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📈  Route Stability",
     "🤖  Prediction Tool",
 ])
-
 
 # ── TAB 1 · OVERVIEW ─────────────────────────────────────────
 with tab1:
@@ -607,14 +717,10 @@ with tab1:
     with left:
         st.markdown('<p class="section-hd">Decision mix</p>', unsafe_allow_html=True)
         dc = fdf["Route_Decision"].value_counts()
-        dc = dc.reindex([x for x in ORDER if x in dc.index]).dropna()
-        wc = {
-            "Expand":   CHART_EXPAND,
-            "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_OPTIMIZE,
-            "Drop":     CHART_DROP,
-        }
-        wedge_colors = [wc[l] for l in dc.index]
+        # Keep consistent ORDER for both labels and colors
+        ordered_labels = [x for x in ORDER if x in dc.index]
+        dc = dc.reindex(ordered_labels).dropna()
+        wedge_colors = [DECISION_COLORS[l] for l in dc.index]
         plotly_donut_chart(
             title="Share of Flights by Decision",
             labels=dc.index.tolist(),
@@ -629,7 +735,7 @@ with tab1:
             fdf.groupby("Route_Decision")[["Profit", "Profit_Margin", "Load_Factor"]]
             .mean()
             .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()])
-            .round(3).reset_index()
+            .reset_index()
             .rename(columns={
                 "Route_Decision": "Decision",
                 "Profit": "Avg Profit ($)",
@@ -637,14 +743,17 @@ with tab1:
                 "Load_Factor": "Avg Load Factor",
             })
         )
+        # ── FIX: format margin as % and load factor as %
+        summary["Avg Profit ($)"]  = summary["Avg Profit ($)"].map("${:,.0f}".format)
+        summary["Avg Margin"]      = summary["Avg Margin"].map("{:.1f}%".format)
+        summary["Avg Load Factor"] = summary["Avg Load Factor"].map("{:.1%}".format)
         st.dataframe(summary, use_container_width=True, hide_index=True)
         st.markdown("""
         <div class="info-box">
-          <strong style="color:#7c3aed">How to read this</strong><br>
+          <strong style="color:#7C3AED">How to read this</strong><br>
           Each row shows average profitability and seat occupancy for flights in that category.
-          <strong style="color:#1d4ed8">Expand</strong> routes should have the highest values across all three columns.
+          <strong style="color:#2563EB">Expand</strong> routes should have the highest values across all three columns.
         </div>""", unsafe_allow_html=True)
-
 
 # ── TAB 2 · PERFORMANCE DRIVERS ──────────────────────────────
 with tab2:
@@ -703,13 +812,9 @@ with tab2:
         "Marketing_Cost": "Marketing", "IT_Systems_Cost": "IT Systems",
     }
     cost_means.index = [label_map.get(i, i) for i in cost_means.index]
-
-    # Build a gradient of jewel tones for cost bars
     nc = len(cost_means)
-    jewel_ramp = [
-        CHART_EXPAND, "#0e7490", ACCENT, CHART_MAINTAIN,
-        "#15803d", CHART_OPTIMIZE, CHART_DROP, "#6d28d9",
-    ]
+    jewel_ramp = [CHART_EXPAND, "#0e7490", ACCENT, CHART_MAINTAIN,
+                  "#15803d", CHART_OPTIMIZE, CHART_DROP, "#6d28d9"]
     neutral_cols = jewel_ramp[:nc]
 
     plotly_hbar_chart(
@@ -720,7 +825,6 @@ with tab2:
         value_format="money",
         height=430,
     )
-
 
 # ── TAB 3 · ROUTE ACTIONS ────────────────────────────────────
 with tab3:
@@ -735,6 +839,11 @@ with tab3:
         .sort_values("Profit", ascending=False)
         [["Route", "Profit", "Profit_Margin", "Load_Factor"]].head(10)
         .rename(columns={"Profit": "Avg Profit ($)", "Profit_Margin": "Profit Margin", "Load_Factor": "Load Factor"})
+        .assign(**{
+            "Avg Profit ($)":  lambda d: d["Avg Profit ($)"].map("${:,.0f}".format),
+            "Profit Margin":   lambda d: d["Profit Margin"].map("{:.1f}%".format),
+            "Load Factor":     lambda d: d["Load Factor"].map("{:.1%}".format),
+        })
     )
     st.dataframe(expand_routes, use_container_width=True, hide_index=True)
 
@@ -769,7 +878,6 @@ with tab3:
             height=430,
         )
 
-
 # ── TAB 4 · ROUTE STABILITY ──────────────────────────────────
 with tab4:
     st.markdown('<p class="section-hd">How consistent are route decisions over time?</p>', unsafe_allow_html=True)
@@ -800,22 +908,15 @@ with tab4:
     bc_map = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
               "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
     bc = [bc_map.get(i, ACCENT) for i in urbd.index]
-
     vals4 = urbd["Unique Routes"].values.tolist()
     plotly_vbar_chart(
         title="Unique Routes per Decision Category",
         labels=urbd.index.tolist(),
-        series=[{
-            "name": "Unique Routes",
-            "values": vals4,
-            "color": ACCENT,
-            "colors": bc,
-        }],
+        series=[{"name": "Unique Routes", "values": vals4, "color": ACCENT, "colors": bc}],
         max_value=max(vals4) if vals4 else 1,
         value_format="number",
         height=390,
     )
-
 
 # ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
 with tab5:
@@ -830,16 +931,8 @@ with tab5:
         title="Model Accuracy & F1 Comparison",
         labels=comparison["Model"].tolist(),
         series=[
-            {
-                "name": "Accuracy",
-                "values": comparison["Accuracy"].tolist(),
-                "color": ACCENT,
-            },
-            {
-                "name": "Macro F1",
-                "values": comparison["Macro F1"].tolist(),
-                "color": ACCENT_2,
-            },
+            {"name": "Accuracy",  "values": comparison["Accuracy"].tolist(),  "color": ACCENT},
+            {"name": "Macro F1",  "values": comparison["Macro F1"].tolist(),  "color": ACCENT_2},
         ],
         max_value=1.0,
         value_format="percent",
@@ -976,8 +1069,8 @@ with tab5:
           <div style='margin-bottom:10px'>
             <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
           </div>
-          <div style='font-family:"Cinzel",serif;font-size:1.55rem;font-weight:600;
-                      color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.04em;
+          <div style='font-family:"Syne",sans-serif;font-size:1.45rem;font-weight:700;
+                      color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.03em;
                       text-transform:uppercase'>
             Suggested Decision: {pred}
           </div>
@@ -995,18 +1088,12 @@ with tab5:
                    .sort_values("Probability", ascending=False))
         bar_cp  = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
                    "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-
         bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
         probs = prob_df["Probability"].tolist()
         plotly_vbar_chart(
             title="Model Confidence per Decision",
             labels=prob_df["Decision"].tolist(),
-            series=[{
-                "name": "Probability",
-                "values": probs,
-                "color": ACCENT,
-                "colors": bar_colors,
-            }],
+            series=[{"name": "Probability", "values": probs, "color": ACCENT, "colors": bar_colors}],
             max_value=1.0,
             value_format="percent",
             height=390,
@@ -1016,28 +1103,27 @@ with tab5:
             prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
             use_container_width=True, hide_index=True)
 
-
 # ─────────────────────────────────────────────────────────────
 #  FOOTER
 # ─────────────────────────────────────────────────────────────
 st.markdown(f"""
 <div style='text-align:center;padding:40px 0 18px'>
   <div style='display:inline-flex;align-items:center;gap:12px;
-              background:rgba(18,18,22,0.82);
-              border:1px solid rgba(255,255,255,0.10);
+              background:rgba(255,255,255,0.65);
+              border:1px solid rgba(255,255,255,0.92);
               border-radius:999px;
               padding:0.55rem 1.4rem;
-              backdrop-filter:blur(14px);
-              box-shadow:0 20px 60px rgba(0,0,0,0.35);
+              backdrop-filter:blur(16px);
+              box-shadow:0 4px 20px rgba(30,40,120,0.10), inset 0 1px 0 rgba(255,255,255,1);
               font-family:"DM Sans",sans-serif;
               font-size:0.67rem;
-              font-weight:600;
-              color:{INK_MUTED};
+              font-weight:700;
+              color:#5A6490;
               letter-spacing:0.12em;
               text-transform:uppercase'>
-    <span style='color:{ACCENT};font-size:0.78rem'>✦</span>
+    <span style='color:#7C3AED;font-size:0.78rem'>✦</span>
     Airline Profitability System
-    <span style='color:{ACCENT};font-size:0.78rem'>✦</span>
+    <span style='color:#7C3AED;font-size:0.78rem'>✦</span>
     Built with Streamlit
   </div>
 </div>
