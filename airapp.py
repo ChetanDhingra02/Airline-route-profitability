@@ -432,28 +432,28 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
    MOBILE
 ========================= */
 
-@media(max-width:900px) {
+@media(max-width:900px) {{
 
-    .cosmos-nav {
+    .cosmos-nav {{
         margin-bottom:40px
-    }
+    }}
 
-    .cosmos-links {
+    .cosmos-links {{
         display:none
-    }
+    }}
 
-    .feature-grid {
+    .feature-grid {{
         grid-template-columns:1fr;
         margin-top:-20px
-    }
+    }}
 
     .info-box,
     .result-card,
-    .plotly-card {
+    .plotly-card {{
         padding:24px!important;
         min-height:auto!important;
-    }
-}
+    }}
+}}
 <div class="twinkle-layer"><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span><span class="twinkle"></span></div>
 <div class="cosmos-bg">
   <div class="constellation c1"><svg viewBox="0 0 200 140"><line x1="20" y1="20" x2="45" y2="70"/><line x1="45" y1="70" x2="78" y2="62"/><line x1="78" y1="62" x2="105" y2="95"/><line x1="45" y1="70" x2="55" y2="115"/><circle cx="20" cy="20" r="2"/><circle cx="45" cy="70" r="3"/><circle cx="78" cy="62" r="2"/><circle cx="105" cy="95" r="3"/><circle cx="55" cy="115" r="2"/></svg></div>
