@@ -47,21 +47,21 @@ INK_MUTED = TEXT_MUTED
 st.markdown("""
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cinzel:wght@400;600;700;900&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 :root{
-    --bg:#060816;
+    --bg:#05070f;
     --text:#F8F6F2;
     --muted:#A8B0C0;
 
-    --glass:rgba(255,255,255,0.08);
-    --glass2:rgba(255,255,255,0.12);
+    --glass:rgba(255,255,255,0.07);
+    --glass2:rgba(255,255,255,0.11);
 
-    --border:rgba(255,255,255,0.10);
+    --border:rgba(255,255,255,0.09);
 
     --shadow:
-        0 10px 50px rgba(0,0,0,.45),
-        inset 0 1px 1px rgba(255,255,255,.18);
+        0 10px 50px rgba(0,0,0,.55),
+        inset 0 1px 1px rgba(255,255,255,.14);
 }
 
 /* ------------------------------------------------ */
@@ -74,38 +74,68 @@ html, body, [class*="css"]{
     -webkit-font-smoothing:antialiased;
 }
 
+/* COSMOS BACKGROUND — subtle nebula, keeps cards readable */
 .stApp{
     background:
-        radial-gradient(circle at top,
-            rgba(120,140,255,.14),
-            transparent 30%),
+        /* subtle violet nebula top-center */
+        radial-gradient(ellipse 70% 50% at 50% -10%,
+            rgba(90,60,180,.18),
+            transparent 60%),
 
-        radial-gradient(circle at bottom right,
-            rgba(255,190,140,.08),
-            transparent 25%),
+        /* faint blue-teal left bloom */
+        radial-gradient(ellipse 50% 60% at -5% 40%,
+            rgba(30,100,200,.10),
+            transparent 55%),
 
-        radial-gradient(circle at left,
-            rgba(80,180,255,.07),
-            transparent 25%),
+        /* warm amber-orange right bloom */
+        radial-gradient(ellipse 55% 50% at 108% 55%,
+            rgba(200,100,40,.08),
+            transparent 55%),
 
-        #060816;
+        /* deep purple glow center */
+        radial-gradient(ellipse 80% 70% at 50% 50%,
+            rgba(60,30,120,.12),
+            transparent 70%),
+
+        /* base — near-black with faint blue-black tint */
+        #05070f;
 
     overflow-x:hidden;
 }
 
-/* subtle stars */
-
+/* Star field — tiny dots, very low opacity */
 .stApp::before{
     content:"";
     position:fixed;
     inset:0;
     pointer-events:none;
-    opacity:.10;
+    z-index:0;
 
     background-image:
-        radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.2px);
+        radial-gradient(circle, rgba(255,255,255,.85) 0 0.8px, transparent 1px),
+        radial-gradient(circle, rgba(200,220,255,.50) 0 0.6px, transparent 0.8px);
 
-    background-size:180px 180px;
+    background-size:160px 160px, 90px 90px;
+    background-position: 0 0, 45px 45px;
+
+    opacity:.08;
+}
+
+/* Constellation lines overlay — SVG-like CSS lines, decorative */
+.stApp::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    opacity:.06;
+
+    background-image:
+        linear-gradient(65deg, transparent 0, transparent 40%, rgba(180,200,255,.7) 40%, rgba(180,200,255,.7) 40.3%, transparent 40.3%),
+        linear-gradient(130deg, transparent 0, transparent 60%, rgba(180,200,255,.5) 60%, rgba(180,200,255,.5) 60.2%, transparent 60.2%),
+        linear-gradient(20deg, transparent 0, transparent 25%, rgba(180,200,255,.4) 25%, rgba(180,200,255,.4) 25.2%, transparent 25.2%);
+
+    background-size: 900px 900px, 700px 700px, 1100px 500px;
 }
 
 /* ------------------------------------------------ */
@@ -723,13 +753,222 @@ if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
 #  HERO
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow">AIRLINE ROUTE INTELLIGENCE</div>
-    <h1>SKYLENS<br>DASHBOARD</h1>
-    <p>Analyze route profitability, operational signals, and model-backed decisions in one polished command view.</p>
+<style>
+/* ── COSMOS NAVBAR ── */
+.cosmos-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 8px 28px 8px;
+    margin-bottom:4px;
+}
+.cosmos-nav-logo{
+    font-family:'Cinzel',serif;
+    font-size:1.35rem;
+    font-weight:700;
+    letter-spacing:.18em;
+    color:#fff;
+    text-transform:uppercase;
+}
+.cosmos-nav-links{
+    display:flex;
+    gap:32px;
+    font-size:.82rem;
+    font-weight:500;
+    color:rgba(255,255,255,.65);
+    letter-spacing:.06em;
+    font-family:'DM Sans',sans-serif;
+}
+.cosmos-nav-links span.active{
+    color:#fff;
+    border-bottom:1px solid rgba(255,255,255,.5);
+    padding-bottom:1px;
+}
+.cosmos-nav-btn{
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.18);
+    color:#fff;
+    border-radius:999px;
+    padding:7px 22px;
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.08em;
+    backdrop-filter:blur(16px);
+    font-family:'DM Sans',sans-serif;
+}
+
+/* ── COSMOS HERO CARDS ── */
+.cosmos-cards{
+    display:grid;
+    grid-template-columns:1fr 1.12fr 1fr;
+    gap:16px;
+    margin-bottom:28px;
+}
+.cosmos-card{
+    background:linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.04))!important;
+    border:1px solid rgba(255,255,255,.10)!important;
+    border-radius:24px!important;
+    backdrop-filter:blur(28px) saturate(160%)!important;
+    box-shadow:0 20px 60px rgba(0,0,0,.50),inset 0 1px 1px rgba(255,255,255,.14)!important;
+    padding:28px 26px 24px 26px;
+    position:relative;
+    overflow:hidden;
+    min-height:280px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+.cosmos-card-center{
+    transform:scale(1.06);
+    transform-origin:top center;
+    z-index:2;
+    border-color:rgba(255,255,255,.15)!important;
+    background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.06))!important;
+}
+.cosmos-card-img{
+    position:absolute;
+    inset:0;
+    border-radius:24px;
+    object-fit:cover;
+    width:100%;
+    height:100%;
+    opacity:.28;
+    mix-blend-mode:luminosity;
+}
+.cosmos-card-content{ position:relative; z-index:1; }
+.cosmos-card-title{
+    font-family:'Cinzel',serif;
+    font-size:1.55rem;
+    font-weight:700;
+    color:#FFFDF8;
+    line-height:1.15;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+}
+.cosmos-card-title.large{
+    font-size:1.95rem;
+}
+.cosmos-card-desc{
+    font-family:'DM Sans',sans-serif;
+    font-size:.85rem;
+    color:rgba(255,255,255,.68);
+    line-height:1.6;
+    margin-bottom:18px;
+}
+.cosmos-card-btn{
+    display:inline-block;
+    padding:9px 24px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.22);
+    background:rgba(255,255,255,.10);
+    backdrop-filter:blur(12px);
+    color:#fff;
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.08em;
+    font-family:'DM Sans',sans-serif;
+    cursor:pointer;
+}
+
+/* ── ICON ROW ── */
+.cosmos-icon-row{
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    margin-bottom:20px;
+    margin-top:4px;
+}
+.cosmos-icon-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    font-family:'DM Sans',sans-serif;
+    font-size:.74rem;
+    color:rgba(255,255,255,.60);
+    letter-spacing:.06em;
+}
+.cosmos-icon-item span.icon{ font-size:1.45rem; }
+
+/* ── LAUNCH BUTTON ── */
+.cosmos-launch-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:32px;
+}
+.cosmos-launch{
+    display:inline-block;
+    padding:14px 52px;
+    border-radius:999px;
+    border:1.5px solid rgba(255,200,80,.45);
+    background:linear-gradient(145deg,rgba(255,180,60,.10),rgba(180,100,255,.08));
+    color:#fff;
+    font-size:.88rem;
+    font-weight:800;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    font-family:'DM Sans',sans-serif;
+    backdrop-filter:blur(16px);
+    box-shadow:0 0 40px rgba(255,160,40,.08), inset 0 1px 1px rgba(255,255,255,.12);
+    cursor:pointer;
+}
+</style>
+
+<!-- NAVBAR -->
+<div class="cosmos-nav">
+  <div class="cosmos-nav-logo">SKYLENS</div>
+  <div class="cosmos-nav-links">
+    <span class="active">Overview</span>
+    <span>Performance</span>
+    <span>Routes</span>
+    <span>Predict</span>
   </div>
-  <div class="hero-badge">Explore dashboard below</div>
+  <div class="cosmos-nav-btn">Dashboard ✦</div>
+</div>
+
+<!-- THREE HERO CARDS -->
+<div class="cosmos-cards">
+
+  <!-- Card 1 -->
+  <div class="cosmos-card">
+    <div class="cosmos-card-content">
+      <div class="cosmos-card-title">Route<br>Intelligence</div>
+      <div class="cosmos-card-desc">Analyze profitability signals across every route in your network.</div>
+      <div class="cosmos-card-btn">Explore Now</div>
+    </div>
+  </div>
+
+  <!-- Card 2 (center, slightly larger) -->
+  <div class="cosmos-card cosmos-card-center">
+    <div class="cosmos-card-content">
+      <div class="cosmos-card-title large">Decision<br>Engine</div>
+      <div class="cosmos-card-desc">Model-backed Expand, Maintain, Optimize & Drop signals in real time.</div>
+      <div class="cosmos-card-btn">Discover</div>
+    </div>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="cosmos-card">
+    <div class="cosmos-card-content">
+      <div class="cosmos-card-title">Performance<br>Hub</div>
+      <div class="cosmos-card-desc">Track load factors, margins, and operational cost drivers.</div>
+      <div class="cosmos-card-btn">Analyze</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ICON ROW -->
+<div class="cosmos-icon-row">
+  <div class="cosmos-icon-item"><span class="icon">📊</span><span>Overview</span></div>
+  <div class="cosmos-icon-item"><span class="icon">✦</span><span>Routes</span></div>
+  <div class="cosmos-icon-item"><span class="icon">🤖</span><span>Prediction</span></div>
+</div>
+
+<!-- LAUNCH CTA -->
+<div class="cosmos-launch-wrap">
+  <div class="cosmos-launch">▼ &nbsp; OPEN DASHBOARD</div>
 </div>
 """, unsafe_allow_html=True)
 
