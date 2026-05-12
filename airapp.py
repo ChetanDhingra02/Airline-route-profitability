@@ -72,7 +72,7 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 .hero {{
   max-width: 1040px;
   margin: -85px auto 10px !important;
-  padding: 10px 72px !important;
+  padding: 30px 72px !important;
   display: block !important;
   text-align: left;
   position: relative;
@@ -134,8 +134,8 @@ html,body,[class*="css"] {{ font-family:'Inter',system-ui,sans-serif!important; 
 }}
 .hero-eyebrow {{
   color: rgba(245,241,232,.62);
-  font-size: .74rem;
-  font-weight: 800;
+  font-size: .94rem;
+  font-weight: 900;
   letter-spacing: .28em;
   text-transform: uppercase;
   margin-bottom: 20px;
