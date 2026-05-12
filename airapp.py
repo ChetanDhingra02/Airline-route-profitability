@@ -1892,8 +1892,8 @@ with tab5:
                 marketing_cost          = st.number_input("Marketing Cost ($)",             min_value=0.0, value=12000.0,  step=500.0)
                 it_systems_cost         = st.number_input("IT Systems Cost ($)",            min_value=0.0, value=3000.0,   step=250.0)
 
-        #submitted = st.form_submit_button("✈  Get Route Decision")
-        render_prediction_result()
+        submitted = st.form_submit_button("✈  Get Route Decision")
+        
 
 
     # ── PREDICTION LOGIC ────────────────────────────────────
@@ -1937,3 +1937,4 @@ with tab5:
         st.session_state.pred_result = {"prediction": pred, "probabilities": prob, "classes": cls}
         st.session_state.active_tab_label = PREDICTION_TAB_LABEL
 
+render_prediction_result()
