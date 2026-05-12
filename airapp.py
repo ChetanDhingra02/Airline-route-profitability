@@ -1,1149 +1,1208 @@
-import os
-import joblib
 import streamlit as st
-import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
-import json
-import plotly.graph_objects as go
 
-st.set_page_config(
-    page_title="SkyLens · Airline Profitability Command Center",
-    page_icon="✈️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# ============================================================
+# SKYLENS - Airline Route Profitability Analytics
+# Streamlit Edition with Custom CSS Theming
+# ============================================================
 
-# ─────────────────────────────────────────────────────────────
-#  PROFESSIONAL AVIATION COMMAND CENTER THEME
-# ─────────────────────────────────────────────────────────────
-BG = "#080B12"
-PANEL = "#121722"
-PANEL_2 = "#171E2B"
-TEXT = "#F5F7FB"
-TEXT_SOFT = "#C9D2E3"
-TEXT_MUTED = "#7F8AA3"
-CYAN = "#38BDF8"
-BLUE = "#2563EB"
-AMBER = "#F59E0B"
-GREEN = "#22C55E"
-RED = "#F43F5E"
-VIOLET = "#A78BFA"
-
-CHART_EXPAND   = "#22C55E"
-CHART_MAINTAIN = "#FACC15"
-CHART_OPTIMIZE = "#FB923C"
-CHART_DROP     = "#FB7185"
-CHART_NEUTRAL  = ["#38BDF8", "#A78BFA", "#F59E0B", "#22C55E", "#FB7185", "#60A5FA", "#2DD4BF", "#F472B6"]
-DECISION_COLORS = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN, "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-ORDER = ["Expand", "Maintain", "Optimize", "Drop"]
-
-ACCENT = CYAN
-ACCENT_2 = VIOLET
-INK = TEXT
-INK_SOFT = TEXT_SOFT
-INK_MUTED = TEXT_MUTED
-
+# ---- CUSTOM CSS THEME ----
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-:root{
-    --bg:#060816;
-    --text:#F8F6F2;
-    --muted:#A8B0C0;
-
-    --glass:rgba(255,255,255,0.08);
-    --glass2:rgba(255,255,255,0.12);
-
-    --border:rgba(255,255,255,0.10);
-
-    --shadow:
-        0 10px 50px rgba(0,0,0,.45),
-        inset 0 1px 1px rgba(255,255,255,.18);
+/* Root Theme Variables */
+:root {
+    --background: 232 45% 5%;
+    --foreground: 40 30% 96%;
+    --card: 232 35% 9%;
+    --primary: 210 85% 70%;
+    --primary-foreground: 232 50% 6%;
+    --primary-glow: 220 90% 78%;
+    --secondary: 232 28% 14%;
+    --muted: 232 22% 12%;
+    --muted-foreground: 225 15% 72%;
+    --accent: 280 55% 70%;
+    --success: 152 70% 48%;
+    --warning: 38 95% 58%;
+    --danger: 0 78% 62%;
+    --border: 215 30% 22%;
+    --glass: rgba(28, 32, 52, 0.55);
+    --glass-strong: rgba(34, 38, 58, 0.72);
+    --glass-border: rgba(200, 180, 220, 0.14);
 }
 
-/* ------------------------------------------------ */
-/* BASE */
-/* ------------------------------------------------ */
-
-html, body, [class*="css"]{
-    font-family:'Inter',sans-serif!important;
-    color:var(--text)!important;
-    -webkit-font-smoothing:antialiased;
+/* Global Background - Muted Nebula Theme */
+.stApp {
+    background: 
+        radial-gradient(900px 600px at 50% 0%, hsl(265 55% 35% / 0.32), transparent 60%),
+        radial-gradient(700px 500px at 85% 30%, hsl(210 70% 45% / 0.18), transparent 60%),
+        radial-gradient(800px 600px at 10% 80%, hsl(290 50% 35% / 0.18), transparent 60%),
+        radial-gradient(600px 450px at 70% 90%, hsl(20 60% 45% / 0.10), transparent 60%),
+        linear-gradient(180deg, hsl(232 50% 4%), hsl(232 45% 6%)) !important;
+    background-attachment: fixed !important;
+    color: hsl(40 30% 96%) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
 }
 
-.stApp{
-    background:
-        radial-gradient(ellipse 80% 55% at 50% 0%, rgba(80,50,170,.22), transparent 55%),
-        radial-gradient(ellipse 55% 65% at 0% 45%, rgba(25,90,200,.13), transparent 55%),
-        radial-gradient(ellipse 60% 55% at 100% 55%, rgba(190,90,35,.10), transparent 55%),
-        radial-gradient(ellipse 90% 75% at 50% 55%, rgba(55,25,115,.14), transparent 70%),
-        #05070f;
-    background-attachment:fixed;
-    overflow-x:hidden;
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif !important;
+    color: hsl(40 30% 96%) !important;
+    letter-spacing: -0.01em !important;
 }
 
-/* ------------------------------------------------ */
-/* SIDEBAR */
-/* ------------------------------------------------ */
-
-[data-testid="stSidebar"]{
-    background:rgba(10,14,28,.55)!important;
-
-    border-right:1px solid rgba(255,255,255,.08)!important;
-
-    backdrop-filter:blur(24px)!important;
+p, div, span, label {
+    color: hsl(225 15% 72%) !important;
 }
 
-[data-testid="stSidebar"] *{
-    color:#EDE7DC!important;
+/* Glass Cards */
+.glass-card {
+    background: linear-gradient(160deg, hsl(220 40% 14% / 0.85), hsl(220 38% 10% / 0.6)) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    border: 1px solid hsl(280 60% 85% / 0.14) !important;
+    border-radius: 0.9rem !important;
+    box-shadow: 0 10px 40px -10px hsl(220 60% 2% / 0.6), inset 0 1px 0 0 hsl(210 100% 90% / 0.05) !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    transition: all 400ms cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
-/* ------------------------------------------------ */
-/* MAIN */
-/* ------------------------------------------------ */
-
-.block-container{
-    padding-top:2rem!important;
-    max-width:1280px!important;
+.glass-card:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 30px 80px -20px hsl(198 95% 58% / 0.25), 0 10px 30px -10px hsl(220 60% 2% / 0.7) !important;
+    border-color: hsl(210 85% 70% / 0.45) !important;
 }
 
-/* ------------------------------------------------ */
-/* HERO */
-/* ------------------------------------------------ */
-
-.hero{
-    position:relative;
-    padding:80px!important;
-    border-radius:34px!important;
-    overflow:hidden;
-    margin-bottom:40px!important;
-    background:linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.05))!important;
-    border:1px solid rgba(255,255,255,.25)!important;
-    border-top:1px solid rgba(255,255,255,.38)!important;
-    backdrop-filter:blur(36px) saturate(200%)!important;
-    -webkit-backdrop-filter:blur(36px) saturate(200%)!important;
-    box-shadow:0 20px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.20);
+.glass-strong {
+    background: linear-gradient(160deg, hsl(220 40% 16% / 0.92), hsl(220 38% 11% / 0.78)) !important;
+    backdrop-filter: blur(24px) saturate(150%) !important;
+    border: 1px solid hsl(210 60% 80% / 0.12) !important;
 }
 
-.hero::before{
-    content:"";
-    position:absolute;
-    top:0; left:0; right:0;
-    height:1px;
-    background:linear-gradient(90deg, transparent, rgba(255,255,255,.5) 30%, rgba(255,255,255,.5) 70%, transparent);
-    pointer-events:none;
+/* KPI Card Styling */
+.kpi-card {
+    background: linear-gradient(160deg, hsl(220 40% 14% / 0.85), hsl(220 38% 10% / 0.6)) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    border: 1px solid hsl(280 60% 85% / 0.14) !important;
+    border-radius: 0.9rem !important;
+    padding: 1.5rem !important;
+    text-align: center !important;
 }
 
-.hero h1{
-    font-size:clamp(3rem,7vw,6rem)!important;
-    line-height:.9!important;
-    letter-spacing:.08em!important;
-    text-transform:uppercase!important;
-    font-weight:900!important;
-    color:#FFFDF8!important;
+.kpi-label {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.65rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.2em !important;
+    color: hsl(225 15% 72%) !important;
+    margin-bottom: 0.5rem !important;
 }
 
-.hero p{
-    color:rgba(255,255,255,.70)!important;
-    font-size:1.05rem!important;
-    line-height:1.7!important;
-    max-width:700px;
+.kpi-value {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 2rem !important;
+    font-weight: 600 !important;
+    color: hsl(40 30% 96%) !important;
 }
 
-.hero-eyebrow{
-    color:rgba(255,255,255,.55)!important;
-    font-size:.75rem!important;
-    letter-spacing:.3em!important;
-    text-transform:uppercase!important;
+.kpi-delta {
+    font-size: 0.85rem !important;
+    margin-top: 0.3rem !important;
 }
 
-.hero-badge{
-    display:inline-flex;
-    margin-top:28px;
-    padding:12px 22px;
-    border-radius:999px;
-    background:linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
-    border:1px solid rgba(255,255,255,.18);
-    backdrop-filter:blur(20px);
-    color:#fff;
+.kpi-delta.positive {
+    color: hsl(152 70% 48%) !important;
 }
 
-/* ------------------------------------------------ */
-/* GLASS CARDS */
-/* ------------------------------------------------ */
-
-[data-testid="metric-container"],
-[data-testid="stDataFrame"],
-[data-testid="stForm"],
-.plotly-card,
-.result-card,
-.info-box{
-
-    background:
-        linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.05))!important;
-
-    border:1px solid rgba(255,255,255,.25)!important;
-    border-top:1px solid rgba(255,255,255,.38)!important;
-
-    border-radius:28px!important;
-
-    backdrop-filter:blur(32px) saturate(200%)!important;
-    -webkit-backdrop-filter:blur(32px) saturate(200%)!important;
-
-    box-shadow:0 12px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.18)!important;
+.kpi-delta.negative {
+    color: hsl(0 78% 62%) !important;
 }
 
-/* ------------------------------------------------ */
-/* METRICS */
-/* ------------------------------------------------ */
-
-[data-testid="metric-container"]{
-    padding:22px!important;
+/* Section Headers */
+.section-eyebrow {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.25em !important;
+    color: hsl(220 90% 78%) !important;
+    margin-bottom: 0.5rem !important;
 }
 
-[data-testid="stMetricLabel"]{
-    color:rgba(255,255,255,.55)!important;
-
-    text-transform:uppercase!important;
-
-    letter-spacing:.15em!important;
+.section-title {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 2rem !important;
+    font-weight: 600 !important;
+    color: hsl(40 30% 96%) !important;
+    margin-bottom: 0.5rem !important;
+    line-height: 1.2 !important;
 }
 
-[data-testid="stMetricValue"]{
-    color:#FFFDF9!important;
-
-    font-weight:800!important;
+.section-subtitle {
+    font-size: 1rem !important;
+    color: hsl(225 15% 72%) !important;
+    margin-bottom: 1.5rem !important;
 }
 
-/* ------------------------------------------------ */
-/* BUTTONS */
-/* ------------------------------------------------ */
-
-.stButton>button,
-[data-testid="stFormSubmitButton"] button{
-
-    border-radius:999px!important;
-
-    border:1px solid rgba(255,255,255,.14)!important;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(110,150,255,.30),
-            rgba(255,255,255,.08)
-        )!important;
-
-    color:#fff!important;
-
-    font-weight:700!important;
-
-    backdrop-filter:blur(20px)!important;
-
-    transition:all .25s ease!important;
-
-    box-shadow:
-        0 0 24px rgba(110,150,255,.15),
-        inset 0 1px 1px rgba(255,255,255,.18)!important;
+/* Text Gradient */
+.text-gradient {
+    background: linear-gradient(135deg, hsl(198 95% 58%), hsl(195 100% 70%)) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
 }
 
-.stButton>button:hover,
-[data-testid="stFormSubmitButton"] button:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 0 40px rgba(110,150,255,.25),
-        inset 0 1px 1px rgba(255,255,255,.18)!important;
+/* Divider Glow */
+.divider-glow {
+    height: 1px !important;
+    background: linear-gradient(90deg, transparent, hsl(210 85% 70% / 0.5), transparent) !important;
+    margin: 1.5rem 0 !important;
 }
 
-/* ------------------------------------------------ */
-/* INPUTS */
-/* ------------------------------------------------ */
-
-.stTextInput input,
-.stNumberInput input,
-.stSelectbox div[data-baseweb="select"]{
-
-    background:rgba(255,255,255,.05)!important;
-
-    border:1px solid rgba(255,255,255,.08)!important;
-
-    border-radius:18px!important;
-
-    color:#fff!important;
-
-    backdrop-filter:blur(16px)!important;
+/* Chips / Badges */
+.chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    border-radius: 9999px !important;
+    padding: 0.3rem 0.8rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    background: hsl(210 85% 70% / 0.12) !important;
+    color: hsl(220 90% 78%) !important;
+    border: 1px solid hsl(210 85% 70% / 0.25) !important;
 }
 
-/* ------------------------------------------------ */
-/* TABS */
-/* ------------------------------------------------ */
-
-.stTabs [data-baseweb="tab-list"]{
-
-    background:rgba(255,255,255,.03)!important;
-
-    border:1px solid rgba(255,255,255,.08)!important;
-
-    border-radius:20px!important;
-
-    padding:6px!important;
+.chip-success {
+    background: hsl(152 70% 48% / 0.12) !important;
+    color: hsl(152 70% 48%) !important;
+    border: 1px solid hsl(152 70% 48% / 0.30) !important;
 }
 
-.stTabs [data-baseweb="tab"]{
-
-    color:rgba(255,255,255,.50)!important;
-
-    border-radius:14px!important;
-
-    font-weight:700!important;
+.chip-warning {
+    background: hsl(38 95% 58% / 0.12) !important;
+    color: hsl(38 95% 58%) !important;
+    border: 1px solid hsl(38 95% 58% / 0.30) !important;
 }
 
-.stTabs [aria-selected="true"]{
-
-    background:rgba(255,255,255,.10)!important;
-
-    color:#fff!important;
+.chip-danger {
+    background: hsl(0 78% 62% / 0.12) !important;
+    color: hsl(0 78% 62%) !important;
+    border: 1px solid hsl(0 78% 62% / 0.30) !important;
 }
 
-.stTabs [data-baseweb="tab-highlight"]{
-    display:none!important;
+/* Tables */
+.data-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 0.9rem !important;
 }
 
-/* ------------------------------------------------ */
-/* PLOTLY */
-/* ------------------------------------------------ */
-
-.plotly-card{
-    padding:18px!important;
+.data-table th {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.65rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.15em !important;
+    color: hsl(225 15% 72%) !important;
+    padding: 0.75rem !important;
+    text-align: left !important;
+    border-bottom: 1px solid hsl(215 30% 22%) !important;
 }
 
-.plotly-card-title{
-    color:#FFFDF8!important;
-
-    font-weight:800!important;
-
-    margin-bottom:12px!important;
+.data-table td {
+    padding: 0.75rem !important;
+    color: hsl(40 30% 96%) !important;
+    border-bottom: 1px solid hsl(215 30% 22% / 0.4) !important;
 }
 
-/* ------------------------------------------------ */
-/* CLEANUP */
-/* ------------------------------------------------ */
-
-.twinkle-layer,
-.constellation,
-.cosmos-bg{
-    display:none!important;
+.data-table tr:hover td {
+    background: hsl(232 28% 14% / 0.5) !important;
 }
 
+/* Decision Dot */
+.decision-dot {
+    display: inline-block !important;
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    margin-right: 0.5rem !important;
+}
+
+/* Progress Bar */
+.progress-bar-bg {
+    width: 100% !important;
+    height: 8px !important;
+    background: hsl(232 28% 14% / 0.6) !important;
+    border-radius: 9999px !important;
+    overflow: hidden !important;
+}
+
+.progress-bar-fill {
+    height: 100% !important;
+    border-radius: 9999px !important;
+    transition: width 0.7s ease !important;
+}
+
+/* Hero Styling */
+.hero-title {
+    font-size: 3rem !important;
+    font-weight: 600 !important;
+    line-height: 1.05 !important;
+    color: hsl(40 30% 96%) !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Buttons */
+button[kind="primary"] {
+    background: linear-gradient(135deg, hsl(198 95% 58%), hsl(195 100% 70%)) !important;
+    color: hsl(232 50% 6%) !important;
+    border: none !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 10px 40px -10px hsl(198 95% 58% / 0.5) !important;
+}
+
+button[kind="primary"]:hover {
+    opacity: 0.95 !important;
+    transform: scale(1.02) !important;
+}
+
+/* Streamlit Specific Overrides */
+.stSelectbox > div > div {
+    background: hsl(232 28% 14% / 0.6) !important;
+    border: 1px solid hsl(215 30% 22%) !important;
+    color: hsl(40 30% 96%) !important;
+    border-radius: 0.5rem !important;
+}
+
+.stNumberInput > div > div > input {
+    background: hsl(232 28% 14% / 0.6) !important;
+    border: 1px solid hsl(215 30% 22%) !important;
+    color: hsl(40 30% 96%) !important;
+    border-radius: 0.5rem !important;
+}
+
+.stSlider > div > div > div {
+    background: hsl(210 85% 70% / 0.3) !important;
+}
+
+.stSlider > div > div > div > div {
+    background: hsl(198 95% 58%) !important;
+}
+
+/* Hide Streamlit branding */
+#MainMenu, footer, header { visibility: hidden; }
+
+/* Map Container */
+.map-container {
+    background: linear-gradient(160deg, hsl(220 40% 14% / 0.85), hsl(220 38% 10% / 0.6)) !important;
+    border: 1px solid hsl(280 60% 85% / 0.14) !important;
+    border-radius: 0.9rem !important;
+    padding: 1rem !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Runway Grid Background */
+.runway-grid {
+    background-image:
+        linear-gradient(hsl(210 60% 80% / 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, hsl(210 60% 80% / 0.05) 1px, transparent 1px) !important;
+    background-size: 56px 56px !important;
+    mask-image: radial-gradient(ellipse at center, black 35%, transparent 80%) !important;
+}
+
+/* Font Mono Class */
+.font-mono {
+    font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Animated Elements */
+@keyframes pulse-ring {
+    0% { transform: scale(0.6); opacity: 0.7; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+
+.pulse-ring {
+    animation: pulse-ring 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes float-soft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.float-soft {
+    animation: float-soft 5s ease-in-out infinite;
+}
 </style>
 """, unsafe_allow_html=True)
-# ─────────────────────────────────────────────────────────────
-#  FINAL CLEAN PLOTLY HELPERS — single source of truth
-# ─────────────────────────────────────────────────────────────
-def _fmt_money(v):
-    if abs(v) >= 1_000_000:
-        return f"${v/1_000_000:.1f}M"
-    if abs(v) >= 1_000:
-        return f"${v/1_000:.0f}K"
-    return f"${v:.0f}"
 
+# ---- DATASETS ----
 
+DECISION_COLORS = {
+    "Expand": "#3ddc84",
+    "Maintain": "#38bdf8",
+    "Optimize": "#fbbf24",
+    "Drop": "#f87171",
+}
 
+DECISION_DESC = {
+    "Expand": {
+        "title": "Expand",
+        "tagline": "Scale capacity & frequency",
+        "body": "Route shows strong unit economics, healthy load factors, and durable demand. Add frequencies, upgauge aircraft, or open codeshare partners.",
+    },
+    "Maintain": {
+        "title": "Maintain",
+        "tagline": "Hold schedule, monitor",
+        "body": "Profit and demand are stable within target bands. Preserve current schedule and pricing while monitoring fuel and competitive dynamics.",
+    },
+    "Optimize": {
+        "title": "Optimize",
+        "tagline": "Reprice, re-time, retrofit",
+        "body": "Margins are pressured but recoverable. Tune fare mix, slot timing, ancillary attach, and seat configuration before changing the network.",
+    },
+    "Drop": {
+        "title": "Drop",
+        "tagline": "Exit or seasonalize",
+        "body": "Persistent losses with weak structural demand. Withdraw the route, seasonalize, or substitute with a regional partner aircraft.",
+    },
+}
 
-def col_seq(labels):
-    return [DECISION_COLORS.get(str(label), ACCENT) for label in labels]
+decisionMix = [
+    {"name": "Expand", "value": 412},
+    {"name": "Maintain", "value": 1086},
+    {"name": "Optimize", "value": 538},
+    {"name": "Drop", "value": 174},
+]
 
-def _format_value(v, value_format="number", fmt_fn=None):
-    if fmt_fn:
-        return fmt_fn(v)
-    if value_format == "money":
-        return _fmt_money(v)
-    if value_format == "percent":
-        return f"{v:.0%}"
-    return f"{v:,.0f}"
+summaryKPIs = [
+    {"label": "Routes Analyzed", "value": "2,210", "delta": "+128 QoQ", "positive": True},
+    {"label": "Avg Route Profit", "value": "$1.42M", "delta": "+6.4%", "positive": True},
+    {"label": "Network Load Factor", "value": "82.7%", "delta": "+1.9 pts", "positive": True},
+    {"label": "Routes At Risk", "value": "174", "delta": "−12 QoQ", "positive": True},
+]
 
+avgProfitByDecision = [
+    {"decision": "Expand", "profit": 4.82},
+    {"decision": "Maintain", "profit": 1.71},
+    {"decision": "Optimize", "profit": 0.34},
+    {"decision": "Drop", "profit": -1.26},
+]
 
-def _plotly_layout(fig, height=420, showlegend=False):
-    fig.update_layout(
-        height=height,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter", color=TEXT_SOFT, size=13),
-        showlegend=showlegend,
-        margin=dict(l=52, r=54, t=18, b=58),
-        hoverlabel=dict(
-            bgcolor="#111722",
-            bordercolor="rgba(255,255,255,.16)",
-            font_color="white",
-            font_family="Inter",
-        ),
-    )
-    fig.update_xaxes(showgrid=False, zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
-    fig.update_yaxes(gridcolor="rgba(255,255,255,.07)", zeroline=False, color=TEXT_MUTED, tickfont=dict(size=12))
-    return fig
+loadFactorByDecision = [
+    {"decision": "Expand", "lf": 88.6},
+    {"decision": "Maintain", "lf": 83.1},
+    {"decision": "Optimize", "lf": 74.8},
+    {"decision": "Drop", "lf": 61.2},
+]
 
+topCostDrivers = [
+    {"driver": "Fuel", "impact": 34},
+    {"driver": "Crew & Labor", "impact": 19},
+    {"driver": "Airport Fees", "impact": 12},
+    {"driver": "Maintenance", "impact": 11},
+    {"driver": "Distribution", "impact": 9},
+    {"driver": "Ground Ops", "impact": 8},
+    {"driver": "Other", "impact": 7},
+]
 
-def plotly_card(title, fig, height=420):
-    st.markdown(
-        f'<div class="plotly-card"><div class="plotly-card-title">{title}</div>',
-        unsafe_allow_html=True,
-    )
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False, "responsive": True})
-    st.markdown('</div>', unsafe_allow_html=True)
+topRoutes = [
+    {"route": "JFK → LHR", "profit": 28.4, "decision": "Expand"},
+    {"route": "LAX → NRT", "profit": 24.1, "decision": "Expand"},
+    {"route": "SFO → SIN", "profit": 21.7, "decision": "Expand"},
+    {"route": "ORD → FRA", "profit": 19.6, "decision": "Maintain"},
+    {"route": "ATL → CDG", "profit": 18.2, "decision": "Maintain"},
+    {"route": "MIA → GRU", "profit": 16.9, "decision": "Expand"},
+    {"route": "DFW → ICN", "profit": 15.4, "decision": "Maintain"},
+    {"route": "BOS → DUB", "profit": 14.1, "decision": "Expand"},
+]
 
+bottomRoutes = [
+    {"route": "CLE → AUS", "profit": -6.8, "decision": "Drop"},
+    {"route": "MEM → BOI", "profit": -5.9, "decision": "Drop"},
+    {"route": "PIT → JAX", "profit": -4.7, "decision": "Drop"},
+    {"route": "OMA → ABQ", "profit": -3.6, "decision": "Optimize"},
+    {"route": "BUF → MSY", "profit": -3.2, "decision": "Optimize"},
+    {"route": "RIC → OKC", "profit": -2.9, "decision": "Optimize"},
+    {"route": "TUL → BHM", "profit": -2.4, "decision": "Optimize"},
+    {"route": "SAT → ROC", "profit": -1.9, "decision": "Optimize"},
+]
 
-def plotly_donut_chart(title, labels, values, colors=None, height=420, **kwargs):
-    labels = [str(x) for x in labels]
-    vals = [float(v) if pd.notna(v) else 0.0 for v in values]
-    if not vals or sum(vals) <= 0:
-        st.info("No chart data available for the current filter.")
-        return
-    colors = colors or [DECISION_COLORS.get(x, CYAN) for x in labels]
-    fig = go.Figure(
-        go.Pie(
-            labels=labels,
-            values=vals,
-            hole=0.58,
-            marker=dict(colors=colors, line=dict(color="#080B12", width=3)),
-            textinfo="percent",
-            textfont=dict(size=15, color="white"),
-            hovertemplate="%{label}<br>%{percent}<br>%{value}<extra></extra>",
-        )
-    )
-    _plotly_layout(fig, height=height, showlegend=True)
-    fig.update_layout(
-        legend=dict(orientation="h", y=-0.08, x=0.5, xanchor="center", font=dict(size=12, color=TEXT_SOFT)),
-        margin=dict(l=20, r=20, t=8, b=76),
-    )
-    plotly_card(title, fig, height)
+stableRoutes = [
+    {"route": "JFK → LHR", "stability": 0.96, "variance": "Low", "years": 7},
+    {"route": "LAX → NRT", "stability": 0.94, "variance": "Low", "years": 9},
+    {"route": "ORD → FRA", "stability": 0.93, "variance": "Low", "years": 11},
+    {"route": "SFO → SIN", "stability": 0.91, "variance": "Low", "years": 6},
+    {"route": "ATL → CDG", "stability": 0.90, "variance": "Low", "years": 8},
+]
 
+volatileRoutes = [
+    {"route": "MIA → CCS", "stability": 0.34, "variance": "High", "years": 4},
+    {"route": "LAX → PVG", "stability": 0.41, "variance": "High", "years": 5},
+    {"route": "JFK → TLV", "stability": 0.46, "variance": "High", "years": 6},
+    {"route": "SEA → ANC", "stability": 0.49, "variance": "High", "years": 3},
+    {"route": "IAH → EZE", "stability": 0.52, "variance": "Medium", "years": 5},
+]
 
-def plotly_vbar_chart(title, labels, series=None, values=None, colors=None, max_value=None, value_format="number", height=420, fmt_fn=None, y_label="", **kwargs):
-    labels = [str(x) for x in labels]
-    fig = go.Figure()
-    if series is None:
-        series = [{"name": "Value", "values": values or [], "colors": colors}]
-    for srs in series:
-        vals = [float(v) if pd.notna(v) else 0.0 for v in srs.get("values", [])]
-        marker_colors = srs.get("colors") or colors or [srs.get("color", CYAN)] * len(vals)
-        if isinstance(marker_colors, str):
-            marker_colors = [marker_colors] * len(vals)
-        text = [_format_value(v, value_format=value_format, fmt_fn=fmt_fn) for v in vals]
-        fig.add_trace(
-            go.Bar(
-                x=labels,
-                y=vals,
-                name=srs.get("name", "Value"),
-                marker=dict(color=marker_colors, line=dict(width=0)),
-                text=text,
-                textposition="outside",
-                cliponaxis=False,
-                hovertemplate="%{x}<br>%{y}<extra></extra>",
-            )
-        )
-    _plotly_layout(fig, height=height, showlegend=len(series) > 1)
-    if max_value is not None:
-        fig.update_yaxes(range=[0, max_value * 1.12])
-    fig.update_traces(width=0.52)
-    if y_label:
-        fig.update_yaxes(title_text=y_label)
-    plotly_card(title, fig, height)
+uniqueRoutesByDecision = [
+    {"decision": "Expand", "routes": 312},
+    {"decision": "Maintain", "routes": 884},
+    {"decision": "Optimize", "routes": 421},
+    {"decision": "Drop", "routes": 138},
+]
 
+modelMetrics = [
+    {"model": "With Revenue Vars", "accuracy": 0.927, "f1": 0.918},
+    {"model": "Without Revenue", "accuracy": 0.871, "f1": 0.854},
+    {"model": "Pre-Operational", "accuracy": 0.802, "f1": 0.781},
+]
 
-def plotly_hbar_chart(title, labels, values, colors=None, color=None, value_format="money", height=460, fmt_fn=None, **kwargs):
-    labels = [str(x) for x in labels]
-    vals = [float(v) if pd.notna(v) else 0.0 for v in values]
-    if not vals:
-        st.info("No chart data available for the current filter.")
-        return
-    if colors is None:
-        colors = [color or CYAN] * len(vals)
-    elif isinstance(colors, str):
-        colors = [colors] * len(vals)
-    else:
-        colors = list(colors)
-    if len(colors) < len(vals):
-        colors = colors + [color or CYAN] * (len(vals) - len(colors))
-    text = [_format_value(v, value_format=value_format, fmt_fn=fmt_fn) for v in vals]
-    fig = go.Figure(
-        go.Bar(
-            y=labels,
-            x=vals,
-            orientation="h",
-            marker=dict(color=colors, line=dict(width=0)),
-            text=text,
-            textposition="outside",
-            cliponaxis=False,
-            hovertemplate="%{y}<br>%{x}<extra></extra>",
-        )
-    )
-    _plotly_layout(fig, height=height, showlegend=False)
-    fig.update_layout(margin=dict(l=130, r=110, t=18, b=48))
-    fig.update_yaxes(autorange="reversed")
-    plotly_card(title, fig, height)
+confidenceByDecision = [
+    {"decision": "Expand", "confidence": 0.91},
+    {"decision": "Maintain", "confidence": 0.88},
+    {"decision": "Optimize", "confidence": 0.79},
+    {"decision": "Drop", "confidence": 0.84},
+]
 
-# ─────────────────────────────────────────────────────────────
-#  PATHS
-# ─────────────────────────────────────────────────────────────
-BASE_DIR     = os.path.dirname(__file__)
-DATA_PATH    = os.path.join(BASE_DIR, "airline_route_profitability.csv")
-if not os.path.exists(DATA_PATH):
-    alt_data_path = os.path.join(BASE_DIR, "airline_route_profitability(1).csv")
-    if os.path.exists(alt_data_path):
-        DATA_PATH = alt_data_path
-MODEL1_PATH  = os.path.join(BASE_DIR, "model_with_revenue.pkl")
-MODEL2_PATH  = os.path.join(BASE_DIR, "model_without_revenue.pkl")
-MODEL3_PATH  = os.path.join(BASE_DIR, "model_preoperational.pkl")
-X1_COLS_PATH = os.path.join(BASE_DIR, "x1_columns.pkl")
-X2_COLS_PATH = os.path.join(BASE_DIR, "x2_columns.pkl")
-X3_COLS_PATH = os.path.join(BASE_DIR, "x3_columns.pkl")
+summaryTable = [
+    {"decision": "Expand", "routes": 412, "share": "18.6%", "avgProfit": "$4.82M", "avgLF": "88.6%"},
+    {"decision": "Maintain", "routes": 1086, "share": "49.1%", "avgProfit": "$1.71M", "avgLF": "83.1%"},
+    {"decision": "Optimize", "routes": 538, "share": "24.3%", "avgProfit": "$0.34M", "avgLF": "74.8%"},
+    {"decision": "Drop", "routes": 174, "share": "7.9%", "avgProfit": "−$1.26M", "avgLF": "61.2%"},
+]
 
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
 
-# ─────────────────────────────────────────────────────────────
-#  DATA & MODEL LOADING
-# ─────────────────────────────────────────────────────────────
-@st.cache_data
-def load_data():
-    df = pd.read_csv(DATA_PATH)
-    df["Flight_Date"] = pd.to_datetime(df["Flight_Date"])
-    for col in ["Ancillary_Revenue", "Catering_Cost", "Handling_Cost"]:
-        if col in df.columns:
-            df[col] = df[col].fillna(0)
-    ph = df["Profit"].quantile(0.75)
-    mh = df["Profit_Margin"].quantile(0.75)
-    lh = df["Load_Factor"].quantile(0.75)
-    mm = df["Profit_Margin"].median()
-    lm = df["Load_Factor"].median()
+def section_header(eyebrow, title, subtitle=""):
+    st.markdown(f'<p class="section-eyebrow">{eyebrow}</p>', unsafe_allow_html=True)
+    st.markdown(f'<h2 class="section-title">{title}</h2>', unsafe_allow_html=True)
+    if subtitle:
+        st.markdown(f'<p class="section-subtitle">{subtitle}</p>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-glow"></div>', unsafe_allow_html=True)
 
-    def classify(row):
-        if row["Profit"] >= ph and row["Profit_Margin"] >= mh and row["Load_Factor"] >= lh:
-            return "Expand"
-        elif row["Profit"] <= 0:
-            return "Drop"
-        elif row["Profit_Margin"] < mm or row["Load_Factor"] < lm:
-            return "Optimize"
-        else:
-            return "Maintain"
-
-    df["Route_Decision"] = df.apply(classify, axis=1)
-    return df
-
-
-@st.cache_resource
-def load_artifacts():
-    return (
-        joblib.load(MODEL1_PATH), joblib.load(MODEL2_PATH), joblib.load(MODEL3_PATH),
-        joblib.load(X1_COLS_PATH), joblib.load(X2_COLS_PATH), joblib.load(X3_COLS_PATH)
-    )
-
-
-def prepare_input(input_df, training_columns):
-    enc = pd.get_dummies(input_df, drop_first=True)
-    return enc.reindex(columns=training_columns, fill_value=0)
-
-
-# ─────────────────────────────────────────────────────────────
-#  LOAD
-# ─────────────────────────────────────────────────────────────
-df = load_data()
-model1, model2, model3, X1_columns, X2_columns, X3_columns = load_artifacts()
-
-
-# ─────────────────────────────────────────────────────────────
-#  PRE-COMPUTED
-# ─────────────────────────────────────────────────────────────
-def compute_model_metrics(df, model, columns):
-    """Compute live model metrics from the loaded artifact and current labeled dataset."""
-    from sklearn.metrics import accuracy_score, f1_score
-
-    feature_df = df.drop(columns=["Route_Decision"], errors="ignore")
-    X = prepare_input(feature_df, columns)
-    y_true = df["Route_Decision"]
-    y_pred = model.predict(X)
-    return accuracy_score(y_true, y_pred), f1_score(y_true, y_pred, average="macro")
-
-try:
-    m1_acc, m1_f1 = compute_model_metrics(df, model1, X1_columns)
-    m2_acc, m2_f1 = compute_model_metrics(df, model2, X2_columns)
-    m3_acc, m3_f1 = compute_model_metrics(df, model3, X3_columns)
-except Exception:
-    # Safe fallback only if an environment/version issue prevents metric recomputation.
-    m1_acc, m1_f1 = 0.879624, 0.879616
-    m2_acc, m2_f1 = 0.837618, 0.838726
-    m3_acc, m3_f1 = 0.721003, 0.729150
-
-comparison = pd.DataFrame({
-    "Model":    ["With revenue variables", "Without revenue variables", "Only pre-operational features"],
-    "Accuracy": [m1_acc, m2_acc, m3_acc],
-    "Macro F1": [m1_f1, m2_f1, m3_f1],
-})
-
-df_sorted = df.sort_values(["Route", "Flight_Date"]).copy()
-df_sorted["Prev_Decision"] = df_sorted.groupby("Route")["Route_Decision"].shift(1)
-df_sorted["Changed"] = df_sorted["Prev_Decision"].notna() & (df_sorted["Route_Decision"] != df_sorted["Prev_Decision"])
-route_switches = (
-    df_sorted.groupby("Route")["Changed"].sum()
-    .sort_values(ascending=False).reset_index()
-    .rename(columns={"Changed": "Decision Switches"})
-)
-route_variability = (
-    df.groupby("Route")["Route_Decision"].nunique()
-    .sort_values(ascending=False).reset_index()
-    .rename(columns={"Route_Decision": "Unique States"})
-)
-
-if "pred_result" not in st.session_state:
-    st.session_state.pred_result = None
-
-
-# ─────────────────────────────────────────────────────────────
-#  SIDEBAR
-# ─────────────────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown('<div class="sidebar-brand">Airline <span>Route</span> Intelligence ✦</div>', unsafe_allow_html=True)
-    st.markdown(
-        f"<p style='font-size:0.64rem;color:{ACCENT};margin-bottom:14px;"
-        "font-weight:700;letter-spacing:0.16em;text-transform:uppercase;font-family:DM Sans,sans-serif'>Filter View</p>",
-        unsafe_allow_html=True,
-    )
-    route_opts    = ["All"] + sorted(df["Route"].dropna().unique().tolist())
-    aircraft_opts = ["All"] + sorted(df["Aircraft_Type"].dropna().unique().tolist())
-    season_opts   = ["All"] + sorted(df["Season"].dropna().unique().tolist())
-    decision_opts = ["All"] + sorted(df["Route_Decision"].dropna().unique().tolist())
-
-    sel_route    = st.selectbox("✈  Route",         route_opts)
-    sel_aircraft = st.selectbox("🛩  Aircraft Type", aircraft_opts)
-    sel_season   = st.selectbox("🌤  Season",        season_opts)
-    sel_decision = st.selectbox("🏷  Decision",      decision_opts)
-
-    st.markdown("---")
+def glass_card(title="", subtitle="", action_html="", content_html=""):
+    subtitle_html = f'<p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">{subtitle}</p>' if subtitle else ""
+    action = f'<div style="float: right;">{action_html}</div>' if action_html else ""
+    header = f'<h3 style="margin: 0; font-size: 1.1rem; font-weight: 600;">{title}</h3>' if title else ""
     st.markdown(f"""
-    <p style='font-size:0.62rem;color:{ACCENT};font-weight:700;letter-spacing:0.16em;
-    text-transform:uppercase;margin-bottom:10px;font-family:DM Sans,sans-serif'>Decision Labels</p>
-    <div style='display:flex;flex-direction:column;gap:9px;font-size:0.80rem;color:{INK_SOFT};font-family:DM Sans,sans-serif'>
-      <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-expand'>Expand</span>High profit &amp; demand
-      </div>
-      <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-maintain'>Maintain</span>Stable performer
-      </div>
-      <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-optimize'>Optimize</span>Room to improve
-      </div>
-      <div style='display:flex;align-items:center;gap:10px'>
-        <span class='pill pill-drop'>Drop</span>Losing money
-      </div>
+    <div class="glass-card">
+        {action}{header}
+        {subtitle_html}
+        {content_html}
     </div>
     """, unsafe_allow_html=True)
 
+def progress_bar_html(value, color, label="", percent_label=""):
+    return f"""
+    <div style="margin-bottom: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.85rem;">
+            <span>{label}</span>
+            <span class="font-mono" style="color: hsl(225 15% 72%);">{percent_label}</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width: {value}%; background: {color};"></div>
+        </div>
+    </div>
+    """
 
-# ─────────────────────────────────────────────────────────────
-#  FILTER
-# ─────────────────────────────────────────────────────────────
-fdf = df.copy()
-if sel_route    != "All": fdf = fdf[fdf["Route"]          == sel_route]
-if sel_aircraft != "All": fdf = fdf[fdf["Aircraft_Type"]  == sel_aircraft]
-if sel_season   != "All": fdf = fdf[fdf["Season"]         == sel_season]
-if sel_decision != "All": fdf = fdf[fdf["Route_Decision"] == sel_decision]
+def decision_badge(decision):
+    color = DECISION_COLORS[decision]
+    return f'<span class="decision-dot" style="background: {color};"></span>{decision}'
 
+# ============================================================
+# PAGE LAYOUT
+# ============================================================
 
-# ─────────────────────────────────────────────────────────────
-#  HERO
-# ─────────────────────────────────────────────────────────────
+st.set_page_config(page_title="SkyLens · Route Intelligence", page_icon="✈️", layout="wide")
+
+# ---- TOP NAV ----
+nav_html = """
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; 
+     background: linear-gradient(160deg, hsl(220 40% 16% / 0.92), hsl(220 38% 11% / 0.78));
+     backdrop-filter: blur(24px) saturate(150%);
+     border: 1px solid hsl(210 60% 80% / 0.12);
+     border-radius: 0.9rem; margin-bottom: 2rem;
+     box-shadow: 0 10px 40px -10px hsl(220 60% 2% / 0.6), inset 0 1px 0 0 hsl(210 100% 90% / 0.05);">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 36px; height: 36px; border-radius: 0.6rem; background: linear-gradient(135deg, hsl(198 95% 58%), hsl(280 55% 70%)); display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 1.2rem;">✈️</span>
+        </div>
+        <div>
+            <div style="font-weight: 600; font-size: 1.1rem; color: hsl(40 30% 96%);">SkyLens</div>
+            <div class="font-mono" style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: hsl(225 15% 72%);">Route Intelligence</div>
+        </div>
+    </div>
+    <div style="display: flex; gap: 1.5rem; font-size: 0.9rem;">
+        <a href="#overview" style="color: hsl(225 15% 72%); text-decoration: none; transition: color 0.3s;">Overview</a>
+        <a href="#drivers" style="color: hsl(225 15% 72%); text-decoration: none; transition: color 0.3s;">Drivers</a>
+        <a href="#actions" style="color: hsl(225 15% 72%); text-decoration: none; transition: color 0.3s;">Actions</a>
+        <a href="#stability" style="color: hsl(225 15% 72%); text-decoration: none; transition: color 0.3s;">Stability</a>
+        <a href="#predict" style="color: hsl(225 15% 72%); text-decoration: none; transition: color 0.3s;">Predict</a>
+    </div>
+    <div>
+        <span class="chip" style="font-size: 0.75rem;">🚀 Launch Console</span>
+    </div>
+</div>
+"""
+st.markdown(nav_html, unsafe_allow_html=True)
+
+# ---- HERO SECTION ----
+hero_html = """
+<div style="padding: 3rem 0 2rem 0;">
+    <div class="chip" style="margin-bottom: 1rem;">📡 Live · Network telemetry</div>
+    <h1 class="hero-title">The command center for <span class="text-gradient">airline route profitability</span>.</h1>
+    <p style="font-size: 1.1rem; max-width: 600px; margin-bottom: 1.5rem; color: hsl(225 15% 72%);">
+        SkyLens translates network economics into clear executive decisions — Expand, Maintain, Optimize, Drop — 
+        backed by transparent models built for revenue management and operations leaders.
+    </p>
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <a href="#overview" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; 
+            background: linear-gradient(135deg, hsl(198 95% 58%), hsl(195 100% 70%)); color: hsl(232 50% 6%);
+            border-radius: 0.75rem; text-decoration: none; font-weight: 600; box-shadow: 0 15px 50px -15px hsl(198 95% 58% / 0.7);">
+            Open Dashboard →
+        </a>
+        <a href="#predict" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem;
+            background: hsl(232 28% 14% / 0.4); border: 1px solid hsl(215 30% 22% / 0.6); color: hsl(40 30% 96%);
+            border-radius: 0.75rem; text-decoration: none; font-weight: 500; backdrop-filter: blur(12px);">
+            ✈️ Run Decision Model
+        </a>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 500px;">
+        <div class="kpi-card">
+            <div class="kpi-value">2,210</div>
+            <div class="kpi-label">Routes</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">92.7%</div>
+            <div class="kpi-label">Model Accuracy</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">47</div>
+            <div class="kpi-label">Carriers</div>
+        </div>
+    </div>
+</div>
+"""
+st.markdown(hero_html, unsafe_allow_html=True)
+
+# ---- OVERVIEW SECTION ----
+st.markdown('<div id="overview" style="scroll-margin-top: 80px;"></div>', unsafe_allow_html=True)
+section_header("01 · Overview", "Network profitability at a glance", 
+    "A consolidated view of the route portfolio, its decision mix, and the KPIs revenue management leaders track every morning.")
+
+# KPI Cards
+kpi_cols = st.columns(4)
+for i, kpi in enumerate(summaryKPIs):
+    with kpi_cols[i]:
+        delta_class = "positive" if kpi["positive"] else "negative"
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">{kpi['label']}</div>
+            <div class="kpi-value">{kpi['value']}</div>
+            <div class="kpi-delta {delta_class}">{'📈' if kpi['positive'] else '📉'} {kpi['delta']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+# Decision Mix & Portfolio Summary
+st.markdown("<br>", unsafe_allow_html=True)
+col1, col2 = st.columns([1, 2])
+
+with col1:
+    total = sum(d["value"] for d in decisionMix)
+    legend_html = ""
+    for d in decisionMix:
+        pct = (d["value"] / total) * 100
+        legend_html += f"""
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; 
+            background: hsl(232 28% 14% / 0.4); border-radius: 0.4rem; margin-bottom: 0.3rem;">
+            <span style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="decision-dot" style="background: {DECISION_COLORS[d['name']};"></span>
+                {d['name']}
+            </span>
+            <span class="font-mono" style="font-size: 0.75rem; color: hsl(225 15% 72%);">{pct:.1f}%</span>
+        </div>
+        """
+    
+    chart_data = pd.DataFrame(decisionMix)
+    st.markdown(f"""
+    <div class="glass-card">
+        <h3 style="margin-top: 0;">Decision Mix</h3>
+        <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Share of routes by recommended action</p>
+        <div style="height: 220px;">
+            {st.bar_chart(chart_data.set_index("name")["value"], use_container_width=True, height=220)}
+        </div>
+        {legend_html}
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    table_rows = ""
+    for row in summaryTable:
+        table_rows += f"""
+        <tr>
+            <td><span class="decision-dot" style="background: {DECISION_COLORS[row['decision']};"></span>{row['decision']}</td>
+            <td class="font-mono">{row['routes']:,}</td>
+            <td class="font-mono" style="color: hsl(225 15% 72%);">{row['share']}</td>
+            <td class="font-mono">{row['avgProfit']}</td>
+            <td class="font-mono">{row['avgLF']}</td>
+        </tr>
+        """
+    
+    st.markdown(f"""
+    <div class="glass-card">
+        <h3 style="margin-top: 0;">Portfolio Summary</h3>
+        <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Decision-level KPIs across the network</p>
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Decision</th>
+                        <th>Routes</th>
+                        <th>Share</th>
+                        <th>Avg Profit</th>
+                        <th>Avg Load Factor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {table_rows}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Live Network Map
+st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("""
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow">AIRLINE ROUTE INTELLIGENCE</div>
-    <h1>SKYLENS<br>DASHBOARD</h1>
-    <p>Analyze route profitability, operational signals, and model-backed decisions in one polished command view.</p>
-  </div>
-  <div class="hero-badge">Explore dashboard below</div>
+<div class="glass-card map-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+            <h3 style="margin: 0;">Live Network Map</h3>
+            <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin: 0.3rem 0 0 0;">Animated route arcs across primary hubs</p>
+        </div>
+        <span class="chip">📡 Live · Realtime</span>
+    </div>
+    <div style="position: relative; height: 350px; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 900 480" style="width: 100%; height: 100%;">
+            <defs>
+                <linearGradient id="arcGrad" x1="0" x2="1">
+                    <stop offset="0%" stop-color="hsl(280 55% 70%)" stop-opacity="0.9" />
+                    <stop offset="100%" stop-color="hsl(210 85% 70%)" stop-opacity="0.9" />
+                </linearGradient>
+                <radialGradient id="hubGlow">
+                    <stop offset="0%" stop-color="hsl(220 90% 78%)" stop-opacity="0.7" />
+                    <stop offset="100%" stop-color="hsl(210 85% 70%)" stop-opacity="0" />
+                </radialGradient>
+            </defs>
+            
+            <!-- Route Arcs -->
+            <path d="M 270 180 Q 370 90 470 150" fill="none" stroke="hsl(210 85% 70% / 0.25)" stroke-width="1.5"/>
+            <path d="M 270 180 Q 370 90 470 150" fill="none" stroke="url(#arcGrad)" stroke-width="1.8" stroke-dasharray="6 8"/>
+            
+            <path d="M 200 220 Q 480 80 760 210" fill="none" stroke="hsl(210 85% 70% / 0.25)" stroke-width="1.5"/>
+            <path d="M 200 220 Q 480 80 760 210" fill="none" stroke="url(#arcGrad)" stroke-width="1.8" stroke-dasharray="6 8"/>
+            
+            <path d="M 470 150 Q 595 150 720 320" fill="none" stroke="hsl(210 85% 70% / 0.25)" stroke-width="1.5"/>
+            <path d="M 470 150 Q 595 150 720 320" fill="none" stroke="url(#arcGrad)" stroke-width="1.8" stroke-dasharray="6 8"/>
+            
+            <path d="M 270 180 Q 315 270 360 360" fill="none" stroke="hsl(210 85% 70% / 0.25)" stroke-width="1.5"/>
+            <path d="M 270 180 Q 315 270 360 360" fill="none" stroke="url(#arcGrad)" stroke-width="1.8" stroke-dasharray="6 8"/>
+            
+            <path d="M 480 165 Q 535 207 590 250" fill="none" stroke="hsl(210 85% 70% / 0.25)" stroke-width="1.5"/>
+            <path d="M 480 165 Q 535 207 590 250" fill="none" stroke="url(#arcGrad)" stroke-width="1.8" stroke-dasharray="6 8"/>
+            
+            <path d="M 590 250 Q 655 285 720 320" fill="none" stroke="hsl(210 85% 70% / 0.25)" stroke-width="1.5"/>
+            <path d="M 590 250 Q 655 285 720 320" fill="none" stroke="url(#arcGrad)" stroke-width="1.8" stroke-dasharray="6 8"/>
+            
+            <!-- Hubs -->
+            <circle cx="270" cy="180" r="22" fill="url(#hubGlow)" class="pulse-ring" style="transform-origin: 270px 180px;"/>
+            <circle cx="270" cy="180" r="4" fill="hsl(220 90% 78%)"/>
+            <text x="285" y="170" fill="hsl(40 30% 96% / 0.85)" font-size="11" font-family="JetBrains Mono, monospace">JFK</text>
+            
+            <circle cx="470" cy="150" r="22" fill="url(#hubGlow)" class="pulse-ring" style="transform-origin: 470px 150px;"/>
+            <circle cx="470" cy="150" r="4" fill="hsl(220 90% 78%)"/>
+            <text x="485" y="140" fill="hsl(40 30% 96% / 0.85)" font-size="11" font-family="JetBrains Mono, monospace">LHR</text>
+            
+            <circle cx="760" cy="210" r="22" fill="url(#hubGlow)" class="pulse-ring" style="transform-origin: 760px 210px;"/>
+            <circle cx="760" cy="210" r="4" fill="hsl(220 90% 78%)"/>
+            <text x="775" y="200" fill="hsl(40 30% 96% / 0.85)" font-size="11" font-family="JetBrains Mono, monospace">NRT</text>
+            
+            <circle cx="720" cy="320" r="22" fill="url(#hubGlow)" class="pulse-ring" style="transform-origin: 720px 320px;"/>
+            <circle cx="720" cy="320" r="4" fill="hsl(220 90% 78%)"/>
+            <text x="735" y="310" fill="hsl(40 30% 96% / 0.85)" font-size="11" font-family="JetBrains Mono, monospace">SIN</text>
+            
+            <circle cx="200" cy="220" r="22" fill="url(#hubGlow)" class="pulse-ring" style="transform-origin: 200px 220px;"/>
+            <circle cx="200" cy="220" r="4" fill="hsl(220 90% 78%)"/>
+            <text x="215" y="210" fill="hsl(40 30% 96% / 0.85)" font-size="11" font-family="JetBrains Mono, monospace">LAX</text>
+            
+            <circle cx="360" cy="360" r="22" fill="url(#hubGlow)" class="pulse-ring" style="transform-origin: 360px 360px;"/>
+            <circle cx="360" cy="360" r="4" fill="hsl(220 90% 78%)"/>
+            <text x="375" y="350" fill="hsl(40 30% 96% / 0.85)" font-size="11" font-family="JetBrains Mono, monospace">GRU</text>
+            
+            <circle cx="480" cy="165" r="22" fill="url(#hubGlow)" class="pulse-ring" style="transform-origin: 480px 165px;"/>
+            <circle cx="480" cy="165" r="4" fill="hsl(220 90% 78%)"/>
+            <text x="495" y="155" fill="hsl(40 30% 96% / 0.85)" font-size="11" font-family="JetBrains Mono, monospace">CDG</text>
+            
+            <circle cx="590" cy="250" r="22" fill="url(#hubGlow)" class="pulse-ring" style="transform-origin: 590px 250px;"/>
+            <circle cx="590" cy="250" r="4" fill="hsl(220 90% 78%)"/>
+            <text x="605" y="240" fill="hsl(40 30% 96% / 0.85)" font-size="11" font-family="JetBrains Mono, monospace">DXB</text>
+        </svg>
+        
+        <!-- Radar Overlay -->
+        <div style="position: absolute; right: 20px; top: 20px; width: 120px; height: 120px;">
+            <div style="width: 100%; height: 100%; border-radius: 50%; border: 1px solid hsl(280 55% 70% / 0.3); position: relative;">
+                <div style="position: absolute; inset: 15px; border-radius: 50%; border: 1px solid hsl(280 55% 70% / 0.2);"></div>
+                <div style="position: absolute; inset: 30px; border-radius: 50%; border: 1px solid hsl(280 55% 70% / 0.15);"></div>
+                <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; border-radius: 50%; background: hsl(280 55% 70%); box-shadow: 0 0 20px hsl(280 55% 70%);"></div>
+            </div>
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
+# ---- DRIVERS SECTION ----
+st.markdown('<div id="drivers" style="scroll-margin-top: 80px;"></div>', unsafe_allow_html=True)
+section_header("02 · Performance Drivers", "What moves the margin",
+    "The economic levers behind each route classification — profit, load factor, and cost composition.")
 
-# ─────────────────────────────────────────────────────────────
-#  TABS
-# ─────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📊  Overview",
-    "🔍  Performance Drivers",
-    "🗺  Route Actions",
-    "📈  Route Stability",
-    "🤖  Prediction Tool",
-])
+st.markdown("<br>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
 
+with col1:
+    df_profit = pd.DataFrame(avgProfitByDecision)
+    st.markdown("""
+    <div class="glass-card">
+        <h3 style="margin-top: 0;">Average Profit by Decision</h3>
+        <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Annualized, USD millions per route</p>
+    """, unsafe_allow_html=True)
+    chart = st.bar_chart(df_profit.set_index("decision")["profit"], use_container_width=True, height=280)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# ── TAB 1 · OVERVIEW ─────────────────────────────────────────
-with tab1:
-    n          = len(fdf)
-    avg_profit = fdf["Profit"].mean()
-    avg_load   = fdf["Load_Factor"].mean()
-    n_routes   = fdf["Route"].nunique()
+with col2:
+    df_lf = pd.DataFrame(loadFactorByDecision)
+    st.markdown("""
+    <div class="glass-card">
+        <h3 style="margin-top: 0;">Load Factor by Decision</h3>
+        <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Percent of seats sold, weighted across the cohort</p>
+    """, unsafe_allow_html=True)
+    st.bar_chart(df_lf.set_index("decision")["lf"], use_container_width=True, height=280)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    expand_pct   = (fdf["Route_Decision"] == "Expand").mean()   * 100 if n else 0
-    maintain_pct = (fdf["Route_Decision"] == "Maintain").mean() * 100 if n else 0
-    optimize_pct = (fdf["Route_Decision"] == "Optimize").mean() * 100 if n else 0
-    drop_pct     = (fdf["Route_Decision"] == "Drop").mean()     * 100 if n else 0
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("""
+<div class="glass-card">
+    <h3 style="margin-top: 0;">Top Cost Drivers</h3>
+    <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Share of operating cost across the network (%)</p>
+""", unsafe_allow_html=True)
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Total Flights",   f"{n:,}")
-    c2.metric("Unique Routes",   f"{n_routes}")
-    c3.metric("Average Profit",  f"${avg_profit:,.0f}")
-    c4.metric("Avg Load Factor", f"{avg_load:.0%}")
+# Horizontal bar chart for cost drivers using HTML/CSS
+cost_html = ""
+for item in topCostDrivers:
+    cost_html += progress_bar_html(item["impact"], "hsl(210 85% 70%)", item["driver"], f"{item['impact']}%")
 
-    st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+st.markdown(f"""{cost_html}</div>""", unsafe_allow_html=True)
 
-    d1, d2, d3, d4 = st.columns(4)
-    d1.metric("Expand",   f"{expand_pct:.1f}%")
-    d2.metric("Maintain", f"{maintain_pct:.1f}%")
-    d3.metric("Optimize", f"{optimize_pct:.1f}%")
-    d4.metric("Drop",     f"{drop_pct:.1f}%")
+# ---- ACTIONS SECTION ----
+st.markdown('<div id="actions" style="scroll-margin-top: 80px;"></div>', unsafe_allow_html=True)
+section_header("03 · Route Actions", "Where to lean in. Where to retreat.",
+    "Ranked profit contribution across the network with action-level distribution.")
 
-    st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
-    st.markdown('<div class="divider-label">Composition</div>', unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
 
-    left, right = st.columns([1, 1])
-
-    with left:
-        st.markdown('<p class="section-hd">Decision mix</p>', unsafe_allow_html=True)
-        dc = fdf["Route_Decision"].value_counts()
-        dc = dc.reindex([x for x in ORDER if x in dc.index]).dropna()
-        wc = {
-            "Expand":   CHART_EXPAND,
-            "Maintain": CHART_MAINTAIN,
-            "Optimize": CHART_OPTIMIZE,
-            "Drop":     CHART_DROP,
-        }
-        wedge_colors = [wc[l] for l in dc.index]
-        plotly_donut_chart(
-            title="Share of Flights by Decision",
-            labels=dc.index.tolist(),
-            values=dc.values.tolist(),
-            colors=wedge_colors,
-            height=390,
+with col1:
+    st.markdown("""
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+                <h3 style="margin: 0;">Top Routes — Total Profit</h3>
+                <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin: 0.3rem 0 0 0;">USD millions, last 12 months</p>
+            </div>
+            <span class="chip chip-success">📈 Winners</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    top_html = ""
+    for route in topRoutes:
+        color = DECISION_COLORS[route["decision"]]
+        top_html += progress_bar_html(
+            (route["profit"] / 30) * 100, color, 
+            f'<span class="decision-dot" style="background: {color};"></span>{route["route"]}',
+            f"${route['profit']}M"
         )
+    st.markdown(f"{top_html}</div>", unsafe_allow_html=True)
 
-    with right:
-        st.markdown('<p class="section-hd">Average metrics by decision</p>', unsafe_allow_html=True)
-        summary = (
-            fdf.groupby("Route_Decision")[["Profit", "Profit_Margin", "Load_Factor"]]
-            .mean()
-            .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()])
-            .round(3).reset_index()
-            .rename(columns={
-                "Route_Decision": "Decision",
-                "Profit": "Avg Profit ($)",
-                "Profit_Margin": "Avg Margin",
-                "Load_Factor": "Avg Load Factor",
-            })
+with col2:
+    st.markdown("""
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+                <h3 style="margin: 0;">Bottom Routes — Total Profit</h3>
+                <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin: 0.3rem 0 0 0;">USD millions, last 12 months</p>
+            </div>
+            <span class="chip chip-danger">📉 Watchlist</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    bottom_html = ""
+    for route in bottomRoutes:
+        color = DECISION_COLORS[route["decision"]]
+        bottom_html += progress_bar_html(
+            (abs(route["profit"]) / 8) * 100, color,
+            f'<span class="decision-dot" style="background: {color};"></span>{route["route"]}',
+            f"${route['profit']}M"
         )
-        st.dataframe(summary, use_container_width=True, hide_index=True)
-        st.markdown("""
-        <div class="info-box">
-          <strong style="color:#7c3aed">How to read this</strong><br>
-          Each row shows average profitability and seat occupancy for flights in that category.
-          <strong style="color:#1d4ed8">Expand</strong> routes should have the highest values across all three columns.
-        </div>""", unsafe_allow_html=True)
+    st.markdown(f"{bottom_html}</div>", unsafe_allow_html=True)
 
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("""
+<div class="glass-card">
+    <h3 style="margin-top: 0;">Unique Routes per Decision</h3>
+    <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Count of distinct city-pairs by recommended action</p>
+""", unsafe_allow_html=True)
 
-# ── TAB 2 · PERFORMANCE DRIVERS ──────────────────────────────
-with tab2:
-    st.markdown('<p class="section-hd">What separates strong routes from weak ones?</p>', unsafe_allow_html=True)
-    st.markdown('<p class="section-sub">These charts reveal the metrics most associated with route profitability.</p>', unsafe_allow_html=True)
-
-    left, right = st.columns(2)
-
-    with left:
-        apd = (fdf.groupby("Route_Decision")["Profit"].mean()
-               .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        plotly_hbar_chart(
-            title="Average Profit by Decision",
-            labels=apd.index.tolist(),
-            values=apd.values.tolist(),
-            colors=col_seq(apd.index.tolist()),
-            value_format="money",
-            height=350,
-        )
-
-    with right:
-        ald = (fdf.groupby("Route_Decision")["Load_Factor"].mean()
-               .reindex([x for x in ORDER if x in fdf["Route_Decision"].unique()]).dropna())
-        plotly_vbar_chart(
-            title="Seat Occupancy by Decision",
-            labels=ald.index.tolist(),
-            series=[{
-                "name": "Average Seat Occupancy",
-                "values": ald.values.tolist(),
-                "color": ACCENT,
-                "colors": col_seq(ald.index.tolist()),
-            }],
-            max_value=1.0,
-            value_format="percent",
-            height=350,
-        )
-
-    st.markdown('<div class="divider-label">Cost breakdown</div>', unsafe_allow_html=True)
-    st.markdown('<p class="section-hd">Where is the money going?</p>', unsafe_allow_html=True)
-    st.markdown('<p class="section-sub">The biggest cost components across all filtered flights.</p>', unsafe_allow_html=True)
-
-    cost_cols = [
-        "Fuel_Cost", "Maintenance_Cost", "Crew_Cost", "Depreciation_Cost", "Insurance_Cost",
-        "Airport_Fees", "Catering_Cost", "Handling_Cost", "Navigation_Fees",
-        "Sales_Distribution_Cost", "Passenger_Service_Cost", "Overhead_Cost",
-        "Marketing_Cost", "IT_Systems_Cost",
-    ]
-    avail_costs = [c for c in cost_cols if c in fdf.columns]
-    cost_means  = fdf[avail_costs].mean().sort_values(ascending=True).tail(8)
-    label_map = {
-        "Fuel_Cost": "Fuel", "Maintenance_Cost": "Maintenance", "Crew_Cost": "Crew",
-        "Depreciation_Cost": "Depreciation", "Insurance_Cost": "Insurance",
-        "Airport_Fees": "Airport Fees", "Catering_Cost": "Catering", "Handling_Cost": "Handling",
-        "Navigation_Fees": "Navigation", "Sales_Distribution_Cost": "Sales & Dist.",
-        "Passenger_Service_Cost": "Pax Service", "Overhead_Cost": "Overhead",
-        "Marketing_Cost": "Marketing", "IT_Systems_Cost": "IT Systems",
-    }
-    cost_means.index = [label_map.get(i, i) for i in cost_means.index]
-
-    # Build a gradient of jewel tones for cost bars
-    nc = len(cost_means)
-    jewel_ramp = [
-        CHART_EXPAND, "#0e7490", ACCENT, CHART_MAINTAIN,
-        "#15803d", CHART_OPTIMIZE, CHART_DROP, "#6d28d9",
-    ]
-    neutral_cols = jewel_ramp[:nc]
-
-    plotly_hbar_chart(
-        title="Top Cost Drivers",
-        labels=cost_means.index.tolist(),
-        values=cost_means.values.tolist(),
-        colors=neutral_cols,
-        value_format="money",
-        height=430,
+routes_html = ""
+for d in uniqueRoutesByDecision:
+    max_routes = max(r["routes"] for r in uniqueRoutesByDecision)
+    pct = (d["routes"] / max_routes) * 100
+    routes_html += progress_bar_html(
+        pct, DECISION_COLORS[d["decision"]],
+        f'<span class="decision-dot" style="background: {DECISION_COLORS[d["decision"]]};"></span>{d["decision"]}',
+        f"{d['routes']:,}"
     )
+st.markdown(f"{routes_html}</div>", unsafe_allow_html=True)
 
+# ---- STABILITY SECTION ----
+st.markdown('<div id="stability" style="scroll-margin-top: 80px;"></div>', unsafe_allow_html=True)
+section_header("04 · Route Stability", "Confidence over time",
+    "Stability score blends profit variance, demand volatility, and competitive pressure across rolling windows.")
 
-# ── TAB 3 · ROUTE ACTIONS ────────────────────────────────────
-with tab3:
-    st.markdown('<p class="section-hd">Which routes need attention?</p>', unsafe_allow_html=True)
-    st.markdown('<p class="section-sub">A quick view of your best and worst performing routes.</p>', unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
 
-    st.markdown(
-        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-        "Top routes currently classified as Expand</p>", unsafe_allow_html=True)
-    expand_routes = (
-        fdf[fdf["Route_Decision"] == "Expand"]
-        .sort_values("Profit", ascending=False)
-        [["Route", "Profit", "Profit_Margin", "Load_Factor"]].head(10)
-        .rename(columns={"Profit": "Avg Profit ($)", "Profit_Margin": "Profit Margin", "Load_Factor": "Load Factor"})
-    )
-    st.dataframe(expand_routes, use_container_width=True, hide_index=True)
-
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-    left, right = st.columns(2)
-
-    with left:
-        st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-            "Top 10 routes by total profit</p>", unsafe_allow_html=True)
-        top = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).tail(10)
-        plotly_hbar_chart(
-            title="Top 10 Routes",
-            labels=top.index.tolist(),
-            values=top.values.tolist(),
-            color=CHART_EXPAND,
-            value_format="money",
-            height=430,
-        )
-
-    with right:
-        st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-            "Bottom 10 routes by total profit</p>", unsafe_allow_html=True)
-        worst = fdf.groupby("Route")["Profit"].sum().sort_values(ascending=True).head(10)
-        plotly_hbar_chart(
-            title="Bottom 10 Routes",
-            labels=worst.index.tolist(),
-            values=worst.values.tolist(),
-            color=CHART_DROP,
-            value_format="money",
-            height=430,
-        )
-
-
-# ── TAB 4 · ROUTE STABILITY ──────────────────────────────────
-with tab4:
-    st.markdown('<p class="section-hd">How consistent are route decisions over time?</p>', unsafe_allow_html=True)
-    st.markdown('<p class="section-sub">A route that frequently flips between categories may need structural attention.</p>', unsafe_allow_html=True)
-
-    left, right = st.columns(2)
-    with left:
-        st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-            "Routes with most decision changes</p>", unsafe_allow_html=True)
-        st.dataframe(route_switches.head(10), use_container_width=True, hide_index=True)
-    with right:
-        st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-            "Routes seen in the most decision states</p>", unsafe_allow_html=True)
-        st.dataframe(route_variability.head(10), use_container_width=True, hide_index=True)
-
-    st.markdown('<div class="divider-label">Distribution</div>', unsafe_allow_html=True)
-    st.markdown(
-        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-        "How many unique routes appear in each category?</p>", unsafe_allow_html=True)
-
-    urbd = (
-        df.groupby("Route_Decision")["Route"].nunique().reset_index()
-        .rename(columns={"Route": "Unique Routes"})
-        .set_index("Route_Decision").reindex(ORDER).dropna()
-    )
-    bc_map = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-              "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-    bc = [bc_map.get(i, ACCENT) for i in urbd.index]
-
-    vals4 = urbd["Unique Routes"].values.tolist()
-    plotly_vbar_chart(
-        title="Unique Routes per Decision Category",
-        labels=urbd.index.tolist(),
-        series=[{
-            "name": "Unique Routes",
-            "values": vals4,
-            "color": ACCENT,
-            "colors": bc,
-        }],
-        max_value=max(vals4) if vals4 else 1,
-        value_format="number",
-        height=390,
-    )
-
-
-# ── TAB 5 · PREDICTION TOOL ──────────────────────────────────
-with tab5:
-    st.markdown('<p class="section-hd">Simulate a route scenario</p>', unsafe_allow_html=True)
-    st.markdown('<p class="section-sub">Enter route characteristics and our model will suggest the best decision.</p>', unsafe_allow_html=True)
-
-    st.markdown(
-        f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-        "How accurate are the models?</p>", unsafe_allow_html=True)
-
-    plotly_vbar_chart(
-        title="Model Accuracy & F1 Comparison",
-        labels=comparison["Model"].tolist(),
-        series=[
-            {
-                "name": "Accuracy",
-                "values": comparison["Accuracy"].tolist(),
-                "color": ACCENT,
-            },
-            {
-                "name": "Macro F1",
-                "values": comparison["Macro F1"].tolist(),
-                "color": ACCENT_2,
-            },
-        ],
-        max_value=1.0,
-        value_format="percent",
-        height=430,
-    )
-
-    st.markdown('<div class="divider-label">Configuration</div>', unsafe_allow_html=True)
-    st.markdown('<p class="section-hd">Choose a prediction mode</p>', unsafe_allow_html=True)
-    st.markdown(f"""<div class="info-box">
-    <span class='pill pill-maintain'>With Revenue</span>&nbsp; Most accurate — use when you have ticket &amp; ancillary revenue data.<br><br>
-    <span class='pill pill-optimize'>Cost-only</span>&nbsp; Good accuracy using cost data only, no revenue figures needed.<br><br>
-    <span class='pill pill-expand'>Pre-launch</span>&nbsp; Use before a route launches, when only capacity/demand signals are known.
-    </div>""", unsafe_allow_html=True)
-
-    model_choice = st.selectbox(
-        "Prediction mode",
-        ["With Revenue Variables", "Without Revenue Variables", "Only Pre-Operational Features"],
-        key="model_choice_select",
-    )
-
-    if st.session_state.get("last_model_choice") != model_choice:
-        st.session_state.pred_result = None
-        st.session_state.last_model_choice = model_choice
-
-    with st.form("prediction_form"):
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            st.markdown('<p class="col-label">✈ Flight basics</p>', unsafe_allow_html=True)
-            aircraft_type     = st.selectbox("Aircraft Type",    sorted(df["Aircraft_Type"].dropna().unique()))
-            aircraft_capacity = st.number_input("Aircraft Capacity", min_value=50,  max_value=600, value=250)
-            passengers        = st.number_input("Passengers",        min_value=0,   max_value=600, value=200)
-            load_factor       = min(passengers / aircraft_capacity, 1.0) if aircraft_capacity else 0.0
-            st.markdown(
-                f"<div class='info-box'>Calculated Load Factor: <strong>{load_factor:.0%}</strong><br>Based on passengers ÷ aircraft capacity.</div>",
-                unsafe_allow_html=True,
-            )
-            if passengers > aircraft_capacity:
-                st.warning("Passengers exceed aircraft capacity. Load factor is capped at 100% for prediction.")
-
-        with col2:
-            st.markdown('<p class="col-label">🌍 Route context</p>', unsafe_allow_html=True)
-            flight_hours   = st.number_input("Flight Hours",   min_value=0.5, max_value=20.0, value=6.0, step=0.1)
-            season_val     = st.selectbox("Season",            sorted(df["Season"].dropna().unique()))
-            route_category = st.selectbox("Route Category",    sorted(df["Route_Category"].dropna().unique()))
-            demand_level   = st.selectbox("Demand Level",      sorted(df["Demand_Level"].dropna().unique()))
-
-        if model_choice == "With Revenue Variables":
-            with col3:
-                st.markdown('<p class="col-label">💰 Revenue</p>', unsafe_allow_html=True)
-                ticket_revenue    = st.number_input("Ticket Revenue ($)",    min_value=0.0, value=120000.0, step=1000.0)
-                ancillary_revenue = st.number_input("Ancillary Revenue ($)", min_value=0.0, value=10000.0,  step=500.0)
-
-        elif model_choice == "Without Revenue Variables":
-            with col3:
-                st.markdown('<p class="col-label">💸 Cost breakdown</p>', unsafe_allow_html=True)
-                fuel_cost               = st.number_input("Fuel Cost ($)",                  min_value=0.0, value=40000.0,  step=1000.0)
-                maintenance_cost        = st.number_input("Maintenance Cost ($)",           min_value=0.0, value=15000.0,  step=500.0)
-                crew_cost               = st.number_input("Crew Cost ($)",                  min_value=0.0, value=8000.0,   step=500.0)
-                depreciation_cost       = st.number_input("Depreciation Cost ($)",          min_value=0.0, value=20000.0,  step=500.0)
-                insurance_cost          = st.number_input("Insurance Cost ($)",             min_value=0.0, value=4000.0,   step=250.0)
-                airport_fees            = st.number_input("Airport Fees ($)",               min_value=0.0, value=5000.0,   step=250.0)
-                catering_cost           = st.number_input("Catering Cost ($)",              min_value=0.0, value=5000.0,   step=250.0)
-                handling_cost           = st.number_input("Handling Cost ($)",              min_value=0.0, value=4000.0,   step=250.0)
-                navigation_fees         = st.number_input("Navigation Fees ($)",            min_value=0.0, value=3500.0,   step=250.0)
-                sales_distribution_cost = st.number_input("Sales & Distribution Cost ($)",  min_value=0.0, value=35000.0,  step=500.0)
-                passenger_service_cost  = st.number_input("Passenger Service Cost ($)",     min_value=0.0, value=5000.0,   step=250.0)
-                overhead_cost           = st.number_input("Overhead Cost ($)",              min_value=0.0, value=25000.0,  step=500.0)
-                marketing_cost          = st.number_input("Marketing Cost ($)",             min_value=0.0, value=12000.0,  step=500.0)
-                it_systems_cost         = st.number_input("IT Systems Cost ($)",            min_value=0.0, value=3000.0,   step=250.0)
-
-        submitted = st.form_submit_button("✈  Get Route Decision")
-
-    # ── PREDICTION LOGIC ────────────────────────────────────
-    if submitted:
-        if model_choice == "With Revenue Variables":
-            row = {
-                "Aircraft_Type": aircraft_type, "Aircraft_Capacity": aircraft_capacity,
-                "Passengers": passengers, "Load_Factor": load_factor,
-                "Flight_Hours": flight_hours, "Season": season_val,
-                "Route_Category": route_category, "Demand_Level": demand_level,
-                "Ticket_Revenue": ticket_revenue, "Ancillary_Revenue": ancillary_revenue,
-            }
-            inp = prepare_input(pd.DataFrame([row]), X1_columns)
-            pred = model1.predict(inp)[0]; prob = model1.predict_proba(inp)[0]; cls = model1.classes_
-        elif model_choice == "Without Revenue Variables":
-            row = {
-                "Aircraft_Type": aircraft_type, "Aircraft_Capacity": aircraft_capacity,
-                "Passengers": passengers, "Load_Factor": load_factor,
-                "Flight_Hours": flight_hours, "Season": season_val,
-                "Route_Category": route_category, "Demand_Level": demand_level,
-                "Fuel_Cost": fuel_cost, "Maintenance_Cost": maintenance_cost,
-                "Crew_Cost": crew_cost, "Depreciation_Cost": depreciation_cost,
-                "Insurance_Cost": insurance_cost, "Airport_Fees": airport_fees,
-                "Catering_Cost": catering_cost, "Handling_Cost": handling_cost,
-                "Navigation_Fees": navigation_fees, "Sales_Distribution_Cost": sales_distribution_cost,
-                "Passenger_Service_Cost": passenger_service_cost, "Overhead_Cost": overhead_cost,
-                "Marketing_Cost": marketing_cost, "IT_Systems_Cost": it_systems_cost,
-            }
-            inp = prepare_input(pd.DataFrame([row]), X2_columns)
-            pred = model2.predict(inp)[0]; prob = model2.predict_proba(inp)[0]; cls = model2.classes_
+def stability_table(rows, title, subtitle, chip_class, chip_text):
+    rows_html = ""
+    for r in rows:
+        variance_chip = ""
+        if r["variance"] == "Low":
+            variance_chip = f'<span class="chip">{r["variance"]}</span>'
+        elif r["variance"] == "Medium":
+            variance_chip = f'<span class="chip chip-warning">{r["variance"]}</span>'
         else:
-            row = {
-                "Aircraft_Type": aircraft_type, "Aircraft_Capacity": aircraft_capacity,
-                "Passengers": passengers, "Load_Factor": load_factor,
-                "Flight_Hours": flight_hours, "Season": season_val,
-                "Route_Category": route_category, "Demand_Level": demand_level,
-            }
-            inp = prepare_input(pd.DataFrame([row]), X3_columns)
-            pred = model3.predict(inp)[0]; prob = model3.predict_proba(inp)[0]; cls = model3.classes_
+            variance_chip = f'<span class="chip chip-danger">{r["variance"]}</span>'
+        
+        color = "linear-gradient(90deg, hsl(152 70% 48%), hsl(280 55% 70%))" if r["stability"] > 0.7 else \
+                "linear-gradient(90deg, hsl(38 95% 58%), hsl(210 85% 70%))" if r["stability"] > 0.5 else \
+                "linear-gradient(90deg, hsl(0 78% 62%), hsl(38 95% 58%))"
+        
+        rows_html += f"""
+        <tr>
+            <td class="font-mono">{r['route']}</td>
+            <td class="font-mono">{r['stability']*100:.0f}</td>
+            <td style="width: 35%;">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: {r['stability']*100}%; background: {color};"></div>
+                </div>
+            </td>
+            <td>{variance_chip}</td>
+            <td class="font-mono" style="color: hsl(225 15% 72%);">{r['years']}</td>
+        </tr>
+        """
+    
+    return f"""
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+                <h3 style="margin: 0;">{title}</h3>
+                <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin: 0.3rem 0 0 0;">{subtitle}</p>
+            </div>
+            <span class="chip {chip_class}">{chip_text}</span>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Stability</th>
+                    <th>Score</th>
+                    <th>Variance</th>
+                    <th>Years</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows_html}
+            </tbody>
+        </table>
+    </div>
+    """
 
-        st.session_state.pred_result = {"prediction": pred, "probabilities": prob, "classes": cls}
+with col1:
+    st.markdown(stability_table(stableRoutes, "Most Stable Routes", 
+        "Lowest variance, highest predictability", "", "🛡️ Anchors"), unsafe_allow_html=True)
 
-    # ── RESULT ──────────────────────────────────────────────
-    if st.session_state.pred_result is not None:
-        res  = st.session_state.pred_result
-        pred = res["prediction"]; prob = res["probabilities"]; cls = res["classes"]
+with col2:
+    st.markdown(stability_table(volatileRoutes, "Most Volatile Routes", 
+        "High variance — review monthly", "chip-warning", "⚡ Monitor"), unsafe_allow_html=True)
 
-        pill_cls   = {"Expand": "pill-expand", "Maintain": "pill-maintain",
-                      "Optimize": "pill-optimize", "Drop": "pill-drop"}
-        result_cls = {"Expand": "result-expand", "Maintain": "result-maintain",
-                      "Optimize": "result-optimize", "Drop": "result-drop"}
-        text_col   = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-                      "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
-        explanations = {
-            "Expand":   "This route shows strong performance signals — high profit, solid margins, and healthy seat occupancy. Consider allocating more capacity here.",
-            "Maintain": "This route is working well and performing steadily. No urgent changes needed — keep monitoring.",
-            "Optimize": "This route has potential but something is holding it back — efficiency or demand may need attention before investing more.",
-            "Drop":     "This route is losing money. A deeper review is recommended to determine whether it can be restructured or should be discontinued.",
-        }
+# ---- PREDICTION SECTION ----
+st.markdown('<div id="predict" style="scroll-margin-top: 80px;"></div>', unsafe_allow_html=True)
+section_header("05 · Prediction Tool", "Decision intelligence for any city-pair",
+    "Three model surfaces — same inputs, different signal availability — calibrated for planning, ops, and live revenue management.")
 
-        st.markdown(f"""
-        <div class='result-card {result_cls.get(pred, "result-expand")}'>
-          <div style='margin-bottom:10px'>
-            <span class='pill {pill_cls.get(pred, "")}'>{pred}</span>
-          </div>
-          <div style='font-family:"Cinzel",serif;font-size:1.55rem;font-weight:600;
-                      color:{text_col.get(pred, INK)};margin-bottom:10px;letter-spacing:0.04em;
-                      text-transform:uppercase'>
-            Suggested Decision: {pred}
-          </div>
-          <p style='color:{INK_SOFT};margin:0;font-size:0.88rem;line-height:1.75;
-                    font-family:"DM Sans",sans-serif'>
-            {explanations.get(pred, "")}
-          </p>
-        </div>""", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown(
-            f"<p style='font-size:0.75rem;font-weight:700;color:{INK};margin-bottom:7px;font-family:DM Sans,sans-serif'>"
-            "Confidence by decision option</p>", unsafe_allow_html=True)
+# Mode Selector
+mode_cols = st.columns(3)
+modes = [
+    ("with", "With Revenue Variables", "Full-signal model — revenue, fares, ancillaries", "✨"),
+    ("without", "Without Revenue Variables", "Operational signals only — no revenue leakage", "⚙️"),
+    ("preop", "Only Pre-Operational Features", "Pre-launch network planning model", "📋"),
+]
 
-        prob_df = (pd.DataFrame({"Decision": cls, "Probability": prob})
-                   .sort_values("Probability", ascending=False))
-        bar_cp  = {"Expand": CHART_EXPAND, "Maintain": CHART_MAINTAIN,
-                   "Optimize": CHART_OPTIMIZE, "Drop": CHART_DROP}
+selected_mode = "with"  # default
 
-        bar_colors = [bar_cp.get(d, ACCENT) for d in prob_df["Decision"]]
-        probs = prob_df["Probability"].tolist()
-        plotly_vbar_chart(
-            title="Model Confidence per Decision",
-            labels=prob_df["Decision"].tolist(),
-            series=[{
-                "name": "Probability",
-                "values": probs,
-                "color": ACCENT,
-                "colors": bar_colors,
-            }],
-            max_value=1.0,
-            value_format="percent",
-            height=390,
+# We need to handle state for mode selection
+if "prediction_mode" not in st.session_state:
+    st.session_state.prediction_mode = "with"
+
+mode_html = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">'
+for m_id, m_label, m_tagline, m_icon in modes:
+    active = "border: 1px solid hsl(210 85% 70% / 0.6); box-shadow: 0 0 0 2px hsl(210 85% 70% / 0.3);" if st.session_state.prediction_mode == m_id else ""
+    bg = "background: hsl(210 85% 70% / 0.12);" if st.session_state.prediction_mode == m_id else ""
+    icon_bg = "background: hsl(210 85% 70% / 0.2); color: hsl(220 90% 78%);" if st.session_state.prediction_mode == m_id else "background: hsl(232 28% 14% / 0.5); color: hsl(225 15% 72%);"
+    
+    mode_html += f"""
+    <div class="glass-card" style="cursor: pointer; {active}">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 36px; height: 36px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; {icon_bg}">
+                {m_icon}
+            </div>
+            <div>
+                <div style="font-weight: 600; color: hsl(40 30% 96%);">{m_label}</div>
+                <div style="font-size: 0.75rem; color: hsl(225 15% 72%);">{m_tagline}</div>
+            </div>
+        </div>
+    </div>
+    """
+mode_html += '</div>'
+st.markdown(mode_html, unsafe_allow_html=True)
+
+# Use radio buttons hidden but functional for mode selection
+mode_choice = st.radio("Select Model Mode", 
+    options=["with", "without", "preop"], 
+    format_func=lambda x: dict(with="With Revenue Variables", without="Without Revenue Variables", preop="Pre-Operational Only")[x],
+    horizontal=True, label_visibility="collapsed")
+st.session_state.prediction_mode = mode_choice
+
+# Form & Results
+col1, col2 = st.columns([3, 2])
+
+with col1:
+    st.markdown("""
+    <div class="glass-card">
+        <h3 style="margin-top: 0;">Route Inputs</h3>
+        <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Configure the city-pair and operating profile</p>
+    """, unsafe_allow_html=True)
+    
+    c1, c2 = st.columns(2)
+    with c1:
+        origin = st.text_input("Origin (IATA)", value="JFK", max_chars=3)
+    with c2:
+        destination = st.text_input("Destination (IATA)", value="LHR", max_chars=3)
+    
+    c3, c4 = st.columns(2)
+    with c3:
+        aircraft = st.selectbox("Aircraft", 
+            options=["A320", "A321", "B738", "B789", "A359", "B77W"],
+            index=3)
+    with c4:
+        distance = st.number_input("Stage Length (km)", value=5540, min_value=100, max_value=15000)
+    
+    show_ops = mode_choice != "preop"
+    show_revenue = mode_choice == "with"
+    
+    if show_ops:
+        freq = st.slider("Frequency / week", min_value=1, max_value=28, value=14)
+        lf = st.slider("Load Factor", min_value=40, max_value=100, value=84)
+        fuel = st.slider("Fuel Cost Index", min_value=20, max_value=100, value=62)
+        comp = st.slider("Competitive Pressure", min_value=0, max_value=100, value=55)
+        season = st.slider("Seasonality (Δ%)", min_value=-50, max_value=50, value=5)
+    else:
+        freq, lf, fuel, comp, season = 14, 84, 62, 55, 5
+    
+    if show_revenue:
+        fare = st.slider("Avg Fare (USD)", min_value=80, max_value=2000, value=720, step=10)
+        anc = st.slider("Ancillary / Pax", min_value=0, max_value=200, value=48)
+        yield_idx = st.slider("Yield Index", min_value=20, max_value=100, value=71)
+    else:
+        fare, anc, yield_idx = 720, 48, 71
+    
+    st.markdown("""
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+        <div class="font-mono" style="font-size: 0.75rem; color: hsl(225 15% 72%);">
+            Model: <span style="color: hsl(220 90% 78%);">{}</span>
+        </div>
+    </div>
+    """.format(dict(with="With Revenue Variables", without="Without Revenue Variables", preop="Pre-Operational Only")[mode_choice]), unsafe_allow_html=True)
+    
+    predict_btn = st.button("✈️ Run Decision Model", type="primary", use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Prediction Logic
+def predict(mode, form):
+    op_score = (
+        (form["lf"] - 60) * 1.4 +
+        (form["freq"] - 7) * 1.2 -
+        (form["fuel"] - 50) * 1.1 -
+        (form["comp"] - 40) * 0.5 +
+        form["season"] * 0.4 -
+        max(0, form["dist"] - 6000) * 0.002
+    )
+    
+    rev_score = (form["fare"] - 400) * 0.06 + form["anc"] * 0.25 + (form["yield"] - 50) * 0.9
+    
+    score = op_score
+    conf_boost = 0
+    if mode == "with":
+        score += rev_score
+        conf_boost = 0.07
+    if mode == "preop":
+        score = score * 0.6 - 4
+        conf_boost = -0.08
+    
+    logits = {
+        "Expand": score - 22,
+        "Maintain": -abs(score - 6) + 14,
+        "Optimize": -abs(score + 6) + 12,
+        "Drop": -score - 12,
+    }
+    
+    exps = {k: np.exp(v / 8) for k, v in logits.items()}
+    total_exp = sum(exps.values())
+    probs = {k: v / total_exp for k, v in exps.items()}
+    
+    decision = max(probs, key=probs.get)
+    confidence = min(0.99, max(0.45, probs[decision] + conf_boost))
+    
+    return {"decision": decision, "probs": probs, "confidence": confidence}
+
+# Default prediction
+form_state = {
+    "origin": origin, "dest": destination, "aircraft": aircraft,
+    "dist": distance, "freq": freq, "lf": lf, "fuel": fuel,
+    "comp": comp, "season": season, "fare": fare, "anc": anc, "yield": yield_idx
+}
+
+if "prediction_result" not in st.session_state:
+    st.session_state.prediction_result = predict("with", form_state)
+
+if predict_btn:
+    st.session_state.prediction_result = predict(mode_choice, form_state)
+
+result = st.session_state.prediction_result
+
+with col2:
+    color = DECISION_COLORS[result["decision"]]
+    desc = DECISION_DESC[result["decision"]]
+    
+    prob_bars = ""
+    for d, p in sorted(result["probs"].items(), key=lambda x: x[1], reverse=True):
+        prob_bars += progress_bar_html(p * 100, DECISION_COLORS[d], 
+            f'<span class="decision-dot" style="background: {DECISION_COLORS[d]};"></span>{d}',
+            f"{p*100:.1f}%")
+    
+    st.markdown(f"""
+    <div class="glass-card glass-strong" style="height: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <div>
+                <p class="font-mono" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: hsl(225 15% 72%);">Recommended Action</p>
+                <h2 style="margin: 0.25rem 0; font-size: 2.5rem; color: {color};">{desc['title']}</h2>
+                <p style="font-size: 0.9rem; color: hsl(225 15% 72%);">{desc['tagline']}</p>
+            </div>
+            <div style="text-align: right;">
+                <p class="font-mono" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: hsl(225 15% 72%);">Confidence</p>
+                <p class="font-mono" style="font-size: 1.8rem; color: hsl(220 90% 78%); margin: 0;">{result['confidence']*100:.1f}%</p>
+            </div>
+        </div>
+        
+        <div style="background: hsl(232 28% 14% / 0.3); border: 1px solid hsl(215 30% 22% / 0.5); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.6; color: hsl(40 30% 96% / 0.9);">{desc['body']}</p>
+        </div>
+        
+        <p class="font-mono" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: hsl(225 15% 72%); margin-bottom: 0.75rem;">Class Probabilities</p>
+        {prob_bars}
+        
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem; font-size: 0.8rem; color: hsl(225 15% 72%);">
+            <span style="font-size: 1rem;">✈️</span>
+            {origin} → {destination} · {aircraft} · {distance:,} km
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Model Performance
+st.markdown("<br>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("""
+    <div class="glass-card">
+        <h3 style="margin-top: 0;">Model Accuracy & F1</h3>
+        <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Hold-out evaluation across the three model surfaces</p>
+    """, unsafe_allow_html=True)
+    
+    df_metrics = pd.DataFrame(modelMetrics)
+    chart_data = df_metrics.set_index("model")[["accuracy", "f1"]]
+    st.bar_chart(chart_data, use_container_width=True, height=280)
+    
+    st.markdown("""
+        <div style="display: flex; gap: 1rem; font-size: 0.8rem; margin-top: 0.5rem;">
+            <span style="display: flex; align-items: center; gap: 0.4rem;">
+                <span class="decision-dot" style="background: hsl(210 85% 70%);"></span> Accuracy
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.4rem;">
+                <span class="decision-dot" style="background: hsl(280 55% 70%);"></span> F1
+            </span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div class="glass-card">
+        <h3 style="margin-top: 0;">Prediction Confidence by Decision</h3>
+        <p style="font-size: 0.85rem; color: hsl(225 15% 72%); margin-bottom: 1rem;">Mean predicted probability of the chosen class</p>
+    """, unsafe_allow_html=True)
+    
+    conf_html = ""
+    for c in confidenceByDecision:
+        conf_html += progress_bar_html(
+            c["confidence"] * 100, DECISION_COLORS[c["decision"]],
+            f'<span class="decision-dot" style="background: {DECISION_COLORS[c["decision"]]};"></span>{c["decision"]}',
+            f"{c['confidence']*100:.1f}%"
         )
+    st.markdown(f"{conf_html}</div>", unsafe_allow_html=True)
 
-        st.dataframe(
-            prob_df.assign(Probability=prob_df["Probability"].map("{:.1%}".format)).reset_index(drop=True),
-            use_container_width=True, hide_index=True)
-
-
-# ─────────────────────────────────────────────────────────────
-#  FOOTER
-# ─────────────────────────────────────────────────────────────
-st.markdown(f"""
-<div style='text-align:center;padding:40px 0 18px'>
-  <div style='display:inline-flex;align-items:center;gap:12px;
-              background:rgba(18,18,22,0.82);
-              border:1px solid rgba(255,255,255,0.10);
-              border-radius:999px;
-              padding:0.55rem 1.4rem;
-              backdrop-filter:blur(14px);
-              box-shadow:0 20px 60px rgba(0,0,0,0.35);
-              font-family:"DM Sans",sans-serif;
-              font-size:0.67rem;
-              font-weight:600;
-              color:{INK_MUTED};
-              letter-spacing:0.12em;
-              text-transform:uppercase'>
-    <span style='color:{ACCENT};font-size:0.78rem'>✦</span>
-    Airline Profitability System
-    <span style='color:{ACCENT};font-size:0.78rem'>✦</span>
-    Built with Streamlit
-  </div>
+# ---- FOOTER ----
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("""
+<div style="border-top: 1px solid hsl(215 30% 22% / 0.5); padding: 2rem 0; margin-top: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 32px; height: 32px; border-radius: 0.5rem; background: linear-gradient(135deg, hsl(198 95% 58%), hsl(280 55% 70%)); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 1rem;">✈️</span>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: hsl(40 30% 96%);">SkyLens</div>
+                <div class="font-mono" style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: hsl(225 15% 72%);">Route Intelligence Platform</div>
+            </div>
+        </div>
+        <p style="font-size: 0.75rem; color: hsl(225 15% 72%);">© 2026 SkyLens Analytics · Built for revenue management & network planning leaders</p>
+    </div>
 </div>
 """, unsafe_allow_html=True)
